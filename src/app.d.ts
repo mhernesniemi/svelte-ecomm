@@ -12,6 +12,8 @@ declare global {
 				getToken: () => Promise<string | null>;
 			};
 			customer: Customer | null;
+			cartToken: string | null;
+			newCartToken?: string; // Set when creating a new guest cart
 		}
 		// interface PageData {}
 		// interface PageState {}

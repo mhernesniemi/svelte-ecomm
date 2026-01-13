@@ -1,18 +1,31 @@
 <script lang="ts">
-	import type { PageData } from './$types';
+	import { enhance } from '$app/forms';
+	import type { PageData, ActionData } from './$types';
 
-	let { data }: { data: PageData } = $props();
+	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	const product = $derived(data.product);
 	const enTrans = $derived(product.translations.find((t) => t.languageCode === 'en'));
 
 	let selectedVariantId = $state<number | null>(null);
 	let quantity = $state(1);
+	let isAddingToCart = $state(false);
+	let showSuccess = $state(false);
 
 	// Initialize selected variant when product loads
 	$effect(() => {
 		if (product.variants[0] && selectedVariantId === null) {
 			selectedVariantId = product.variants[0].id;
+		}
+	});
+
+	// Show success message when item is added
+	$effect(() => {
+		if (form?.success) {
+			showSuccess = true;
+			setTimeout(() => {
+				showSuccess = false;
+			}, 3000);
 		}
 	});
 
@@ -23,14 +36,6 @@
 	function getVariantName(variant: (typeof product.variants)[0]): string {
 		const trans = variant.translations.find((t) => t.languageCode === 'en');
 		return trans?.name ?? variant.sku;
-	}
-
-	async function addToCart() {
-		if (!selectedVariantId) return;
-
-		// For now, just show an alert - in a full implementation, this would
-		// add to a cart stored in cookies/session or call a server action
-		alert(`Added ${quantity} x ${selectedVariant?.sku} to cart`);
 	}
 </script>
 
@@ -108,35 +113,72 @@
 				</div>
 			{/if}
 
+			<!-- Success/Error Messages -->
+			{#if showSuccess}
+				<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+					Added to cart!
+					<a href="/cart" class="underline ml-2">View cart</a>
+				</div>
+			{/if}
+
+			{#if form?.error}
+				<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+					{form.error}
+				</div>
+			{/if}
+
 			<!-- Quantity & Add to Cart -->
 			{#if selectedVariant && selectedVariant.stock > 0}
-				<div class="flex items-center gap-4 mb-6">
+				<form
+					method="POST"
+					action="?/addToCart"
+					use:enhance={() => {
+						isAddingToCart = true;
+						return async ({ update }) => {
+							await update();
+							isAddingToCart = false;
+						};
+					}}
+					class="flex items-center gap-4 mb-6"
+				>
+					<input type="hidden" name="variantId" value={selectedVariantId} />
+
 					<div class="flex items-center border rounded-lg">
 						<button
 							type="button"
 							onclick={() => quantity > 1 && (quantity -= 1)}
 							class="px-3 py-2 hover:bg-gray-50"
+							aria-label="Decrease quantity"
 						>
 							-
 						</button>
-						<span class="px-4 py-2 border-x">{quantity}</span>
+						<input
+							type="number"
+							name="quantity"
+							bind:value={quantity}
+							min="1"
+							max={selectedVariant.stock}
+							class="w-12 text-center py-2 border-x"
+							aria-label="Quantity"
+						/>
 						<button
 							type="button"
 							onclick={() => quantity < selectedVariant.stock && (quantity += 1)}
 							class="px-3 py-2 hover:bg-gray-50"
+							aria-label="Increase quantity"
 						>
 							+
 						</button>
 					</div>
 
 					<button
-						type="button"
-						onclick={addToCart}
-						class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+						type="submit"
+						disabled={isAddingToCart}
+						class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 					>
-						Add to Cart
+						{isAddingToCart ? 'Adding...' : 'Add to Cart'}
 					</button>
-				</div>
+				</form>
 			{/if}
 
 			<!-- Facet Values / Tags -->

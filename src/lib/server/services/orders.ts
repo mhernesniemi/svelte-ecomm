@@ -1,8 +1,14 @@
 /**
  * Order Service
  * Handles order lifecycle, line items, and state transitions
+ *
+ * Cart Pattern (following Vendure):
+ * - Orders with `active=true` are carts (can be modified)
+ * - Orders with `active=false` are completed orders
+ * - Guest users get a `cartToken` stored in cookies
+ * - Logged-in users have carts linked to `customerId`
  */
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, desc, sql, isNull } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import {
 	orders,
@@ -23,6 +29,11 @@ import type {
 } from '$lib/commerce/types.js';
 import { nanoid } from 'nanoid';
 
+// Generate a secure cart token for guest users
+function generateCartToken(): string {
+	return nanoid(32);
+}
+
 // Valid state transitions
 const STATE_TRANSITIONS: Record<OrderState, OrderState[]> = {
 	created: ['payment_pending', 'cancelled'],
@@ -35,9 +46,9 @@ const STATE_TRANSITIONS: Record<OrderState, OrderState[]> = {
 
 export class OrderService {
 	/**
-	 * Create a new order
+	 * Create a new order/cart
 	 */
-	async create(input: CreateOrderInput = {}): Promise<Order> {
+	async create(input: CreateOrderInput & { cartToken?: string } = {}): Promise<Order> {
 		const code = this.generateOrderCode();
 
 		const [order] = await db
@@ -45,6 +56,8 @@ export class OrderService {
 			.values({
 				code,
 				customerId: input.customerId ?? null,
+				cartToken: input.cartToken ?? null,
+				active: true,
 				state: 'created',
 				currencyCode: input.currencyCode ?? 'EUR',
 				subtotal: 0,
@@ -55,6 +68,135 @@ export class OrderService {
 			.returning();
 
 		return order;
+	}
+
+	/**
+	 * Get or create an active cart for a customer or guest
+	 * Returns { order, cartToken } - cartToken is set for new guest carts
+	 */
+	async getOrCreateActiveCart(options: {
+		customerId?: number | null;
+		cartToken?: string | null;
+	}): Promise<{ order: OrderWithRelations; cartToken: string | null; isNew: boolean }> {
+		const { customerId, cartToken } = options;
+
+		// Try to find existing active cart
+		let order: Order | undefined;
+
+		if (customerId) {
+			// Logged-in user: find by customerId
+			[order] = await db
+				.select()
+				.from(orders)
+				.where(and(eq(orders.customerId, customerId), eq(orders.active, true)));
+		} else if (cartToken) {
+			// Guest user: find by cartToken
+			[order] = await db
+				.select()
+				.from(orders)
+				.where(and(eq(orders.cartToken, cartToken), eq(orders.active, true)));
+		}
+
+		if (order) {
+			return {
+				order: await this.loadOrderRelations(order),
+				cartToken: order.cartToken,
+				isNew: false
+			};
+		}
+
+		// Create new cart
+		const newCartToken = customerId ? null : generateCartToken();
+		const newOrder = await this.create({
+			customerId: customerId ?? undefined,
+			cartToken: newCartToken ?? undefined
+		});
+
+		return {
+			order: await this.loadOrderRelations(newOrder),
+			cartToken: newCartToken,
+			isNew: true
+		};
+	}
+
+	/**
+	 * Get active cart without creating one
+	 */
+	async getActiveCart(options: {
+		customerId?: number | null;
+		cartToken?: string | null;
+	}): Promise<OrderWithRelations | null> {
+		const { customerId, cartToken } = options;
+
+		let order: Order | undefined;
+
+		if (customerId) {
+			[order] = await db
+				.select()
+				.from(orders)
+				.where(and(eq(orders.customerId, customerId), eq(orders.active, true)));
+		} else if (cartToken) {
+			[order] = await db
+				.select()
+				.from(orders)
+				.where(and(eq(orders.cartToken, cartToken), eq(orders.active, true)));
+		}
+
+		if (!order) return null;
+		return this.loadOrderRelations(order);
+	}
+
+	/**
+	 * Transfer guest cart to customer (on login)
+	 * Merges items if customer already has an active cart
+	 */
+	async transferCartToCustomer(cartToken: string, customerId: number): Promise<Order | null> {
+		// Get guest cart
+		const [guestCart] = await db
+			.select()
+			.from(orders)
+			.where(and(eq(orders.cartToken, cartToken), eq(orders.active, true)));
+
+		if (!guestCart) return null;
+
+		// Check if customer already has an active cart
+		const [existingCart] = await db
+			.select()
+			.from(orders)
+			.where(and(eq(orders.customerId, customerId), eq(orders.active, true)));
+
+		if (existingCart) {
+			// Merge guest cart items into existing cart
+			const guestLines = await db
+				.select()
+				.from(orderLines)
+				.where(eq(orderLines.orderId, guestCart.id));
+
+			for (const line of guestLines) {
+				await this.addLine(existingCart.id, {
+					variantId: line.variantId,
+					quantity: line.quantity
+				});
+			}
+
+			// Delete the guest cart
+			await db.delete(orders).where(eq(orders.id, guestCart.id));
+
+			return existingCart;
+		} else {
+			// Transfer ownership of guest cart to customer
+			const [updated] = await db
+				.update(orders)
+				.set({
+					customerId,
+					cartToken: null, // Clear guest token
+					updatedAt: new Date()
+				})
+				.where(eq(orders.id, guestCart.id))
+				.returning();
+
+			return updated;
+		}
 	}
 
 	/**
@@ -80,13 +222,23 @@ export class OrderService {
 	}
 
 	/**
-	 * List orders for a customer
+	 * List orders for a customer (excludes active carts by default)
 	 */
-	async listForCustomer(customerId: number, limit = 20, offset = 0): Promise<OrderWithRelations[]> {
+	async listForCustomer(
+		customerId: number,
+		options: { includeActive?: boolean; limit?: number; offset?: number } = {}
+	): Promise<OrderWithRelations[]> {
+		const { includeActive = false, limit = 20, offset = 0 } = options;
+
+		const conditions = [eq(orders.customerId, customerId)];
+		if (!includeActive) {
+			conditions.push(eq(orders.active, false));
+		}
+
 		const orderList = await db
 			.select()
 			.from(orders)
-			.where(eq(orders.customerId, customerId))
+			.where(and(...conditions))
 			.orderBy(desc(orders.createdAt))
 			.limit(limit)
 			.offset(offset);
@@ -112,12 +264,12 @@ export class OrderService {
 	}
 
 	/**
-	 * Add a line item to the order
+	 * Add a line item to the order (cart must be active)
 	 */
 	async addLine(orderId: number, input: AddOrderLineInput): Promise<OrderLine> {
 		const order = await this.getById(orderId);
 		if (!order) throw new Error('Order not found');
-		if (order.state !== 'created') throw new Error('Cannot modify order after checkout');
+		if (!order.active) throw new Error('Cannot modify completed order');
 
 		// Get variant with current price
 		const [variant] = await db
@@ -185,7 +337,7 @@ export class OrderService {
 	async updateLineQuantity(orderId: number, lineId: number, quantity: number): Promise<OrderLine> {
 		const order = await this.getById(orderId);
 		if (!order) throw new Error('Order not found');
-		if (order.state !== 'created') throw new Error('Cannot modify order after checkout');
+		if (!order.active) throw new Error('Cannot modify completed order');
 
 		if (quantity <= 0) {
 			await this.removeLine(orderId, lineId);
@@ -215,7 +367,7 @@ export class OrderService {
 	async removeLine(orderId: number, lineId: number): Promise<void> {
 		const order = await this.getById(orderId);
 		if (!order) throw new Error('Order not found');
-		if (order.state !== 'created') throw new Error('Cannot modify order after checkout');
+		if (!order.active) throw new Error('Cannot modify completed order');
 
 		await db.delete(orderLines).where(eq(orderLines.id, lineId));
 		await this.recalculateTotals(orderId);
@@ -227,7 +379,7 @@ export class OrderService {
 	async applyPromotion(orderId: number, code: string): Promise<{ success: boolean; message: string }> {
 		const order = await this.getById(orderId);
 		if (!order) return { success: false, message: 'Order not found' };
-		if (order.state !== 'created') return { success: false, message: 'Cannot modify order after checkout' };
+		if (!order.active) return { success: false, message: 'Cannot modify completed order' };
 
 		// Find promotion
 		const [promotion] = await db
@@ -309,9 +461,12 @@ export class OrderService {
 			updatedAt: new Date()
 		};
 
-		// Set order placed timestamp when transitioning to payment_pending
-		if (newState === 'payment_pending' && !order.orderPlacedAt) {
-			updateData.orderPlacedAt = new Date();
+		// When transitioning to payment_pending, mark cart as no longer active (becomes an order)
+		if (newState === 'payment_pending') {
+			updateData.active = false;
+			if (!order.orderPlacedAt) {
+				updateData.orderPlacedAt = new Date();
+			}
 		}
 
 		const [updated] = await db.update(orders).set(updateData).where(eq(orders.id, orderId)).returning();

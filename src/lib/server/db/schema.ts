@@ -300,6 +300,8 @@ export const orders = pgTable(
 		id: serial('id').primaryKey(),
 		code: varchar('code', { length: 50 }).notNull().unique(), // Customer-facing order reference
 		customerId: integer('customer_id').references(() => customers.id, { onDelete: 'set null' }),
+		cartToken: varchar('cart_token', { length: 64 }).unique(), // For guest cart tracking via cookies
+		active: boolean('active').default(true).notNull(), // true = cart, false = completed order
 		state: varchar('state', { length: 50 }).notNull().default('created'),
 		// Pricing (all in cents)
 		subtotal: integer('subtotal').default(0).notNull(),
@@ -322,7 +324,9 @@ export const orders = pgTable(
 	(table) => [
 		index('orders_customer_idx').on(table.customerId),
 		index('orders_state_idx').on(table.state),
-		index('orders_placed_at_idx').on(table.orderPlacedAt)
+		index('orders_placed_at_idx').on(table.orderPlacedAt),
+		index('orders_active_idx').on(table.active),
+		index('orders_cart_token_idx').on(table.cartToken)
 	]
 );
 
