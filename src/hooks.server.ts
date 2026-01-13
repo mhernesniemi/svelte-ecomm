@@ -8,14 +8,15 @@ import type { Handle } from '@sveltejs/kit';
 import { db } from '$lib/server/db/index.js';
 import { customers } from '$lib/server/db/schema.js';
 import { eq } from 'drizzle-orm';
+import { CLERK_SECRET_KEY } from '$env/static/private';
 
 // Clerk authentication handler
 const clerkHandler = withClerkHandler();
 
 // Customer sync handler - links Clerk users to local customer records
 const customerSync: Handle = async ({ event, resolve }) => {
-	// Get auth from Clerk (set by clerkHandler)
-	const auth = event.locals.auth;
+	// Get auth from Clerk (set by clerkHandler) - auth is a function!
+	const auth = event.locals.auth?.();
 	const userId = auth?.userId;
 
 	if (userId) {
@@ -25,28 +26,23 @@ const customerSync: Handle = async ({ event, resolve }) => {
 		});
 
 		if (!customer) {
-			// First login - create customer record
-			// Get user info from Clerk
+			// First login - create customer record from Clerk user data
 			try {
 				const response = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
 					headers: {
-						Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`
+						Authorization: `Bearer ${CLERK_SECRET_KEY}`
 					}
 				});
 
 				if (response.ok) {
 					const clerkUser = await response.json();
-					const email = clerkUser.email_addresses?.[0]?.email_address ?? '';
-					const firstName = clerkUser.first_name ?? '';
-					const lastName = clerkUser.last_name ?? '';
-
 					[customer] = await db
 						.insert(customers)
 						.values({
 							clerkUserId: userId,
-							email,
-							firstName,
-							lastName
+							email: clerkUser.email_addresses?.[0]?.email_address ?? '',
+							firstName: clerkUser.first_name ?? '',
+							lastName: clerkUser.last_name ?? ''
 						})
 						.returning();
 				}

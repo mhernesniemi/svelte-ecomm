@@ -6,7 +6,7 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			auth: {
+			auth: () => {
 				userId: string | null;
 				sessionId: string | null;
 				getToken: () => Promise<string | null>;

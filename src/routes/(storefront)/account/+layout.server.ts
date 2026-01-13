@@ -6,7 +6,8 @@ import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-	if (!locals.auth?.userId) {
+	const { userId } = locals.auth();
+	if (!userId) {
 		throw redirect(303, '/sign-in?redirect=/account');
 	}
 
