@@ -1,6 +1,6 @@
 import { productService } from '$lib/server/services/products.js';
 import { facetService } from '$lib/server/services/facets.js';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, redirect, isRedirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
@@ -56,7 +56,7 @@ export const actions: Actions = {
 
 			throw redirect(303, `/admin/products/${product.id}`);
 		} catch (error) {
-			if (error instanceof Response) throw error;
+			if (isRedirect(error)) throw error;
 			return fail(500, {
 				error: 'Failed to create product',
 				values: { nameEn, nameFi, slugEn, slugFi, descriptionEn, descriptionFi, enabled }
