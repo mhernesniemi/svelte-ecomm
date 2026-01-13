@@ -1,8 +1,30 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
+	import { Debounced } from 'runed';
+	import { formatPrice } from '$lib/utils/money';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	// Debounced search input
+	let searchInput = $state(data.search ?? '');
+	const debouncedSearch = new Debounced(() => searchInput, 300);
+
+	// Navigate when debounced search value changes
+	$effect(() => {
+		const searchValue = debouncedSearch.current;
+		if (searchValue !== undefined && searchValue !== data.search) {
+			const params = new URLSearchParams($page.url.searchParams);
+			if (searchValue) {
+				params.set('q', searchValue);
+			} else {
+				params.delete('q');
+			}
+			params.delete('page'); // Reset to page 1
+			goto(`?${params.toString()}`, { replaceState: true, keepFocus: true });
+		}
+	});
 
 	function getProductName(product: (typeof data.products)[0]): string {
 		return product.translations.find((t) => t.languageCode === 'en')?.name ?? 'Untitled';
@@ -31,15 +53,12 @@
 		if (add) {
 			params.append(`facet_${facetCode}`, valueCode);
 		} else {
-			// Remove this specific value
 			const values = params.getAll(`facet_${facetCode}`).filter((v) => v !== valueCode);
 			params.delete(`facet_${facetCode}`);
 			values.forEach((v) => params.append(`facet_${facetCode}`, v));
 		}
 
-		// Reset to page 1 when changing filters
 		params.delete('page');
-
 		const paramString = params.toString();
 		return paramString ? `?${paramString}` : '/products';
 	}
@@ -62,16 +81,15 @@
 	<div class="flex gap-8">
 		<!-- Sidebar Filters -->
 		<aside class="w-64 flex-shrink-0">
-			<!-- Search -->
-			<form method="GET" class="mb-6">
+			<!-- Debounced Search -->
+			<div class="mb-6">
 				<input
 					type="text"
-					name="q"
-					value={data.search ?? ''}
+					bind:value={searchInput}
 					placeholder="Search products..."
 					class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
 				/>
-			</form>
+			</div>
 
 			{#if hasActiveFilters}
 				<div class="mb-6">
@@ -167,7 +185,7 @@
 								</h3>
 								{#if getLowestPrice(product) !== null}
 									<p class="text-gray-600 mt-1">
-										From {(getLowestPrice(product)! / 100).toFixed(2)} EUR
+										From {formatPrice(getLowestPrice(product)!)}
 									</p>
 								{/if}
 							</div>

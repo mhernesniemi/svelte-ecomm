@@ -1,13 +1,78 @@
 <script lang="ts">
-	import type { ActionData, PageData } from './$types';
+	import { createFacet, createFacetValue, deleteFacet, listFacets } from '$lib/remote/facets.remote';
+	import type { PageData } from './$types';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
 
+	let facets = $state(data.facets);
 	let showCreateFacet = $state(false);
 	let addingValueToFacet = $state<number | null>(null);
+	let isLoading = $state(false);
+	let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
+
+	// Form state
+	let newFacetCode = $state('');
+	let newFacetName = $state('');
+	let newValueCode = $state('');
+	let newValueName = $state('');
 
 	function getTranslation(translations: { languageCode: string; name: string }[]): string {
 		return translations.find((t) => t.languageCode === 'en')?.name ?? '';
+	}
+
+	async function handleCreateFacet() {
+		if (!newFacetCode || !newFacetName) return;
+		isLoading = true;
+		message = null;
+		try {
+			await createFacet({
+				code: newFacetCode,
+				translations: [{ languageCode: 'en', name: newFacetName }]
+			});
+			facets = await listFacets({});
+			showCreateFacet = false;
+			newFacetCode = '';
+			newFacetName = '';
+			message = { type: 'success', text: 'Facet created successfully' };
+		} catch {
+			message = { type: 'error', text: 'Failed to create facet' };
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	async function handleCreateValue(facetId: number) {
+		if (!newValueCode || !newValueName) return;
+		isLoading = true;
+		message = null;
+		try {
+			await createFacetValue({
+				facetId,
+				code: newValueCode,
+				translations: [{ languageCode: 'en', name: newValueName }]
+			});
+			facets = await listFacets({});
+			addingValueToFacet = null;
+			newValueCode = '';
+			newValueName = '';
+		} catch {
+			message = { type: 'error', text: 'Failed to create value' };
+		} finally {
+			isLoading = false;
+		}
+	}
+
+	async function handleDelete(id: number) {
+		isLoading = true;
+		message = null;
+		try {
+			await deleteFacet({ id });
+			facets = await listFacets({});
+		} catch {
+			message = { type: 'error', text: 'Failed to delete facet' };
+		} finally {
+			isLoading = false;
+		}
 	}
 </script>
 
@@ -23,21 +88,19 @@
 		</button>
 	</div>
 
-	{#if form?.success}
-		<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6">
-			Facet created successfully
-		</div>
-	{/if}
-
-	{#if form?.error}
-		<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-			{form.error}
+	{#if message}
+		<div
+			class="px-4 py-3 rounded mb-6 {message.type === 'success'
+				? 'bg-green-50 border border-green-200 text-green-700'
+				: 'bg-red-50 border border-red-200 text-red-700'}"
+		>
+			{message.text}
 		</div>
 	{/if}
 
 	<!-- Create Facet Form -->
 	{#if showCreateFacet}
-		<form method="POST" action="?/create" class="bg-white rounded-lg shadow p-6 mb-6">
+		<div class="bg-white rounded-lg shadow p-6 mb-6">
 			<h2 class="font-semibold mb-4">Create New Facet</h2>
 			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 				<div>
@@ -45,20 +108,20 @@
 					<input
 						type="text"
 						id="facet_code"
-						name="code"
+						bind:value={newFacetCode}
 						placeholder="e.g., color"
-						required
 						class="w-full px-3 py-2 border border-gray-300 rounded-lg"
 					/>
 				</div>
 				<div>
-					<label for="facet_name_en" class="block text-sm font-medium text-gray-700 mb-1">Name (EN)</label>
+					<label for="facet_name_en" class="block text-sm font-medium text-gray-700 mb-1"
+						>Name (EN)</label
+					>
 					<input
 						type="text"
 						id="facet_name_en"
-						name="name_en"
+						bind:value={newFacetName}
 						placeholder="e.g., Color"
-						required
 						class="w-full px-3 py-2 border border-gray-300 rounded-lg"
 					/>
 				</div>
@@ -71,21 +134,26 @@
 				>
 					Cancel
 				</button>
-				<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
-					Create Facet
+				<button
+					type="button"
+					onclick={handleCreateFacet}
+					disabled={isLoading || !newFacetCode || !newFacetName}
+					class="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
+				>
+					{isLoading ? 'Creating...' : 'Create Facet'}
 				</button>
 			</div>
-		</form>
+		</div>
 	{/if}
 
 	<!-- Facets List -->
 	<div class="space-y-6">
-		{#if data.facets.length === 0}
+		{#if facets.length === 0}
 			<div class="bg-white rounded-lg shadow p-12 text-center text-gray-500">
 				No facets yet. Create your first facet to start categorizing products.
 			</div>
 		{:else}
-			{#each data.facets as facet}
+			{#each facets as facet}
 				<div class="bg-white rounded-lg shadow">
 					<div class="px-6 py-4 border-b flex justify-between items-center">
 						<div>
@@ -101,50 +169,57 @@
 							>
 								Add Value
 							</button>
-							<form method="POST" action="?/delete" class="inline">
-								<input type="hidden" name="id" value={facet.id} />
-								<button type="submit" class="px-3 py-1 text-sm text-red-600 hover:text-red-800">
-									Delete
-								</button>
-							</form>
+							<button
+								type="button"
+								onclick={() => handleDelete(facet.id)}
+								disabled={isLoading}
+								class="px-3 py-1 text-sm text-red-600 hover:text-red-800 disabled:opacity-50"
+							>
+								Delete
+							</button>
 						</div>
 					</div>
 
 					<!-- Add Value Form -->
 					{#if addingValueToFacet === facet.id}
-						<form method="POST" action="?/createValue" class="px-6 py-4 bg-gray-50 border-b">
-							<input type="hidden" name="facetId" value={facet.id} />
+						<div class="px-6 py-4 bg-gray-50 border-b">
 							<div class="flex gap-4 items-end">
 								<div class="flex-1">
-									<label for="value_code_{facet.id}" class="block text-sm font-medium text-gray-700 mb-1">Code</label>
+									<label
+										for="value_code_{facet.id}"
+										class="block text-sm font-medium text-gray-700 mb-1">Code</label
+									>
 									<input
 										type="text"
 										id="value_code_{facet.id}"
-										name="code"
+										bind:value={newValueCode}
 										placeholder="e.g., red"
-										required
 										class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
 									/>
 								</div>
 								<div class="flex-1">
-									<label for="value_name_{facet.id}" class="block text-sm font-medium text-gray-700 mb-1">Name (EN)</label>
+									<label
+										for="value_name_{facet.id}"
+										class="block text-sm font-medium text-gray-700 mb-1">Name (EN)</label
+									>
 									<input
 										type="text"
 										id="value_name_{facet.id}"
-										name="name_en"
+										bind:value={newValueName}
 										placeholder="e.g., Red"
-										required
 										class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
 									/>
 								</div>
 								<button
-									type="submit"
-									class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+									type="button"
+									onclick={() => handleCreateValue(facet.id)}
+									disabled={isLoading || !newValueCode || !newValueName}
+									class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm disabled:opacity-50"
 								>
 									Add
 								</button>
 							</div>
-						</form>
+						</div>
 					{/if}
 
 					<!-- Values -->
