@@ -1,0 +1,427 @@
+/**
+ * Order Service
+ * Handles order lifecycle, line items, and state transitions
+ */
+import { eq, and, desc, sql } from 'drizzle-orm';
+import { db } from '../db/index.js';
+import {
+	orders,
+	orderLines,
+	orderPromotions,
+	productVariants,
+	productTranslations,
+	productVariantTranslations,
+	promotions
+} from '../db/schema.js';
+import type {
+	Order,
+	OrderWithRelations,
+	OrderLine,
+	CreateOrderInput,
+	AddOrderLineInput,
+	OrderState
+} from '$lib/commerce/types.js';
+import { nanoid } from 'nanoid';
+
+// Valid state transitions
+const STATE_TRANSITIONS: Record<OrderState, OrderState[]> = {
+	created: ['payment_pending', 'cancelled'],
+	payment_pending: ['paid', 'cancelled'],
+	paid: ['shipped', 'cancelled'],
+	shipped: ['delivered'],
+	delivered: [],
+	cancelled: []
+};
+
+export class OrderService {
+	/**
+	 * Create a new order
+	 */
+	async create(input: CreateOrderInput = {}): Promise<Order> {
+		const code = this.generateOrderCode();
+
+		const [order] = await db
+			.insert(orders)
+			.values({
+				code,
+				customerId: input.customerId ?? null,
+				state: 'created',
+				currencyCode: input.currencyCode ?? 'EUR',
+				subtotal: 0,
+				shipping: 0,
+				discount: 0,
+				total: 0
+			})
+			.returning();
+
+		return order;
+	}
+
+	/**
+	 * Get order by ID with all relations
+	 */
+	async getById(id: number): Promise<OrderWithRelations | null> {
+		const [order] = await db.select().from(orders).where(eq(orders.id, id));
+
+		if (!order) return null;
+
+		return this.loadOrderRelations(order);
+	}
+
+	/**
+	 * Get order by code
+	 */
+	async getByCode(code: string): Promise<OrderWithRelations | null> {
+		const [order] = await db.select().from(orders).where(eq(orders.code, code));
+
+		if (!order) return null;
+
+		return this.loadOrderRelations(order);
+	}
+
+	/**
+	 * List orders for a customer
+	 */
+	async listForCustomer(customerId: number, limit = 20, offset = 0): Promise<OrderWithRelations[]> {
+		const orderList = await db
+			.select()
+			.from(orders)
+			.where(eq(orders.customerId, customerId))
+			.orderBy(desc(orders.createdAt))
+			.limit(limit)
+			.offset(offset);
+
+		return Promise.all(orderList.map((o) => this.loadOrderRelations(o)));
+	}
+
+	/**
+	 * List all orders with optional state filter
+	 */
+	async list(state?: OrderState, limit = 20, offset = 0): Promise<OrderWithRelations[]> {
+		const conditions = state ? [eq(orders.state, state)] : [];
+
+		const orderList = await db
+			.select()
+			.from(orders)
+			.where(and(...conditions))
+			.orderBy(desc(orders.createdAt))
+			.limit(limit)
+			.offset(offset);
+
+		return Promise.all(orderList.map((o) => this.loadOrderRelations(o)));
+	}
+
+	/**
+	 * Add a line item to the order
+	 */
+	async addLine(orderId: number, input: AddOrderLineInput): Promise<OrderLine> {
+		const order = await this.getById(orderId);
+		if (!order) throw new Error('Order not found');
+		if (order.state !== 'created') throw new Error('Cannot modify order after checkout');
+
+		// Get variant with current price
+		const [variant] = await db
+			.select()
+			.from(productVariants)
+			.where(eq(productVariants.id, input.variantId));
+
+		if (!variant) throw new Error('Variant not found');
+
+		// Get product name for snapshot
+		const [productTrans] = await db
+			.select()
+			.from(productTranslations)
+			.where(eq(productTranslations.productId, variant.productId))
+			.limit(1);
+
+		// Get variant name
+		const [variantTrans] = await db
+			.select()
+			.from(productVariantTranslations)
+			.where(eq(productVariantTranslations.variantId, variant.id))
+			.limit(1);
+
+		// Check if line already exists for this variant
+		const existingLine = order.lines.find((l) => l.variantId === input.variantId);
+
+		if (existingLine) {
+			// Update quantity
+			const newQuantity = existingLine.quantity + input.quantity;
+			const [updated] = await db
+				.update(orderLines)
+				.set({
+					quantity: newQuantity,
+					lineTotal: variant.price * newQuantity
+				})
+				.where(eq(orderLines.id, existingLine.id))
+				.returning();
+
+			await this.recalculateTotals(orderId);
+			return updated;
+		}
+
+		// Create new line
+		const [line] = await db
+			.insert(orderLines)
+			.values({
+				orderId,
+				variantId: input.variantId,
+				quantity: input.quantity,
+				unitPrice: variant.price,
+				lineTotal: variant.price * input.quantity,
+				productName: productTrans?.name ?? 'Unknown Product',
+				variantName: variantTrans?.name ?? null,
+				sku: variant.sku
+			})
+			.returning();
+
+		await this.recalculateTotals(orderId);
+		return line;
+	}
+
+	/**
+	 * Update line quantity
+	 */
+	async updateLineQuantity(orderId: number, lineId: number, quantity: number): Promise<OrderLine> {
+		const order = await this.getById(orderId);
+		if (!order) throw new Error('Order not found');
+		if (order.state !== 'created') throw new Error('Cannot modify order after checkout');
+
+		if (quantity <= 0) {
+			await this.removeLine(orderId, lineId);
+			throw new Error('Line removed due to zero quantity');
+		}
+
+		const [line] = await db.select().from(orderLines).where(eq(orderLines.id, lineId));
+
+		if (!line) throw new Error('Line not found');
+
+		const [updated] = await db
+			.update(orderLines)
+			.set({
+				quantity,
+				lineTotal: line.unitPrice * quantity
+			})
+			.where(eq(orderLines.id, lineId))
+			.returning();
+
+		await this.recalculateTotals(orderId);
+		return updated;
+	}
+
+	/**
+	 * Remove a line item
+	 */
+	async removeLine(orderId: number, lineId: number): Promise<void> {
+		const order = await this.getById(orderId);
+		if (!order) throw new Error('Order not found');
+		if (order.state !== 'created') throw new Error('Cannot modify order after checkout');
+
+		await db.delete(orderLines).where(eq(orderLines.id, lineId));
+		await this.recalculateTotals(orderId);
+	}
+
+	/**
+	 * Apply a promotion code
+	 */
+	async applyPromotion(orderId: number, code: string): Promise<{ success: boolean; message: string }> {
+		const order = await this.getById(orderId);
+		if (!order) return { success: false, message: 'Order not found' };
+		if (order.state !== 'created') return { success: false, message: 'Cannot modify order after checkout' };
+
+		// Find promotion
+		const [promotion] = await db
+			.select()
+			.from(promotions)
+			.where(and(eq(promotions.code, code), eq(promotions.enabled, true)));
+
+		if (!promotion) return { success: false, message: 'Invalid promotion code' };
+
+		// Check usage limit
+		if (promotion.usageLimit && promotion.usageCount >= promotion.usageLimit) {
+			return { success: false, message: 'Promotion code has reached its usage limit' };
+		}
+
+		// Check dates
+		const now = new Date();
+		if (promotion.startsAt && promotion.startsAt > now) {
+			return { success: false, message: 'Promotion is not yet active' };
+		}
+		if (promotion.endsAt && promotion.endsAt < now) {
+			return { success: false, message: 'Promotion has expired' };
+		}
+
+		// Check minimum order amount
+		if (promotion.minOrderAmount && order.subtotal < promotion.minOrderAmount) {
+			return {
+				success: false,
+				message: `Minimum order amount of ${promotion.minOrderAmount / 100} not met`
+			};
+		}
+
+		// Calculate discount
+		let discountAmount = 0;
+		if (promotion.discountType === 'percentage') {
+			discountAmount = Math.round(order.subtotal * (promotion.discountValue / 100));
+		} else {
+			discountAmount = Math.min(promotion.discountValue, order.subtotal);
+		}
+
+		// Apply promotion
+		await db.insert(orderPromotions).values({
+			orderId,
+			promotionId: promotion.id,
+			discountAmount
+		}).onConflictDoNothing();
+
+		await this.recalculateTotals(orderId);
+
+		return { success: true, message: `Discount of ${discountAmount / 100} applied` };
+	}
+
+	/**
+	 * Remove a promotion
+	 */
+	async removePromotion(orderId: number, promotionId: number): Promise<void> {
+		await db
+			.delete(orderPromotions)
+			.where(and(eq(orderPromotions.orderId, orderId), eq(orderPromotions.promotionId, promotionId)));
+
+		await this.recalculateTotals(orderId);
+	}
+
+	/**
+	 * Transition order to a new state
+	 */
+	async transitionState(orderId: number, newState: OrderState): Promise<Order> {
+		const order = await this.getById(orderId);
+		if (!order) throw new Error('Order not found');
+
+		const currentState = order.state as OrderState;
+		const allowedTransitions = STATE_TRANSITIONS[currentState];
+
+		if (!allowedTransitions.includes(newState)) {
+			throw new Error(`Cannot transition from ${currentState} to ${newState}`);
+		}
+
+		const updateData: Partial<Order> = {
+			state: newState,
+			updatedAt: new Date()
+		};
+
+		// Set order placed timestamp when transitioning to payment_pending
+		if (newState === 'payment_pending' && !order.orderPlacedAt) {
+			updateData.orderPlacedAt = new Date();
+		}
+
+		const [updated] = await db.update(orders).set(updateData).where(eq(orders.id, orderId)).returning();
+
+		// Update promotion usage counts when order is paid
+		if (newState === 'paid') {
+			const appliedPromotions = await db
+				.select()
+				.from(orderPromotions)
+				.where(eq(orderPromotions.orderId, orderId));
+
+			for (const op of appliedPromotions) {
+				await db
+					.update(promotions)
+					.set({ usageCount: sql`${promotions.usageCount} + 1` })
+					.where(eq(promotions.id, op.promotionId));
+			}
+
+			// Decrease stock for variants
+			for (const line of order.lines) {
+				await db
+					.update(productVariants)
+					.set({ stock: sql`${productVariants.stock} - ${line.quantity}` })
+					.where(eq(productVariants.id, line.variantId));
+			}
+		}
+
+		return updated;
+	}
+
+	/**
+	 * Set shipping address
+	 */
+	async setShippingAddress(
+		orderId: number,
+		address: {
+			fullName: string;
+			streetLine1: string;
+			streetLine2?: string;
+			city: string;
+			postalCode: string;
+			country: string;
+		}
+	): Promise<Order> {
+		const [updated] = await db
+			.update(orders)
+			.set({
+				shippingFullName: address.fullName,
+				shippingStreetLine1: address.streetLine1,
+				shippingStreetLine2: address.streetLine2 ?? null,
+				shippingCity: address.city,
+				shippingPostalCode: address.postalCode,
+				shippingCountry: address.country,
+				updatedAt: new Date()
+			})
+			.where(eq(orders.id, orderId))
+			.returning();
+
+		return updated;
+	}
+
+	// ============================================================================
+	// PRIVATE HELPERS
+	// ============================================================================
+
+	private async loadOrderRelations(order: Order): Promise<OrderWithRelations> {
+		const lines = await db.select().from(orderLines).where(eq(orderLines.orderId, order.id));
+
+		// Note: We're not loading full variant data here to keep it lightweight
+		// The line already contains snapshot data (productName, variantName, sku)
+
+		return {
+			...order,
+			lines: lines.map((l) => ({ ...l, variant: null })),
+			payments: [], // Load payments separately if needed
+			customer: null
+		};
+	}
+
+	private async recalculateTotals(orderId: number): Promise<void> {
+		// Get all lines
+		const lines = await db.select().from(orderLines).where(eq(orderLines.orderId, orderId));
+
+		const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
+
+		// Get applied discounts
+		const appliedPromotions = await db
+			.select()
+			.from(orderPromotions)
+			.where(eq(orderPromotions.orderId, orderId));
+
+		const discount = appliedPromotions.reduce((sum, op) => sum + op.discountAmount, 0);
+
+		// Get current order for shipping
+		const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
+		const shipping = order?.shipping ?? 0;
+
+		const total = Math.max(0, subtotal - discount + shipping);
+
+		await db
+			.update(orders)
+			.set({ subtotal, discount, total, updatedAt: new Date() })
+			.where(eq(orders.id, orderId));
+	}
+
+	private generateOrderCode(): string {
+		// Generate a unique order code like "ORD-XXXXX"
+		return `ORD-${nanoid(8).toUpperCase()}`;
+	}
+}
+
+// Export singleton instance
+export const orderService = new OrderService();
