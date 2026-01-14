@@ -88,7 +88,7 @@
 						</div>
 
 						<!-- Remove button -->
-						<form method="POST" action="?/remove" use:enhance>
+						<form method="POST" action="?/removeLine" use:enhance>
 							<input type="hidden" name="lineId" value={line.id} />
 							<button
 								type="submit"
@@ -112,7 +112,7 @@
 
 		<!-- Promotion Code -->
 		<div class="mt-6 bg-white rounded-lg shadow p-6">
-			<form method="POST" action="?/applyPromo" use:enhance class="flex gap-2">
+			<form method="POST" action="?/applyPromotion" use:enhance class="flex gap-2">
 				<label for="promo-code" class="sr-only">Promotion code</label>
 				<input
 					id="promo-code"
