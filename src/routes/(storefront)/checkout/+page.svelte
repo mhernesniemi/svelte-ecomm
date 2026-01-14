@@ -6,6 +6,27 @@
 
 	let selectedShippingRate: (typeof data.shippingRates)[0] | null = null;
 	let selectedPaymentMethod: (typeof data.paymentMethods)[0] | null = null;
+	let isProcessingPayment = $state(false);
+	let isCompletingOrder = $state(false);
+
+	// Initialize selected shipping rate if already set
+	$effect(() => {
+		if (data.orderShipping && data.shippingRates.length > 0 && !selectedShippingRate) {
+			const rate = data.shippingRates.find(
+				(r) => r.methodId === data.orderShipping?.shippingMethodId
+			);
+			if (rate) {
+				selectedShippingRate = rate;
+			}
+		}
+	});
+
+	// Initialize payment info from existing payment
+	$effect(() => {
+		if (data.paymentInfo && !form?.paymentInfo) {
+			// Payment already exists, show it
+		}
+	});
 	let addressFormData = {
 		fullName: data.cart?.shippingFullName || '',
 		streetLine1: data.cart?.shippingStreetLine1 || '',
@@ -191,7 +212,7 @@
 							{/each}
 						</div>
 
-						{#if selectedShippingRate}
+						{#if selectedShippingRate && !data.orderShipping}
 							<form method="POST" action="?/setShippingMethod" use:enhance class="mt-4">
 								<input type="hidden" name="methodId" value={selectedShippingRate.methodId} />
 								<input type="hidden" name="rateId" value={selectedShippingRate.id} />
@@ -203,6 +224,12 @@
 									Select Shipping Method
 								</button>
 							</form>
+						{:else if data.orderShipping}
+							<div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+								<p class="text-green-800 text-sm font-medium">
+									Shipping method selected: {data.shippingRates.find(r => r.methodId === data.orderShipping?.shippingMethodId)?.name || 'Selected'}
+								</p>
+							</div>
 						{/if}
 					</div>
 				{:else if data.cart.shippingPostalCode}
@@ -220,7 +247,7 @@
 				{/if}
 
 				<!-- Payment Method Selection -->
-				{#if data.cart.shippingPostalCode && selectedShippingRate && data.paymentMethods?.length > 0}
+				{#if data.cart.shippingPostalCode && data.orderShipping && data.paymentMethods?.length > 0}
 					<div class="bg-white rounded-lg shadow p-6">
 						<h2 class="text-xl font-semibold mb-4">Payment Method</h2>
 
@@ -250,19 +277,37 @@
 							{/each}
 						</div>
 
-						{#if selectedPaymentMethod}
-							<form method="POST" action="?/createPayment" use:enhance class="mt-4">
+						{#if selectedPaymentMethod && !form?.paymentInfo && !data.paymentInfo}
+							<form
+								method="POST"
+								action="?/createPayment"
+								use:enhance={() => {
+									isProcessingPayment = true;
+									return async ({ update }) => {
+										isProcessingPayment = false;
+										await update();
+									};
+								}}
+								class="mt-4"
+							>
 								<input type="hidden" name="paymentMethodId" value={selectedPaymentMethod.id} />
 								<button
 									type="submit"
-									class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+									disabled={isProcessingPayment}
+									class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 								>
-									Proceed to Payment
+									{isProcessingPayment ? 'Processing...' : 'Create Payment'}
 								</button>
 							</form>
+						{:else if (form?.paymentInfo || data.paymentInfo) && !data.orderShipping}
+							<div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+								<p class="text-yellow-800 text-sm">
+									Please select a shipping method first.
+								</p>
+							</div>
 						{/if}
 					</div>
-				{:else if data.cart.shippingPostalCode && selectedShippingRate}
+				{:else if data.cart.shippingPostalCode && !data.orderShipping}
 					<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
 						<p class="text-gray-600 text-sm">
 							Please select a shipping method first to see payment options.
@@ -317,22 +362,34 @@
 						</div>
 					</div>
 
-					{#if form?.paymentInfo}
+					{#if form?.paymentInfo || data.paymentInfo}
+						{@const paymentInfo = form?.paymentInfo || data.paymentInfo}
 						<div class="mt-6 pt-6 border-t">
 							<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-								<p class="text-green-800 font-medium mb-2">Payment Created</p>
+								<p class="text-green-800 font-medium mb-2">Payment Ready</p>
 								<p class="text-green-700 text-sm">
-									Transaction ID: {form.paymentInfo.providerTransactionId}
+									Transaction ID: {paymentInfo.providerTransactionId}
 								</p>
-								{#if form.paymentInfo.clientSecret}
-									<p class="text-green-700 text-sm mt-2">
-										Client Secret: {form.paymentInfo.clientSecret.substring(0, 20)}...
-									</p>
-								{/if}
 							</div>
-							<p class="text-sm text-gray-500 mb-4">
-								Payment integration with Stripe Elements will be implemented next.
-							</p>
+							<form
+								method="POST"
+								action="?/completeOrder"
+								use:enhance={() => {
+									isCompletingOrder = true;
+									return async ({ update }) => {
+										isCompletingOrder = false;
+										await update();
+									};
+								}}
+							>
+								<button
+									type="submit"
+									disabled={isCompletingOrder}
+									class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+								>
+									{isCompletingOrder ? 'Completing Order...' : 'Complete Order'}
+								</button>
+							</form>
 						</div>
 					{:else}
 						<div class="mt-6 pt-6 border-t">

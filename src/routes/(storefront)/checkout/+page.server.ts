@@ -1,7 +1,7 @@
 /**
  * Checkout page server actions
  */
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { orderService, shippingService, paymentService } from '$lib/server/services/index.js';
 import type { PageServerLoad, Actions } from './$types.js';
 
@@ -24,10 +24,28 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 	// Get available payment methods
 	const paymentMethods = await paymentService.getActiveMethods();
 
+	// Check if shipping method is already set
+	const orderShipping = await shippingService.getOrderShipping(cart.id);
+
+	// Check if payment is already created
+	const orderPayments = await paymentService.getByOrderId(cart.id);
+	const existingPayment = orderPayments[0] || null;
+	let paymentInfo = null;
+	if (existingPayment && existingPayment.metadata) {
+		paymentInfo = {
+			providerTransactionId: existingPayment.transactionId || '',
+			clientSecret: (existingPayment.metadata as any)?.clientSecret,
+			metadata: existingPayment.metadata as Record<string, unknown>
+		};
+	}
+
 	return {
 		cart,
 		shippingRates,
-		paymentMethods
+		paymentMethods,
+		orderShipping,
+		existingPayment,
+		paymentInfo
 	};
 };
 
@@ -133,17 +151,39 @@ export const actions: Actions = {
 		}
 
 		try {
-			// Load full order relations for payment
-			const order = await orderService.getById(cart.id);
-			if (!order) {
-				return fail(404, { error: 'Order not found' });
-			}
+			// Check if payment already exists for this order
+			const existingPayments = await paymentService.getByOrderId(cart.id);
+			let payment;
+			let paymentInfo;
 
-			// Create payment via provider
-			const { payment, paymentInfo } = await paymentService.createPayment(
-				order,
-				parseInt(paymentMethodId)
-			);
+			if (existingPayments.length > 0) {
+				// Payment already exists, return it
+				payment = existingPayments[0];
+				const method = await paymentService.getMethodById(payment.paymentMethodId);
+				if (method && payment.metadata) {
+					paymentInfo = {
+						providerTransactionId: payment.transactionId || '',
+						clientSecret: (payment.metadata as any)?.clientSecret,
+						metadata: payment.metadata as Record<string, unknown>
+					};
+				} else {
+					paymentInfo = {
+						providerTransactionId: payment.transactionId || '',
+						metadata: payment.metadata as Record<string, unknown>
+					};
+				}
+			} else {
+				// Load full order relations for payment
+				const order = await orderService.getById(cart.id);
+				if (!order) {
+					return fail(404, { error: 'Order not found' });
+				}
+
+				// Create payment via provider
+				const result = await paymentService.createPayment(order, parseInt(paymentMethodId));
+				payment = result.payment;
+				paymentInfo = result.paymentInfo;
+			}
 
 			return {
 				success: true,
@@ -151,6 +191,75 @@ export const actions: Actions = {
 				paymentInfo
 			};
 		} catch (error) {
+			return fail(400, { error: (error as Error).message });
+		}
+	},
+
+	completeOrder: async ({ request, cookies, locals }) => {
+		const cartToken = cookies.get('cartToken') ?? null;
+		const customerId = locals.user?.id ?? null;
+
+		const cart = await orderService.getActiveCart({ customerId, cartToken });
+		if (!cart) {
+			return fail(404, { error: 'Cart not found' });
+		}
+
+		// Validate that all required information is present
+		if (!cart.shippingPostalCode) {
+			return fail(400, { error: 'Shipping address required' });
+		}
+
+		// Check if shipping method is set
+		const orderShipping = await shippingService.getOrderShipping(cart.id);
+		if (!orderShipping) {
+			return fail(400, { error: 'Shipping method required' });
+		}
+
+		// Check if payment exists
+		const orderPayments = await paymentService.getByOrderId(cart.id);
+		if (orderPayments.length === 0) {
+			return fail(400, { error: 'Payment required' });
+		}
+
+		try {
+			// Transition order to payment_pending (marks cart as inactive)
+			await orderService.transitionState(cart.id, 'payment_pending');
+
+			// Confirm payment (for mock provider, this will mark it as completed)
+			const payment = orderPayments[0];
+			const paymentStatus = await paymentService.confirmPayment(payment.id);
+
+			// If payment is completed, transition order to paid
+			if (paymentStatus === 'completed') {
+				await orderService.transitionState(cart.id, 'paid');
+
+				// Create shipment
+				const order = await orderService.getById(cart.id);
+				if (order) {
+					try {
+						await shippingService.createShipment(order);
+					} catch (e) {
+						console.error('Error creating shipment:', e);
+						// Don't fail the order if shipment creation fails
+					}
+				}
+			}
+
+			// Get final order with code for redirect
+			const finalOrder = await orderService.getById(cart.id);
+			if (!finalOrder) {
+				return fail(500, { error: 'Failed to retrieve order' });
+			}
+
+			// Clear cart token cookie
+			cookies.delete('cartToken', { path: '/' });
+
+			// Redirect to thank you page
+			throw redirect(303, `/checkout/thank-you?order=${finalOrder.code}`);
+		} catch (error) {
+			if (error && typeof error === 'object' && 'status' in error && error.status === 303) {
+				throw error; // Re-throw redirect
+			}
 			return fail(400, { error: (error as Error).message });
 		}
 	}
