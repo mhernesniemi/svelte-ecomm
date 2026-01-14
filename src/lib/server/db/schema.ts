@@ -13,7 +13,9 @@ import {
 	varchar,
 	primaryKey,
 	index,
-	uniqueIndex
+	uniqueIndex,
+	numeric,
+	jsonb
 } from 'drizzle-orm/pg-core';
 
 // ============================================================================
@@ -383,6 +385,52 @@ export const payments = pgTable(
 );
 
 // ============================================================================
+// SHIPPING
+// ============================================================================
+
+export const shippingMethods = pgTable(
+	'shipping_methods',
+	{
+		id: serial('id').primaryKey(),
+		code: varchar('code', { length: 100 }).notNull().unique(), // 'posti_standard', 'matkahuolto_express'
+		name: varchar('name', { length: 255 }).notNull(), // 'Posti Standard', 'Matkahuolto Express'
+		description: text('description'),
+		active: boolean('active').default(true).notNull(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').defaultNow().notNull()
+	},
+	(table) => [
+		uniqueIndex('shipping_methods_code_idx').on(table.code),
+		index('shipping_methods_active_idx').on(table.active)
+	]
+);
+
+export const orderShipping = pgTable(
+	'order_shipping',
+	{
+		id: serial('id').primaryKey(),
+		orderId: integer('order_id')
+			.references(() => orders.id, { onDelete: 'cascade' })
+			.notNull(),
+		shippingMethodId: integer('shipping_method_id')
+			.references(() => shippingMethods.id)
+			.notNull(),
+		trackingNumber: varchar('tracking_number', { length: 255 }),
+		status: varchar('status', { length: 50 }).default('pending').notNull(), // pending, shipped, in_transit, delivered
+		price: integer('price').notNull(), // Price in cents
+		metadata: jsonb('metadata'), // Store provider-specific data
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').defaultNow().notNull()
+	},
+	(table) => [
+		index('order_shipping_order_idx').on(table.orderId),
+		index('order_shipping_method_idx').on(table.shippingMethodId),
+		index('order_shipping_status_idx').on(table.status),
+		index('order_shipping_tracking_idx').on(table.trackingNumber)
+	]
+);
+
+// ============================================================================
 // PROMOTIONS
 // ============================================================================
 
@@ -570,7 +618,8 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
 	}),
 	lines: many(orderLines),
 	payments: many(payments),
-	promotions: many(orderPromotions)
+	promotions: many(orderPromotions),
+	shipping: one(orderShipping)
 }));
 
 export const orderLinesRelations = relations(orderLines, ({ one }) => ({
@@ -603,5 +652,20 @@ export const orderPromotionsRelations = relations(orderPromotions, ({ one }) => 
 	promotion: one(promotions, {
 		fields: [orderPromotions.promotionId],
 		references: [promotions.id]
+	})
+}));
+
+export const shippingMethodsRelations = relations(shippingMethods, ({ many }) => ({
+	orderShippings: many(orderShipping)
+}));
+
+export const orderShippingRelations = relations(orderShipping, ({ one }) => ({
+	order: one(orders, {
+		fields: [orderShipping.orderId],
+		references: [orders.id]
+	}),
+	shippingMethod: one(shippingMethods, {
+		fields: [orderShipping.shippingMethodId],
+		references: [shippingMethods.id]
 	})
 }));

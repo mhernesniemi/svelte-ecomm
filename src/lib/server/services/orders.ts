@@ -17,7 +17,8 @@ import {
 	productVariants,
 	productTranslations,
 	productVariantTranslations,
-	promotions
+	promotions,
+	orderShipping
 } from '../db/schema.js';
 import type {
 	Order,
@@ -542,7 +543,8 @@ export class OrderService {
 			...order,
 			lines: lines.map((l) => ({ ...l, variant: null })),
 			payments: [], // Load payments separately if needed
-			customer: null
+			customer: null,
+			shipping: null // Load shipping separately if needed
 		};
 	}
 
@@ -560,15 +562,19 @@ export class OrderService {
 
 		const discount = appliedPromotions.reduce((sum, op) => sum + op.discountAmount, 0);
 
-		// Get current order for shipping
-		const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
-		const shipping = order?.shipping ?? 0;
+		// Get shipping cost from order_shipping table
+		const [shippingRecord] = await db
+			.select()
+			.from(orderShipping)
+			.where(eq(orderShipping.orderId, orderId))
+			.limit(1);
+		const shipping = shippingRecord?.price ?? 0;
 
 		const total = Math.max(0, subtotal - discount + shipping);
 
 		await db
 			.update(orders)
-			.set({ subtotal, discount, total, updatedAt: new Date() })
+			.set({ subtotal, discount, shipping, total, updatedAt: new Date() })
 			.where(eq(orders.id, orderId));
 	}
 

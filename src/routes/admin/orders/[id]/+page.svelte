@@ -137,6 +137,66 @@
 				</div>
 			{/if}
 
+			{#if data.orderShipping && data.shippingMethod}
+				<div class="bg-white rounded-lg shadow p-6">
+					<h2 class="font-semibold mb-4">Shipping Information</h2>
+					<dl class="space-y-2 text-sm">
+						<div class="flex justify-between">
+							<dt class="text-gray-500">Method</dt>
+							<dd class="font-medium">{data.shippingMethod.name}</dd>
+						</div>
+						<div class="flex justify-between">
+							<dt class="text-gray-500">Status</dt>
+							<dd>
+								<span
+									class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize
+									{data.orderShipping.status === 'delivered'
+										? 'bg-green-100 text-green-800'
+										: data.orderShipping.status === 'shipped' || data.orderShipping.status === 'in_transit'
+											? 'bg-blue-100 text-blue-800'
+											: 'bg-gray-100 text-gray-800'}"
+								>
+									{data.orderShipping.status.replace('_', ' ')}
+								</span>
+							</dd>
+						</div>
+						{#if data.orderShipping.trackingNumber}
+							<div class="flex justify-between">
+								<dt class="text-gray-500">Tracking</dt>
+								<dd class="font-mono text-xs">{data.orderShipping.trackingNumber}</dd>
+							</div>
+						{/if}
+						<div class="flex justify-between">
+							<dt class="text-gray-500">Cost</dt>
+							<dd>{(data.orderShipping.price / 100).toFixed(2)} EUR</dd>
+						</div>
+					</dl>
+
+					{#if data.orderShipping.trackingNumber}
+						<form method="POST" action="?/trackShipment" class="mt-4">
+							<button
+								type="submit"
+								class="w-full px-3 py-2 text-sm border rounded hover:bg-gray-50"
+							>
+								Refresh Tracking Status
+							</button>
+						</form>
+					{/if}
+
+					{#if data.order.state === 'paid' && data.orderShipping.status === 'pending'}
+						<form method="POST" action="?/updateShippingStatus" class="mt-4">
+							<input type="hidden" name="status" value="shipped" />
+							<button
+								type="submit"
+								class="w-full px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+							>
+								Mark as Shipped
+							</button>
+						</form>
+					{/if}
+				</div>
+			{/if}
+
 			<div class="bg-white rounded-lg shadow p-6">
 				<h2 class="font-semibold mb-4">Details</h2>
 				<dl class="space-y-2 text-sm">

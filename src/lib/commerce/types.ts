@@ -18,7 +18,9 @@ import type {
 	orders,
 	orderLines,
 	payments,
-	promotions
+	promotions,
+	shippingMethods,
+	orderShipping
 } from '../server/db/schema.js';
 
 // ============================================================================
@@ -159,6 +161,28 @@ export type Promotion = InferSelectModel<typeof promotions>;
 export type NewPromotion = InferInsertModel<typeof promotions>;
 
 export type DiscountType = 'percentage' | 'fixed_amount';
+
+// ============================================================================
+// SHIPPING TYPES
+// ============================================================================
+
+export type ShippingMethod = InferSelectModel<typeof shippingMethods>;
+export type NewShippingMethod = InferInsertModel<typeof shippingMethods>;
+
+export type OrderShipping = InferSelectModel<typeof orderShipping>;
+export type NewOrderShipping = InferInsertModel<typeof orderShipping>;
+
+export type ShippingStatus = 'pending' | 'shipped' | 'in_transit' | 'delivered';
+
+/** Order with shipping info */
+export interface OrderWithShipping extends OrderWithRelations {
+	shipping?: OrderShippingWithMethod | null;
+}
+
+/** Order shipping with method details */
+export interface OrderShippingWithMethod extends OrderShipping {
+	shippingMethod: ShippingMethod;
+}
 
 // ============================================================================
 // FILTER & QUERY TYPES

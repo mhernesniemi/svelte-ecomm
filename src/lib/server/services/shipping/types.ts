@@ -1,0 +1,41 @@
+/**
+ * Shipping Provider Interface and Types
+ * Defines the contract for shipping providers (Posti, Matkahuolto, etc.)
+ */
+import type { OrderWithRelations } from '$lib/commerce/types.js';
+
+export interface ShippingProvider {
+	code: string; // unique code like 'posti_standard'
+
+	getRates: (order: OrderWithRelations) => Promise<ShippingRate[]>;
+	createShipment: (order: OrderWithRelations) => Promise<ShipmentInfo>;
+	trackShipment?: (trackingNumber: string) => Promise<ShipmentStatus>;
+}
+
+export type ShippingRate = {
+	id: string;
+	name: string;
+	price: number; // Price in cents
+	estimatedDeliveryDays?: number;
+	description?: string;
+	methodId?: number; // Shipping method ID (added by service)
+	methodCode?: string; // Shipping method code (added by service)
+};
+
+export type ShipmentInfo = {
+	trackingNumber: string;
+	labelUrl?: string;
+	metadata?: Record<string, unknown>;
+};
+
+export type ShipmentStatus = 'pending' | 'shipped' | 'in_transit' | 'delivered' | 'error';
+
+export interface ShippingAddress {
+	fullName: string;
+	streetLine1: string;
+	streetLine2?: string;
+	city: string;
+	postalCode: string;
+	country: string;
+	phoneNumber?: string;
+}
