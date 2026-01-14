@@ -12,7 +12,7 @@ import type {
 	Payment,
 	NewPayment,
 	OrderWithRelations
-} from '$lib/commerce/types.js';
+} from '$lib/types.js';
 import type { PaymentProvider, PaymentInfo, PaymentStatus, RefundInfo } from './types.js';
 import { StripeProvider, MockProvider } from './providers/index.js';
 

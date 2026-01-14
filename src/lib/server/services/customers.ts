@@ -11,7 +11,7 @@ import type {
 	Address,
 	CreateCustomerInput,
 	PaginatedResult
-} from '$lib/commerce/types.js';
+} from '$lib/types.js';
 
 export class CustomerService {
 	/**

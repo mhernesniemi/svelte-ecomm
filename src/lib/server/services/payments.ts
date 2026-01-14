@@ -6,7 +6,7 @@
 import { eq, and, desc } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { payments, orders } from '../db/schema.js';
-import type { Payment, PaymentState } from '$lib/commerce/types.js';
+import type { Payment, PaymentState } from '$lib/types.js';
 import { nanoid } from 'nanoid';
 
 export interface PaymentResult {

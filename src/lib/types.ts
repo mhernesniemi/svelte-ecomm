@@ -22,7 +22,7 @@ import type {
 	promotions,
 	shippingMethods,
 	orderShipping
-} from '../server/db/schema.js';
+} from '$lib/server/db/schema.js';
 
 // ============================================================================
 // PRODUCT TYPES
@@ -184,7 +184,7 @@ export type NewOrderShipping = InferInsertModel<typeof orderShipping>;
 export type ShippingStatus = 'pending' | 'shipped' | 'in_transit' | 'delivered';
 
 /** Order with shipping info */
-export interface OrderWithShipping extends OrderWithRelations {
+export interface OrderWithShipping extends Omit<OrderWithRelations, 'shipping'> {
 	shipping?: OrderShippingWithMethod | null;
 }
 

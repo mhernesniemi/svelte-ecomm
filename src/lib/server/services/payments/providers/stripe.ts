@@ -8,7 +8,7 @@
  * 3. Add Stripe to payment_methods table
  */
 import type { PaymentProvider, PaymentInfo, PaymentStatus, RefundInfo } from '../types.js';
-import type { OrderWithRelations } from '$lib/commerce/types.js';
+import type { OrderWithRelations } from '$lib/types.js';
 
 export class StripeProvider implements PaymentProvider {
 	code = 'stripe';

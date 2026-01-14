@@ -1,7 +1,7 @@
 import { productService } from '$lib/server/services/products.js';
 import { facetService } from '$lib/server/services/facets.js';
 import type { PageServerLoad } from './$types';
-import type { FacetCount, FacetWithValues } from '$lib/commerce/types.js';
+import type { FacetCount, FacetWithValues } from '$lib/types.js';
 
 export const load: PageServerLoad = async ({ url }) => {
 	const search = url.searchParams.get('q') ?? undefined;

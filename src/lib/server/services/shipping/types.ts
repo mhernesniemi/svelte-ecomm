@@ -2,7 +2,7 @@
  * Shipping Provider Interface and Types
  * Defines the contract for shipping providers (Posti, Matkahuolto, etc.)
  */
-import type { OrderWithRelations } from '$lib/commerce/types.js';
+import type { OrderWithRelations } from '$lib/types.js';
 
 export interface ShippingProvider {
 	code: string; // unique code like 'posti_standard'

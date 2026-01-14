@@ -3,7 +3,7 @@
  * Example implementation for Posti (Finnish postal service)
  */
 import type { ShippingProvider, ShippingRate, ShipmentInfo, ShipmentStatus } from '../types.js';
-import type { OrderWithRelations } from '$lib/commerce/types.js';
+import type { OrderWithRelations } from '$lib/types.js';
 
 export class PostiProvider implements ShippingProvider {
 	code = 'posti_standard';

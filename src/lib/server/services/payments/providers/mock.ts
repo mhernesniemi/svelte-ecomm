@@ -3,7 +3,7 @@
  * Simple mock implementation for development and testing
  */
 import type { PaymentProvider, PaymentInfo, PaymentStatus, RefundInfo } from '../types.js';
-import type { OrderWithRelations } from '$lib/commerce/types.js';
+import type { OrderWithRelations } from '$lib/types.js';
 import { nanoid } from 'nanoid';
 
 export class MockProvider implements PaymentProvider {

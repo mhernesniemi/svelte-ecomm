@@ -5,7 +5,7 @@
 import { eq, and, desc, sql, gte, lte, or, isNull } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { promotions } from '../db/schema.js';
-import type { Promotion, CreatePromotionInput, PaginatedResult } from '$lib/commerce/types.js';
+import type { Promotion, CreatePromotionInput, PaginatedResult } from '$lib/types.js';
 
 export class PromotionService {
 	/**

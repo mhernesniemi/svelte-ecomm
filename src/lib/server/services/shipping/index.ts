@@ -11,7 +11,7 @@ import type {
 	OrderShipping,
 	NewOrderShipping,
 	OrderWithRelations
-} from '$lib/commerce/types.js';
+} from '$lib/types.js';
 import type { ShippingProvider, ShippingRate, ShipmentInfo } from './types.js';
 import { PostiProvider, MatkahuoltoProvider } from './providers/index.js';
 

@@ -17,7 +17,7 @@ import type {
 	FacetValue,
 	FacetValueWithTranslations,
 	PaginatedResult
-} from '$lib/commerce/types.js';
+} from '$lib/types.js';
 
 export class FacetService {
 	private defaultLanguage = 'en';

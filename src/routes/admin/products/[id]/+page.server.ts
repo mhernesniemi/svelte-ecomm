@@ -74,6 +74,78 @@ export const actions: Actions = {
 		throw redirect(303, '/admin/products');
 	},
 
+	updateFacetValues: async ({ params, request }) => {
+		const productId = Number(params.id);
+		const formData = await request.formData();
+		const facetValueIds = formData.getAll('facetValueIds').map(Number);
+
+		try {
+			// Get current facet values
+			const product = await productService.getById(productId, 'en');
+			if (!product) {
+				return fail(404, { error: 'Product not found' });
+			}
+
+			const currentIds = product.facetValues.map((fv) => fv.id);
+
+			// Remove unchecked values
+			for (const id of currentIds) {
+				if (!facetValueIds.includes(id)) {
+					await productService.removeFacetValue(productId, id);
+				}
+			}
+
+			// Add newly checked values
+			for (const id of facetValueIds) {
+				if (!currentIds.includes(id)) {
+					await productService.addFacetValue(productId, id);
+				}
+			}
+
+			return { facetSuccess: true };
+		} catch (e) {
+			return fail(500, { error: 'Failed to update facet values' });
+		}
+	},
+
+	updateVariantFacetValues: async ({ request }) => {
+		const formData = await request.formData();
+		const variantId = Number(formData.get('variantId'));
+		const facetValueIds = formData.getAll('facetValueIds').map(Number);
+
+		if (isNaN(variantId)) {
+			return fail(400, { error: 'Invalid variant ID' });
+		}
+
+		try {
+			// Get current facet values for this variant
+			const variant = await productService.getVariantById(variantId, 'en');
+			if (!variant) {
+				return fail(404, { error: 'Variant not found' });
+			}
+
+			const currentIds = variant.facetValues.map((fv) => fv.id);
+
+			// Remove unchecked values
+			for (const id of currentIds) {
+				if (!facetValueIds.includes(id)) {
+					await productService.removeVariantFacetValue(variantId, id);
+				}
+			}
+
+			// Add newly checked values
+			for (const id of facetValueIds) {
+				if (!currentIds.includes(id)) {
+					await productService.addVariantFacetValue(variantId, id);
+				}
+			}
+
+			return { variantFacetSuccess: true };
+		} catch (e) {
+			return fail(500, { error: 'Failed to update variant facet values' });
+		}
+	},
+
 	addVariant: async ({ params, request }) => {
 		const productId = Number(params.id);
 		const formData = await request.formData();

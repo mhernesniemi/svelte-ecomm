@@ -3,7 +3,7 @@
  * Example implementation for Matkahuolto (Finnish logistics company)
  */
 import type { ShippingProvider, ShippingRate, ShipmentInfo, ShipmentStatus } from '../types.js';
-import type { OrderWithRelations } from '$lib/commerce/types.js';
+import type { OrderWithRelations } from '$lib/types.js';
 
 export class MatkahuoltoProvider implements ShippingProvider {
 	code = 'matkahuolto_standard';

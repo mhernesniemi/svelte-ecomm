@@ -6,6 +6,7 @@
 	let activeTab = $state<'en' | 'fi'>('en');
 	let showDeleteConfirm = $state(false);
 	let showAddVariant = $state(false);
+	let editingVariantFacets = $state<number | null>(null);
 
 	function getTranslation(lang: string) {
 		return data.product.translations.find((t) => t.languageCode === lang);
@@ -175,6 +176,64 @@
 		</div>
 	</form>
 
+	<!-- Facet Values Section -->
+	<div class="bg-white rounded-lg shadow mb-8">
+		<div class="px-6 py-4 border-b">
+			<h2 class="text-lg font-semibold">Facet Values</h2>
+			<p class="text-sm text-gray-500">Assign attributes to this product for filtering</p>
+		</div>
+
+		{#if form?.facetSuccess}
+			<div class="mx-6 mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+				Facet values updated
+			</div>
+		{/if}
+
+		<form method="POST" action="?/updateFacetValues" class="p-6">
+			{#if data.facets.length === 0}
+				<p class="text-gray-500">No facets defined. Create facets first in the Facets section.</p>
+			{:else}
+				<div class="space-y-6">
+					{#each data.facets as facet}
+						{@const facetName = facet.translations.find((t) => t.languageCode === 'en')?.name ?? facet.code}
+						<div>
+							<p class="text-sm font-medium text-gray-700 mb-2">{facetName}</p>
+							{#if facet.values.length === 0}
+								<p class="text-sm text-gray-400">No values defined for this facet</p>
+							{:else}
+								<div class="flex flex-wrap gap-2">
+									{#each facet.values as value}
+										{@const valueName = value.translations.find((t) => t.languageCode === 'en')?.name ?? value.code}
+										{@const isSelected = data.product.facetValues.some((fv) => fv.id === value.id)}
+										<label
+											class="inline-flex items-center px-3 py-1.5 rounded-full text-sm cursor-pointer transition-colors {isSelected
+												? 'bg-blue-100 text-blue-800 border-2 border-blue-300'
+												: 'bg-gray-100 text-gray-700 border-2 border-transparent hover:bg-gray-200'}"
+										>
+											<input
+												type="checkbox"
+												name="facetValueIds"
+												value={value.id}
+												checked={isSelected}
+												class="sr-only"
+											/>
+											{valueName}
+										</label>
+									{/each}
+								</div>
+							{/if}
+						</div>
+					{/each}
+				</div>
+				<div class="mt-6 pt-4 border-t">
+					<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+						Save Facet Values
+					</button>
+				</div>
+			{/if}
+		</form>
+	</div>
+
 	<!-- Variants Section -->
 	<div class="bg-white rounded-lg shadow">
 		<div class="px-6 py-4 border-b flex justify-between items-center">
@@ -262,6 +321,12 @@
 			</form>
 		{/if}
 
+		{#if form?.variantFacetSuccess}
+			<div class="mx-6 mt-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+				Variant facet values updated
+			</div>
+		{/if}
+
 		<!-- Variants Table -->
 		<table class="min-w-full divide-y divide-gray-200">
 			<thead class="bg-gray-50">
@@ -270,12 +335,14 @@
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
 					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+					<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Facets</th>
+					<th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-gray-200">
 				{#if data.product.variants.length === 0}
 					<tr>
-						<td colspan="4" class="px-6 py-8 text-center text-gray-500">
+						<td colspan="6" class="px-6 py-8 text-center text-gray-500">
 							No variants yet. Add a variant to start selling this product.
 						</td>
 					</tr>
@@ -288,7 +355,74 @@
 							</td>
 							<td class="px-6 py-4 text-sm">{(variant.price / 100).toFixed(2)} EUR</td>
 							<td class="px-6 py-4 text-sm">{variant.stock}</td>
+							<td class="px-6 py-4 text-sm">
+								{#if variant.facetValues.length === 0}
+									<span class="text-gray-400">None</span>
+								{:else}
+									<div class="flex flex-wrap gap-1">
+										{#each variant.facetValues as fv}
+											{@const name = fv.translations.find((t) => t.languageCode === 'en')?.name ?? fv.code}
+											<span class="px-2 py-0.5 bg-gray-100 rounded text-xs">{name}</span>
+										{/each}
+									</div>
+								{/if}
+							</td>
+							<td class="px-6 py-4 text-right text-sm">
+								<button
+									type="button"
+									onclick={() => (editingVariantFacets = editingVariantFacets === variant.id ? null : variant.id)}
+									class="text-blue-600 hover:text-blue-800"
+								>
+									{editingVariantFacets === variant.id ? 'Cancel' : 'Edit Facets'}
+								</button>
+							</td>
 						</tr>
+						{#if editingVariantFacets === variant.id}
+							<tr class="bg-gray-50">
+								<td colspan="6" class="px-6 py-4">
+									<form method="POST" action="?/updateVariantFacetValues">
+										<input type="hidden" name="variantId" value={variant.id} />
+										<div class="space-y-4">
+											{#each data.facets as facet}
+												{@const facetName = facet.translations.find((t) => t.languageCode === 'en')?.name ?? facet.code}
+												<div>
+													<p class="text-sm font-medium text-gray-700 mb-2">{facetName}</p>
+													{#if facet.values.length === 0}
+														<p class="text-sm text-gray-400">No values</p>
+													{:else}
+														<div class="flex flex-wrap gap-2">
+															{#each facet.values as value}
+																{@const valueName = value.translations.find((t) => t.languageCode === 'en')?.name ?? value.code}
+																{@const isSelected = variant.facetValues.some((fv) => fv.id === value.id)}
+																<label
+																	class="inline-flex items-center px-3 py-1.5 rounded-full text-sm cursor-pointer transition-colors {isSelected
+																		? 'bg-blue-100 text-blue-800 border-2 border-blue-300'
+																		: 'bg-gray-100 text-gray-700 border-2 border-transparent hover:bg-gray-200'}"
+																>
+																	<input
+																		type="checkbox"
+																		name="facetValueIds"
+																		value={value.id}
+																		checked={isSelected}
+																		class="sr-only"
+																	/>
+																	{valueName}
+																</label>
+															{/each}
+														</div>
+													{/if}
+												</div>
+											{/each}
+										</div>
+										<div class="mt-4">
+											<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+												Save Variant Facets
+											</button>
+										</div>
+									</form>
+								</td>
+							</tr>
+						{/if}
 					{/each}
 				{/if}
 			</tbody>

@@ -30,7 +30,7 @@ import type {
 	UpdateVariantInput,
 	FacetCount,
 	PaginatedResult
-} from '$lib/commerce/types.js';
+} from '$lib/types.js';
 
 export class ProductService {
 	private defaultLanguage = 'en';
@@ -391,11 +391,39 @@ export class ProductService {
 	/**
 	 * Add facet value to variant
 	 */
+	async getVariantById(
+		variantId: number,
+		language?: string
+	): Promise<ProductVariantWithRelations | null> {
+		const lang = language ?? this.defaultLanguage;
+
+		const variant = await db
+			.select()
+			.from(productVariants)
+			.where(and(eq(productVariants.id, variantId), isNull(productVariants.deletedAt)))
+			.limit(1);
+
+		if (!variant[0]) return null;
+
+		return this.loadVariantRelations(variant[0], lang);
+	}
+
 	async addVariantFacetValue(variantId: number, facetValueId: number): Promise<void> {
 		await db
 			.insert(variantFacetValues)
 			.values({ variantId, facetValueId })
 			.onConflictDoNothing();
+	}
+
+	async removeVariantFacetValue(variantId: number, facetValueId: number): Promise<void> {
+		await db
+			.delete(variantFacetValues)
+			.where(
+				and(
+					eq(variantFacetValues.variantId, variantId),
+					eq(variantFacetValues.facetValueId, facetValueId)
+				)
+			);
 	}
 
 	// ============================================================================

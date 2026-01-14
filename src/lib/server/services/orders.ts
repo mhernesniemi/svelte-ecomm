@@ -27,7 +27,7 @@ import type {
 	CreateOrderInput,
 	AddOrderLineInput,
 	OrderState
-} from '$lib/commerce/types.js';
+} from '$lib/types.js';
 import { nanoid } from 'nanoid';
 
 // Generate a secure cart token for guest users
