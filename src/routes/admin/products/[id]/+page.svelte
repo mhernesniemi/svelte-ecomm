@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -7,6 +8,8 @@
   let showDeleteConfirm = $state(false);
   let showAddVariant = $state(false);
   let editingVariantFacets = $state<number | null>(null);
+  let isUploading = $state(false);
+  let uploadError = $state<string | null>(null);
 
   function getTranslation(lang: string) {
     return data.product.translations.find((t) => t.languageCode === lang);
@@ -14,6 +17,66 @@
 
   const enTrans = getTranslation("en");
   const fiTrans = getTranslation("fi");
+
+  async function handleImageUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files || files.length === 0) return;
+
+    isUploading = true;
+    uploadError = null;
+
+    try {
+      // Get auth params from server
+      const authResponse = await fetch("/api/assets/auth");
+      const auth = await authResponse.json();
+
+      // Upload each file to ImageKit
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("publicKey", auth.publicKey);
+        formData.append("signature", auth.signature);
+        formData.append("expire", auth.expire.toString());
+        formData.append("token", auth.token);
+        formData.append("fileName", file.name);
+        formData.append("folder", `/products/${data.product.id}`);
+
+        const uploadResponse = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error("Upload failed");
+        }
+
+        const result = await uploadResponse.json();
+
+        // Save to database via form action
+        const saveForm = new FormData();
+        saveForm.append("url", result.url);
+        saveForm.append("name", result.name);
+        saveForm.append("fileId", result.fileId);
+        saveForm.append("width", result.width?.toString() ?? "0");
+        saveForm.append("height", result.height?.toString() ?? "0");
+        saveForm.append("fileSize", result.size?.toString() ?? "0");
+
+        await fetch(`?/addImage`, {
+          method: "POST",
+          body: saveForm
+        });
+      }
+
+      // Reload page to show new images
+      window.location.reload();
+    } catch (e) {
+      uploadError = e instanceof Error ? e.message : "Upload failed";
+    } finally {
+      isUploading = false;
+      input.value = "";
+    }
+  }
 </script>
 
 <div>
@@ -177,6 +240,93 @@
       </button>
     </div>
   </form>
+
+  <!-- Images Section -->
+  <div class="mb-8 rounded-lg bg-white shadow">
+    <div class="border-b px-6 py-4">
+      <h2 class="text-lg font-semibold">Product Images</h2>
+      <p class="text-sm text-gray-500">Upload and manage product images</p>
+    </div>
+
+    {#if form?.imageError}
+      <div class="mx-6 mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+        {form.imageError}
+      </div>
+    {/if}
+
+    {#if uploadError}
+      <div class="mx-6 mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+        {uploadError}
+      </div>
+    {/if}
+
+    <div class="p-6">
+      <!-- Current Images -->
+      {#if data.product.assets.length > 0}
+        <div class="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          {#each data.product.assets as asset}
+            <div class="group relative">
+              <img
+                src="{asset.source}?tr=w-200,h-200,fo-auto"
+                alt={asset.name}
+                class="h-32 w-full rounded-lg border object-cover {data.product.featuredAssetId === asset.id ? 'ring-2 ring-blue-500' : ''}"
+              />
+              <div class="absolute inset-0 flex items-center justify-center gap-2 rounded-lg bg-black bg-opacity-50 opacity-0 transition-opacity group-hover:opacity-100">
+                {#if data.product.featuredAssetId !== asset.id}
+                  <form method="POST" action="?/setFeaturedImage" use:enhance>
+                    <input type="hidden" name="assetId" value={asset.id} />
+                    <button
+                      type="submit"
+                      class="rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700"
+                      title="Set as featured"
+                    >
+                      Featured
+                    </button>
+                  </form>
+                {/if}
+                <form method="POST" action="?/removeImage" use:enhance>
+                  <input type="hidden" name="assetId" value={asset.id} />
+                  <button
+                    type="submit"
+                    class="rounded bg-red-600 px-2 py-1 text-xs text-white hover:bg-red-700"
+                    title="Remove image"
+                  >
+                    Remove
+                  </button>
+                </form>
+              </div>
+              {#if data.product.featuredAssetId === asset.id}
+                <span class="absolute left-1 top-1 rounded bg-blue-600 px-1.5 py-0.5 text-xs text-white">
+                  Featured
+                </span>
+              {/if}
+            </div>
+          {/each}
+        </div>
+      {:else}
+        <p class="mb-4 text-gray-500">No images yet</p>
+      {/if}
+
+      <!-- Upload -->
+      <div class="flex items-center gap-4">
+        <label class="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 px-6 py-4 text-center hover:border-blue-500 hover:bg-gray-50">
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            class="hidden"
+            onchange={handleImageUpload}
+            disabled={isUploading}
+          />
+          {#if isUploading}
+            <span class="text-gray-500">Uploading...</span>
+          {:else}
+            <span class="text-gray-600">Click to upload images</span>
+          {/if}
+        </label>
+      </div>
+    </div>
+  </div>
 
   <!-- Facet Values Section -->
   <div class="mb-8 rounded-lg bg-white shadow">

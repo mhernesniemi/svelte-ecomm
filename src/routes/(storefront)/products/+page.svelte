@@ -144,7 +144,7 @@
               <div class="relative aspect-square bg-gray-100">
                 {#if product.featuredAsset}
                   <img
-                    src={product.featuredAsset.preview ?? product.featuredAsset.source}
+                    src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto"
                     alt={getProductName(product)}
                     class="h-full w-full object-cover"
                   />

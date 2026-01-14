@@ -1,5 +1,6 @@
 import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
+import { assetService } from "$lib/server/services/assets.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -171,6 +172,65 @@ export const actions: Actions = {
 			return { variantSuccess: true };
 		} catch (e) {
 			return fail(500, { variantError: "Failed to create variant" });
+		}
+	},
+
+	addImage: async ({ params, request }) => {
+		const productId = Number(params.id);
+		const formData = await request.formData();
+
+		const url = formData.get("url") as string;
+		const name = formData.get("name") as string;
+		const fileId = formData.get("fileId") as string;
+		const width = Number(formData.get("width")) || 0;
+		const height = Number(formData.get("height")) || 0;
+		const fileSize = Number(formData.get("fileSize")) || 0;
+
+		if (!url || !name) {
+			return fail(400, { imageError: "Image data is required" });
+		}
+
+		try {
+			const asset = await assetService.create({ name, url, fileId, width, height, fileSize });
+			await assetService.addToProduct(productId, asset.id);
+			return { imageSuccess: true };
+		} catch (e) {
+			return fail(500, { imageError: "Failed to add image" });
+		}
+	},
+
+	removeImage: async ({ params, request }) => {
+		const productId = Number(params.id);
+		const formData = await request.formData();
+		const assetId = Number(formData.get("assetId"));
+
+		if (isNaN(assetId)) {
+			return fail(400, { imageError: "Invalid asset ID" });
+		}
+
+		try {
+			await assetService.removeFromProduct(productId, assetId);
+			await assetService.delete(assetId);
+			return { imageRemoved: true };
+		} catch (e) {
+			return fail(500, { imageError: "Failed to remove image" });
+		}
+	},
+
+	setFeaturedImage: async ({ params, request }) => {
+		const productId = Number(params.id);
+		const formData = await request.formData();
+		const assetId = Number(formData.get("assetId"));
+
+		if (isNaN(assetId)) {
+			return fail(400, { imageError: "Invalid asset ID" });
+		}
+
+		try {
+			await assetService.setFeaturedAsset(productId, assetId);
+			return { featuredSet: true };
+		} catch (e) {
+			return fail(500, { imageError: "Failed to set featured image" });
 		}
 	}
 };

@@ -11,6 +11,9 @@
   let quantity = $state(1);
   let isAddingToCart = $state(false);
   let message = $state<{ type: "success" | "error"; text: string } | null>(null);
+  let selectedImageIndex = $state(0);
+
+  const images = $derived(product.assets.length > 0 ? product.assets : (product.featuredAsset ? [product.featuredAsset] : []));
 
   // Initialize selected variant when product loads
   $effect(() => {
@@ -48,24 +51,46 @@
   </nav>
 
   <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
-    <!-- Product Image -->
-    <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
-      {#if product.featuredAsset}
-        <img
-          src={product.featuredAsset.preview ?? product.featuredAsset.source}
-          alt={enTrans?.name}
-          class="h-full w-full object-cover"
-        />
-      {:else}
-        <div class="flex h-full w-full items-center justify-center text-gray-400">
-          <svg class="h-24 w-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-            />
-          </svg>
+    <!-- Product Images -->
+    <div>
+      <!-- Main Image -->
+      <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
+        {#if images.length > 0}
+          <img
+            src="{images[selectedImageIndex].source}?tr=w-600,h-600,fo-auto"
+            alt={enTrans?.name}
+            class="h-full w-full object-cover"
+          />
+        {:else}
+          <div class="flex h-full w-full items-center justify-center text-gray-400">
+            <svg class="h-24 w-24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </div>
+        {/if}
+      </div>
+
+      <!-- Thumbnails -->
+      {#if images.length > 1}
+        <div class="mt-4 flex gap-2 overflow-x-auto">
+          {#each images as image, index}
+            <button
+              type="button"
+              onclick={() => (selectedImageIndex = index)}
+              class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-colors {selectedImageIndex === index ? 'border-blue-500' : 'border-transparent hover:border-gray-300'}"
+            >
+              <img
+                src="{image.source}?tr=w-100,h-100,fo-auto"
+                alt=""
+                class="h-full w-full object-cover"
+              />
+            </button>
+          {/each}
         </div>
       {/if}
     </div>
