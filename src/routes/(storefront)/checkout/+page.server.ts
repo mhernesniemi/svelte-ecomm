@@ -129,9 +129,17 @@ export const actions: Actions = {
 			cartToken: locals.cartToken
 		});
 
+		// Get the shipping method we just set
+		const orderShipping = await shippingService.getOrderShipping(cart.id);
+
+		// Get payment methods so they can be displayed
+		const paymentMethods = await paymentService.getActiveMethods();
+
 		return {
 			success: true,
-			cart: updatedCart
+			cart: updatedCart,
+			orderShipping,
+			paymentMethods
 		};
 	},
 

@@ -4,16 +4,25 @@
 
 	let { data, form }: { data: PageData; form: any } = $props();
 
-	let selectedShippingRate: (typeof data.shippingRates)[0] | null = null;
-	let selectedPaymentMethod: (typeof data.paymentMethods)[0] | null = null;
+	let selectedShippingRate = $state<(typeof data.shippingRates)[0] | null>(null);
+	let selectedPaymentMethod = $state<NonNullable<typeof data.paymentMethods>[number] | null>(null);
 	let isProcessingPayment = $state(false);
 	let isCompletingOrder = $state(false);
 
+	// Combine form and data for reactive state
+	// After form submission, form object contains the updated data
+	const currentOrderShipping = $derived(form?.orderShipping ?? data.orderShipping);
+	const currentPaymentMethods = $derived(form?.paymentMethods ?? data.paymentMethods);
+	const currentPaymentInfo = $derived(form?.paymentInfo ?? data.paymentInfo);
+	const currentCart = $derived(form?.cart ?? data.cart);
+	const currentShippingRates = $derived(form?.shippingRates ?? data.shippingRates);
+
 	// Initialize selected shipping rate if already set
 	$effect(() => {
-		if (data.orderShipping && data.shippingRates.length > 0 && !selectedShippingRate) {
-			const rate = data.shippingRates.find(
-				(r) => r.methodId === data.orderShipping?.shippingMethodId
+		if (currentOrderShipping && currentShippingRates.length > 0 && !selectedShippingRate) {
+			const rate = currentShippingRates.find(
+				(r: (typeof currentShippingRates)[number]) =>
+					r.methodId === currentOrderShipping?.shippingMethodId
 			);
 			if (rate) {
 				selectedShippingRate = rate;
@@ -21,20 +30,14 @@
 		}
 	});
 
-	// Initialize payment info from existing payment
-	$effect(() => {
-		if (data.paymentInfo && !form?.paymentInfo) {
-			// Payment already exists, show it
-		}
+	let addressFormData = $state({
+		fullName: data.cart?.shippingFullName ?? '',
+		streetLine1: data.cart?.shippingStreetLine1 ?? '',
+		streetLine2: data.cart?.shippingStreetLine2 ?? '',
+		city: data.cart?.shippingCity ?? '',
+		postalCode: data.cart?.shippingPostalCode ?? '',
+		country: data.cart?.shippingCountry ?? 'FI'
 	});
-	let addressFormData = {
-		fullName: data.cart?.shippingFullName || '',
-		streetLine1: data.cart?.shippingStreetLine1 || '',
-		streetLine2: data.cart?.shippingStreetLine2 || '',
-		city: data.cart?.shippingCity || '',
-		postalCode: data.cart?.shippingPostalCode || '',
-		country: data.cart?.shippingCountry || 'FI'
-	};
 
 	function formatPrice(cents: number): string {
 		return (cents / 100).toFixed(2);
@@ -45,24 +48,24 @@
 	}
 </script>
 
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-	<h1 class="text-3xl font-bold mb-8">Checkout</h1>
+<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+	<h1 class="mb-8 text-3xl font-bold">Checkout</h1>
 
-	{#if !data.cart || data.cart.lines.length === 0}
-		<div class="bg-white rounded-lg shadow p-8 text-center">
-			<p class="text-gray-500 mb-4">Your cart is empty</p>
-			<a href="/products" class="text-blue-600 hover:text-blue-700 underline">Browse products</a>
+	{#if !currentCart || currentCart.lines.length === 0}
+		<div class="rounded-lg bg-white p-8 text-center shadow">
+			<p class="mb-4 text-gray-500">Your cart is empty</p>
+			<a href="/products" class="text-blue-600 underline hover:text-blue-700">Browse products</a>
 		</div>
 	{:else}
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+		<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
 			<!-- Main Content -->
-			<div class="lg:col-span-2 space-y-6">
+			<div class="space-y-6 lg:col-span-2">
 				<!-- Shipping Address -->
-				<div class="bg-white rounded-lg shadow p-6">
-					<h2 class="text-xl font-semibold mb-4">Shipping Address</h2>
+				<div class="rounded-lg bg-white p-6 shadow">
+					<h2 class="mb-4 text-xl font-semibold">Shipping Address</h2>
 
 					{#if form?.error}
-						<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+						<div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
 							{form.error}
 						</div>
 					{/if}
@@ -70,7 +73,7 @@
 					<form method="POST" action="?/setShippingAddress" use:enhance>
 						<div class="space-y-4">
 							<div>
-								<label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">
+								<label for="fullName" class="mb-1 block text-sm font-medium text-gray-700">
 									Full Name <span class="text-red-500">*</span>
 								</label>
 								<input
@@ -79,12 +82,12 @@
 									name="fullName"
 									bind:value={addressFormData.fullName}
 									required
-									class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+									class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
 								/>
 							</div>
 
 							<div>
-								<label for="streetLine1" class="block text-sm font-medium text-gray-700 mb-1">
+								<label for="streetLine1" class="mb-1 block text-sm font-medium text-gray-700">
 									Street Address <span class="text-red-500">*</span>
 								</label>
 								<input
@@ -93,12 +96,12 @@
 									name="streetLine1"
 									bind:value={addressFormData.streetLine1}
 									required
-									class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+									class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
 								/>
 							</div>
 
 							<div>
-								<label for="streetLine2" class="block text-sm font-medium text-gray-700 mb-1">
+								<label for="streetLine2" class="mb-1 block text-sm font-medium text-gray-700">
 									Apartment, suite, etc. (optional)
 								</label>
 								<input
@@ -106,13 +109,13 @@
 									id="streetLine2"
 									name="streetLine2"
 									bind:value={addressFormData.streetLine2}
-									class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+									class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
 								/>
 							</div>
 
 							<div class="grid grid-cols-2 gap-4">
 								<div>
-									<label for="postalCode" class="block text-sm font-medium text-gray-700 mb-1">
+									<label for="postalCode" class="mb-1 block text-sm font-medium text-gray-700">
 										Postal Code <span class="text-red-500">*</span>
 									</label>
 									<input
@@ -121,12 +124,12 @@
 										name="postalCode"
 										bind:value={addressFormData.postalCode}
 										required
-										class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
 									/>
 								</div>
 
 								<div>
-									<label for="city" class="block text-sm font-medium text-gray-700 mb-1">
+									<label for="city" class="mb-1 block text-sm font-medium text-gray-700">
 										City <span class="text-red-500">*</span>
 									</label>
 									<input
@@ -135,13 +138,13 @@
 										name="city"
 										bind:value={addressFormData.city}
 										required
-										class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
 									/>
 								</div>
 							</div>
 
 							<div>
-								<label for="country" class="block text-sm font-medium text-gray-700 mb-1">
+								<label for="country" class="mb-1 block text-sm font-medium text-gray-700">
 									Country <span class="text-red-500">*</span>
 								</label>
 								<select
@@ -149,7 +152,7 @@
 									name="country"
 									bind:value={addressFormData.country}
 									required
-									class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+									class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
 								>
 									<option value="FI">Finland</option>
 									<option value="SE">Sweden</option>
@@ -160,7 +163,7 @@
 
 							<button
 								type="submit"
-								class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+								class="w-full rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
 							>
 								Save Address
 							</button>
@@ -169,14 +172,14 @@
 				</div>
 
 				<!-- Shipping Method Selection -->
-				{#if data.cart.shippingPostalCode && data.shippingRates.length > 0}
-					<div class="bg-white rounded-lg shadow p-6">
-						<h2 class="text-xl font-semibold mb-4">Shipping Method</h2>
+				{#if currentCart?.shippingPostalCode && currentShippingRates.length > 0}
+					<div class="rounded-lg bg-white p-6 shadow">
+						<h2 class="mb-4 text-xl font-semibold">Shipping Method</h2>
 
 						<div class="space-y-3">
-							{#each data.shippingRates as rate}
+							{#each currentShippingRates as rate}
 								<label
-									class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors {selectedShippingRate?.id ===
+									class="flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50 {selectedShippingRate?.id ===
 									rate.id
 										? 'border-blue-500 bg-blue-50'
 										: 'border-gray-300'}"
@@ -190,71 +193,74 @@
 										class="mt-1 mr-3"
 									/>
 									<div class="flex-1">
-										<div class="flex justify-between items-start">
+										<div class="flex items-start justify-between">
 											<div>
 												<p class="font-medium">{rate.name}</p>
 												{#if rate.description}
-													<p class="text-sm text-gray-500 mt-1">{rate.description}</p>
+													<p class="mt-1 text-sm text-gray-500">{rate.description}</p>
 												{/if}
 												{#if rate.estimatedDeliveryDays}
-													<p class="text-sm text-gray-500 mt-1">
-														Estimated delivery: {rate.estimatedDeliveryDays} business day{rate
-															.estimatedDeliveryDays !== 1
+													<p class="mt-1 text-sm text-gray-500">
+														Estimated delivery: {rate.estimatedDeliveryDays} business day{rate.estimatedDeliveryDays !==
+														1
 															? 's'
 															: ''}
 													</p>
 												{/if}
 											</div>
-											<p class="font-semibold ml-4">{formatPrice(rate.price)} EUR</p>
+											<p class="ml-4 font-semibold">{formatPrice(rate.price)} EUR</p>
 										</div>
 									</div>
 								</label>
 							{/each}
 						</div>
 
-						{#if selectedShippingRate && !data.orderShipping}
+						{#if selectedShippingRate && !currentOrderShipping}
 							<form method="POST" action="?/setShippingMethod" use:enhance class="mt-4">
 								<input type="hidden" name="methodId" value={selectedShippingRate.methodId} />
 								<input type="hidden" name="rateId" value={selectedShippingRate.id} />
 								<input type="hidden" name="price" value={selectedShippingRate.price} />
 								<button
 									type="submit"
-									class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+									class="w-full rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
 								>
 									Select Shipping Method
 								</button>
 							</form>
-						{:else if data.orderShipping}
-							<div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-								<p class="text-green-800 text-sm font-medium">
-									Shipping method selected: {data.shippingRates.find(r => r.methodId === data.orderShipping?.shippingMethodId)?.name || 'Selected'}
+						{:else if currentOrderShipping}
+							<div class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
+								<p class="text-sm font-medium text-green-800">
+									Shipping method selected: {currentShippingRates.find(
+										(r: (typeof currentShippingRates)[number]) =>
+											r.methodId === currentOrderShipping?.shippingMethodId
+									)?.name || 'Selected'}
 								</p>
 							</div>
 						{/if}
 					</div>
-				{:else if data.cart.shippingPostalCode}
-					<div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-						<p class="text-yellow-800 text-sm">
+				{:else if currentCart?.shippingPostalCode}
+					<div class="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+						<p class="text-sm text-yellow-800">
 							No shipping methods available for this address. Please check your address.
 						</p>
 					</div>
 				{:else}
-					<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-						<p class="text-gray-600 text-sm">
+					<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+						<p class="text-sm text-gray-600">
 							Please enter your shipping address to see available shipping methods.
 						</p>
 					</div>
 				{/if}
 
 				<!-- Payment Method Selection -->
-				{#if data.cart.shippingPostalCode && data.orderShipping && data.paymentMethods?.length > 0}
-					<div class="bg-white rounded-lg shadow p-6">
-						<h2 class="text-xl font-semibold mb-4">Payment Method</h2>
+				{#if currentCart?.shippingPostalCode && currentOrderShipping && currentPaymentMethods?.length > 0}
+					<div class="rounded-lg bg-white p-6 shadow">
+						<h2 class="mb-4 text-xl font-semibold">Payment Method</h2>
 
 						<div class="space-y-3">
-							{#each data.paymentMethods as method}
+							{#each currentPaymentMethods as method}
 								<label
-									class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors {selectedPaymentMethod?.id ===
+									class="flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50 {selectedPaymentMethod?.id ===
 									method.id
 										? 'border-blue-500 bg-blue-50'
 										: 'border-gray-300'}"
@@ -270,14 +276,14 @@
 									<div class="flex-1">
 										<p class="font-medium">{method.name}</p>
 										{#if method.description}
-											<p class="text-sm text-gray-500 mt-1">{method.description}</p>
+											<p class="mt-1 text-sm text-gray-500">{method.description}</p>
 										{/if}
 									</div>
 								</label>
 							{/each}
 						</div>
 
-						{#if selectedPaymentMethod && !form?.paymentInfo && !data.paymentInfo}
+						{#if selectedPaymentMethod && !currentPaymentInfo}
 							<form
 								method="POST"
 								action="?/createPayment"
@@ -294,22 +300,20 @@
 								<button
 									type="submit"
 									disabled={isProcessingPayment}
-									class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+									class="w-full rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
 								>
 									{isProcessingPayment ? 'Processing...' : 'Create Payment'}
 								</button>
 							</form>
-						{:else if (form?.paymentInfo || data.paymentInfo) && !data.orderShipping}
-							<div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-								<p class="text-yellow-800 text-sm">
-									Please select a shipping method first.
-								</p>
+						{:else if currentPaymentInfo}
+							<div class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
+								<p class="text-sm font-medium text-green-800">Payment created successfully</p>
 							</div>
 						{/if}
 					</div>
-				{:else if data.cart.shippingPostalCode && !data.orderShipping}
-					<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-						<p class="text-gray-600 text-sm">
+				{:else if currentCart?.shippingPostalCode && !currentOrderShipping}
+					<div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+						<p class="text-sm text-gray-600">
 							Please select a shipping method first to see payment options.
 						</p>
 					</div>
@@ -318,57 +322,56 @@
 
 			<!-- Order Summary -->
 			<div class="lg:col-span-1">
-				<div class="bg-white rounded-lg shadow p-6 sticky top-4">
-					<h2 class="text-xl font-semibold mb-4">Order Summary</h2>
+				<div class="sticky top-4 rounded-lg bg-white p-6 shadow">
+					<h2 class="mb-4 text-xl font-semibold">Order Summary</h2>
 
-					<div class="space-y-4 mb-4">
-						{#each data.cart.lines as line}
+					<div class="mb-4 space-y-4">
+						{#each currentCart.lines as line}
 							<div class="flex justify-between text-sm">
 								<div>
 									<p class="font-medium">{line.productName}</p>
 									{#if line.variantName}
-										<p class="text-gray-500 text-xs">{line.variantName}</p>
+										<p class="text-xs text-gray-500">{line.variantName}</p>
 									{/if}
-									<p class="text-gray-500 text-xs">Qty: {line.quantity}</p>
+									<p class="text-xs text-gray-500">Qty: {line.quantity}</p>
 								</div>
 								<p class="font-medium">{formatPrice(line.lineTotal)} EUR</p>
 							</div>
 						{/each}
 					</div>
 
-					<div class="border-t pt-4 space-y-2">
+					<div class="space-y-2 border-t pt-4">
 						<div class="flex justify-between text-sm">
 							<span class="text-gray-600">Subtotal</span>
-							<span class="font-medium">{formatPrice(data.cart.subtotal)} EUR</span>
+							<span class="font-medium">{formatPrice(currentCart.subtotal)} EUR</span>
 						</div>
 
-						{#if data.cart.discount > 0}
+						{#if currentCart.discount > 0}
 							<div class="flex justify-between text-sm">
 								<span class="text-gray-600">Discount</span>
 								<span class="font-medium text-green-600">
-									-{formatPrice(data.cart.discount)} EUR
+									-{formatPrice(currentCart.discount)} EUR
 								</span>
 							</div>
 						{/if}
 
 						<div class="flex justify-between text-sm">
 							<span class="text-gray-600">Shipping</span>
-							<span class="font-medium">{formatPrice(data.cart.shipping)} EUR</span>
+							<span class="font-medium">{formatPrice(currentCart.shipping)} EUR</span>
 						</div>
 
-						<div class="flex justify-between text-lg font-bold pt-2 border-t">
+						<div class="flex justify-between border-t pt-2 text-lg font-bold">
 							<span>Total</span>
-							<span>{formatPrice(data.cart.total)} EUR</span>
+							<span>{formatPrice(currentCart.total)} EUR</span>
 						</div>
 					</div>
 
-					{#if form?.paymentInfo || data.paymentInfo}
-						{@const paymentInfo = form?.paymentInfo || data.paymentInfo}
-						<div class="mt-6 pt-6 border-t">
-							<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-								<p class="text-green-800 font-medium mb-2">Payment Ready</p>
-								<p class="text-green-700 text-sm">
-									Transaction ID: {paymentInfo.providerTransactionId}
+					{#if currentPaymentInfo}
+						<div class="mt-6 border-t pt-6">
+							<div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4">
+								<p class="mb-2 font-medium text-green-800">Payment Ready</p>
+								<p class="text-sm text-green-700">
+									Transaction ID: {currentPaymentInfo.providerTransactionId}
 								</p>
 							</div>
 							<form
@@ -385,16 +388,22 @@
 								<button
 									type="submit"
 									disabled={isCompletingOrder}
-									class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+									class="w-full rounded-lg bg-green-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
 								>
 									{isCompletingOrder ? 'Completing Order...' : 'Complete Order'}
 								</button>
 							</form>
 						</div>
 					{:else}
-						<div class="mt-6 pt-6 border-t">
-							<p class="text-sm text-gray-500 mb-4">
-								Select payment method to proceed.
+						<div class="mt-6 border-t pt-6">
+							<p class="mb-4 text-sm text-gray-500">
+								{#if !currentCart?.shippingPostalCode}
+									Enter shipping address to proceed.
+								{:else if !currentOrderShipping}
+									Select shipping method to proceed.
+								{:else}
+									Select payment method to proceed.
+								{/if}
 							</p>
 						</div>
 					{/if}
