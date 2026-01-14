@@ -5,12 +5,12 @@ import { fail, redirect } from '@sveltejs/kit';
 import { orderService, shippingService, paymentService } from '$lib/server/services/index.js';
 import type { PageServerLoad, Actions } from './$types.js';
 
-export const load: PageServerLoad = async ({ cookies, locals }) => {
-	const cartToken = cookies.get('cartToken') ?? null;
-	const customerId = locals.user?.id ?? null;
-
-	// Get active cart
-	const cart = await orderService.getActiveCart({ customerId, cartToken });
+export const load: PageServerLoad = async ({ locals }) => {
+	// Use locals.cartToken and locals.customer?.id (set by hooks.server.ts)
+	const cart = await orderService.getActiveCart({
+		customerId: locals.customer?.id,
+		cartToken: locals.cartToken
+	});
 	if (!cart) {
 		return {
 			cart: null,
@@ -50,11 +50,11 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 };
 
 export const actions: Actions = {
-	setShippingAddress: async ({ request, cookies, locals }) => {
-		const cartToken = cookies.get('cartToken') ?? null;
-		const customerId = locals.user?.id ?? null;
-
-		const cart = await orderService.getActiveCart({ customerId, cartToken });
+	setShippingAddress: async ({ request, locals }) => {
+		const cart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
 		if (!cart) {
 			return fail(404, { error: 'Cart not found' });
 		}
@@ -81,7 +81,10 @@ export const actions: Actions = {
 		});
 
 		// Reload cart to get updated shipping rates
-		const updatedCart = await orderService.getActiveCart({ customerId, cartToken });
+		const updatedCart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
 		const shippingRates = updatedCart
 			? await shippingService.getAvailableRates(updatedCart)
 			: [];
@@ -93,11 +96,11 @@ export const actions: Actions = {
 		};
 	},
 
-	setShippingMethod: async ({ request, cookies, locals }) => {
-		const cartToken = cookies.get('cartToken') ?? null;
-		const customerId = locals.user?.id ?? null;
-
-		const cart = await orderService.getActiveCart({ customerId, cartToken });
+	setShippingMethod: async ({ request, locals }) => {
+		const cart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
 		if (!cart) {
 			return fail(404, { error: 'Cart not found' });
 		}
@@ -121,7 +124,10 @@ export const actions: Actions = {
 		// Recalculate totals with new shipping cost
 		await orderService.getById(cart.id);
 
-		const updatedCart = await orderService.getActiveCart({ customerId, cartToken });
+		const updatedCart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
 
 		return {
 			success: true,
@@ -129,11 +135,11 @@ export const actions: Actions = {
 		};
 	},
 
-	createPayment: async ({ request, cookies, locals }) => {
-		const cartToken = cookies.get('cartToken') ?? null;
-		const customerId = locals.user?.id ?? null;
-
-		const cart = await orderService.getActiveCart({ customerId, cartToken });
+	createPayment: async ({ request, locals }) => {
+		const cart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
 		if (!cart) {
 			return fail(404, { error: 'Cart not found' });
 		}
@@ -196,10 +202,10 @@ export const actions: Actions = {
 	},
 
 	completeOrder: async ({ request, cookies, locals }) => {
-		const cartToken = cookies.get('cartToken') ?? null;
-		const customerId = locals.user?.id ?? null;
-
-		const cart = await orderService.getActiveCart({ customerId, cartToken });
+		const cart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
 		if (!cart) {
 			return fail(404, { error: 'Cart not found' });
 		}
