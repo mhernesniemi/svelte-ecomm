@@ -3,23 +3,23 @@
  * Manages payment methods and order payment processing
  * Uses provider pattern for modular payment gateway support
  */
-import { eq, and, inArray, desc } from 'drizzle-orm';
-import { db } from '../../db/index.js';
-import { paymentMethods, payments } from '../../db/schema.js';
+import { eq, and, inArray, desc } from "drizzle-orm";
+import { db } from "../../db/index.js";
+import { paymentMethods, payments } from "../../db/schema.js";
 import type {
 	PaymentMethod,
 	NewPaymentMethod,
 	Payment,
 	NewPayment,
 	OrderWithRelations
-} from '$lib/types.js';
-import type { PaymentProvider, PaymentInfo, PaymentStatus, RefundInfo } from './types.js';
-import { StripeProvider, MockProvider } from './providers/index.js';
+} from "$lib/types.js";
+import type { PaymentProvider, PaymentInfo, PaymentStatus, RefundInfo } from "./types.js";
+import { StripeProvider, MockProvider } from "./providers/index.js";
 
 // Provider registry - maps provider codes to provider instances
 const PROVIDERS: Map<string, PaymentProvider> = new Map([
-	['stripe', new StripeProvider()],
-	['mock', new MockProvider()]
+	["stripe", new StripeProvider()],
+	["mock", new MockProvider()]
 ]);
 
 export class PaymentService {
@@ -27,10 +27,7 @@ export class PaymentService {
 	 * Get all active payment methods
 	 */
 	async getActiveMethods(): Promise<PaymentMethod[]> {
-		return db
-			.select()
-			.from(paymentMethods)
-			.where(eq(paymentMethods.active, true));
+		return db.select().from(paymentMethods).where(eq(paymentMethods.active, true));
 	}
 
 	/**
@@ -68,7 +65,7 @@ export class PaymentService {
 	): Promise<{ payment: Payment; paymentInfo: PaymentInfo }> {
 		const method = await this.getMethodById(paymentMethodId);
 		if (!method) {
-			throw new Error('Payment method not found');
+			throw new Error("Payment method not found");
 		}
 
 		const provider = PROVIDERS.get(method.code);
@@ -87,7 +84,7 @@ export class PaymentService {
 				paymentMethodId: method.id,
 				method: method.code, // Legacy field
 				amount: order.total,
-				state: 'pending',
+				state: "pending",
 				transactionId: paymentInfo.providerTransactionId,
 				metadata: paymentInfo.metadata ?? null
 			})
@@ -122,12 +119,12 @@ export class PaymentService {
 	async confirmPayment(paymentId: number): Promise<PaymentStatus> {
 		const payment = await this.getById(paymentId);
 		if (!payment) {
-			throw new Error('Payment not found');
+			throw new Error("Payment not found");
 		}
 
 		const method = await this.getMethodById(payment.paymentMethodId);
 		if (!method) {
-			throw new Error('Payment method not found');
+			throw new Error("Payment method not found");
 		}
 
 		const provider = PROVIDERS.get(method.code);
@@ -137,7 +134,7 @@ export class PaymentService {
 		}
 
 		if (!payment.transactionId) {
-			throw new Error('Payment has no transaction ID');
+			throw new Error("Payment has no transaction ID");
 		}
 
 		try {
@@ -154,7 +151,7 @@ export class PaymentService {
 
 			return status;
 		} catch (error) {
-			console.error('Error confirming payment:', error);
+			console.error("Error confirming payment:", error);
 			throw error;
 		}
 	}
@@ -165,16 +162,16 @@ export class PaymentService {
 	async refundPayment(paymentId: number, amount?: number): Promise<RefundInfo> {
 		const payment = await this.getById(paymentId);
 		if (!payment) {
-			throw new Error('Payment not found');
+			throw new Error("Payment not found");
 		}
 
-		if (payment.state !== 'settled' && payment.state !== 'completed') {
+		if (payment.state !== "settled" && payment.state !== "completed") {
 			throw new Error(`Cannot refund payment in state: ${payment.state}`);
 		}
 
 		const method = await this.getMethodById(payment.paymentMethodId);
 		if (!method) {
-			throw new Error('Payment method not found');
+			throw new Error("Payment method not found");
 		}
 
 		const provider = PROVIDERS.get(method.code);
@@ -183,12 +180,12 @@ export class PaymentService {
 		}
 
 		if (!payment.transactionId) {
-			throw new Error('Payment has no transaction ID');
+			throw new Error("Payment has no transaction ID");
 		}
 
 		const refundAmount = amount ?? payment.amount;
 		if (refundAmount > payment.amount) {
-			throw new Error('Refund amount exceeds payment amount');
+			throw new Error("Refund amount exceeds payment amount");
 		}
 
 		try {
@@ -198,7 +195,7 @@ export class PaymentService {
 			await db
 				.update(payments)
 				.set({
-					state: 'refunded',
+					state: "refunded",
 					metadata: {
 						...(payment.metadata as Record<string, unknown>),
 						refund: refundInfo
@@ -209,7 +206,7 @@ export class PaymentService {
 
 			return refundInfo;
 		} catch (error) {
-			console.error('Error refunding payment:', error);
+			console.error("Error refunding payment:", error);
 			throw error;
 		}
 	}
@@ -228,15 +225,15 @@ export class PaymentService {
 	async initializeDefaultMethods(): Promise<void> {
 		const defaultMethods: NewPaymentMethod[] = [
 			{
-				code: 'stripe',
-				name: 'Stripe',
-				description: 'Pay with credit card via Stripe',
+				code: "stripe",
+				name: "Stripe",
+				description: "Pay with credit card via Stripe",
 				active: true
 			},
 			{
-				code: 'mock',
-				name: 'Mock Payment',
-				description: 'Mock payment for development and testing',
+				code: "mock",
+				name: "Mock Payment",
+				description: "Mock payment for development and testing",
 				active: true
 			}
 		];
@@ -262,4 +259,4 @@ export class PaymentService {
 export const paymentService = new PaymentService();
 
 // Re-export types for convenience
-export type { PaymentInfo, PaymentStatus, RefundInfo } from './types.js';
+export type { PaymentInfo, PaymentStatus, RefundInfo } from "./types.js";

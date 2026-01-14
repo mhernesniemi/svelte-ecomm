@@ -1,6 +1,6 @@
-import { orderService } from '$lib/server/services/orders.js';
-import { fail } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import { orderService } from "$lib/server/services/orders.js";
+import { fail } from "@sveltejs/kit";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const cart = await orderService.getActiveCart({
@@ -16,11 +16,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 export const actions: Actions = {
 	updateQuantity: async ({ request, locals }) => {
 		const formData = await request.formData();
-		const lineId = parseInt(formData.get('lineId') as string);
-		const quantity = parseInt(formData.get('quantity') as string);
+		const lineId = parseInt(formData.get("lineId") as string);
+		const quantity = parseInt(formData.get("quantity") as string);
 
 		if (isNaN(lineId) || isNaN(quantity)) {
-			return fail(400, { error: 'Invalid input' });
+			return fail(400, { error: "Invalid input" });
 		}
 
 		// Get the active cart
@@ -30,7 +30,7 @@ export const actions: Actions = {
 		});
 
 		if (!cart) {
-			return fail(400, { error: 'No active cart' });
+			return fail(400, { error: "No active cart" });
 		}
 
 		try {
@@ -41,16 +41,16 @@ export const actions: Actions = {
 			}
 			return { success: true };
 		} catch (error) {
-			return fail(500, { error: 'Failed to update cart' });
+			return fail(500, { error: "Failed to update cart" });
 		}
 	},
 
 	removeLine: async ({ request, locals }) => {
 		const formData = await request.formData();
-		const lineId = parseInt(formData.get('lineId') as string);
+		const lineId = parseInt(formData.get("lineId") as string);
 
 		if (isNaN(lineId)) {
-			return fail(400, { error: 'Invalid input' });
+			return fail(400, { error: "Invalid input" });
 		}
 
 		const cart = await orderService.getActiveCart({
@@ -59,23 +59,23 @@ export const actions: Actions = {
 		});
 
 		if (!cart) {
-			return fail(400, { error: 'No active cart' });
+			return fail(400, { error: "No active cart" });
 		}
 
 		try {
 			await orderService.removeLine(cart.id, lineId);
 			return { success: true };
 		} catch (error) {
-			return fail(500, { error: 'Failed to remove item' });
+			return fail(500, { error: "Failed to remove item" });
 		}
 	},
 
 	applyPromotion: async ({ request, locals }) => {
 		const formData = await request.formData();
-		const code = formData.get('code') as string;
+		const code = formData.get("code") as string;
 
 		if (!code) {
-			return fail(400, { error: 'Promotion code is required' });
+			return fail(400, { error: "Promotion code is required" });
 		}
 
 		const cart = await orderService.getActiveCart({
@@ -84,7 +84,7 @@ export const actions: Actions = {
 		});
 
 		if (!cart) {
-			return fail(400, { error: 'No active cart' });
+			return fail(400, { error: "No active cart" });
 		}
 
 		const result = await orderService.applyPromotion(cart.id, code);

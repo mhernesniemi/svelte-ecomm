@@ -8,8 +8,8 @@
  * - Guest users get a `cartToken` stored in cookies
  * - Logged-in users have carts linked to `customerId`
  */
-import { eq, and, desc, sql, isNull } from 'drizzle-orm';
-import { db } from '../db/index.js';
+import { eq, and, desc, sql, isNull } from "drizzle-orm";
+import { db } from "../db/index.js";
 import {
 	orders,
 	orderLines,
@@ -19,7 +19,7 @@ import {
 	productVariantTranslations,
 	promotions,
 	orderShipping
-} from '../db/schema.js';
+} from "../db/schema.js";
 import type {
 	Order,
 	OrderWithRelations,
@@ -27,8 +27,8 @@ import type {
 	CreateOrderInput,
 	AddOrderLineInput,
 	OrderState
-} from '$lib/types.js';
-import { nanoid } from 'nanoid';
+} from "$lib/types.js";
+import { nanoid } from "nanoid";
 
 // Generate a secure cart token for guest users
 function generateCartToken(): string {
@@ -37,10 +37,10 @@ function generateCartToken(): string {
 
 // Valid state transitions
 const STATE_TRANSITIONS: Record<OrderState, OrderState[]> = {
-	created: ['payment_pending', 'cancelled'],
-	payment_pending: ['paid', 'cancelled'],
-	paid: ['shipped', 'cancelled'],
-	shipped: ['delivered'],
+	created: ["payment_pending", "cancelled"],
+	payment_pending: ["paid", "cancelled"],
+	paid: ["shipped", "cancelled"],
+	shipped: ["delivered"],
 	delivered: [],
 	cancelled: []
 };
@@ -59,8 +59,8 @@ export class OrderService {
 				customerId: input.customerId ?? null,
 				cartToken: input.cartToken ?? null,
 				active: true,
-				state: 'created',
-				currencyCode: input.currencyCode ?? 'EUR',
+				state: "created",
+				currencyCode: input.currencyCode ?? "EUR",
 				subtotal: 0,
 				shipping: 0,
 				discount: 0,
@@ -269,8 +269,8 @@ export class OrderService {
 	 */
 	async addLine(orderId: number, input: AddOrderLineInput): Promise<OrderLine> {
 		const order = await this.getById(orderId);
-		if (!order) throw new Error('Order not found');
-		if (!order.active) throw new Error('Cannot modify completed order');
+		if (!order) throw new Error("Order not found");
+		if (!order.active) throw new Error("Cannot modify completed order");
 
 		// Get variant with current price
 		const [variant] = await db
@@ -278,7 +278,7 @@ export class OrderService {
 			.from(productVariants)
 			.where(eq(productVariants.id, input.variantId));
 
-		if (!variant) throw new Error('Variant not found');
+		if (!variant) throw new Error("Variant not found");
 
 		// Get product name for snapshot
 		const [productTrans] = await db
@@ -322,7 +322,7 @@ export class OrderService {
 				quantity: input.quantity,
 				unitPrice: variant.price,
 				lineTotal: variant.price * input.quantity,
-				productName: productTrans?.name ?? 'Unknown Product',
+				productName: productTrans?.name ?? "Unknown Product",
 				variantName: variantTrans?.name ?? null,
 				sku: variant.sku
 			})
@@ -335,19 +335,23 @@ export class OrderService {
 	/**
 	 * Update line quantity
 	 */
-	async updateLineQuantity(orderId: number, lineId: number, quantity: number): Promise<OrderLine> {
+	async updateLineQuantity(
+		orderId: number,
+		lineId: number,
+		quantity: number
+	): Promise<OrderLine> {
 		const order = await this.getById(orderId);
-		if (!order) throw new Error('Order not found');
-		if (!order.active) throw new Error('Cannot modify completed order');
+		if (!order) throw new Error("Order not found");
+		if (!order.active) throw new Error("Cannot modify completed order");
 
 		if (quantity <= 0) {
 			await this.removeLine(orderId, lineId);
-			throw new Error('Line removed due to zero quantity');
+			throw new Error("Line removed due to zero quantity");
 		}
 
 		const [line] = await db.select().from(orderLines).where(eq(orderLines.id, lineId));
 
-		if (!line) throw new Error('Line not found');
+		if (!line) throw new Error("Line not found");
 
 		const [updated] = await db
 			.update(orderLines)
@@ -367,8 +371,8 @@ export class OrderService {
 	 */
 	async removeLine(orderId: number, lineId: number): Promise<void> {
 		const order = await this.getById(orderId);
-		if (!order) throw new Error('Order not found');
-		if (!order.active) throw new Error('Cannot modify completed order');
+		if (!order) throw new Error("Order not found");
+		if (!order.active) throw new Error("Cannot modify completed order");
 
 		await db.delete(orderLines).where(eq(orderLines.id, lineId));
 		await this.recalculateTotals(orderId);
@@ -377,10 +381,13 @@ export class OrderService {
 	/**
 	 * Apply a promotion code
 	 */
-	async applyPromotion(orderId: number, code: string): Promise<{ success: boolean; message: string }> {
+	async applyPromotion(
+		orderId: number,
+		code: string
+	): Promise<{ success: boolean; message: string }> {
 		const order = await this.getById(orderId);
-		if (!order) return { success: false, message: 'Order not found' };
-		if (!order.active) return { success: false, message: 'Cannot modify completed order' };
+		if (!order) return { success: false, message: "Order not found" };
+		if (!order.active) return { success: false, message: "Cannot modify completed order" };
 
 		// Find promotion
 		const [promotion] = await db
@@ -388,20 +395,20 @@ export class OrderService {
 			.from(promotions)
 			.where(and(eq(promotions.code, code), eq(promotions.enabled, true)));
 
-		if (!promotion) return { success: false, message: 'Invalid promotion code' };
+		if (!promotion) return { success: false, message: "Invalid promotion code" };
 
 		// Check usage limit
 		if (promotion.usageLimit && promotion.usageCount >= promotion.usageLimit) {
-			return { success: false, message: 'Promotion code has reached its usage limit' };
+			return { success: false, message: "Promotion code has reached its usage limit" };
 		}
 
 		// Check dates
 		const now = new Date();
 		if (promotion.startsAt && promotion.startsAt > now) {
-			return { success: false, message: 'Promotion is not yet active' };
+			return { success: false, message: "Promotion is not yet active" };
 		}
 		if (promotion.endsAt && promotion.endsAt < now) {
-			return { success: false, message: 'Promotion has expired' };
+			return { success: false, message: "Promotion has expired" };
 		}
 
 		// Check minimum order amount
@@ -414,18 +421,21 @@ export class OrderService {
 
 		// Calculate discount
 		let discountAmount = 0;
-		if (promotion.discountType === 'percentage') {
+		if (promotion.discountType === "percentage") {
 			discountAmount = Math.round(order.subtotal * (promotion.discountValue / 100));
 		} else {
 			discountAmount = Math.min(promotion.discountValue, order.subtotal);
 		}
 
 		// Apply promotion
-		await db.insert(orderPromotions).values({
-			orderId,
-			promotionId: promotion.id,
-			discountAmount
-		}).onConflictDoNothing();
+		await db
+			.insert(orderPromotions)
+			.values({
+				orderId,
+				promotionId: promotion.id,
+				discountAmount
+			})
+			.onConflictDoNothing();
 
 		await this.recalculateTotals(orderId);
 
@@ -438,7 +448,12 @@ export class OrderService {
 	async removePromotion(orderId: number, promotionId: number): Promise<void> {
 		await db
 			.delete(orderPromotions)
-			.where(and(eq(orderPromotions.orderId, orderId), eq(orderPromotions.promotionId, promotionId)));
+			.where(
+				and(
+					eq(orderPromotions.orderId, orderId),
+					eq(orderPromotions.promotionId, promotionId)
+				)
+			);
 
 		await this.recalculateTotals(orderId);
 	}
@@ -448,7 +463,7 @@ export class OrderService {
 	 */
 	async transitionState(orderId: number, newState: OrderState): Promise<Order> {
 		const order = await this.getById(orderId);
-		if (!order) throw new Error('Order not found');
+		if (!order) throw new Error("Order not found");
 
 		const currentState = order.state as OrderState;
 		const allowedTransitions = STATE_TRANSITIONS[currentState];
@@ -463,17 +478,21 @@ export class OrderService {
 		};
 
 		// When transitioning to payment_pending, mark cart as no longer active (becomes an order)
-		if (newState === 'payment_pending') {
+		if (newState === "payment_pending") {
 			updateData.active = false;
 			if (!order.orderPlacedAt) {
 				updateData.orderPlacedAt = new Date();
 			}
 		}
 
-		const [updated] = await db.update(orders).set(updateData).where(eq(orders.id, orderId)).returning();
+		const [updated] = await db
+			.update(orders)
+			.set(updateData)
+			.where(eq(orders.id, orderId))
+			.returning();
 
 		// Update promotion usage counts when order is paid
-		if (newState === 'paid') {
+		if (newState === "paid") {
 			const appliedPromotions = await db
 				.select()
 				.from(orderPromotions)

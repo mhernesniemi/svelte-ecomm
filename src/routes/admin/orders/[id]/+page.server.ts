@@ -1,19 +1,19 @@
-import { orderService } from '$lib/server/services/orders.js';
-import { shippingService, paymentService } from '$lib/server/services/index.js';
-import { error, fail } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import { orderService } from "$lib/server/services/orders.js";
+import { shippingService, paymentService } from "$lib/server/services/index.js";
+import { error, fail } from "@sveltejs/kit";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
-		throw error(404, 'Invalid order ID');
+		throw error(404, "Invalid order ID");
 	}
 
 	const order = await orderService.getById(id);
 
 	if (!order) {
-		throw error(404, 'Order not found');
+		throw error(404, "Order not found");
 	}
 
 	// Load shipping info
@@ -38,34 +38,34 @@ export const actions: Actions = {
 	transition: async ({ params, request }) => {
 		const id = Number(params.id);
 		const formData = await request.formData();
-		const newState = formData.get('state') as string;
+		const newState = formData.get("state") as string;
 
 		try {
 			await orderService.transitionState(id, newState as any);
-			
+
 			// If transitioning to 'paid', create shipment
-			if (newState === 'paid') {
+			if (newState === "paid") {
 				const order = await orderService.getById(id);
 				if (order) {
 					try {
 						await shippingService.createShipment(order);
 					} catch (e) {
-						console.error('Error creating shipment:', e);
+						console.error("Error creating shipment:", e);
 						// Don't fail the transition if shipment creation fails
 					}
 				}
 			}
-			
+
 			return { success: true };
 		} catch (e) {
 			return fail(400, { error: (e as Error).message });
 		}
 	},
-	
+
 	updateShippingStatus: async ({ params, request }) => {
 		const id = Number(params.id);
 		const formData = await request.formData();
-		const status = formData.get('status') as string;
+		const status = formData.get("status") as string;
 
 		try {
 			await shippingService.updateShippingStatus(id, status as any);
@@ -74,10 +74,10 @@ export const actions: Actions = {
 			return fail(400, { error: (e as Error).message });
 		}
 	},
-	
+
 	trackShipment: async ({ params }) => {
 		const id = Number(params.id);
-		
+
 		try {
 			const status = await shippingService.trackShipment(id);
 			return { success: true, trackingStatus: status };
@@ -85,36 +85,39 @@ export const actions: Actions = {
 			return fail(400, { error: (e as Error).message });
 		}
 	},
-	
+
 	confirmPayment: async ({ params }) => {
 		const id = Number(params.id);
-		
+
 		try {
 			const orderPayments = await paymentService.getByOrderId(id);
 			if (orderPayments.length === 0) {
-				return fail(404, { error: 'No payment found for this order' });
+				return fail(404, { error: "No payment found for this order" });
 			}
-			
+
 			const status = await paymentService.confirmPayment(orderPayments[0].id);
 			return { success: true, paymentStatus: status };
 		} catch (e) {
 			return fail(400, { error: (e as Error).message });
 		}
 	},
-	
+
 	refundPayment: async ({ params, request }) => {
 		const id = Number(params.id);
 		const formData = await request.formData();
-		const amount = formData.get('amount')?.toString();
-		
+		const amount = formData.get("amount")?.toString();
+
 		try {
 			const orderPayments = await paymentService.getByOrderId(id);
 			if (orderPayments.length === 0) {
-				return fail(404, { error: 'No payment found for this order' });
+				return fail(404, { error: "No payment found for this order" });
 			}
-			
+
 			const refundAmount = amount ? parseInt(amount) : undefined;
-			const refundInfo = await paymentService.refundPayment(orderPayments[0].id, refundAmount);
+			const refundInfo = await paymentService.refundPayment(
+				orderPayments[0].id,
+				refundAmount
+			);
 			return { success: true, refundInfo };
 		} catch (e) {
 			return fail(400, { error: (e as Error).message });

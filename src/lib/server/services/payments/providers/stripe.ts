@@ -7,11 +7,11 @@
  * 2. Set STRIPE_SECRET_KEY environment variable
  * 3. Add Stripe to payment_methods table
  */
-import type { PaymentProvider, PaymentInfo, PaymentStatus, RefundInfo } from '../types.js';
-import type { OrderWithRelations } from '$lib/types.js';
+import type { PaymentProvider, PaymentInfo, PaymentStatus, RefundInfo } from "../types.js";
+import type { OrderWithRelations } from "$lib/types.js";
 
 export class StripeProvider implements PaymentProvider {
-	code = 'stripe';
+	code = "stripe";
 	private stripe: any; // Stripe instance - will be initialized if Stripe is installed
 
 	constructor() {
@@ -22,7 +22,9 @@ export class StripeProvider implements PaymentProvider {
 			// For now, we'll use a mock implementation
 			this.stripe = null;
 		} catch (error) {
-			console.warn('[StripeProvider] Stripe package not installed. Using mock implementation.');
+			console.warn(
+				"[StripeProvider] Stripe package not installed. Using mock implementation."
+			);
 			this.stripe = null;
 		}
 	}
@@ -60,7 +62,7 @@ export class StripeProvider implements PaymentProvider {
 			providerTransactionId: mockPaymentIntentId,
 			clientSecret: `pi_mock_${order.id}_secret_${Date.now()}`,
 			metadata: {
-				provider: 'stripe',
+				provider: "stripe",
 				mock: true,
 				orderId: order.id,
 				orderCode: order.code
@@ -86,10 +88,10 @@ export class StripeProvider implements PaymentProvider {
 
 		// Mock implementation
 		// In mock, assume payment succeeds if it's not explicitly failed
-		if (paymentId.includes('_fail_')) {
-			return 'failed';
+		if (paymentId.includes("_fail_")) {
+			return "failed";
 		}
-		return 'completed';
+		return "completed";
 	}
 
 	/**
@@ -117,7 +119,7 @@ export class StripeProvider implements PaymentProvider {
 			refundedAmount: amount ?? 0, // In real implementation, get from refund response
 			refundId: mockRefundId,
 			metadata: {
-				provider: 'stripe',
+				provider: "stripe",
 				mock: true,
 				paymentIntentId: paymentId
 			}

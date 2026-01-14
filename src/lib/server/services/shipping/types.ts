@@ -2,7 +2,7 @@
  * Shipping Provider Interface and Types
  * Defines the contract for shipping providers (Posti, Matkahuolto, etc.)
  */
-import type { OrderWithRelations } from '$lib/types.js';
+import type { OrderWithRelations } from "$lib/types.js";
 
 export interface ShippingProvider {
 	code: string; // unique code like 'posti_standard'
@@ -28,7 +28,7 @@ export type ShipmentInfo = {
 	metadata?: Record<string, unknown>;
 };
 
-export type ShipmentStatus = 'pending' | 'shipped' | 'in_transit' | 'delivered' | 'error';
+export type ShipmentStatus = "pending" | "shipped" | "in_transit" | "delivered" | "error";
 
 export interface ShippingAddress {
 	fullName: string;

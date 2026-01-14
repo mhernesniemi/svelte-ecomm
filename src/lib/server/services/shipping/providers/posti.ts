@@ -2,11 +2,11 @@
  * Posti Shipping Provider
  * Example implementation for Posti (Finnish postal service)
  */
-import type { ShippingProvider, ShippingRate, ShipmentInfo, ShipmentStatus } from '../types.js';
-import type { OrderWithRelations } from '$lib/types.js';
+import type { ShippingProvider, ShippingRate, ShipmentInfo, ShipmentStatus } from "../types.js";
+import type { OrderWithRelations } from "$lib/types.js";
 
 export class PostiProvider implements ShippingProvider {
-	code = 'posti_standard';
+	code = "posti_standard";
 
 	/**
 	 * Get available shipping rates for an order
@@ -32,25 +32,25 @@ export class PostiProvider implements ShippingProvider {
 		// Mock rates for demonstration
 		return [
 			{
-				id: 'posti_standard',
-				name: 'Posti Standard',
+				id: "posti_standard",
+				name: "Posti Standard",
 				price: 1050, // 10.50 EUR in cents
 				estimatedDeliveryDays: 3,
-				description: 'Standard delivery within Finland'
+				description: "Standard delivery within Finland"
 			},
 			{
-				id: 'posti_express',
-				name: 'Posti Express',
+				id: "posti_express",
+				name: "Posti Express",
 				price: 1500, // 15.00 EUR in cents
 				estimatedDeliveryDays: 1,
-				description: 'Express delivery next business day'
+				description: "Express delivery next business day"
 			},
 			{
-				id: 'posti_pickup',
-				name: 'Posti Parcel Shop',
+				id: "posti_pickup",
+				name: "Posti Parcel Shop",
 				price: 850, // 8.50 EUR in cents
 				estimatedDeliveryDays: 2,
-				description: 'Pickup from nearest Posti parcel shop'
+				description: "Pickup from nearest Posti parcel shop"
 			}
 		];
 	}
@@ -79,13 +79,13 @@ export class PostiProvider implements ShippingProvider {
 		// const data = await response.json();
 
 		// Mock response
-		const trackingNumber = `POSTI${order.id.toString().padStart(10, '0')}`;
+		const trackingNumber = `POSTI${order.id.toString().padStart(10, "0")}`;
 		return {
 			trackingNumber,
 			labelUrl: `https://posti.fi/labels/${trackingNumber}`,
 			metadata: {
-				provider: 'posti',
-				service: 'standard',
+				provider: "posti",
+				service: "standard",
 				createdAt: new Date().toISOString()
 			}
 		};
@@ -103,7 +103,7 @@ export class PostiProvider implements ShippingProvider {
 		// return this.mapPostiStatusToShipmentStatus(data.status);
 
 		// Mock response
-		return 'in_transit';
+		return "in_transit";
 	}
 
 	private estimateOrderWeight(order: OrderWithRelations): number {
@@ -114,13 +114,13 @@ export class PostiProvider implements ShippingProvider {
 
 	private mapPostiStatusToShipmentStatus(postiStatus: string): ShipmentStatus {
 		const statusMap: Record<string, ShipmentStatus> = {
-			'created': 'pending',
-			'dispatched': 'shipped',
-			'in_transit': 'in_transit',
-			'out_for_delivery': 'in_transit',
-			'delivered': 'delivered',
-			'error': 'error'
+			created: "pending",
+			dispatched: "shipped",
+			in_transit: "in_transit",
+			out_for_delivery: "in_transit",
+			delivered: "delivered",
+			error: "error"
 		};
-		return statusMap[postiStatus] || 'pending';
+		return statusMap[postiStatus] || "pending";
 	}
 }

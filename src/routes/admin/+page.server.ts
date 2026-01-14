@@ -1,7 +1,7 @@
-import { productService } from '$lib/server/services/products.js';
-import { orderService } from '$lib/server/services/orders.js';
-import { customerService } from '$lib/server/services/customers.js';
-import type { PageServerLoad } from './$types';
+import { productService } from "$lib/server/services/products.js";
+import { orderService } from "$lib/server/services/orders.js";
+import { customerService } from "$lib/server/services/customers.js";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
 	// Get counts for dashboard

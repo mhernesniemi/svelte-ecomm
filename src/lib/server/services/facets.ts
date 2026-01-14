@@ -2,25 +2,25 @@
  * Facet Service
  * Handles facets and facet values for product filtering
  */
-import { eq, and, desc, sql } from 'drizzle-orm';
-import { db } from '../db/index.js';
+import { eq, and, desc, sql } from "drizzle-orm";
+import { db } from "../db/index.js";
 import {
 	facets,
 	facetTranslations,
 	facetValues,
 	facetValueTranslations,
 	productFacetValues
-} from '../db/schema.js';
+} from "../db/schema.js";
 import type {
 	Facet,
 	FacetWithValues,
 	FacetValue,
 	FacetValueWithTranslations,
 	PaginatedResult
-} from '$lib/types.js';
+} from "$lib/types.js";
 
 export class FacetService {
-	private defaultLanguage = 'en';
+	private defaultLanguage = "en";
 
 	/**
 	 * Create a new facet
@@ -228,7 +228,10 @@ export class FacetService {
 						name: t.name
 					})
 					.onConflictDoUpdate({
-						target: [facetValueTranslations.facetValueId, facetValueTranslations.languageCode],
+						target: [
+							facetValueTranslations.facetValueId,
+							facetValueTranslations.languageCode
+						],
 						set: { name: t.name }
 					});
 			}

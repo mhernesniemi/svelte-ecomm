@@ -1,22 +1,22 @@
-import { productService } from '$lib/server/services/products.js';
-import { facetService } from '$lib/server/services/facets.js';
-import { error, fail, redirect } from '@sveltejs/kit';
-import type { Actions, PageServerLoad } from './$types';
+import { productService } from "$lib/server/services/products.js";
+import { facetService } from "$lib/server/services/facets.js";
+import { error, fail, redirect } from "@sveltejs/kit";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
-		throw error(404, 'Invalid product ID');
+		throw error(404, "Invalid product ID");
 	}
 
-	const product = await productService.getById(id, 'en');
+	const product = await productService.getById(id, "en");
 
 	if (!product) {
-		throw error(404, 'Product not found');
+		throw error(404, "Product not found");
 	}
 
-	const facets = await facetService.list('en');
+	const facets = await facetService.list("en");
 
 	return {
 		product,
@@ -29,16 +29,16 @@ export const actions: Actions = {
 		const id = Number(params.id);
 		const formData = await request.formData();
 
-		const nameEn = formData.get('name_en') as string;
-		const nameFi = formData.get('name_fi') as string;
-		const slugEn = formData.get('slug_en') as string;
-		const slugFi = formData.get('slug_fi') as string;
-		const descriptionEn = formData.get('description_en') as string;
-		const descriptionFi = formData.get('description_fi') as string;
-		const enabled = formData.get('enabled') === 'on';
+		const nameEn = formData.get("name_en") as string;
+		const nameFi = formData.get("name_fi") as string;
+		const slugEn = formData.get("slug_en") as string;
+		const slugFi = formData.get("slug_fi") as string;
+		const descriptionEn = formData.get("description_en") as string;
+		const descriptionFi = formData.get("description_fi") as string;
+		const enabled = formData.get("enabled") === "on";
 
 		if (!nameEn || !slugEn) {
-			return fail(400, { error: 'English name and slug are required' });
+			return fail(400, { error: "English name and slug are required" });
 		}
 
 		try {
@@ -46,13 +46,13 @@ export const actions: Actions = {
 				enabled,
 				translations: [
 					{
-						languageCode: 'en',
+						languageCode: "en",
 						name: nameEn,
 						slug: slugEn,
 						description: descriptionEn || undefined
 					},
 					{
-						languageCode: 'fi',
+						languageCode: "fi",
 						name: nameFi || nameEn,
 						slug: slugFi || slugEn,
 						description: descriptionFi || undefined
@@ -62,7 +62,7 @@ export const actions: Actions = {
 
 			return { success: true };
 		} catch (e) {
-			return fail(500, { error: 'Failed to update product' });
+			return fail(500, { error: "Failed to update product" });
 		}
 	},
 
@@ -71,19 +71,19 @@ export const actions: Actions = {
 
 		await productService.delete(id);
 
-		throw redirect(303, '/admin/products');
+		throw redirect(303, "/admin/products");
 	},
 
 	updateFacetValues: async ({ params, request }) => {
 		const productId = Number(params.id);
 		const formData = await request.formData();
-		const facetValueIds = formData.getAll('facetValueIds').map(Number);
+		const facetValueIds = formData.getAll("facetValueIds").map(Number);
 
 		try {
 			// Get current facet values
-			const product = await productService.getById(productId, 'en');
+			const product = await productService.getById(productId, "en");
 			if (!product) {
-				return fail(404, { error: 'Product not found' });
+				return fail(404, { error: "Product not found" });
 			}
 
 			const currentIds = product.facetValues.map((fv) => fv.id);
@@ -104,24 +104,24 @@ export const actions: Actions = {
 
 			return { facetSuccess: true };
 		} catch (e) {
-			return fail(500, { error: 'Failed to update facet values' });
+			return fail(500, { error: "Failed to update facet values" });
 		}
 	},
 
 	updateVariantFacetValues: async ({ request }) => {
 		const formData = await request.formData();
-		const variantId = Number(formData.get('variantId'));
-		const facetValueIds = formData.getAll('facetValueIds').map(Number);
+		const variantId = Number(formData.get("variantId"));
+		const facetValueIds = formData.getAll("facetValueIds").map(Number);
 
 		if (isNaN(variantId)) {
-			return fail(400, { error: 'Invalid variant ID' });
+			return fail(400, { error: "Invalid variant ID" });
 		}
 
 		try {
 			// Get current facet values for this variant
-			const variant = await productService.getVariantById(variantId, 'en');
+			const variant = await productService.getVariantById(variantId, "en");
 			if (!variant) {
-				return fail(404, { error: 'Variant not found' });
+				return fail(404, { error: "Variant not found" });
 			}
 
 			const currentIds = variant.facetValues.map((fv) => fv.id);
@@ -142,7 +142,7 @@ export const actions: Actions = {
 
 			return { variantFacetSuccess: true };
 		} catch (e) {
-			return fail(500, { error: 'Failed to update variant facet values' });
+			return fail(500, { error: "Failed to update variant facet values" });
 		}
 	},
 
@@ -150,13 +150,13 @@ export const actions: Actions = {
 		const productId = Number(params.id);
 		const formData = await request.formData();
 
-		const sku = formData.get('sku') as string;
-		const price = Number(formData.get('price')) * 100; // Convert to cents
-		const stock = Number(formData.get('stock')) || 0;
-		const nameEn = formData.get('variant_name_en') as string;
+		const sku = formData.get("sku") as string;
+		const price = Number(formData.get("price")) * 100; // Convert to cents
+		const stock = Number(formData.get("stock")) || 0;
+		const nameEn = formData.get("variant_name_en") as string;
 
 		if (!sku || isNaN(price)) {
-			return fail(400, { variantError: 'SKU and price are required' });
+			return fail(400, { variantError: "SKU and price are required" });
 		}
 
 		try {
@@ -165,12 +165,12 @@ export const actions: Actions = {
 				sku,
 				price,
 				stock,
-				translations: nameEn ? [{ languageCode: 'en', name: nameEn }] : []
+				translations: nameEn ? [{ languageCode: "en", name: nameEn }] : []
 			});
 
 			return { variantSuccess: true };
 		} catch (e) {
-			return fail(500, { variantError: 'Failed to create variant' });
+			return fail(500, { variantError: "Failed to create variant" });
 		}
 	}
 };

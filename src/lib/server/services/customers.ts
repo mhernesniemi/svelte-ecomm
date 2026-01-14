@@ -2,16 +2,16 @@
  * Customer Service
  * Handles customer management and addresses
  */
-import { eq, and, desc, isNull, sql } from 'drizzle-orm';
-import { db } from '../db/index.js';
-import { customers, addresses } from '../db/schema.js';
+import { eq, and, desc, isNull, sql } from "drizzle-orm";
+import { db } from "../db/index.js";
+import { customers, addresses } from "../db/schema.js";
 import type {
 	Customer,
 	CustomerWithAddresses,
 	Address,
 	CreateCustomerInput,
 	PaginatedResult
-} from '$lib/types.js';
+} from "$lib/types.js";
 
 export class CustomerService {
 	/**
@@ -100,14 +100,8 @@ export class CustomerService {
 	/**
 	 * Update customer
 	 */
-	async update(
-		id: number,
-		input: Partial<CreateCustomerInput>
-	): Promise<Customer | null> {
-		const [customer] = await db
-			.select()
-			.from(customers)
-			.where(eq(customers.id, id));
+	async update(id: number, input: Partial<CreateCustomerInput>): Promise<Customer | null> {
+		const [customer] = await db.select().from(customers).where(eq(customers.id, id));
 
 		if (!customer) return null;
 
@@ -130,10 +124,7 @@ export class CustomerService {
 	 * Soft delete customer
 	 */
 	async delete(id: number): Promise<boolean> {
-		await db
-			.update(customers)
-			.set({ deletedAt: new Date() })
-			.where(eq(customers.id, id));
+		await db.update(customers).set({ deletedAt: new Date() }).where(eq(customers.id, id));
 
 		return true;
 	}
@@ -203,10 +194,7 @@ export class CustomerService {
 			isDefault: boolean;
 		}>
 	): Promise<Address | null> {
-		const [address] = await db
-			.select()
-			.from(addresses)
-			.where(eq(addresses.id, addressId));
+		const [address] = await db.select().from(addresses).where(eq(addresses.id, addressId));
 
 		if (!address) return null;
 

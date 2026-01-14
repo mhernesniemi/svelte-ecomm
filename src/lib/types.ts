@@ -2,7 +2,7 @@
  * TypeScript types for the commerce platform
  * These types are inferred from the Drizzle schema for end-to-end type safety
  */
-import type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
+import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 import type {
 	products,
 	productTranslations,
@@ -22,7 +22,7 @@ import type {
 	promotions,
 	shippingMethods,
 	orderShipping
-} from '$lib/server/db/schema.js';
+} from "$lib/server/db/schema.js";
 
 // ============================================================================
 // PRODUCT TYPES
@@ -100,7 +100,7 @@ export interface FacetValueWithTranslations extends FacetValue {
 export type Asset = InferSelectModel<typeof assets>;
 export type NewAsset = InferInsertModel<typeof assets>;
 
-export type AssetType = 'image' | 'video' | 'document' | 'other';
+export type AssetType = "image" | "video" | "document" | "other";
 
 // ============================================================================
 // CUSTOMER TYPES
@@ -140,15 +140,15 @@ export interface PaymentWithMethod extends Payment {
 
 /** Order states from config */
 export type OrderState =
-	| 'created'
-	| 'payment_pending'
-	| 'paid'
-	| 'shipped'
-	| 'delivered'
-	| 'cancelled';
+	| "created"
+	| "payment_pending"
+	| "paid"
+	| "shipped"
+	| "delivered"
+	| "cancelled";
 
 /** Payment states */
-export type PaymentState = 'pending' | 'authorized' | 'settled' | 'declined' | 'refunded';
+export type PaymentState = "pending" | "authorized" | "settled" | "declined" | "refunded";
 
 /** Order with all related data */
 export interface OrderWithRelations extends Order {
@@ -169,7 +169,7 @@ export interface OrderLineWithVariant extends OrderLine {
 export type Promotion = InferSelectModel<typeof promotions>;
 export type NewPromotion = InferInsertModel<typeof promotions>;
 
-export type DiscountType = 'percentage' | 'fixed_amount';
+export type DiscountType = "percentage" | "fixed_amount";
 
 // ============================================================================
 // SHIPPING TYPES
@@ -181,10 +181,10 @@ export type NewShippingMethod = InferInsertModel<typeof shippingMethods>;
 export type OrderShipping = InferSelectModel<typeof orderShipping>;
 export type NewOrderShipping = InferInsertModel<typeof orderShipping>;
 
-export type ShippingStatus = 'pending' | 'shipped' | 'in_transit' | 'delivered';
+export type ShippingStatus = "pending" | "shipped" | "in_transit" | "delivered";
 
 /** Order with shipping info */
-export interface OrderWithShipping extends Omit<OrderWithRelations, 'shipping'> {
+export interface OrderWithShipping extends Omit<OrderWithRelations, "shipping"> {
 	shipping?: OrderShippingWithMethod | null;
 }
 

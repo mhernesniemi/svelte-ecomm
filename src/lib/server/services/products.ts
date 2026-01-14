@@ -2,8 +2,8 @@
  * Product Service
  * Handles all product-related business logic and database operations
  */
-import { eq, and, desc, asc, sql, inArray, isNull, like } from 'drizzle-orm';
-import { db } from '../db/index.js';
+import { eq, and, desc, asc, sql, inArray, isNull, like } from "drizzle-orm";
+import { db } from "../db/index.js";
 import {
 	products,
 	productTranslations,
@@ -17,7 +17,7 @@ import {
 	facetTranslations,
 	productAssets,
 	assets
-} from '../db/schema.js';
+} from "../db/schema.js";
 import type {
 	Product,
 	ProductWithRelations,
@@ -30,10 +30,10 @@ import type {
 	UpdateVariantInput,
 	FacetCount,
 	PaginatedResult
-} from '$lib/types.js';
+} from "$lib/types.js";
 
 export class ProductService {
-	private defaultLanguage = 'en';
+	private defaultLanguage = "en";
 
 	/**
 	 * List products with filtering and pagination
@@ -91,7 +91,9 @@ export class ProductService {
 			.offset(offset);
 
 		// Load relations for each product
-		const items = await Promise.all(productList.map((p) => this.loadProductRelations(p, language)));
+		const items = await Promise.all(
+			productList.map((p) => this.loadProductRelations(p, language))
+		);
 
 		return {
 			items,
@@ -174,7 +176,10 @@ export class ProductService {
 
 		// Update product fields
 		if (input.enabled !== undefined) {
-			await db.update(products).set({ enabled: input.enabled, updatedAt: new Date() }).where(eq(products.id, id));
+			await db
+				.update(products)
+				.set({ enabled: input.enabled, updatedAt: new Date() })
+				.where(eq(products.id, id));
 		}
 
 		// Update translations
@@ -185,8 +190,8 @@ export class ProductService {
 					.values({
 						productId: id,
 						languageCode: t.languageCode,
-						name: t.name ?? '',
-						slug: t.slug ?? '',
+						name: t.name ?? "",
+						slug: t.slug ?? "",
 						description: t.description
 					})
 					.onConflictDoUpdate({
@@ -354,7 +359,10 @@ export class ProductService {
 						name: t.name
 					})
 					.onConflictDoUpdate({
-						target: [productVariantTranslations.variantId, productVariantTranslations.languageCode],
+						target: [
+							productVariantTranslations.variantId,
+							productVariantTranslations.languageCode
+						],
 						set: { name: t.name }
 					});
 			}
@@ -444,7 +452,9 @@ export class ProductService {
 		const variantList = await db
 			.select()
 			.from(productVariants)
-			.where(and(eq(productVariants.productId, product.id), isNull(productVariants.deletedAt)));
+			.where(
+				and(eq(productVariants.productId, product.id), isNull(productVariants.deletedAt))
+			);
 
 		const variants = await Promise.all(
 			variantList.map((v) => this.loadVariantRelations(v, language))
@@ -490,7 +500,10 @@ export class ProductService {
 		// Load featured asset
 		let featuredAsset = null;
 		if (product.featuredAssetId) {
-			const [fa] = await db.select().from(assets).where(eq(assets.id, product.featuredAssetId));
+			const [fa] = await db
+				.select()
+				.from(assets)
+				.where(eq(assets.id, product.featuredAssetId));
 			featuredAsset = fa ?? null;
 		}
 
@@ -564,7 +577,9 @@ export class ProductService {
 			const values = await db
 				.select()
 				.from(facetValues)
-				.where(and(eq(facetValues.facetId, facet[0].id), inArray(facetValues.code, valueCodes)));
+				.where(
+					and(eq(facetValues.facetId, facet[0].id), inArray(facetValues.code, valueCodes))
+				);
 
 			allValueIds.push(...values.map((v) => v.id));
 		}

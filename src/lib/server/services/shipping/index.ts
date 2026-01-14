@@ -2,23 +2,23 @@
  * Shipping Service
  * Manages shipping methods and order shipping information
  */
-import { eq, and, inArray } from 'drizzle-orm';
-import { db } from '../../db/index.js';
-import { shippingMethods, orderShipping } from '../../db/schema.js';
+import { eq, and, inArray } from "drizzle-orm";
+import { db } from "../../db/index.js";
+import { shippingMethods, orderShipping } from "../../db/schema.js";
 import type {
 	ShippingMethod,
 	NewShippingMethod,
 	OrderShipping,
 	NewOrderShipping,
 	OrderWithRelations
-} from '$lib/types.js';
-import type { ShippingProvider, ShippingRate, ShipmentInfo } from './types.js';
-import { PostiProvider, MatkahuoltoProvider } from './providers/index.js';
+} from "$lib/types.js";
+import type { ShippingProvider, ShippingRate, ShipmentInfo } from "./types.js";
+import { PostiProvider, MatkahuoltoProvider } from "./providers/index.js";
 
 // Provider registry - maps provider codes to provider instances
 const PROVIDERS: Map<string, ShippingProvider> = new Map([
-	['posti_standard', new PostiProvider()],
-	['matkahuolto_standard', new MatkahuoltoProvider()]
+	["posti_standard", new PostiProvider()],
+	["matkahuolto_standard", new MatkahuoltoProvider()]
 ]);
 
 export class ShippingService {
@@ -26,10 +26,7 @@ export class ShippingService {
 	 * Get all active shipping methods
 	 */
 	async getActiveMethods(): Promise<ShippingMethod[]> {
-		return db
-			.select()
-			.from(shippingMethods)
-			.where(eq(shippingMethods.active, true));
+		return db.select().from(shippingMethods).where(eq(shippingMethods.active, true));
 	}
 
 	/**
@@ -111,7 +108,7 @@ export class ShippingService {
 				.set({
 					shippingMethodId,
 					price,
-					status: 'pending',
+					status: "pending",
 					updatedAt: new Date()
 				})
 				.where(eq(orderShipping.id, existing.id))
@@ -127,7 +124,7 @@ export class ShippingService {
 				orderId,
 				shippingMethodId,
 				price,
-				status: 'pending'
+				status: "pending"
 			})
 			.returning();
 
@@ -154,12 +151,12 @@ export class ShippingService {
 	async createShipment(order: OrderWithRelations): Promise<ShipmentInfo> {
 		const shipping = await this.getOrderShipping(order.id);
 		if (!shipping) {
-			throw new Error('No shipping method set for this order');
+			throw new Error("No shipping method set for this order");
 		}
 
 		const method = await this.getMethodById(shipping.shippingMethodId);
 		if (!method) {
-			throw new Error('Shipping method not found');
+			throw new Error("Shipping method not found");
 		}
 
 		const provider = PROVIDERS.get(method.code);
@@ -176,7 +173,7 @@ export class ShippingService {
 			.set({
 				trackingNumber: shipmentInfo.trackingNumber,
 				metadata: shipmentInfo.metadata ?? null,
-				status: 'shipped',
+				status: "shipped",
 				updatedAt: new Date()
 			})
 			.where(eq(orderShipping.id, shipping.id));
@@ -205,7 +202,7 @@ export class ShippingService {
 
 		try {
 			const status = await provider.trackShipment(shipping.trackingNumber);
-			
+
 			// Update status in database
 			await db
 				.update(orderShipping)
@@ -217,7 +214,7 @@ export class ShippingService {
 
 			return status;
 		} catch (error) {
-			console.error('Error tracking shipment:', error);
+			console.error("Error tracking shipment:", error);
 			return null;
 		}
 	}
@@ -227,7 +224,7 @@ export class ShippingService {
 	 */
 	async updateShippingStatus(
 		orderId: number,
-		status: 'pending' | 'shipped' | 'in_transit' | 'delivered'
+		status: "pending" | "shipped" | "in_transit" | "delivered"
 	): Promise<OrderShipping> {
 		const [updated] = await db
 			.update(orderShipping)
@@ -239,7 +236,7 @@ export class ShippingService {
 			.returning();
 
 		if (!updated) {
-			throw new Error('Shipping not found for this order');
+			throw new Error("Shipping not found for this order");
 		}
 
 		return updated;
@@ -261,15 +258,15 @@ export class ShippingService {
 	async initializeDefaultMethods(): Promise<void> {
 		const defaultMethods: NewShippingMethod[] = [
 			{
-				code: 'posti_standard',
-				name: 'Posti Standard',
-				description: 'Standard delivery via Posti',
+				code: "posti_standard",
+				name: "Posti Standard",
+				description: "Standard delivery via Posti",
 				active: true
 			},
 			{
-				code: 'matkahuolto_standard',
-				name: 'Matkahuolto Standard',
-				description: 'Standard delivery via Matkahuolto',
+				code: "matkahuolto_standard",
+				name: "Matkahuolto Standard",
+				description: "Standard delivery via Matkahuolto",
 				active: true
 			}
 		];

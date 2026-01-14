@@ -2,10 +2,10 @@
  * Promotion Service
  * Handles coupon codes and discounts
  */
-import { eq, and, desc, sql, gte, lte, or, isNull } from 'drizzle-orm';
-import { db } from '../db/index.js';
-import { promotions } from '../db/schema.js';
-import type { Promotion, CreatePromotionInput, PaginatedResult } from '$lib/types.js';
+import { eq, and, desc, sql, gte, lte, or, isNull } from "drizzle-orm";
+import { db } from "../db/index.js";
+import { promotions } from "../db/schema.js";
+import type { Promotion, CreatePromotionInput, PaginatedResult } from "$lib/types.js";
 
 export class PromotionService {
 	/**
@@ -54,11 +54,13 @@ export class PromotionService {
 	/**
 	 * List all promotions
 	 */
-	async list(options: {
-		enabled?: boolean;
-		limit?: number;
-		offset?: number;
-	} = {}): Promise<PaginatedResult<Promotion>> {
+	async list(
+		options: {
+			enabled?: boolean;
+			limit?: number;
+			offset?: number;
+		} = {}
+	): Promise<PaginatedResult<Promotion>> {
 		const { enabled, limit = 20, offset = 0 } = options;
 
 		const conditions = enabled !== undefined ? [eq(promotions.enabled, enabled)] : [];
@@ -118,7 +120,7 @@ export class PromotionService {
 	 */
 	async update(
 		id: number,
-		input: Partial<Omit<CreatePromotionInput, 'code'> & { enabled?: boolean }>
+		input: Partial<Omit<CreatePromotionInput, "code"> & { enabled?: boolean }>
 	): Promise<Promotion | null> {
 		const [promotion] = await db.select().from(promotions).where(eq(promotions.id, id));
 
@@ -168,25 +170,25 @@ export class PromotionService {
 		const promotion = await this.getByCode(code);
 
 		if (!promotion) {
-			return { valid: false, error: 'Invalid promotion code' };
+			return { valid: false, error: "Invalid promotion code" };
 		}
 
 		if (!promotion.enabled) {
-			return { valid: false, error: 'Promotion is not active' };
+			return { valid: false, error: "Promotion is not active" };
 		}
 
 		const now = new Date();
 
 		if (promotion.startsAt && promotion.startsAt > now) {
-			return { valid: false, error: 'Promotion has not started yet' };
+			return { valid: false, error: "Promotion has not started yet" };
 		}
 
 		if (promotion.endsAt && promotion.endsAt < now) {
-			return { valid: false, error: 'Promotion has expired' };
+			return { valid: false, error: "Promotion has expired" };
 		}
 
 		if (promotion.usageLimit && promotion.usageCount >= promotion.usageLimit) {
-			return { valid: false, error: 'Promotion usage limit reached' };
+			return { valid: false, error: "Promotion usage limit reached" };
 		}
 
 		if (promotion.minOrderAmount && orderAmount < promotion.minOrderAmount) {
@@ -203,7 +205,7 @@ export class PromotionService {
 	 * Calculate discount amount for a promotion
 	 */
 	calculateDiscount(promotion: Promotion, orderAmount: number): number {
-		if (promotion.discountType === 'percentage') {
+		if (promotion.discountType === "percentage") {
 			return Math.round(orderAmount * (promotion.discountValue / 100));
 		}
 

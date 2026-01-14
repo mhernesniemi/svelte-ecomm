@@ -2,17 +2,17 @@
  * Server hooks for authentication, customer sync, and cart handling
  * Uses Clerk for authentication via svelte-clerk
  */
-import { withClerkHandler } from 'svelte-clerk/server';
-import { sequence } from '@sveltejs/kit/hooks';
-import type { Handle } from '@sveltejs/kit';
-import { db } from '$lib/server/db/index.js';
-import { customers } from '$lib/server/db/schema.js';
-import { eq } from 'drizzle-orm';
-import { CLERK_SECRET_KEY } from '$env/static/private';
-import { orderService } from '$lib/server/services/orders.js';
-import { shippingService, paymentService } from '$lib/server/services/index.js';
+import { withClerkHandler } from "svelte-clerk/server";
+import { sequence } from "@sveltejs/kit/hooks";
+import type { Handle } from "@sveltejs/kit";
+import { db } from "$lib/server/db/index.js";
+import { customers } from "$lib/server/db/schema.js";
+import { eq } from "drizzle-orm";
+import { CLERK_SECRET_KEY } from "$env/static/private";
+import { orderService } from "$lib/server/services/orders.js";
+import { shippingService, paymentService } from "$lib/server/services/index.js";
 
-const CART_COOKIE_NAME = 'cart_token';
+const CART_COOKIE_NAME = "cart_token";
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 // Clerk authentication handler
@@ -45,14 +45,14 @@ const customerSync: Handle = async ({ event, resolve }) => {
 						.insert(customers)
 						.values({
 							clerkUserId: userId,
-							email: clerkUser.email_addresses?.[0]?.email_address ?? '',
-							firstName: clerkUser.first_name ?? '',
-							lastName: clerkUser.last_name ?? ''
+							email: clerkUser.email_addresses?.[0]?.email_address ?? "",
+							firstName: clerkUser.first_name ?? "",
+							lastName: clerkUser.last_name ?? ""
 						})
 						.returning();
 				}
 			} catch (error) {
-				console.error('[hooks] Failed to sync Clerk user:', error);
+				console.error("[hooks] Failed to sync Clerk user:", error);
 			}
 		}
 
@@ -75,7 +75,7 @@ const cartHandler: Handle = async ({ event, resolve }) => {
 		try {
 			await orderService.transferCartToCustomer(cartToken, event.locals.customer.id);
 			// Clear the guest cart cookie after transfer
-			event.cookies.delete(CART_COOKIE_NAME, { path: '/' });
+			event.cookies.delete(CART_COOKIE_NAME, { path: "/" });
 			event.locals.cartToken = null;
 		} catch (error) {
 			// Transfer failed, likely no guest cart exists - ignore
@@ -87,7 +87,7 @@ const cartHandler: Handle = async ({ event, resolve }) => {
 	// If a new cart token was set during the request, set the cookie
 	if (event.locals.newCartToken) {
 		response.headers.append(
-			'Set-Cookie',
+			"Set-Cookie",
 			`${CART_COOKIE_NAME}=${event.locals.newCartToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${CART_COOKIE_MAX_AGE}`
 		);
 	}
@@ -104,9 +104,9 @@ const shippingInit: Handle = async ({ event, resolve }) => {
 		try {
 			await shippingService.initializeDefaultMethods();
 			shippingMethodsInitialized = true;
-			console.log('[hooks] Shipping methods initialized');
+			console.log("[hooks] Shipping methods initialized");
 		} catch (error) {
-			console.error('[hooks] Failed to initialize shipping methods:', error);
+			console.error("[hooks] Failed to initialize shipping methods:", error);
 			// Don't block requests if initialization fails
 		}
 	}
@@ -123,9 +123,9 @@ const paymentInit: Handle = async ({ event, resolve }) => {
 		try {
 			await paymentService.initializeDefaultMethods();
 			paymentMethodsInitialized = true;
-			console.log('[hooks] Payment methods initialized');
+			console.log("[hooks] Payment methods initialized");
 		} catch (error) {
-			console.error('[hooks] Failed to initialize payment methods:', error);
+			console.error("[hooks] Failed to initialize payment methods:", error);
 			// Don't block requests if initialization fails
 		}
 	}
@@ -134,10 +134,4 @@ const paymentInit: Handle = async ({ event, resolve }) => {
 };
 
 // Combine handlers in sequence
-export const handle = sequence(
-	clerkHandler,
-	customerSync,
-	cartHandler,
-	shippingInit,
-	paymentInit
-);
+export const handle = sequence(clerkHandler, customerSync, cartHandler, shippingInit, paymentInit);

@@ -3,11 +3,11 @@
  * Handles payment processing with mock gateway
  * Designed to be easily swapped with real payment providers (Stripe, etc.)
  */
-import { eq, and, desc } from 'drizzle-orm';
-import { db } from '../db/index.js';
-import { payments, orders } from '../db/schema.js';
-import type { Payment, PaymentState } from '$lib/types.js';
-import { nanoid } from 'nanoid';
+import { eq, and, desc } from "drizzle-orm";
+import { db } from "../db/index.js";
+import { payments, orders } from "../db/schema.js";
+import type { Payment, PaymentState } from "$lib/types.js";
+import { nanoid } from "nanoid";
 
 export interface PaymentResult {
 	success: boolean;
@@ -26,14 +26,14 @@ export class PaymentService {
 	/**
 	 * Create a new payment for an order
 	 */
-	async createPayment(orderId: number, amount: number, method = 'mock'): Promise<Payment> {
+	async createPayment(orderId: number, amount: number, method = "mock"): Promise<Payment> {
 		const [payment] = await db
 			.insert(payments)
 			.values({
 				orderId,
 				method,
 				amount,
-				state: 'pending'
+				state: "pending"
 			})
 			.returning();
 
@@ -68,10 +68,10 @@ export class PaymentService {
 		const payment = await this.getById(paymentId);
 
 		if (!payment) {
-			return { success: false, error: 'Payment not found' };
+			return { success: false, error: "Payment not found" };
 		}
 
-		if (payment.state !== 'pending') {
+		if (payment.state !== "pending") {
 			return { success: false, error: `Cannot process payment in state: ${payment.state}` };
 		}
 
@@ -86,7 +86,7 @@ export class PaymentService {
 			const [updated] = await db
 				.update(payments)
 				.set({
-					state: 'settled',
+					state: "settled",
 					transactionId: `mock_${nanoid(16)}`,
 					updatedAt: new Date()
 				})
@@ -98,14 +98,14 @@ export class PaymentService {
 			const [updated] = await db
 				.update(payments)
 				.set({
-					state: 'declined',
-					errorMessage: 'Mock payment declined',
+					state: "declined",
+					errorMessage: "Mock payment declined",
 					updatedAt: new Date()
 				})
 				.where(eq(payments.id, paymentId))
 				.returning();
 
-			return { success: false, payment: updated, error: 'Payment declined' };
+			return { success: false, payment: updated, error: "Payment declined" };
 		}
 	}
 
@@ -116,10 +116,10 @@ export class PaymentService {
 		const payment = await this.getById(paymentId);
 
 		if (!payment) {
-			return { success: false, error: 'Payment not found' };
+			return { success: false, error: "Payment not found" };
 		}
 
-		if (payment.state !== 'pending') {
+		if (payment.state !== "pending") {
 			return { success: false, error: `Cannot authorize payment in state: ${payment.state}` };
 		}
 
@@ -127,7 +127,7 @@ export class PaymentService {
 		const [updated] = await db
 			.update(payments)
 			.set({
-				state: 'authorized',
+				state: "authorized",
 				transactionId: `mock_auth_${nanoid(16)}`,
 				updatedAt: new Date()
 			})
@@ -144,17 +144,17 @@ export class PaymentService {
 		const payment = await this.getById(paymentId);
 
 		if (!payment) {
-			return { success: false, error: 'Payment not found' };
+			return { success: false, error: "Payment not found" };
 		}
 
-		if (payment.state !== 'authorized') {
+		if (payment.state !== "authorized") {
 			return { success: false, error: `Cannot capture payment in state: ${payment.state}` };
 		}
 
 		const [updated] = await db
 			.update(payments)
 			.set({
-				state: 'settled',
+				state: "settled",
 				updatedAt: new Date()
 			})
 			.where(eq(payments.id, paymentId))
@@ -170,17 +170,17 @@ export class PaymentService {
 		const payment = await this.getById(paymentId);
 
 		if (!payment) {
-			return { success: false, error: 'Payment not found' };
+			return { success: false, error: "Payment not found" };
 		}
 
-		if (payment.state !== 'settled') {
+		if (payment.state !== "settled") {
 			return { success: false, error: `Cannot refund payment in state: ${payment.state}` };
 		}
 
 		const refundAmount = amount ?? payment.amount;
 
 		if (refundAmount > payment.amount) {
-			return { success: false, error: 'Refund amount exceeds payment amount' };
+			return { success: false, error: "Refund amount exceeds payment amount" };
 		}
 
 		// For mock, we just mark as refunded
@@ -188,7 +188,7 @@ export class PaymentService {
 		const [updated] = await db
 			.update(payments)
 			.set({
-				state: 'refunded',
+				state: "refunded",
 				metadata: JSON.stringify({ refundAmount, refundedAt: new Date().toISOString() }),
 				updatedAt: new Date()
 			})
@@ -205,18 +205,18 @@ export class PaymentService {
 		const payment = await this.getById(paymentId);
 
 		if (!payment) {
-			return { success: false, error: 'Payment not found' };
+			return { success: false, error: "Payment not found" };
 		}
 
-		if (!['pending', 'authorized'].includes(payment.state)) {
+		if (!["pending", "authorized"].includes(payment.state)) {
 			return { success: false, error: `Cannot cancel payment in state: ${payment.state}` };
 		}
 
 		const [updated] = await db
 			.update(payments)
 			.set({
-				state: 'declined',
-				errorMessage: 'Payment cancelled',
+				state: "declined",
+				errorMessage: "Payment cancelled",
 				updatedAt: new Date()
 			})
 			.where(eq(payments.id, paymentId))
