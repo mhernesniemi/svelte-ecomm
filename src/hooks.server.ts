@@ -10,7 +10,7 @@ import { customers } from '$lib/server/db/schema.js';
 import { eq } from 'drizzle-orm';
 import { CLERK_SECRET_KEY } from '$env/static/private';
 import { orderService } from '$lib/server/services/orders.js';
-import { shippingService } from '$lib/server/services/index.js';
+import { shippingService, paymentService } from '$lib/server/services/index.js';
 
 const CART_COOKIE_NAME = 'cart_token';
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -114,5 +114,30 @@ const shippingInit: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
+// Payment initialization handler - initializes default payment methods on first startup
+let paymentMethodsInitialized = false;
+
+const paymentInit: Handle = async ({ event, resolve }) => {
+	// Initialize payment methods once on first request
+	if (!paymentMethodsInitialized) {
+		try {
+			await paymentService.initializeDefaultMethods();
+			paymentMethodsInitialized = true;
+			console.log('[hooks] Payment methods initialized');
+		} catch (error) {
+			console.error('[hooks] Failed to initialize payment methods:', error);
+			// Don't block requests if initialization fails
+		}
+	}
+
+	return resolve(event);
+};
+
 // Combine handlers in sequence
-export const handle = sequence(clerkHandler, customerSync, cartHandler, shippingInit);
+export const handle = sequence(
+	clerkHandler,
+	customerSync,
+	cartHandler,
+	shippingInit,
+	paymentInit
+);

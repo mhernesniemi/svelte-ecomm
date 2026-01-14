@@ -197,6 +197,73 @@
 				</div>
 			{/if}
 
+			{#if data.payment && data.paymentMethod}
+				<div class="bg-white rounded-lg shadow p-6">
+					<h2 class="font-semibold mb-4">Payment Information</h2>
+					<dl class="space-y-2 text-sm">
+						<div class="flex justify-between">
+							<dt class="text-gray-500">Method</dt>
+							<dd class="font-medium">{data.paymentMethod.name}</dd>
+						</div>
+						<div class="flex justify-between">
+							<dt class="text-gray-500">Status</dt>
+							<dd>
+								<span
+									class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize
+									{data.payment.state === 'completed' || data.payment.state === 'settled'
+										? 'bg-green-100 text-green-800'
+										: data.payment.state === 'failed' || data.payment.state === 'declined'
+											? 'bg-red-100 text-red-800'
+											: data.payment.state === 'refunded'
+												? 'bg-yellow-100 text-yellow-800'
+												: 'bg-gray-100 text-gray-800'}"
+								>
+									{data.payment.state}
+								</span>
+							</dd>
+						</div>
+						<div class="flex justify-between">
+							<dt class="text-gray-500">Amount</dt>
+							<dd>{(data.payment.amount / 100).toFixed(2)} EUR</dd>
+						</div>
+						{#if data.payment.transactionId}
+							<div class="flex justify-between">
+								<dt class="text-gray-500">Transaction ID</dt>
+								<dd class="font-mono text-xs break-all">{data.payment.transactionId}</dd>
+							</div>
+						{/if}
+						{#if data.payment.errorMessage}
+							<div class="flex justify-between">
+								<dt class="text-gray-500">Error</dt>
+								<dd class="text-red-600 text-xs">{data.payment.errorMessage}</dd>
+							</div>
+						{/if}
+					</dl>
+
+					{#if data.payment.state === 'pending' || data.payment.state === 'authorized'}
+						<form method="POST" action="?/confirmPayment" class="mt-4">
+							<button
+								type="submit"
+								class="w-full px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
+							>
+								Confirm Payment Status
+							</button>
+						</form>
+					{/if}
+
+					{#if (data.payment.state === 'completed' || data.payment.state === 'settled') && data.payment.transactionId}
+						<form method="POST" action="?/refundPayment" class="mt-4">
+							<button
+								type="submit"
+								class="w-full px-3 py-2 text-sm bg-yellow-600 text-white rounded hover:bg-yellow-700"
+							>
+								Refund Payment
+							</button>
+						</form>
+					{/if}
+				</div>
+			{/if}
+
 			<div class="bg-white rounded-lg shadow p-6">
 				<h2 class="font-semibold mb-4">Details</h2>
 				<dl class="space-y-2 text-sm">

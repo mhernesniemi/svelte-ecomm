@@ -5,6 +5,7 @@
 	let { data, form }: { data: PageData; form: any } = $props();
 
 	let selectedShippingRate: (typeof data.shippingRates)[0] | null = null;
+	let selectedPaymentMethod: (typeof data.paymentMethods)[0] | null = null;
 	let addressFormData = {
 		fullName: data.cart?.shippingFullName || '',
 		streetLine1: data.cart?.shippingStreetLine1 || '',
@@ -217,6 +218,57 @@
 						</p>
 					</div>
 				{/if}
+
+				<!-- Payment Method Selection -->
+				{#if data.cart.shippingPostalCode && selectedShippingRate && data.paymentMethods?.length > 0}
+					<div class="bg-white rounded-lg shadow p-6">
+						<h2 class="text-xl font-semibold mb-4">Payment Method</h2>
+
+						<div class="space-y-3">
+							{#each data.paymentMethods as method}
+								<label
+									class="flex items-start p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors {selectedPaymentMethod?.id ===
+									method.id
+										? 'border-blue-500 bg-blue-50'
+										: 'border-gray-300'}"
+								>
+									<input
+										type="radio"
+										name="paymentMethod"
+										value={method.id}
+										checked={selectedPaymentMethod?.id === method.id}
+										onchange={() => (selectedPaymentMethod = method)}
+										class="mt-1 mr-3"
+									/>
+									<div class="flex-1">
+										<p class="font-medium">{method.name}</p>
+										{#if method.description}
+											<p class="text-sm text-gray-500 mt-1">{method.description}</p>
+										{/if}
+									</div>
+								</label>
+							{/each}
+						</div>
+
+						{#if selectedPaymentMethod}
+							<form method="POST" action="?/createPayment" use:enhance class="mt-4">
+								<input type="hidden" name="paymentMethodId" value={selectedPaymentMethod.id} />
+								<button
+									type="submit"
+									class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+								>
+									Proceed to Payment
+								</button>
+							</form>
+						{/if}
+					</div>
+				{:else if data.cart.shippingPostalCode && selectedShippingRate}
+					<div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+						<p class="text-gray-600 text-sm">
+							Please select a shipping method first to see payment options.
+						</p>
+					</div>
+				{/if}
 			</div>
 
 			<!-- Order Summary -->
@@ -265,17 +317,30 @@
 						</div>
 					</div>
 
-					<div class="mt-6 pt-6 border-t">
-						<p class="text-sm text-gray-500 mb-4">
-							Payment processing will be implemented next.
-						</p>
-						<button
-							disabled
-							class="w-full bg-gray-400 text-white px-4 py-2 rounded-lg cursor-not-allowed"
-						>
-							Complete Order
-						</button>
-					</div>
+					{#if form?.paymentInfo}
+						<div class="mt-6 pt-6 border-t">
+							<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+								<p class="text-green-800 font-medium mb-2">Payment Created</p>
+								<p class="text-green-700 text-sm">
+									Transaction ID: {form.paymentInfo.providerTransactionId}
+								</p>
+								{#if form.paymentInfo.clientSecret}
+									<p class="text-green-700 text-sm mt-2">
+										Client Secret: {form.paymentInfo.clientSecret.substring(0, 20)}...
+									</p>
+								{/if}
+							</div>
+							<p class="text-sm text-gray-500 mb-4">
+								Payment integration with Stripe Elements will be implemented next.
+							</p>
+						</div>
+					{:else}
+						<div class="mt-6 pt-6 border-t">
+							<p class="text-sm text-gray-500 mb-4">
+								Select payment method to proceed.
+							</p>
+						</div>
+					{/if}
 				</div>
 			</div>
 		</div>

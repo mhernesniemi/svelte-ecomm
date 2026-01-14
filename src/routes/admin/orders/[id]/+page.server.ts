@@ -1,5 +1,5 @@
 import { orderService } from '$lib/server/services/orders.js';
-import { shippingService } from '$lib/server/services/index.js';
+import { shippingService, paymentService } from '$lib/server/services/index.js';
 import { error, fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -23,7 +23,15 @@ export const load: PageServerLoad = async ({ params }) => {
 		shippingMethod = await shippingService.getMethodById(orderShipping.shippingMethodId);
 	}
 
-	return { order, orderShipping, shippingMethod };
+	// Load payment info
+	const orderPayments = await paymentService.getByOrderId(id);
+	const payment = orderPayments[0] || null;
+	let paymentMethod = null;
+	if (payment) {
+		paymentMethod = await paymentService.getMethodById(payment.paymentMethodId);
+	}
+
+	return { order, orderShipping, shippingMethod, payment, paymentMethod };
 };
 
 export const actions: Actions = {
@@ -73,6 +81,41 @@ export const actions: Actions = {
 		try {
 			const status = await shippingService.trackShipment(id);
 			return { success: true, trackingStatus: status };
+		} catch (e) {
+			return fail(400, { error: (e as Error).message });
+		}
+	},
+	
+	confirmPayment: async ({ params }) => {
+		const id = Number(params.id);
+		
+		try {
+			const orderPayments = await paymentService.getByOrderId(id);
+			if (orderPayments.length === 0) {
+				return fail(404, { error: 'No payment found for this order' });
+			}
+			
+			const status = await paymentService.confirmPayment(orderPayments[0].id);
+			return { success: true, paymentStatus: status };
+		} catch (e) {
+			return fail(400, { error: (e as Error).message });
+		}
+	},
+	
+	refundPayment: async ({ params, request }) => {
+		const id = Number(params.id);
+		const formData = await request.formData();
+		const amount = formData.get('amount')?.toString();
+		
+		try {
+			const orderPayments = await paymentService.getByOrderId(id);
+			if (orderPayments.length === 0) {
+				return fail(404, { error: 'No payment found for this order' });
+			}
+			
+			const refundAmount = amount ? parseInt(amount) : undefined;
+			const refundInfo = await paymentService.refundPayment(orderPayments[0].id, refundAmount);
+			return { success: true, refundInfo };
 		} catch (e) {
 			return fail(400, { error: (e as Error).message });
 		}

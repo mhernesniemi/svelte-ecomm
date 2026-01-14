@@ -2,8 +2,7 @@
  * Checkout page server actions
  */
 import { fail } from '@sveltejs/kit';
-import { orderService } from '$lib/server/services/index.js';
-import { shippingService } from '$lib/server/services/index.js';
+import { orderService, shippingService, paymentService } from '$lib/server/services/index.js';
 import type { PageServerLoad, Actions } from './$types.js';
 
 export const load: PageServerLoad = async ({ cookies, locals }) => {
@@ -22,9 +21,13 @@ export const load: PageServerLoad = async ({ cookies, locals }) => {
 	// Get available shipping rates
 	const shippingRates = await shippingService.getAvailableRates(cart);
 
+	// Get available payment methods
+	const paymentMethods = await paymentService.getActiveMethods();
+
 	return {
 		cart,
-		shippingRates
+		shippingRates,
+		paymentMethods
 	};
 };
 
@@ -106,5 +109,49 @@ export const actions: Actions = {
 			success: true,
 			cart: updatedCart
 		};
+	},
+
+	createPayment: async ({ request, cookies, locals }) => {
+		const cartToken = cookies.get('cartToken') ?? null;
+		const customerId = locals.user?.id ?? null;
+
+		const cart = await orderService.getActiveCart({ customerId, cartToken });
+		if (!cart) {
+			return fail(404, { error: 'Cart not found' });
+		}
+
+		// Cart must have shipping address and method set
+		if (!cart.shippingPostalCode) {
+			return fail(400, { error: 'Shipping address required' });
+		}
+
+		const data = await request.formData();
+		const paymentMethodId = data.get('paymentMethodId')?.toString();
+
+		if (!paymentMethodId) {
+			return fail(400, { error: 'Payment method required' });
+		}
+
+		try {
+			// Load full order relations for payment
+			const order = await orderService.getById(cart.id);
+			if (!order) {
+				return fail(404, { error: 'Order not found' });
+			}
+
+			// Create payment via provider
+			const { payment, paymentInfo } = await paymentService.createPayment(
+				order,
+				parseInt(paymentMethodId)
+			);
+
+			return {
+				success: true,
+				payment,
+				paymentInfo
+			};
+		} catch (error) {
+			return fail(400, { error: (error as Error).message });
+		}
 	}
 };

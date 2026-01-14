@@ -18,6 +18,7 @@ import type {
 	orders,
 	orderLines,
 	payments,
+	paymentMethods,
 	promotions,
 	shippingMethods,
 	orderShipping
@@ -128,6 +129,14 @@ export type NewOrderLine = InferInsertModel<typeof orderLines>;
 
 export type Payment = InferSelectModel<typeof payments>;
 export type NewPayment = InferInsertModel<typeof payments>;
+
+export type PaymentMethod = InferSelectModel<typeof paymentMethods>;
+export type NewPaymentMethod = InferInsertModel<typeof paymentMethods>;
+
+/** Payment with method details */
+export interface PaymentWithMethod extends Payment {
+	paymentMethod: PaymentMethod;
+}
 
 /** Order states from config */
 export type OrderState =

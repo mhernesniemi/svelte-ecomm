@@ -362,6 +362,23 @@ export const orderLines = pgTable(
 // PAYMENTS
 // ============================================================================
 
+export const paymentMethods = pgTable(
+	'payment_methods',
+	{
+		id: serial('id').primaryKey(),
+		code: varchar('code', { length: 100 }).notNull().unique(), // 'stripe', 'paypal', 'klarna'
+		name: varchar('name', { length: 255 }).notNull(), // 'Stripe', 'PayPal', 'Klarna'
+		description: text('description'),
+		active: boolean('active').default(true).notNull(),
+		createdAt: timestamp('created_at').defaultNow().notNull(),
+		updatedAt: timestamp('updated_at').defaultNow().notNull()
+	},
+	(table) => [
+		uniqueIndex('payment_methods_code_idx').on(table.code),
+		index('payment_methods_active_idx').on(table.active)
+	]
+);
+
 export const payments = pgTable(
 	'payments',
 	{
@@ -369,18 +386,23 @@ export const payments = pgTable(
 		orderId: integer('order_id')
 			.references(() => orders.id, { onDelete: 'cascade' })
 			.notNull(),
-		method: varchar('method', { length: 100 }).notNull(), // 'mock', 'stripe', etc.
+		paymentMethodId: integer('payment_method_id')
+			.references(() => paymentMethods.id)
+			.notNull(),
+		method: varchar('method', { length: 100 }).notNull(), // Legacy: kept for backward compatibility
 		amount: integer('amount').notNull(), // Amount in cents
 		state: varchar('state', { length: 50 }).notNull().default('pending'),
 		transactionId: varchar('transaction_id', { length: 255 }), // External gateway ID
 		errorMessage: text('error_message'),
-		metadata: text('metadata'), // JSON string for gateway-specific data
+		metadata: jsonb('metadata'), // Store provider-specific data (changed from text to jsonb)
 		createdAt: timestamp('created_at').defaultNow().notNull(),
 		updatedAt: timestamp('updated_at').defaultNow().notNull()
 	},
 	(table) => [
 		index('payments_order_idx').on(table.orderId),
-		index('payments_state_idx').on(table.state)
+		index('payments_method_idx').on(table.paymentMethodId),
+		index('payments_state_idx').on(table.state),
+		index('payments_transaction_idx').on(table.transactionId)
 	]
 );
 
@@ -633,10 +655,18 @@ export const orderLinesRelations = relations(orderLines, ({ one }) => ({
 	})
 }));
 
+export const paymentMethodsRelations = relations(paymentMethods, ({ many }) => ({
+	payments: many(payments)
+}));
+
 export const paymentsRelations = relations(payments, ({ one }) => ({
 	order: one(orders, {
 		fields: [payments.orderId],
 		references: [orders.id]
+	}),
+	paymentMethod: one(paymentMethods, {
+		fields: [payments.paymentMethodId],
+		references: [paymentMethods.id]
 	})
 }));
 
