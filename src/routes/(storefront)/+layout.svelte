@@ -9,7 +9,7 @@
 	<header>
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 			<div class="flex h-16 items-center justify-between">
-				<a href="/" class="bg-[#f7d0dd] text-xl font-bold text-gray-900">Solakka</a>
+				<a href="/" class="bg-[#f7d0dd] text-xl font-bold text-gray-900">Hoikka</a>
 
 				<nav class="flex items-center gap-6">
 					<a href="/products" class="text-gray-600 hover:text-gray-900">Products</a>
@@ -54,7 +54,7 @@
 	<footer class="mt-auto border-t">
 		<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 			<div class="flex items-center justify-between">
-				<p class="text-sm text-gray-500">Sveltecomm - Opinionated Commerce with TypeScript</p>
+				<p class="text-sm text-gray-500">Solakka - Opinionated Commerce with TypeScript</p>
 				<a href="/admin" class="text-sm text-gray-500 hover:text-gray-900">Admin</a>
 			</div>
 		</div>

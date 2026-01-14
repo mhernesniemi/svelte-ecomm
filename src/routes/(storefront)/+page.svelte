@@ -21,11 +21,11 @@
 	<!-- Hero Section -->
 	<section class="bg-gray-100 py-20">
 		<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-			<div class="flex items-center gap-10">
+			<div class="flex items-center gap-14">
 				<div>
 					<h1 class="mb-4 text-4xl font-bold md:text-5xl">Opinionated Commerce</h1>
 					<p class="mb-10 text-lg leading-[1.75] text-gray-600">
-						A lightweight, ecommerce platform built with <span class="font-semibold text-gray-900"
+						A lightweight, ecommerce kit for <span class="font-semibold text-gray-900"
 							>TypeScript</span
 						>, <span class="font-semibold text-gray-900">SvelteKit</span> and
 						<span class="font-semibold text-gray-900">Drizzle</span>, <br />
