@@ -54,7 +54,7 @@
   <footer class="mt-auto border-t">
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-gray-500">Hoikka - Opinionated Commerce with TypeScript</p>
+        <p class="text-sm text-gray-500">Hoikka - Opinionated Commerce for SvelteKit</p>
         <a href="/admin" class="text-sm text-gray-500 hover:text-gray-900">Admin</a>
       </div>
     </div>
