@@ -26,7 +26,7 @@
 	let { children } = $props();
 </script>
 
-<div class="min-h-screen bg-gray-100">
+<div class="min-h-screen bg-gray-100 font-sans">
 	<!-- Sidebar -->
 	<aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
 		<div class="p-6">
@@ -41,10 +41,10 @@
 					class="flex items-center gap-3 px-6 py-3 text-gray-300 transition-colors hover:bg-gray-800 hover:text-white {isActive(
 						item.href
 					)
-						? 'bg-gray-800 border-l-4 border-blue-500 text-white'
+						? 'border-l-4 border-blue-500 bg-gray-800 text-white'
 						: ''}"
 				>
-					<span class="w-5 h-5">
+					<span class="h-5 w-5">
 						{#if item.icon === 'home'}
 							<svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path
@@ -106,7 +106,7 @@
 			{/each}
 		</nav>
 
-		<div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+		<div class="absolute right-0 bottom-0 left-0 border-t border-gray-800 p-4">
 			<a href="/" class="text-sm text-gray-400 hover:text-white"> View Storefront </a>
 		</div>
 	</aside>
