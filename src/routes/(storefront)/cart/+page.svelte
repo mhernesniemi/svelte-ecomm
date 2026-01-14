@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { PageData, ActionData } from './$types';
+	import type { PageData } from './$types';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
 
 	const cart = $derived(data.cart);
 	const lines = $derived(cart?.lines ?? []);
@@ -13,25 +13,10 @@
 	function formatPrice(cents: number): string {
 		return (cents / 100).toFixed(2);
 	}
-
-	let promoCode = $state('');
-	let isUpdating = $state(false);
 </script>
 
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 	<h1 class="text-2xl font-bold mb-8">Shopping Cart</h1>
-
-	{#if form?.error}
-		<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-			{form.error}
-		</div>
-	{/if}
-
-	{#if form?.message}
-		<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-			{form.message}
-		</div>
-	{/if}
 
 	{#if lines.length === 0}
 		<div class="text-center py-12">
@@ -70,41 +55,31 @@
 
 					<div class="flex items-center gap-4">
 						<!-- Quantity controls -->
-						<form
-							method="POST"
-							action="?/updateQuantity"
-							use:enhance={() => {
-								isUpdating = true;
-								return async ({ update }) => {
-									await update();
-									isUpdating = false;
-								};
-							}}
-							class="flex items-center gap-2"
-						>
-							<input type="hidden" name="lineId" value={line.id} />
-							<button
-								type="submit"
-								name="quantity"
-								value={line.quantity - 1}
-								class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50"
-								disabled={isUpdating}
-								aria-label="Decrease quantity"
-							>
-								-
-							</button>
+						<div class="flex items-center gap-2">
+							<form method="POST" action="?/updateQuantity" use:enhance>
+								<input type="hidden" name="lineId" value={line.id} />
+								<input type="hidden" name="quantity" value={line.quantity - 1} />
+								<button
+									type="submit"
+									class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+									aria-label="Decrease quantity"
+								>
+									-
+								</button>
+							</form>
 							<span class="w-8 text-center">{line.quantity}</span>
-							<button
-								type="submit"
-								name="quantity"
-								value={line.quantity + 1}
-								class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50"
-								disabled={isUpdating}
-								aria-label="Increase quantity"
-							>
-								+
-							</button>
-						</form>
+							<form method="POST" action="?/updateQuantity" use:enhance>
+								<input type="hidden" name="lineId" value={line.id} />
+								<input type="hidden" name="quantity" value={line.quantity + 1} />
+								<button
+									type="submit"
+									class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100"
+									aria-label="Increase quantity"
+								>
+									+
+								</button>
+							</form>
+						</div>
 
 						<!-- Line total -->
 						<div class="w-24 text-right">
@@ -113,22 +88,11 @@
 						</div>
 
 						<!-- Remove button -->
-						<form
-							method="POST"
-							action="?/removeLine"
-							use:enhance={() => {
-								isUpdating = true;
-								return async ({ update }) => {
-									await update();
-									isUpdating = false;
-								};
-							}}
-						>
+						<form method="POST" action="?/remove" use:enhance>
 							<input type="hidden" name="lineId" value={line.id} />
 							<button
 								type="submit"
-								class="text-red-500 hover:text-red-700 disabled:opacity-50"
-								disabled={isUpdating}
+								class="text-red-500 hover:text-red-700"
 								aria-label="Remove item"
 							>
 								<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,18 +112,12 @@
 
 		<!-- Promotion Code -->
 		<div class="mt-6 bg-white rounded-lg shadow p-6">
-			<form
-				method="POST"
-				action="?/applyPromotion"
-				use:enhance
-				class="flex gap-2"
-			>
+			<form method="POST" action="?/applyPromo" use:enhance class="flex gap-2">
 				<label for="promo-code" class="sr-only">Promotion code</label>
 				<input
 					id="promo-code"
 					type="text"
 					name="code"
-					bind:value={promoCode}
 					placeholder="Promotion code"
 					class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 				/>

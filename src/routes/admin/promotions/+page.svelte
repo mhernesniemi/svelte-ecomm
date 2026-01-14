@@ -1,9 +1,14 @@
 <script lang="ts">
-	import type { ActionData, PageData } from './$types';
+	import { enhance } from '$app/forms';
+	import type { PageData } from './$types';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
 
 	let showCreateForm = $state(false);
+
+	function formatPrice(cents: number): string {
+		return (cents / 100).toFixed(2);
+	}
 </script>
 
 <div>
@@ -18,96 +23,98 @@
 		</button>
 	</div>
 
-	{#if form?.success}
-		<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6">
-			Promotion created successfully
-		</div>
-	{/if}
-
-	{#if form?.error}
-		<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-			{form.error}
-		</div>
-	{/if}
-
 	<!-- Create Form -->
 	{#if showCreateForm}
-		<form method="POST" action="?/create" class="bg-white rounded-lg shadow p-6 mb-6">
+		<div class="bg-white rounded-lg shadow p-6 mb-6">
 			<h2 class="font-semibold mb-4">Create Promotion</h2>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<div>
-					<label for="promo_code" class="block text-sm font-medium text-gray-700 mb-1">Code</label>
-					<input
-						type="text"
-						id="promo_code"
-						name="code"
-						placeholder="e.g., SUMMER20"
-						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase"
-					/>
+			<form method="POST" action="?/create" use:enhance={() => {
+				return async ({ update }) => {
+					await update();
+					showCreateForm = false;
+				};
+			}}>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div>
+						<label for="promo_code" class="block text-sm font-medium text-gray-700 mb-1">Code</label>
+						<input
+							type="text"
+							id="promo_code"
+							name="code"
+							placeholder="e.g., SUMMER20"
+							class="w-full px-3 py-2 border border-gray-300 rounded-lg uppercase"
+						/>
+					</div>
+					<div>
+						<label for="promo_discount_type" class="block text-sm font-medium text-gray-700 mb-1"
+							>Discount Type</label
+						>
+						<select
+							id="promo_discount_type"
+							name="discountType"
+							class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+						>
+							<option value="percentage">Percentage (%)</option>
+							<option value="fixed_amount">Fixed Amount (EUR)</option>
+						</select>
+					</div>
+					<div>
+						<label for="promo_value" class="block text-sm font-medium text-gray-700 mb-1">Value</label
+						>
+						<input
+							type="number"
+							id="promo_value"
+							name="discountValue"
+							placeholder="e.g., 20"
+							min="0"
+							step="0.01"
+							class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+						/>
+					</div>
+					<div>
+						<label for="promo_min_order" class="block text-sm font-medium text-gray-700 mb-1"
+							>Min Order (EUR)</label
+						>
+						<input
+							type="number"
+							id="promo_min_order"
+							name="minOrderAmount"
+							placeholder="Optional"
+							min="0"
+							step="0.01"
+							class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+						/>
+					</div>
+					<div>
+						<label for="promo_usage_limit" class="block text-sm font-medium text-gray-700 mb-1"
+							>Usage Limit</label
+						>
+						<input
+							type="number"
+							id="promo_usage_limit"
+							name="usageLimit"
+							placeholder="Unlimited"
+							min="0"
+							class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+						/>
+					</div>
 				</div>
-				<div>
-					<label for="promo_discount_type" class="block text-sm font-medium text-gray-700 mb-1">Discount Type</label>
-					<select
-						id="promo_discount_type"
-						name="discountType"
-						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+				<div class="mt-4 flex justify-end gap-2">
+					<button
+						type="button"
+						onclick={() => (showCreateForm = false)}
+						class="px-4 py-2 border rounded-lg"
 					>
-						<option value="percentage">Percentage (%)</option>
-						<option value="fixed_amount">Fixed Amount (EUR)</option>
-					</select>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+					>
+						Create Promotion
+					</button>
 				</div>
-				<div>
-					<label for="promo_value" class="block text-sm font-medium text-gray-700 mb-1">Value</label>
-					<input
-						type="number"
-						id="promo_value"
-						name="discountValue"
-						placeholder="e.g., 20"
-						min="0"
-						step="0.01"
-						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-					/>
-				</div>
-				<div>
-					<label for="promo_min_order" class="block text-sm font-medium text-gray-700 mb-1">Min Order (EUR)</label>
-					<input
-						type="number"
-						id="promo_min_order"
-						name="minOrderAmount"
-						placeholder="Optional"
-						min="0"
-						step="0.01"
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-					/>
-				</div>
-				<div>
-					<label for="promo_usage_limit" class="block text-sm font-medium text-gray-700 mb-1">Usage Limit</label>
-					<input
-						type="number"
-						id="promo_usage_limit"
-						name="usageLimit"
-						placeholder="Unlimited"
-						min="0"
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-					/>
-				</div>
-			</div>
-			<div class="mt-4 flex justify-end gap-2">
-				<button
-					type="button"
-					onclick={() => (showCreateForm = false)}
-					class="px-4 py-2 border rounded-lg"
-				>
-					Cancel
-				</button>
-				<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
-					Create Promotion
-				</button>
-			</div>
-		</form>
+			</form>
+		</div>
 	{/if}
 
 	<!-- Promotions Table -->
@@ -136,11 +143,11 @@
 								{#if promo.discountType === 'percentage'}
 									{promo.discountValue}%
 								{:else}
-									{(promo.discountValue / 100).toFixed(2)} EUR
+									{formatPrice(promo.discountValue)} EUR
 								{/if}
 							</td>
 							<td class="px-6 py-4 text-sm text-gray-500">
-								{promo.minOrderAmount ? `${(promo.minOrderAmount / 100).toFixed(2)} EUR` : '-'}
+								{promo.minOrderAmount ? `${formatPrice(promo.minOrderAmount)} EUR` : '-'}
 							</td>
 							<td class="px-6 py-4 text-sm text-gray-500">
 								{promo.usageCount}{promo.usageLimit ? ` / ${promo.usageLimit}` : ''}
@@ -155,16 +162,24 @@
 								</span>
 							</td>
 							<td class="px-6 py-4 text-right text-sm">
-								<form method="POST" action="?/toggle" class="inline">
+								<form method="POST" action="?/toggle" use:enhance class="inline">
 									<input type="hidden" name="id" value={promo.id} />
 									<input type="hidden" name="enabled" value={!promo.enabled} />
-									<button type="submit" class="text-blue-600 hover:text-blue-800 mr-3">
+									<button
+										type="submit"
+										class="text-blue-600 hover:text-blue-800 mr-3"
+									>
 										{promo.enabled ? 'Disable' : 'Enable'}
 									</button>
 								</form>
-								<form method="POST" action="?/delete" class="inline">
+								<form method="POST" action="?/delete" use:enhance class="inline">
 									<input type="hidden" name="id" value={promo.id} />
-									<button type="submit" class="text-red-600 hover:text-red-800"> Delete </button>
+									<button
+										type="submit"
+										class="text-red-600 hover:text-red-800"
+									>
+										Delete
+									</button>
 								</form>
 							</td>
 						</tr>

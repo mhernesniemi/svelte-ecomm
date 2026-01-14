@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import type { PageData, ActionData } from './$types';
+	import { addToCart } from '$lib/remote/cart.remote';
+	import type { PageData } from './$types';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
 
 	const product = $derived(data.product);
 	const enTrans = $derived(product.translations.find((t) => t.languageCode === 'en'));
@@ -10,7 +10,7 @@
 	let selectedVariantId = $state<number | null>(null);
 	let quantity = $state(1);
 	let isAddingToCart = $state(false);
-	let showSuccess = $state(false);
+	let message = $state<{ type: 'success' | 'error'; text: string } | null>(null);
 
 	// Initialize selected variant when product loads
 	$effect(() => {
@@ -19,23 +19,26 @@
 		}
 	});
 
-	// Show success message when item is added
-	$effect(() => {
-		if (form?.success) {
-			showSuccess = true;
-			setTimeout(() => {
-				showSuccess = false;
-			}, 3000);
-		}
-	});
-
-	const selectedVariant = $derived(
-		product.variants.find((v) => v.id === selectedVariantId)
-	);
+	const selectedVariant = $derived(product.variants.find((v) => v.id === selectedVariantId));
 
 	function getVariantName(variant: (typeof product.variants)[0]): string {
 		const trans = variant.translations.find((t) => t.languageCode === 'en');
 		return trans?.name ?? variant.sku;
+	}
+
+	async function handleAddToCart() {
+		if (!selectedVariantId) return;
+		isAddingToCart = true;
+		message = null;
+		try {
+			await addToCart({ variantId: selectedVariantId, quantity });
+			message = { type: 'success', text: 'Added to cart!' };
+			setTimeout(() => (message = null), 3000);
+		} catch {
+			message = { type: 'error', text: 'Failed to add item to cart' };
+		} finally {
+			isAddingToCart = false;
+		}
 	}
 </script>
 
@@ -114,35 +117,22 @@
 			{/if}
 
 			<!-- Success/Error Messages -->
-			{#if showSuccess}
-				<div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-					Added to cart!
-					<a href="/cart" class="underline ml-2">View cart</a>
-				</div>
-			{/if}
-
-			{#if form?.error}
-				<div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-					{form.error}
+			{#if message}
+				<div
+					class="mb-4 p-4 rounded-lg border {message.type === 'error'
+						? 'bg-red-50 border-red-200 text-red-700'
+						: 'bg-green-50 border-green-200 text-green-700'}"
+				>
+					{message.text}
+					{#if message.type === 'success'}
+						<a href="/cart" class="underline ml-2">View cart</a>
+					{/if}
 				</div>
 			{/if}
 
 			<!-- Quantity & Add to Cart -->
 			{#if selectedVariant && selectedVariant.stock > 0}
-				<form
-					method="POST"
-					action="?/addToCart"
-					use:enhance={() => {
-						isAddingToCart = true;
-						return async ({ update }) => {
-							await update();
-							isAddingToCart = false;
-						};
-					}}
-					class="flex items-center gap-4 mb-6"
-				>
-					<input type="hidden" name="variantId" value={selectedVariantId} />
-
+				<div class="flex items-center gap-4 mb-6">
 					<div class="flex items-center border rounded-lg">
 						<button
 							type="button"
@@ -154,7 +144,6 @@
 						</button>
 						<input
 							type="number"
-							name="quantity"
 							bind:value={quantity}
 							min="1"
 							max={selectedVariant.stock}
@@ -172,13 +161,14 @@
 					</div>
 
 					<button
-						type="submit"
+						type="button"
+						onclick={handleAddToCart}
 						disabled={isAddingToCart}
 						class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{isAddingToCart ? 'Adding...' : 'Add to Cart'}
 					</button>
-				</form>
+				</div>
 			{/if}
 
 			<!-- Facet Values / Tags -->

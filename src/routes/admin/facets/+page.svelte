@@ -1,7 +1,8 @@
 <script lang="ts">
-	import type { ActionData, PageData } from './$types';
+	import { enhance } from '$app/forms';
+	import type { PageData } from './$types';
 
-	let { data, form }: { data: PageData; form: ActionData } = $props();
+	let { data }: { data: PageData } = $props();
 
 	let showCreateFacet = $state(false);
 	let addingValueToFacet = $state<number | null>(null);
@@ -23,59 +24,57 @@
 		</button>
 	</div>
 
-	{#if form?.success}
-		<div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded mb-6">
-			Facet created successfully
-		</div>
-	{/if}
-
-	{#if form?.error}
-		<div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
-			{form.error}
-		</div>
-	{/if}
-
 	<!-- Create Facet Form -->
 	{#if showCreateFacet}
-		<form method="POST" action="?/create" class="bg-white rounded-lg shadow p-6 mb-6">
+		<div class="bg-white rounded-lg shadow p-6 mb-6">
 			<h2 class="font-semibold mb-4">Create New Facet</h2>
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-				<div>
-					<label for="facet_code" class="block text-sm font-medium text-gray-700 mb-1">Code</label>
-					<input
-						type="text"
-						id="facet_code"
-						name="code"
-						placeholder="e.g., color"
-						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-					/>
+			<form method="POST" action="?/create" use:enhance={() => {
+				return async ({ update }) => {
+					await update();
+					showCreateFacet = false;
+				};
+			}}>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div>
+						<label for="facet_code" class="block text-sm font-medium text-gray-700 mb-1">Code</label>
+						<input
+							type="text"
+							id="facet_code"
+							name="code"
+							placeholder="e.g., color"
+							class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+						/>
+					</div>
+					<div>
+						<label for="facet_name_en" class="block text-sm font-medium text-gray-700 mb-1"
+							>Name (EN)</label
+						>
+						<input
+							type="text"
+							id="facet_name_en"
+							name="name_en"
+							placeholder="e.g., Color"
+							class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+						/>
+					</div>
 				</div>
-				<div>
-					<label for="facet_name_en" class="block text-sm font-medium text-gray-700 mb-1">Name (EN)</label>
-					<input
-						type="text"
-						id="facet_name_en"
-						name="name_en"
-						placeholder="e.g., Color"
-						required
-						class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-					/>
+				<div class="mt-4 flex justify-end gap-2">
+					<button
+						type="button"
+						onclick={() => (showCreateFacet = false)}
+						class="px-4 py-2 border rounded-lg"
+					>
+						Cancel
+					</button>
+					<button
+						type="submit"
+						class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+					>
+						Create Facet
+					</button>
 				</div>
-			</div>
-			<div class="mt-4 flex justify-end gap-2">
-				<button
-					type="button"
-					onclick={() => (showCreateFacet = false)}
-					class="px-4 py-2 border rounded-lg"
-				>
-					Cancel
-				</button>
-				<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">
-					Create Facet
-				</button>
-			</div>
-		</form>
+			</form>
+		</div>
 	{/if}
 
 	<!-- Facets List -->
@@ -101,9 +100,12 @@
 							>
 								Add Value
 							</button>
-							<form method="POST" action="?/delete" class="inline">
+							<form method="POST" action="?/delete" use:enhance>
 								<input type="hidden" name="id" value={facet.id} />
-								<button type="submit" class="px-3 py-1 text-sm text-red-600 hover:text-red-800">
+								<button
+									type="submit"
+									class="px-3 py-1 text-sm text-red-600 hover:text-red-800"
+								>
 									Delete
 								</button>
 							</form>
@@ -112,39 +114,50 @@
 
 					<!-- Add Value Form -->
 					{#if addingValueToFacet === facet.id}
-						<form method="POST" action="?/createValue" class="px-6 py-4 bg-gray-50 border-b">
-							<input type="hidden" name="facetId" value={facet.id} />
-							<div class="flex gap-4 items-end">
-								<div class="flex-1">
-									<label for="value_code_{facet.id}" class="block text-sm font-medium text-gray-700 mb-1">Code</label>
-									<input
-										type="text"
-										id="value_code_{facet.id}"
-										name="code"
-										placeholder="e.g., red"
-										required
-										class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-									/>
+						<div class="px-6 py-4 bg-gray-50 border-b">
+							<form method="POST" action="?/createValue" use:enhance={() => {
+								return async ({ update }) => {
+									await update();
+									addingValueToFacet = null;
+								};
+							}}>
+								<input type="hidden" name="facetId" value={facet.id} />
+								<div class="flex gap-4 items-end">
+									<div class="flex-1">
+										<label
+											for="value_code_{facet.id}"
+											class="block text-sm font-medium text-gray-700 mb-1">Code</label
+										>
+										<input
+											type="text"
+											id="value_code_{facet.id}"
+											name="code"
+											placeholder="e.g., red"
+											class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+										/>
+									</div>
+									<div class="flex-1">
+										<label
+											for="value_name_{facet.id}"
+											class="block text-sm font-medium text-gray-700 mb-1">Name (EN)</label
+										>
+										<input
+											type="text"
+											id="value_name_{facet.id}"
+											name="name_en"
+											placeholder="e.g., Red"
+											class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+										/>
+									</div>
+									<button
+										type="submit"
+										class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+									>
+										Add
+									</button>
 								</div>
-								<div class="flex-1">
-									<label for="value_name_{facet.id}" class="block text-sm font-medium text-gray-700 mb-1">Name (EN)</label>
-									<input
-										type="text"
-										id="value_name_{facet.id}"
-										name="name_en"
-										placeholder="e.g., Red"
-										required
-										class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-									/>
-								</div>
-								<button
-									type="submit"
-									class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
-								>
-									Add
-								</button>
-							</div>
-						</form>
+							</form>
+						</div>
 					{/if}
 
 					<!-- Values -->
