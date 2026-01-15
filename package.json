@@ -72,6 +72,7 @@
 		"svelte"
 	],
 	"dependencies": {
+		"@inlang/paraglide-sveltekit": "^0.16.1",
 		"nanoid": "^5.1.6",
 		"postgres": "^3.4.7",
 		"svelte-clerk": "^0.20.3",

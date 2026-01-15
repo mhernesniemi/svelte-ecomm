@@ -1,7 +1,12 @@
 <script lang="ts">
   import { SignedIn, SignedOut, UserButton, SignInButton } from "svelte-clerk";
+  import { page } from "$app/stores";
+  import * as m from "$lib/paraglide/messages.js";
 
   let { children } = $props();
+
+  // Get the canonical path (without locale prefix) for language switching
+  const canonicalPath = $derived($page.url.pathname.replace(/^\/(en|fi)/, "") || "/");
 </script>
 
 <div class="min-h-screen bg-white">
@@ -9,11 +14,11 @@
   <header>
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex h-16 items-center justify-between">
-        <a href="/" class="bg-[#f7d0dd] text-xl font-bold text-gray-900">Hoikka</a>
+        <a href="/" class="bg-[#f7d0dd] text-xl font-bold text-gray-900">Hoikkis</a>
 
         <nav class="flex items-center gap-6">
-          <a href="/products" class="text-gray-600 hover:text-gray-900">Products</a>
-          <a href="/cart" class="text-gray-600 hover:text-gray-900" aria-label="Shopping cart">
+          <a href="/products" class="text-gray-600 hover:text-gray-900">{m.common_products()}</a>
+          <a href="/cart" class="text-gray-600 hover:text-gray-900" aria-label={m.common_cart()}>
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 stroke-linecap="round"
@@ -24,20 +29,39 @@
             </svg>
           </a>
 
+          <!-- Language Switcher -->
+          <div class="flex items-center gap-1 border-l pl-4">
+            <a
+              href={canonicalPath}
+              hreflang="en"
+              class="text-sm text-gray-600 hover:text-gray-900"
+              data-sveltekit-reload>EN</a
+            >
+            <span class="text-gray-300">|</span>
+            <a
+              href={canonicalPath}
+              hreflang="fi"
+              class="text-sm text-gray-600 hover:text-gray-900"
+              data-sveltekit-reload>FI</a
+            >
+          </div>
+
           <!-- Auth UI -->
           <SignedIn>
-            <a href="/account" class="text-sm text-gray-600 hover:text-gray-900">Account</a>
+            <a href="/account" class="text-sm text-gray-600 hover:text-gray-900"
+              >{m.common_account()}</a
+            >
             <UserButton />
           </SignedIn>
           <SignedOut>
             <SignInButton mode="modal">
-              <button class="text-sm text-gray-600 hover:text-gray-900">Sign in</button>
+              <button class="text-sm text-gray-600 hover:text-gray-900">{m.common_signIn()}</button>
             </SignInButton>
             <a
               href="/sign-up"
               class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
             >
-              Sign up
+              {m.common_signUp()}
             </a>
           </SignedOut>
         </nav>
@@ -54,8 +78,8 @@
   <footer class="mt-auto border-t">
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-gray-500">Hoikka - Opinionated Commerce for SvelteKit</p>
-        <a href="/admin" class="text-sm text-gray-500 hover:text-gray-900">Admin</a>
+        <p class="text-sm text-gray-500">{m.footer_tagline()}</p>
+        <a href="/admin" class="text-sm text-gray-500 hover:text-gray-900">{m.common_admin()}</a>
       </div>
     </div>
   </footer>

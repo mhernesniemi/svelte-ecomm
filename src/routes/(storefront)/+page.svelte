@@ -1,14 +1,26 @@
 <script lang="ts">
+  import { languageTag } from "$lib/paraglide/runtime.js";
+    import * as m from "$lib/paraglide/messages.js";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
 
+  const locale = languageTag();
+
   function getProductName(product: (typeof data.featuredProducts)[0]): string {
-    return product.translations.find((t) => t.languageCode === "en")?.name ?? "Untitled";
+    return (
+      product.translations.find((t) => t.languageCode === locale)?.name ??
+      product.translations[0]?.name ??
+      "Untitled"
+    );
   }
 
   function getProductSlug(product: (typeof data.featuredProducts)[0]): string {
-    return product.translations.find((t) => t.languageCode === "en")?.slug ?? "";
+    return (
+      product.translations.find((t) => t.languageCode === locale)?.slug ??
+      product.translations[0]?.slug ??
+      ""
+    );
   }
 
   function getLowestPrice(product: (typeof data.featuredProducts)[0]): number | null {
@@ -23,14 +35,9 @@
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex items-center gap-16">
         <div>
-          <h1 class="mb-4 text-4xl font-bold md:text-5xl">Opinionated Commerce</h1>
+          <h1 class="mb-4 text-4xl font-bold md:text-5xl">{m.home_title()}</h1>
           <p class="mb-10 text-lg leading-[1.75] text-gray-600">
-            A lightweight, ecommerce kit for <span class="font-semibold text-gray-900"
-              >TypeScript</span
-            >, <span class="font-semibold text-gray-900">SvelteKit</span> and
-            <span class="font-semibold text-gray-900">Drizzle</span>, <br />
-            that is truly <span class="font-semibold text-gray-900">100% customizable</span> and owned
-            by you.
+            {m.home_subtitle()}
           </p>
           <div class="flex items-center gap-4">
             <img src="/kuvitus2.png" alt="Svelte" class="h-20 w-20" />
@@ -38,7 +45,7 @@
               href="/products"
               class="inline-block rounded-lg border bg-white px-8 py-3 font-semibold text-gray-900 transition-colors hover:bg-gray-100"
             >
-              Get Started: Docs
+              {m.home_getStarted()}
             </a>
           </div>
         </div>
@@ -56,20 +63,20 @@
   <!-- Featured Products -->
   <section class="py-16">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <h2 class="mb-8 text-xl font-bold">Demo Store Products</h2>
+      <h2 class="mb-8 text-xl font-bold">{m.home_demoProducts()}</h2>
 
       {#if data.featuredProducts.length === 0}
         <div class="py-12 text-center text-gray-500">
-          <p>No products yet.</p>
+          <p>{m.home_noProducts()}</p>
           <a href="/admin/products/new" class="text-blue-600 hover:underline">
-            Add your first product
+            {m.home_addFirstProduct()}
           </a>
         </div>
       {:else}
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {#each data.featuredProducts as product}
             <a
-              href="/products/{getProductSlug(product)}"
+              href={`/products/${getProductSlug(product)}`}
               class="group overflow-hidden rounded-lg border bg-white transition-shadow hover:shadow-lg"
             >
               <div class="relative aspect-square bg-gray-100">
@@ -98,7 +105,7 @@
                 </h3>
                 {#if getLowestPrice(product) !== null}
                   <p class="mt-1 text-gray-600">
-                    From {(getLowestPrice(product)! / 100).toFixed(2)} EUR
+                    {m.product_from({ price: (getLowestPrice(product)! / 100).toFixed(2) })}
                   </p>
                 {/if}
               </div>

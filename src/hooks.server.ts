@@ -11,6 +11,7 @@ import { eq } from "drizzle-orm";
 import { CLERK_SECRET_KEY } from "$env/static/private";
 import { orderService } from "$lib/server/services/orders.js";
 import { shippingService, paymentService } from "$lib/server/services/index.js";
+import { i18n } from "$lib/i18n.js";
 
 const CART_COOKIE_NAME = "cart_token";
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -133,5 +134,15 @@ const paymentInit: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
+// Paraglide i18n handler - must be first to set locale
+const paraglideHandle = i18n.handle();
+
 // Combine handlers in sequence
-export const handle = sequence(clerkHandler, customerSync, cartHandler, shippingInit, paymentInit);
+export const handle = sequence(
+	paraglideHandle,
+	clerkHandler,
+	customerSync,
+	cartHandler,
+	shippingInit,
+	paymentInit
+);

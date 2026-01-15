@@ -1,15 +1,27 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import { languageTag } from "$lib/paraglide/runtime.js";
+    import * as m from "$lib/paraglide/messages.js";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
 
+  const locale = languageTag();
+
   function getProductName(product: (typeof data.products)[0]): string {
-    return product.translations.find((t) => t.languageCode === "en")?.name ?? "Untitled";
+    return (
+      product.translations.find((t) => t.languageCode === locale)?.name ??
+      product.translations[0]?.name ??
+      "Untitled"
+    );
   }
 
   function getProductSlug(product: (typeof data.products)[0]): string {
-    return product.translations.find((t) => t.languageCode === "en")?.slug ?? "";
+    return (
+      product.translations.find((t) => t.languageCode === locale)?.slug ??
+      product.translations[0]?.slug ??
+      ""
+    );
   }
 
   function getLowestPrice(product: (typeof data.products)[0]): number | null {
@@ -18,7 +30,11 @@
   }
 
   function getFacetName(facet: (typeof data.facets)[0]): string {
-    return facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+    return (
+      facet.translations.find((t) => t.languageCode === locale)?.name ??
+      facet.translations[0]?.name ??
+      facet.code
+    );
   }
 
   function isFilterActive(facetCode: string, valueCode: string): boolean {
@@ -57,7 +73,7 @@
 </script>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-  <h1 class="mb-8 text-2xl font-bold">Products</h1>
+  <h1 class="mb-8 text-2xl font-bold">{m.common_products()}</h1>
 
   <div class="flex gap-8">
     <!-- Sidebar Filters -->
@@ -68,7 +84,7 @@
           type="text"
           name="q"
           value={data.search ?? ""}
-          placeholder="Search products..."
+          placeholder={m.product_searchPlaceholder()}
           class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
         />
       </form>
@@ -76,7 +92,7 @@
       {#if hasActiveFilters}
         <div class="mb-6">
           <a href={clearAllFilters()} class="text-sm text-blue-600 hover:underline">
-            Clear all filters
+            {m.product_clearAllFilters()}
           </a>
         </div>
       {/if}
@@ -127,10 +143,10 @@
     <div class="flex-1">
       {#if data.products.length === 0}
         <div class="py-12 text-center text-gray-500">
-          <p>No products found matching your criteria.</p>
+          <p>{m.product_noProductsFound()}</p>
           {#if hasActiveFilters}
             <a href={clearAllFilters()} class="mt-2 inline-block text-blue-600 hover:underline">
-              Clear filters
+              {m.product_clearFilters()}
             </a>
           {/if}
         </div>
@@ -138,7 +154,7 @@
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {#each data.products as product}
             <a
-              href="/products/{getProductSlug(product)}"
+              href={`/products/${getProductSlug(product)}`}
               class="group overflow-hidden rounded-lg border bg-white transition-shadow hover:shadow-lg"
             >
               <div class="relative aspect-square bg-gray-100">
@@ -167,7 +183,7 @@
                 </h3>
                 {#if getLowestPrice(product) !== null}
                   <p class="mt-1 text-gray-600">
-                    From {(getLowestPrice(product)! / 100).toFixed(2)} EUR
+                    {m.product_from({ price: (getLowestPrice(product)! / 100).toFixed(2) })}
                   </p>
                 {/if}
               </div>
@@ -183,18 +199,21 @@
                 href="?page={data.currentPage - 1}"
                 class="rounded-lg border px-4 py-2 hover:bg-gray-50"
               >
-                Previous
+                {m.product_previous()}
               </a>
             {/if}
             <span class="px-4 py-2 text-gray-500">
-              Page {data.currentPage} of {Math.ceil(data.pagination.total / data.pagination.limit)}
+              {m.product_pageOf({
+                current: data.currentPage.toString(),
+                total: Math.ceil(data.pagination.total / data.pagination.limit).toString()
+              })}
             </span>
             {#if data.pagination.hasMore}
               <a
                 href="?page={data.currentPage + 1}"
                 class="rounded-lg border px-4 py-2 hover:bg-gray-50"
               >
-                Next
+                {m.product_next()}
               </a>
             {/if}
           </div>

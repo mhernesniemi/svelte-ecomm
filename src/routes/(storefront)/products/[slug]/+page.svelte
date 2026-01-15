@@ -1,11 +1,16 @@
 <script lang="ts">
   import { addToCart } from "$lib/remote/cart.remote";
+  import { languageTag } from "$lib/paraglide/runtime.js";
+    import * as m from "$lib/paraglide/messages.js";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
 
+  const locale = languageTag();
   const product = $derived(data.product);
-  const enTrans = $derived(product.translations.find((t) => t.languageCode === "en"));
+  const currentTrans = $derived(
+    product.translations.find((t) => t.languageCode === locale) ?? product.translations[0]
+  );
 
   let selectedVariantId = $state<number | null>(null);
   let quantity = $state(1);
@@ -13,7 +18,9 @@
   let message = $state<{ type: "success" | "error"; text: string } | null>(null);
   let selectedImageIndex = $state(0);
 
-  const images = $derived(product.assets.length > 0 ? product.assets : (product.featuredAsset ? [product.featuredAsset] : []));
+  const images = $derived(
+    product.assets.length > 0 ? product.assets : product.featuredAsset ? [product.featuredAsset] : []
+  );
 
   // Initialize selected variant when product loads
   $effect(() => {
@@ -25,7 +32,8 @@
   const selectedVariant = $derived(product.variants.find((v) => v.id === selectedVariantId));
 
   function getVariantName(variant: (typeof product.variants)[0]): string {
-    const trans = variant.translations.find((t) => t.languageCode === "en");
+    const trans =
+      variant.translations.find((t) => t.languageCode === locale) ?? variant.translations[0];
     return trans?.name ?? variant.sku;
   }
 
@@ -35,10 +43,10 @@
     message = null;
     try {
       await addToCart({ variantId: selectedVariantId, quantity });
-      message = { type: "success", text: "Added to cart!" };
+      message = { type: "success", text: m.product_addedToCart() };
       setTimeout(() => (message = null), 3000);
     } catch {
-      message = { type: "error", text: "Failed to add item to cart" };
+      message = { type: "error", text: m.product_failedToAdd() };
     } finally {
       isAddingToCart = false;
     }
@@ -47,7 +55,9 @@
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
   <nav class="mb-6">
-    <a href="/products" class="text-sm text-blue-600 hover:underline">&larr; Back to Products</a>
+    <a href="/products" class="text-sm text-blue-600 hover:underline"
+      >&larr; {m.product_backToProducts()}</a
+    >
   </nav>
 
   <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
@@ -58,7 +68,7 @@
         {#if images.length > 0}
           <img
             src="{images[selectedImageIndex].source}?tr=w-600,h-600,fo-auto"
-            alt={enTrans?.name}
+            alt={currentTrans?.name}
             class="h-full w-full object-cover"
           />
         {:else}
@@ -97,10 +107,10 @@
 
     <!-- Product Info -->
     <div>
-      <h1 class="mb-4 text-3xl font-bold">{enTrans?.name ?? "Product"}</h1>
+      <h1 class="mb-4 text-3xl font-bold">{currentTrans?.name ?? "Product"}</h1>
 
-      {#if enTrans?.description}
-        <p class="mb-6 text-gray-600">{enTrans.description}</p>
+      {#if currentTrans?.description}
+        <p class="mb-6 text-gray-600">{currentTrans.description}</p>
       {/if}
 
       {#if selectedVariant}
@@ -112,7 +122,7 @@
       <!-- Variant Selection -->
       {#if product.variants.length > 1}
         <div class="mb-6">
-          <p class="mb-2 block text-sm font-medium text-gray-700">Select Variant</p>
+          <p class="mb-2 block text-sm font-medium text-gray-700">{m.product_selectVariant()}</p>
           <div class="flex flex-wrap gap-2" role="group" aria-label="Product variants">
             {#each product.variants as variant}
               <button
@@ -134,9 +144,11 @@
       {#if selectedVariant}
         <div class="mb-6">
           {#if selectedVariant.stock > 0}
-            <span class="text-sm text-green-600">In stock ({selectedVariant.stock} available)</span>
+            <span class="text-sm text-green-600"
+              >{m.product_inStock({ count: selectedVariant.stock.toString() })}</span
+            >
           {:else}
-            <span class="text-sm text-red-600">Out of stock</span>
+            <span class="text-sm text-red-600">{m.product_outOfStock()}</span>
           {/if}
         </div>
       {/if}
@@ -150,7 +162,7 @@
         >
           {message.text}
           {#if message.type === "success"}
-            <a href="/cart" class="ml-2 underline">View cart</a>
+            <a href="/cart" class="ml-2 underline">{m.product_viewCart()}</a>
           {/if}
         </div>
       {/if}
@@ -191,7 +203,7 @@
             disabled={isAddingToCart}
             class="flex-1 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isAddingToCart ? "Adding..." : "Add to Cart"}
+            {isAddingToCart ? m.product_adding() : m.product_addToCart()}
           </button>
         </div>
       {/if}
@@ -199,10 +211,13 @@
       <!-- Facet Values / Tags -->
       {#if product.facetValues.length > 0}
         <div class="border-t pt-6">
-          <h3 class="mb-2 text-sm font-medium text-gray-700">Details</h3>
+          <h3 class="mb-2 text-sm font-medium text-gray-700">{m.product_details()}</h3>
           <div class="flex flex-wrap gap-2">
             {#each product.facetValues as fv}
-              {@const name = fv.translations.find((t) => t.languageCode === "en")?.name ?? fv.code}
+              {@const name =
+                fv.translations.find((t) => t.languageCode === locale)?.name ??
+                fv.translations[0]?.name ??
+                fv.code}
               <span class="rounded-full bg-gray-100 px-3 py-1 text-sm">{name}</span>
             {/each}
           </div>

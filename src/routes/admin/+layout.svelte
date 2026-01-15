@@ -107,7 +107,7 @@
     </nav>
 
     <div class="absolute right-0 bottom-0 left-0 border-t border-gray-800 p-4">
-      <a href="/" class="text-sm text-gray-400 hover:text-white"> View Storefront </a>
+      <a href="/" class="text-sm text-gray-400 hover:text-white">View Storefront</a>
     </div>
   </aside>
 
