@@ -96,7 +96,18 @@
     <a href="/admin/products" class="text-sm text-blue-600 hover:underline"
       >&larr; Back to Products</a
     >
-    <h1 class="mt-2 text-2xl font-bold">Edit Product</h1>
+    <div class="mt-2 flex items-center justify-between">
+      <h1 class="text-2xl font-bold">Edit Product</h1>
+      {#if enTrans?.slug}
+        <a
+          href="/products/{enTrans.slug}"
+          target="_blank"
+          class="text-sm text-gray-500 hover:text-gray-700"
+        >
+          View in store &rarr;
+        </a>
+      {/if}
+    </div>
   </div>
 
   {#if form?.success}

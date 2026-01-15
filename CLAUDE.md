@@ -17,6 +17,12 @@ This is a **full-stack e-commerce platform** built with:
 
 - Use Bun everywhere when possible.
 
+## UI Guidelines
+
+- Use shadcn/svelte for UI components where they provide value and install a new one only if it's not available.
+- No dark theme
+- Use global focus styles for all interactive elements
+
 ## Key Structure
 
 | Directory                  | Purpose                                            |

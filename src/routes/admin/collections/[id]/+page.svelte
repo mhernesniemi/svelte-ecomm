@@ -115,9 +115,20 @@
       </a>
       <h1 class="text-2xl font-bold text-gray-900">Edit Collection</h1>
     </div>
-    <span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
-      {data.productCount} products
-    </span>
+    <div class="flex items-center gap-4">
+      <span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+        {data.productCount} products
+      </span>
+      {#if slugEn}
+        <a
+          href="/collections/{slugEn}"
+          target="_blank"
+          class="text-sm text-gray-500 hover:text-gray-700"
+        >
+          View in store &rarr;
+        </a>
+      {/if}
+    </div>
   </div>
 
   {#if form?.error}
