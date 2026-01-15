@@ -17,6 +17,12 @@
   let isUploading = $state(false);
   let uploadError = $state<string | null>(null);
 
+  // Selected facet values (bind:group handles reactivity)
+  let selectedProductFacets = $state(data.product.facetValues.map((fv) => fv.id));
+  let variantFacets: Record<number, number[]> = $state(
+    Object.fromEntries(data.product.variants.map((v) => [v.id, v.facetValues.map((fv) => fv.id)]))
+  );
+
   function getTranslation(lang: string) {
     return data.product.translations.find((t) => t.languageCode === lang);
   }
@@ -365,9 +371,8 @@
                   {#each facet.values as value}
                     {@const valueName =
                       value.translations.find((t) => t.languageCode === "en")?.name ?? value.code}
-                    {@const isSelected = data.product.facetValues.some((fv) => fv.id === value.id)}
                     <label
-                      class="inline-flex cursor-pointer items-center rounded-full px-3 py-1.5 text-sm transition-colors {isSelected
+                      class="cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors {selectedProductFacets.includes(value.id)
                         ? 'border-2 border-blue-300 bg-blue-100 text-blue-800'
                         : 'border-2 border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200'}"
                     >
@@ -375,7 +380,7 @@
                         type="checkbox"
                         name="facetValueIds"
                         value={value.id}
-                        checked={isSelected}
+                        bind:group={selectedProductFacets}
                         class="sr-only"
                       />
                       {valueName}
@@ -572,11 +577,8 @@
                                 {@const valueName =
                                   value.translations.find((t) => t.languageCode === "en")?.name ??
                                   value.code}
-                                {@const isSelected = variant.facetValues.some(
-                                  (fv) => fv.id === value.id
-                                )}
                                 <label
-                                  class="inline-flex cursor-pointer items-center rounded-full px-3 py-1.5 text-sm transition-colors {isSelected
+                                  class="cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors {variantFacets[variant.id]?.includes(value.id)
                                     ? 'border-2 border-blue-300 bg-blue-100 text-blue-800'
                                     : 'border-2 border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200'}"
                                 >
@@ -584,7 +586,7 @@
                                     type="checkbox"
                                     name="facetValueIds"
                                     value={value.id}
-                                    checked={isSelected}
+                                    bind:group={variantFacets[variant.id]}
                                     class="sr-only"
                                   />
                                   {valueName}
