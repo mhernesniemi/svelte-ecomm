@@ -500,6 +500,62 @@ export const orderPromotions = pgTable(
 );
 
 // ============================================================================
+// COLLECTIONS (Smart Collections - Vendure/Shopify style)
+// ============================================================================
+
+export const collections = pgTable(
+	"collections",
+	{
+		id: serial("id").primaryKey(),
+		code: varchar("code", { length: 255 }).notNull().unique(),
+		enabled: boolean("enabled").default(true).notNull(),
+		isPrivate: boolean("is_private").default(false).notNull(),
+		featuredAssetId: integer("featured_asset_id").references(() => assets.id),
+		position: integer("position").default(0).notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull()
+	},
+	(table) => [index("collections_enabled_idx").on(table.enabled)]
+);
+
+export const collectionTranslations = pgTable(
+	"collection_translations",
+	{
+		id: serial("id").primaryKey(),
+		collectionId: integer("collection_id")
+			.references(() => collections.id, { onDelete: "cascade" })
+			.notNull(),
+		languageCode: varchar("language_code", { length: 10 }).notNull(),
+		name: varchar("name", { length: 255 }).notNull(),
+		slug: varchar("slug", { length: 255 }).notNull(),
+		description: text("description")
+	},
+	(table) => [
+		uniqueIndex("collection_translations_collection_lang_idx").on(
+			table.collectionId,
+			table.languageCode
+		),
+		index("collection_translations_slug_idx").on(table.slug)
+	]
+);
+
+// Collection filters - rules stored as rows, products derived dynamically
+export const collectionFilters = pgTable(
+	"collection_filters",
+	{
+		id: serial("id").primaryKey(),
+		collectionId: integer("collection_id")
+			.references(() => collections.id, { onDelete: "cascade" })
+			.notNull(),
+		field: varchar("field", { length: 100 }).notNull(), // 'facet', 'price', 'stock', 'enabled', 'product', 'variant'
+		operator: varchar("operator", { length: 50 }).notNull(), // 'eq', 'in', 'gte', 'lte', 'gt', 'contains'
+		value: jsonb("value").notNull(), // flexible payload
+		createdAt: timestamp("created_at").defaultNow().notNull()
+	},
+	(table) => [index("collection_filters_collection_idx").on(table.collectionId)]
+);
+
+// ============================================================================
 // RELATIONS
 // ============================================================================
 
@@ -700,5 +756,28 @@ export const orderShippingRelations = relations(orderShipping, ({ one }) => ({
 	shippingMethod: one(shippingMethods, {
 		fields: [orderShipping.shippingMethodId],
 		references: [shippingMethods.id]
+	})
+}));
+
+export const collectionsRelations = relations(collections, ({ one, many }) => ({
+	translations: many(collectionTranslations),
+	filters: many(collectionFilters),
+	featuredAsset: one(assets, {
+		fields: [collections.featuredAssetId],
+		references: [assets.id]
+	})
+}));
+
+export const collectionTranslationsRelations = relations(collectionTranslations, ({ one }) => ({
+	collection: one(collections, {
+		fields: [collectionTranslations.collectionId],
+		references: [collections.id]
+	})
+}));
+
+export const collectionFiltersRelations = relations(collectionFilters, ({ one }) => ({
+	collection: one(collections, {
+		fields: [collectionFilters.collectionId],
+		references: [collections.id]
 	})
 }));

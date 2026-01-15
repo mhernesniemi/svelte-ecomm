@@ -21,7 +21,10 @@ import type {
 	paymentMethods,
 	promotions,
 	shippingMethods,
-	orderShipping
+	orderShipping,
+	collections,
+	collectionTranslations,
+	collectionFilters
 } from "$lib/server/db/schema.js";
 
 // ============================================================================
@@ -194,6 +197,54 @@ export interface OrderShippingWithMethod extends OrderShipping {
 }
 
 // ============================================================================
+// COLLECTION TYPES (Smart Collections - Vendure/Shopify style)
+// ============================================================================
+
+export type Collection = InferSelectModel<typeof collections>;
+export type NewCollection = InferInsertModel<typeof collections>;
+
+export type CollectionTranslation = InferSelectModel<typeof collectionTranslations>;
+export type NewCollectionTranslation = InferInsertModel<typeof collectionTranslations>;
+
+export type CollectionFilter = InferSelectModel<typeof collectionFilters>;
+export type NewCollectionFilter = InferInsertModel<typeof collectionFilters>;
+
+/** Collection filter field types */
+export type CollectionFilterField =
+	| "facet" // Filter by facet values
+	| "enabled" // Filter by enabled status
+	| "price" // Filter by variant price
+	| "stock" // Filter by variant stock
+	| "product" // Manual product selection
+	| "variant"; // Manual variant selection
+
+/** Collection filter operators */
+export type CollectionFilterOperator =
+	| "eq" // equals
+	| "in" // in array
+	| "gte" // greater than or equal
+	| "lte" // less than or equal
+	| "gt" // greater than
+	| "contains"; // contains (for facet by code)
+
+/** Collection with translations */
+export interface CollectionWithTranslations extends Collection {
+	translations: CollectionTranslation[];
+}
+
+/** Collection with all related data */
+export interface CollectionWithRelations extends Collection {
+	translations: CollectionTranslation[];
+	filters: CollectionFilter[];
+	featuredAsset?: Asset | null;
+}
+
+/** Collection with product count */
+export interface CollectionWithCount extends CollectionWithTranslations {
+	productCount: number;
+}
+
+// ============================================================================
 // FILTER & QUERY TYPES
 // ============================================================================
 
@@ -306,4 +357,44 @@ export interface CreatePromotionInput {
 	usageLimit?: number;
 	startsAt?: Date;
 	endsAt?: Date;
+}
+
+export interface CreateCollectionInput {
+	code: string;
+	enabled?: boolean;
+	isPrivate?: boolean;
+	position?: number;
+	featuredAssetId?: number;
+	translations: {
+		languageCode: string;
+		name: string;
+		slug: string;
+		description?: string;
+	}[];
+	filters?: {
+		field: CollectionFilterField;
+		operator: CollectionFilterOperator;
+		value: unknown;
+	}[];
+}
+
+export interface UpdateCollectionInput {
+	code?: string;
+	enabled?: boolean;
+	isPrivate?: boolean;
+	position?: number;
+	featuredAssetId?: number | null;
+	translations?: {
+		languageCode: string;
+		name?: string;
+		slug?: string;
+		description?: string;
+	}[];
+}
+
+export interface AddCollectionFilterInput {
+	collectionId: number;
+	field: CollectionFilterField;
+	operator: CollectionFilterOperator;
+	value: unknown;
 }
