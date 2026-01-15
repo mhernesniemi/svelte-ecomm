@@ -106,7 +106,8 @@ export interface FacetValueWithTranslations extends FacetValue {
 export type Asset = InferSelectModel<typeof assets>;
 export type NewAsset = InferInsertModel<typeof assets>;
 
-export type AssetType = "image" | "video" | "document" | "other";
+/** Asset type - derived from schema enum */
+export type AssetType = Asset["type"];
 
 // ============================================================================
 // CUSTOMER TYPES
@@ -144,17 +145,11 @@ export interface PaymentWithMethod extends Payment {
 	paymentMethod: PaymentMethod;
 }
 
-/** Order states from config */
-export type OrderState =
-	| "created"
-	| "payment_pending"
-	| "paid"
-	| "shipped"
-	| "delivered"
-	| "cancelled";
+/** Order state - derived from schema enum */
+export type OrderState = Order["state"];
 
-/** Payment states */
-export type PaymentState = "pending" | "authorized" | "settled" | "declined" | "refunded";
+/** Payment state - derived from schema enum */
+export type PaymentState = Payment["state"];
 
 /** Order with all related data */
 export interface OrderWithRelations extends Order {
@@ -175,7 +170,8 @@ export interface OrderLineWithVariant extends OrderLine {
 export type Promotion = InferSelectModel<typeof promotions>;
 export type NewPromotion = InferInsertModel<typeof promotions>;
 
-export type DiscountType = "percentage" | "fixed_amount";
+/** Discount type - derived from schema enum */
+export type DiscountType = Promotion["discountType"];
 
 // ============================================================================
 // SHIPPING TYPES
@@ -187,7 +183,8 @@ export type NewShippingMethod = InferInsertModel<typeof shippingMethods>;
 export type OrderShipping = InferSelectModel<typeof orderShipping>;
 export type NewOrderShipping = InferInsertModel<typeof orderShipping>;
 
-export type ShippingStatus = "pending" | "shipped" | "in_transit" | "delivered";
+/** Shipping status - derived from schema enum */
+export type ShippingStatus = OrderShipping["status"];
 
 /** Order with shipping info */
 export interface OrderWithShipping extends Omit<OrderWithRelations, "shipping"> {
@@ -264,7 +261,8 @@ export type NewWishlistItem = InferInsertModel<typeof wishlistItems>;
 export type Review = InferSelectModel<typeof reviews>;
 export type NewReview = InferInsertModel<typeof reviews>;
 
-export type ReviewStatus = "pending" | "approved" | "rejected";
+/** Review status - derived from schema enum */
+export type ReviewStatus = Review["status"];
 
 /** Review with customer info */
 export interface ReviewWithCustomer extends Review {

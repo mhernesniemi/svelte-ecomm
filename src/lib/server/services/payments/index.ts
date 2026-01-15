@@ -165,7 +165,7 @@ export class PaymentService {
 			throw new Error("Payment not found");
 		}
 
-		if (payment.state !== "settled" && payment.state !== "completed") {
+		if (payment.state !== "settled") {
 			throw new Error(`Cannot refund payment in state: ${payment.state}`);
 		}
 

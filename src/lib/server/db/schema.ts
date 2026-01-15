@@ -204,7 +204,7 @@ export const variantFacetValues = pgTable(
 export const assets = pgTable("assets", {
 	id: serial("id").primaryKey(),
 	name: varchar("name", { length: 255 }).notNull(),
-	type: varchar("type", { length: 50 }).notNull(), // 'image', 'video', etc.
+	type: text("type", { enum: ["image", "video", "document", "other"] }).notNull(),
 	mimeType: varchar("mime_type", { length: 100 }).notNull(),
 	width: integer("width").default(0),
 	height: integer("height").default(0),
@@ -307,7 +307,7 @@ export const orders = pgTable(
 		customerId: integer("customer_id").references(() => customers.id, { onDelete: "set null" }),
 		cartToken: varchar("cart_token", { length: 64 }).unique(), // For guest cart tracking via cookies
 		active: boolean("active").default(true).notNull(), // true = cart, false = completed order
-		state: varchar("state", { length: 50 }).notNull().default("created"),
+		state: text("state", { enum: ["created", "payment_pending", "paid", "shipped", "delivered", "cancelled"] }).notNull().default("created"),
 		// Pricing (all in cents)
 		subtotal: integer("subtotal").default(0).notNull(),
 		shipping: integer("shipping").default(0).notNull(),
@@ -394,7 +394,7 @@ export const payments = pgTable(
 			.notNull(),
 		method: varchar("method", { length: 100 }).notNull(), // Legacy: kept for backward compatibility
 		amount: integer("amount").notNull(), // Amount in cents
-		state: varchar("state", { length: 50 }).notNull().default("pending"),
+		state: text("state", { enum: ["pending", "authorized", "settled", "declined", "refunded"] }).notNull().default("pending"),
 		transactionId: varchar("transaction_id", { length: 255 }), // External gateway ID
 		errorMessage: text("error_message"),
 		metadata: jsonb("metadata"), // Store provider-specific data (changed from text to jsonb)
@@ -441,7 +441,7 @@ export const orderShipping = pgTable(
 			.references(() => shippingMethods.id)
 			.notNull(),
 		trackingNumber: varchar("tracking_number", { length: 255 }),
-		status: varchar("status", { length: 50 }).default("pending").notNull(), // pending, shipped, in_transit, delivered
+		status: text("status", { enum: ["pending", "shipped", "in_transit", "delivered", "error"] }).default("pending").notNull(),
 		price: integer("price").notNull(), // Price in cents
 		metadata: jsonb("metadata"), // Store provider-specific data
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -464,7 +464,7 @@ export const promotions = pgTable(
 	{
 		id: serial("id").primaryKey(),
 		code: varchar("code", { length: 50 }).notNull().unique(),
-		discountType: varchar("discount_type", { length: 50 }).notNull(), // 'percentage' or 'fixed_amount'
+		discountType: text("discount_type", { enum: ["percentage", "fixed_amount"] }).notNull(),
 		discountValue: integer("discount_value").notNull(), // Percentage (0-100) or amount in cents
 		minOrderAmount: integer("min_order_amount"), // Minimum order amount for promotion
 		usageLimit: integer("usage_limit"), // Max number of times this can be used
@@ -573,7 +573,7 @@ export const reviews = pgTable(
 		rating: integer("rating").notNull(),
 		comment: text("comment"),
 		isVerifiedPurchase: boolean("is_verified_purchase").default(false).notNull(),
-		status: varchar("status", { length: 20 }).default("pending").notNull(), // pending, approved, rejected
+		status: text("status", { enum: ["pending", "approved", "rejected"] }).default("pending").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull()
 	},

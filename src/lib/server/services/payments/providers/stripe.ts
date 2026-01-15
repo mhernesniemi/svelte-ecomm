@@ -79,19 +79,19 @@ export class StripeProvider implements PaymentProvider {
 		// const paymentIntent = await stripe.paymentIntents.retrieve(paymentId);
 		//
 		// if (paymentIntent.status === 'succeeded') {
-		//   return 'completed';
+		//   return 'settled';
 		// } else if (paymentIntent.status === 'requires_payment_method' ||
 		//            paymentIntent.status === 'canceled') {
-		//   return 'failed';
+		//   return 'declined';
 		// }
 		// return 'pending';
 
 		// Mock implementation
 		// In mock, assume payment succeeds if it's not explicitly failed
 		if (paymentId.includes("_fail_")) {
-			return "failed";
+			return "declined";
 		}
-		return "completed";
+		return "settled";
 	}
 
 	/**

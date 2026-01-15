@@ -28,6 +28,7 @@ export type ShipmentInfo = {
 	metadata?: Record<string, unknown>;
 };
 
+// Shipment status values must match the database orderShipping.status enum
 export type ShipmentStatus = "pending" | "shipped" | "in_transit" | "delivered" | "error";
 
 export interface ShippingAddress {

@@ -19,7 +19,8 @@ export type PaymentInfo = {
 	metadata?: Record<string, unknown>;
 };
 
-export type PaymentStatus = "pending" | "completed" | "failed" | "refunded";
+// Payment status values must match the database enum
+export type PaymentStatus = "pending" | "authorized" | "settled" | "declined" | "refunded";
 
 export type RefundInfo = {
 	refundedAmount: number; // Amount in cents

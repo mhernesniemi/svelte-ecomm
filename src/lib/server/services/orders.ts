@@ -484,7 +484,7 @@ export class OrderService {
 		const order = await this.getById(orderId);
 		if (!order) throw new Error("Order not found");
 
-		const currentState = order.state as OrderState;
+		const currentState = order.state;
 		const allowedTransitions = STATE_TRANSITIONS[currentState];
 
 		if (!allowedTransitions.includes(newState)) {

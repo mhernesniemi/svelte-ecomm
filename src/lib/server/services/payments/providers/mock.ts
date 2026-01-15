@@ -33,12 +33,12 @@ export class MockProvider implements PaymentProvider {
 	async confirmPayment(paymentId: string): Promise<PaymentStatus> {
 		// Mock: fail payments with specific pattern
 		if (paymentId.includes("_fail_")) {
-			return "failed";
+			return "declined";
 		}
 
 		// In a real implementation, you would check the payment status
 		// For mock, we assume it succeeds
-		return "completed";
+		return "settled";
 	}
 
 	/**
