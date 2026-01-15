@@ -10,7 +10,7 @@
  * - Loading product data (use ProductService for that)
  * - View model building (compose at route level)
  */
-import { eq, and } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { wishlists, wishlistItems } from "../db/schema.js";
 import type { Wishlist, WishlistItem } from "$lib/types.js";
@@ -286,7 +286,7 @@ export class WishlistService {
 			// Transfer ownership
 			await db
 				.update(wishlists)
-				.set({ customerId, guestToken: null, updatedAt: new Date() })
+				.set({ customerId, guestToken: null })
 				.where(eq(wishlists.id, guestWishlist.id));
 		}
 
@@ -296,7 +296,7 @@ export class WishlistService {
 	private async touch(wishlistId: number): Promise<void> {
 		await db
 			.update(wishlists)
-			.set({ updatedAt: new Date() })
+			.set({ updatedAt: sql`now()` })
 			.where(eq(wishlists.id, wishlistId));
 	}
 }

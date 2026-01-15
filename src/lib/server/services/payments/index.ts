@@ -144,8 +144,7 @@ export class PaymentService {
 			await db
 				.update(payments)
 				.set({
-					state: status,
-					updatedAt: new Date()
+					state: status
 				})
 				.where(eq(payments.id, paymentId));
 
@@ -199,8 +198,7 @@ export class PaymentService {
 					metadata: {
 						...(payment.metadata as Record<string, unknown>),
 						refund: refundInfo
-					},
-					updatedAt: new Date()
+					}
 				})
 				.where(eq(payments.id, paymentId));
 

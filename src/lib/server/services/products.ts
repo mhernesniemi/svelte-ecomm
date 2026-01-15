@@ -178,7 +178,7 @@ export class ProductService {
 		if (input.enabled !== undefined) {
 			await db
 				.update(products)
-				.set({ enabled: input.enabled, updatedAt: new Date() })
+				.set({ enabled: input.enabled })
 				.where(eq(products.id, id));
 		}
 
@@ -337,7 +337,7 @@ export class ProductService {
 
 		if (!variant) return null;
 
-		const updateData: Partial<typeof variant> = { updatedAt: new Date() };
+		const updateData: Partial<typeof variant> = {};
 		if (input.sku !== undefined) updateData.sku = input.sku;
 		if (input.price !== undefined) updateData.price = input.price;
 		if (input.stock !== undefined) updateData.stock = input.stock;
@@ -390,8 +390,7 @@ export class ProductService {
 		await db
 			.update(productVariants)
 			.set({
-				stock: sql`${productVariants.stock} + ${quantity}`,
-				updatedAt: new Date()
+				stock: sql`${productVariants.stock} + ${quantity}`
 			})
 			.where(eq(productVariants.id, variantId));
 	}

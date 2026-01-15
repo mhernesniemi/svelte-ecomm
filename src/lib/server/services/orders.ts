@@ -190,8 +190,7 @@ export class OrderService {
 				.update(orders)
 				.set({
 					customerId,
-					cartToken: null, // Clear guest token
-					updatedAt: new Date()
+					cartToken: null // Clear guest token
 				})
 				.where(eq(orders.id, guestCart.id))
 				.returning();
@@ -492,8 +491,7 @@ export class OrderService {
 		}
 
 		const updateData: Partial<Order> = {
-			state: newState,
-			updatedAt: new Date()
+			state: newState
 		};
 
 		// When transitioning to payment_pending, mark cart as no longer active (becomes an order)
@@ -564,8 +562,7 @@ export class OrderService {
 				shippingStreetLine2: address.streetLine2 ?? null,
 				shippingCity: address.city,
 				shippingPostalCode: address.postalCode,
-				shippingCountry: address.country,
-				updatedAt: new Date()
+				shippingCountry: address.country
 			})
 			.where(eq(orders.id, orderId))
 			.returning();
@@ -644,7 +641,7 @@ export class OrderService {
 
 		await db
 			.update(orders)
-			.set({ subtotal, discount, shipping, total, updatedAt: new Date() })
+			.set({ subtotal, discount, shipping, total })
 			.where(eq(orders.id, orderId));
 	}
 

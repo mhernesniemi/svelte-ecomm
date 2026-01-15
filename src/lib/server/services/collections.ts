@@ -247,9 +247,7 @@ export class CollectionService {
 		if (!existing) return null;
 
 		// Update main collection
-		const updateData: Partial<Collection> = {
-			updatedAt: new Date()
-		};
+		const updateData: Partial<Collection> = {};
 		if (input.code !== undefined) updateData.code = input.code;
 		if (input.enabled !== undefined) updateData.enabled = input.enabled;
 		if (input.isPrivate !== undefined) updateData.isPrivate = input.isPrivate;

@@ -87,8 +87,7 @@ export class PaymentService {
 				.update(payments)
 				.set({
 					state: "settled",
-					transactionId: `mock_${nanoid(16)}`,
-					updatedAt: new Date()
+					transactionId: `mock_${nanoid(16)}`
 				})
 				.where(eq(payments.id, paymentId))
 				.returning();
@@ -99,8 +98,7 @@ export class PaymentService {
 				.update(payments)
 				.set({
 					state: "declined",
-					errorMessage: "Mock payment declined",
-					updatedAt: new Date()
+					errorMessage: "Mock payment declined"
 				})
 				.where(eq(payments.id, paymentId))
 				.returning();
@@ -128,8 +126,7 @@ export class PaymentService {
 			.update(payments)
 			.set({
 				state: "authorized",
-				transactionId: `mock_auth_${nanoid(16)}`,
-				updatedAt: new Date()
+				transactionId: `mock_auth_${nanoid(16)}`
 			})
 			.where(eq(payments.id, paymentId))
 			.returning();
@@ -154,8 +151,7 @@ export class PaymentService {
 		const [updated] = await db
 			.update(payments)
 			.set({
-				state: "settled",
-				updatedAt: new Date()
+				state: "settled"
 			})
 			.where(eq(payments.id, paymentId))
 			.returning();
@@ -189,8 +185,7 @@ export class PaymentService {
 			.update(payments)
 			.set({
 				state: "refunded",
-				metadata: JSON.stringify({ refundAmount, refundedAt: new Date().toISOString() }),
-				updatedAt: new Date()
+				metadata: JSON.stringify({ refundAmount, refundedAt: new Date().toISOString() })
 			})
 			.where(eq(payments.id, paymentId))
 			.returning();
@@ -216,8 +211,7 @@ export class PaymentService {
 			.update(payments)
 			.set({
 				state: "declined",
-				errorMessage: "Payment cancelled",
-				updatedAt: new Date()
+				errorMessage: "Payment cancelled"
 			})
 			.where(eq(payments.id, paymentId))
 			.returning();

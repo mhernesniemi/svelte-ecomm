@@ -30,7 +30,7 @@ export const products = pgTable(
 		featuredAssetId: integer("featured_asset_id"),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [index("products_enabled_idx").on(table.enabled)]
 );
@@ -73,7 +73,7 @@ export const productVariants = pgTable(
 		featuredAssetId: integer("featured_asset_id"),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		uniqueIndex("product_variants_sku_idx").on(table.sku),
@@ -108,7 +108,7 @@ export const facets = pgTable("facets", {
 	code: varchar("code", { length: 255 }).notNull().unique(),
 	isPrivate: boolean("is_private").default(false).notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at").defaultNow().notNull()
+	updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 });
 
 export const facetTranslations = pgTable(
@@ -135,7 +135,7 @@ export const facetValues = pgTable(
 			.notNull(),
 		code: varchar("code", { length: 255 }).notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		uniqueIndex("facet_values_facet_code_idx").on(table.facetId, table.code),
@@ -264,7 +264,7 @@ export const customers = pgTable(
 		isAdmin: boolean("is_admin").default(false).notNull(),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		uniqueIndex("customers_email_idx").on(table.email),
@@ -290,7 +290,7 @@ export const addresses = pgTable(
 		phoneNumber: varchar("phone_number", { length: 50 }),
 		isDefault: boolean("is_default").default(false).notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [index("addresses_customer_idx").on(table.customerId)]
 );
@@ -324,7 +324,7 @@ export const orders = pgTable(
 		// Timestamps
 		orderPlacedAt: timestamp("order_placed_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		index("orders_customer_idx").on(table.customerId),
@@ -374,7 +374,7 @@ export const paymentMethods = pgTable(
 		description: text("description"),
 		active: boolean("active").default(true).notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		uniqueIndex("payment_methods_code_idx").on(table.code),
@@ -399,7 +399,7 @@ export const payments = pgTable(
 		errorMessage: text("error_message"),
 		metadata: jsonb("metadata"), // Store provider-specific data (changed from text to jsonb)
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		index("payments_order_idx").on(table.orderId),
@@ -422,7 +422,7 @@ export const shippingMethods = pgTable(
 		description: text("description"),
 		active: boolean("active").default(true).notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		uniqueIndex("shipping_methods_code_idx").on(table.code),
@@ -445,7 +445,7 @@ export const orderShipping = pgTable(
 		price: integer("price").notNull(), // Price in cents
 		metadata: jsonb("metadata"), // Store provider-specific data
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		index("order_shipping_order_idx").on(table.orderId),
@@ -473,7 +473,7 @@ export const promotions = pgTable(
 		startsAt: timestamp("starts_at"),
 		endsAt: timestamp("ends_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		index("promotions_code_idx").on(table.code),
@@ -513,7 +513,7 @@ export const collections = pgTable(
 		featuredAssetId: integer("featured_asset_id").references(() => assets.id),
 		position: integer("position").default(0).notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [index("collections_enabled_idx").on(table.enabled)]
 );
@@ -575,7 +575,7 @@ export const reviews = pgTable(
 		isVerifiedPurchase: boolean("is_verified_purchase").default(false).notNull(),
 		status: text("status", { enum: ["pending", "approved", "rejected"] }).default("pending").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		index("reviews_product_idx").on(table.productId),
@@ -596,7 +596,7 @@ export const wishlists = pgTable(
 		customerId: integer("customer_id").references(() => customers.id, { onDelete: "cascade" }),
 		guestToken: varchar("guest_token", { length: 64 }).unique(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at").defaultNow().notNull()
+		updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 	},
 	(table) => [
 		index("wishlists_customer_idx").on(table.customerId),

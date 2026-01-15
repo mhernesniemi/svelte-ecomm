@@ -234,7 +234,7 @@ export class ReviewService {
 	async moderate(id: number, status: "approved" | "rejected"): Promise<Review | null> {
 		const [updated] = await db
 			.update(reviews)
-			.set({ status, updatedAt: new Date() })
+			.set({ status })
 			.where(eq(reviews.id, id))
 			.returning();
 

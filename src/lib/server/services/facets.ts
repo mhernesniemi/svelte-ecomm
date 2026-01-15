@@ -108,8 +108,7 @@ export class FacetService {
 			.update(facets)
 			.set({
 				...(input.code && { code: input.code }),
-				...(input.isPrivate !== undefined && { isPrivate: input.isPrivate }),
-				updatedAt: new Date()
+				...(input.isPrivate !== undefined && { isPrivate: input.isPrivate })
 			})
 			.where(eq(facets.id, id))
 			.returning();
@@ -211,8 +210,7 @@ export class FacetService {
 		const [updated] = await db
 			.update(facetValues)
 			.set({
-				...(input.code && { code: input.code }),
-				updatedAt: new Date()
+				...(input.code && { code: input.code })
 			})
 			.where(eq(facetValues.id, id))
 			.returning();

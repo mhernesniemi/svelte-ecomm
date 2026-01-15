@@ -111,8 +111,7 @@ export class CustomerService {
 				...(input.email && { email: input.email }),
 				...(input.firstName && { firstName: input.firstName }),
 				...(input.lastName && { lastName: input.lastName }),
-				...(input.phone !== undefined && { phone: input.phone }),
-				updatedAt: new Date()
+				...(input.phone !== undefined && { phone: input.phone })
 			})
 			.where(eq(customers.id, id))
 			.returning();
@@ -209,8 +208,7 @@ export class CustomerService {
 		const [updated] = await db
 			.update(addresses)
 			.set({
-				...input,
-				updatedAt: new Date()
+				...input
 			})
 			.where(eq(addresses.id, addressId))
 			.returning();

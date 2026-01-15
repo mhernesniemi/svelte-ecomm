@@ -108,8 +108,7 @@ export class ShippingService {
 				.set({
 					shippingMethodId,
 					price,
-					status: "pending",
-					updatedAt: new Date()
+					status: "pending"
 				})
 				.where(eq(orderShipping.id, existing.id))
 				.returning();
@@ -173,8 +172,7 @@ export class ShippingService {
 			.set({
 				trackingNumber: shipmentInfo.trackingNumber,
 				metadata: shipmentInfo.metadata ?? null,
-				status: "shipped",
-				updatedAt: new Date()
+				status: "shipped"
 			})
 			.where(eq(orderShipping.id, shipping.id));
 
@@ -207,8 +205,7 @@ export class ShippingService {
 			await db
 				.update(orderShipping)
 				.set({
-					status,
-					updatedAt: new Date()
+					status
 				})
 				.where(eq(orderShipping.id, shipping.id));
 
@@ -229,8 +226,7 @@ export class ShippingService {
 		const [updated] = await db
 			.update(orderShipping)
 			.set({
-				status,
-				updatedAt: new Date()
+				status
 			})
 			.where(eq(orderShipping.orderId, orderId))
 			.returning();

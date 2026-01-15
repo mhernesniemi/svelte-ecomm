@@ -135,8 +135,7 @@ export class PromotionService {
 				...(input.usageLimit !== undefined && { usageLimit: input.usageLimit }),
 				...(input.startsAt !== undefined && { startsAt: input.startsAt }),
 				...(input.endsAt !== undefined && { endsAt: input.endsAt }),
-				...(input.enabled !== undefined && { enabled: input.enabled }),
-				updatedAt: new Date()
+				...(input.enabled !== undefined && { enabled: input.enabled })
 			})
 			.where(eq(promotions.id, id))
 			.returning();
