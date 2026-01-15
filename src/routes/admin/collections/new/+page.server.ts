@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail, redirect, isRedirect } from "@sveltejs/kit";
 
 function slugify(text: string): string {
 	return text
@@ -76,7 +76,7 @@ export const actions: Actions = {
 
 			throw redirect(303, `/admin/collections/${collection.id}`);
 		} catch (err) {
-			if (err instanceof Response) throw err;
+			if (isRedirect(err)) throw err;
 			return fail(500, {
 				error: "Failed to create collection",
 				code,

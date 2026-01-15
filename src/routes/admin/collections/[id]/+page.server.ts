@@ -2,7 +2,7 @@ import type { PageServerLoad, Actions } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
-import { error, fail, redirect } from "@sveltejs/kit";
+import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { CollectionFilterField, CollectionFilterOperator } from "$lib/types.js";
 
 function slugify(text: string): string {
@@ -151,7 +151,7 @@ export const actions: Actions = {
 			await collectionService.delete(id);
 			throw redirect(303, "/admin/collections");
 		} catch (err) {
-			if (err instanceof Response) throw err;
+			if (isRedirect(err)) throw err;
 			return fail(500, { error: "Failed to delete collection" });
 		}
 	}
