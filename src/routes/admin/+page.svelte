@@ -1,4 +1,6 @@
 <script lang="ts">
+  import * as Card from "$lib/components/admin/ui/card";
+  import { Badge } from "$lib/components/admin/ui/badge";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -9,18 +11,18 @@
 
   <!-- Stats Grid -->
   <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-    <div class="rounded-lg bg-white p-6 shadow">
+    <Card.Root class="p-6">
       <h3 class="text-sm font-medium text-gray-500">Total Products</h3>
       <p class="text-3xl font-bold text-gray-900">{data.stats.totalProducts}</p>
-    </div>
-    <div class="rounded-lg bg-white p-6 shadow">
+    </Card.Root>
+    <Card.Root class="p-6">
       <h3 class="text-sm font-medium text-gray-500">Total Orders</h3>
       <p class="text-3xl font-bold text-gray-900">{data.stats.totalOrders}</p>
-    </div>
-    <div class="rounded-lg bg-white p-6 shadow">
+    </Card.Root>
+    <Card.Root class="p-6">
       <h3 class="text-sm font-medium text-gray-500">Total Customers</h3>
       <p class="text-3xl font-bold text-gray-900">{data.stats.totalCustomers}</p>
-    </div>
+    </Card.Root>
   </div>
 
   <!-- Recent Orders -->
@@ -42,18 +44,17 @@
             </div>
             <div class="text-right">
               <p class="font-medium">{(order.total / 100).toFixed(2)} {order.currencyCode}</p>
-              <span
-                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-								{order.state === 'paid'
-                  ? 'bg-green-100 text-green-800'
+              <Badge
+                variant={order.state === 'paid'
+                  ? 'success'
                   : order.state === 'created'
-                    ? 'bg-gray-100 text-gray-800'
+                    ? 'secondary'
                     : order.state === 'shipped'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-yellow-100 text-yellow-800'}"
+                      ? 'default'
+                      : 'warning'}
               >
                 {order.state}
-              </span>
+              </Badge>
             </div>
           </div>
         {/each}

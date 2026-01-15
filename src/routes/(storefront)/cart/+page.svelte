@@ -1,5 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/storefront/ui/button";
+  import { Input } from "$lib/components/storefront/ui/input";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -36,7 +38,7 @@
       <p class="mb-4 text-gray-500">Your cart is empty</p>
       <a
         href="/products"
-        class="inline-block rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+        class="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700"
       >
         Continue Shopping
       </a>
@@ -114,19 +116,16 @@
     <div class="mt-6 rounded-lg bg-white p-6 shadow">
       <form method="POST" action="?/applyPromotion" use:enhance class="flex gap-2">
         <label for="promo-code" class="sr-only">Promotion code</label>
-        <input
+        <Input
           id="promo-code"
           type="text"
           name="code"
           placeholder="Promotion code"
-          class="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+          class="flex-1"
         />
-        <button
-          type="submit"
-          class="rounded-lg bg-gray-100 px-6 py-2 font-medium text-gray-700 hover:bg-gray-200"
-        >
+        <Button type="submit" variant="secondary">
           Apply
-        </button>
+        </Button>
       </form>
     </div>
 
@@ -155,7 +154,7 @@
 
       <a
         href="/checkout"
-        class="mt-6 block w-full rounded-lg bg-blue-600 px-6 py-3 text-center font-semibold text-white hover:bg-blue-700"
+        class="mt-6 flex w-full items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700"
       >
         Proceed to Checkout
       </a>

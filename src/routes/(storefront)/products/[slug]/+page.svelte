@@ -2,6 +2,10 @@
   import { addToCart } from "$lib/remote/cart.remote";
   import { toggleWishlist } from "$lib/remote/wishlist.remote";
   import { invalidateAll } from "$app/navigation";
+  import { Button } from "$lib/components/storefront/ui/button";
+  import { Input } from "$lib/components/storefront/ui/input";
+  import { Alert } from "$lib/components/storefront/ui/alert";
+  import { Badge } from "$lib/components/storefront/ui/badge";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -178,16 +182,12 @@
 
       <!-- Success/Error Messages -->
       {#if message}
-        <div
-          class="mb-4 rounded-lg border p-4 {message.type === 'error'
-            ? 'border-red-200 bg-red-50 text-red-700'
-            : 'border-green-200 bg-green-50 text-green-700'}"
-        >
+        <Alert variant={message.type === "error" ? "destructive" : "success"} class="mb-4">
           {message.text}
           {#if message.type === "success"}
             <a href="/cart" class="ml-2 underline">View cart</a>
           {/if}
-        </div>
+        </Alert>
       {/if}
 
       <!-- Quantity & Add to Cart -->
@@ -220,14 +220,14 @@
             </button>
           </div>
 
-          <button
+          <Button
             type="button"
             onclick={handleAddToCart}
             disabled={isAddingToCart}
-            class="flex-1 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            class="flex-1 py-3"
           >
             {isAddingToCart ? "Adding..." : "Add to Cart"}
-          </button>
+          </Button>
         </div>
       {/if}
 
@@ -238,7 +238,7 @@
           <div class="flex flex-wrap gap-2">
             {#each product.facetValues as fv}
               {@const name = fv.translations.find((t) => t.languageCode === "en")?.name ?? fv.code}
-              <span class="rounded-full bg-gray-100 px-3 py-1 text-sm">{name}</span>
+              <Badge variant="secondary">{name}</Badge>
             {/each}
           </div>
         </div>

@@ -1,5 +1,11 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/admin/ui/button";
+  import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
+  import { Alert } from "$lib/components/admin/ui/alert";
+  import { Badge } from "$lib/components/admin/ui/badge";
+  import * as Dialog from "$lib/components/admin/ui/dialog";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -88,15 +94,15 @@
   </div>
 
   {#if form?.success}
-    <div class="mb-6 rounded border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+    <Alert variant="success" class="mb-6">
       Product updated successfully
-    </div>
+    </Alert>
   {/if}
 
   {#if form?.error}
-    <div class="mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+    <Alert variant="destructive" class="mb-6">
       {form.error}
-    </div>
+    </Alert>
   {/if}
 
   <!-- Product Form -->
@@ -228,16 +234,17 @@
 
     <!-- Actions -->
     <div class="flex justify-between border-t bg-gray-50 px-6 py-4">
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onclick={() => (showDeleteConfirm = true)}
-        class="px-4 py-2 text-red-600 hover:text-red-800"
+        class="text-red-600 hover:text-red-800"
       >
         Delete Product
-      </button>
-      <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+      </Button>
+      <Button type="submit">
         Save Changes
-      </button>
+      </Button>
     </div>
   </form>
 
@@ -249,15 +256,15 @@
     </div>
 
     {#if form?.imageError}
-      <div class="mx-6 mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+      <Alert variant="destructive" class="mx-6 mt-4">
         {form.imageError}
-      </div>
+      </Alert>
     {/if}
 
     {#if uploadError}
-      <div class="mx-6 mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+      <Alert variant="destructive" class="mx-6 mt-4">
         {uploadError}
-      </div>
+      </Alert>
     {/if}
 
     <div class="p-6">
@@ -336,9 +343,9 @@
     </div>
 
     {#if form?.facetSuccess}
-      <div class="mx-6 mt-4 rounded border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+      <Alert variant="success" class="mx-6 mt-4">
         Facet values updated
-      </div>
+      </Alert>
     {/if}
 
     <form method="POST" action="?/updateFacetValues" class="p-6">
@@ -405,15 +412,15 @@
     </div>
 
     {#if form?.variantSuccess}
-      <div class="mx-6 mt-4 rounded border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+      <Alert variant="success" class="mx-6 mt-4">
         Variant added successfully
-      </div>
+      </Alert>
     {/if}
 
     {#if form?.variantError}
-      <div class="mx-6 mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+      <Alert variant="destructive" class="mx-6 mt-4">
         {form.variantError}
-      </div>
+      </Alert>
     {/if}
 
     <!-- Add Variant Form -->
@@ -487,9 +494,9 @@
     {/if}
 
     {#if form?.variantFacetSuccess}
-      <div class="mx-6 mt-4 rounded border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+      <Alert variant="success" class="mx-6 mt-4">
         Variant facet values updated
-      </div>
+      </Alert>
     {/if}
 
     <!-- Variants Table -->
@@ -607,31 +614,24 @@
   </div>
 
   <!-- Delete Confirmation Modal -->
-  {#if showDeleteConfirm}
-    <div class="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black">
-      <div class="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
-        <h3 class="mb-4 text-lg font-semibold">Delete Product?</h3>
-        <p class="mb-6 text-gray-600">
+  <Dialog.Root bind:open={showDeleteConfirm}>
+    <Dialog.Content>
+      <Dialog.Header>
+        <Dialog.Title>Delete Product?</Dialog.Title>
+        <Dialog.Description>
           Are you sure you want to delete this product? This action cannot be undone.
-        </p>
-        <div class="flex justify-end gap-3">
-          <button
-            type="button"
-            onclick={() => (showDeleteConfirm = false)}
-            class="rounded-lg border px-4 py-2"
-          >
-            Cancel
-          </button>
-          <form method="POST" action="?/delete" class="inline">
-            <button
-              type="submit"
-              class="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
-            >
-              Delete
-            </button>
-          </form>
-        </div>
-      </div>
-    </div>
-  {/if}
+        </Dialog.Description>
+      </Dialog.Header>
+      <Dialog.Footer>
+        <Button variant="outline" onclick={() => (showDeleteConfirm = false)}>
+          Cancel
+        </Button>
+        <form method="POST" action="?/delete" class="inline">
+          <Button type="submit" variant="destructive">
+            Delete
+          </Button>
+        </form>
+      </Dialog.Footer>
+    </Dialog.Content>
+  </Dialog.Root>
 </div>

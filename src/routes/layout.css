@@ -1,3 +1,18 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
+
+/* Global focus styles */
+*:focus-visible {
+	@apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+[role="checkbox"]:focus-visible,
+[role="radio"]:focus-visible,
+[role="menuitem"]:focus-visible {
+	@apply ring-offset-0;
+}

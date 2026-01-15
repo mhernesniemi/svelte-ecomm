@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
+	import { Button } from "$lib/components/storefront/ui/button";
+	import { Alert } from "$lib/components/storefront/ui/alert";
 	import type { PageData, ActionData } from "./$types";
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -53,10 +55,10 @@
 	</div>
 
 	{#if message}
-		<div class="mb-6 rounded-lg border border-green-200 bg-green-50 p-4 text-green-700">
+		<Alert variant="success" class="mb-6">
 			{message.text}
 			<a href="/cart" class="ml-2 underline">View cart</a>
-		</div>
+		</Alert>
 	{/if}
 
 	{#if items.length === 0}
@@ -135,9 +137,9 @@
 										}}
 									>
 										<input type="hidden" name="variantId" value={variantId} />
-										<button type="submit" disabled={addingId === variantId} class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50">
+										<Button type="submit" size="sm" disabled={addingId === variantId}>
 											{addingId === variantId ? "Adding..." : "Add to Cart"}
-										</button>
+										</Button>
 									</form>
 								{/if}
 							</div>

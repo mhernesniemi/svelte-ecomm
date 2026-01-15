@@ -1,5 +1,9 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/storefront/ui/button";
+  import { Input } from "$lib/components/storefront/ui/input";
+  import { Label } from "$lib/components/storefront/ui/label";
+  import { Alert } from "$lib/components/storefront/ui/alert";
   import type { PageData } from "./$types.js";
 
   let { data, form }: { data: PageData; form: any } = $props();
@@ -65,94 +69,94 @@
           <h2 class="mb-4 text-xl font-semibold">Shipping Address</h2>
 
           {#if form?.error}
-            <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+            <Alert variant="destructive" class="mb-4">
               {form.error}
-            </div>
+            </Alert>
           {/if}
 
           <form method="POST" action="?/setShippingAddress" use:enhance>
             <div class="space-y-4">
               <div>
-                <label for="fullName" class="mb-1 block text-sm font-medium text-gray-700">
+                <Label for="fullName">
                   Full Name <span class="text-red-500">*</span>
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   id="fullName"
                   name="fullName"
                   bind:value={addressFormData.fullName}
                   required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="mt-1"
                 />
               </div>
 
               <div>
-                <label for="streetLine1" class="mb-1 block text-sm font-medium text-gray-700">
+                <Label for="streetLine1">
                   Street Address <span class="text-red-500">*</span>
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   id="streetLine1"
                   name="streetLine1"
                   bind:value={addressFormData.streetLine1}
                   required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="mt-1"
                 />
               </div>
 
               <div>
-                <label for="streetLine2" class="mb-1 block text-sm font-medium text-gray-700">
+                <Label for="streetLine2">
                   Apartment, suite, etc. (optional)
-                </label>
-                <input
+                </Label>
+                <Input
                   type="text"
                   id="streetLine2"
                   name="streetLine2"
                   bind:value={addressFormData.streetLine2}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="mt-1"
                 />
               </div>
 
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label for="postalCode" class="mb-1 block text-sm font-medium text-gray-700">
+                  <Label for="postalCode">
                     Postal Code <span class="text-red-500">*</span>
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     id="postalCode"
                     name="postalCode"
                     bind:value={addressFormData.postalCode}
                     required
-                    class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    class="mt-1"
                   />
                 </div>
 
                 <div>
-                  <label for="city" class="mb-1 block text-sm font-medium text-gray-700">
+                  <Label for="city">
                     City <span class="text-red-500">*</span>
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="text"
                     id="city"
                     name="city"
                     bind:value={addressFormData.city}
                     required
-                    class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                    class="mt-1"
                   />
                 </div>
               </div>
 
               <div>
-                <label for="country" class="mb-1 block text-sm font-medium text-gray-700">
+                <Label for="country">
                   Country <span class="text-red-500">*</span>
-                </label>
+                </Label>
                 <select
                   id="country"
                   name="country"
                   bind:value={addressFormData.country}
                   required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
                 >
                   <option value="FI">Finland</option>
                   <option value="SE">Sweden</option>
@@ -161,12 +165,9 @@
                 </select>
               </div>
 
-              <button
-                type="submit"
-                class="w-full rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
-              >
+              <Button type="submit" class="w-full">
                 Save Address
-              </button>
+              </Button>
             </div>
           </form>
         </div>
@@ -220,36 +221,33 @@
                 <input type="hidden" name="methodId" value={selectedShippingRate.methodId} />
                 <input type="hidden" name="rateId" value={selectedShippingRate.id} />
                 <input type="hidden" name="price" value={selectedShippingRate.price} />
-                <button
-                  type="submit"
-                  class="w-full rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
-                >
+                <Button type="submit" class="w-full">
                   Select Shipping Method
-                </button>
+                </Button>
               </form>
             {:else if currentOrderShipping}
-              <div class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
-                <p class="text-sm font-medium text-green-800">
+              <Alert variant="success" class="mt-4">
+                <p class="text-sm font-medium">
                   Shipping method selected: {currentShippingRates.find(
                     (r: (typeof currentShippingRates)[number]) =>
                       r.methodId === currentOrderShipping?.shippingMethodId
                   )?.name || "Selected"}
                 </p>
-              </div>
+              </Alert>
             {/if}
           </div>
         {:else if currentCart?.shippingPostalCode}
-          <div class="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-            <p class="text-sm text-yellow-800">
+          <Alert variant="warning">
+            <p class="text-sm">
               No shipping methods available for this address. Please check your address.
             </p>
-          </div>
+          </Alert>
         {:else}
-          <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-            <p class="text-sm text-gray-600">
+          <Alert variant="default">
+            <p class="text-sm">
               Please enter your shipping address to see available shipping methods.
             </p>
-          </div>
+          </Alert>
         {/if}
 
         <!-- Payment Method Selection -->
@@ -297,26 +295,22 @@
                 class="mt-4"
               >
                 <input type="hidden" name="paymentMethodId" value={selectedPaymentMethod.id} />
-                <button
-                  type="submit"
-                  disabled={isProcessingPayment}
-                  class="w-full rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                >
+                <Button type="submit" disabled={isProcessingPayment} class="w-full">
                   {isProcessingPayment ? "Processing..." : "Create Payment"}
-                </button>
+                </Button>
               </form>
             {:else if currentPaymentInfo}
-              <div class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
-                <p class="text-sm font-medium text-green-800">Payment created successfully</p>
-              </div>
+              <Alert variant="success" class="mt-4">
+                <p class="text-sm font-medium">Payment created successfully</p>
+              </Alert>
             {/if}
           </div>
         {:else if currentCart?.shippingPostalCode && !currentOrderShipping}
-          <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-            <p class="text-sm text-gray-600">
+          <Alert variant="default">
+            <p class="text-sm">
               Please select a shipping method first to see payment options.
             </p>
-          </div>
+          </Alert>
         {/if}
       </div>
 
@@ -368,12 +362,12 @@
 
           {#if currentPaymentInfo}
             <div class="mt-6 border-t pt-6">
-              <div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4">
-                <p class="mb-2 font-medium text-green-800">Payment Ready</p>
-                <p class="text-sm text-green-700">
+              <Alert variant="success" class="mb-4">
+                <p class="mb-2 font-medium">Payment Ready</p>
+                <p class="text-sm">
                   Transaction ID: {currentPaymentInfo.providerTransactionId}
                 </p>
-              </div>
+              </Alert>
               <form
                 method="POST"
                 action="?/completeOrder"
@@ -385,13 +379,13 @@
                   };
                 }}
               >
-                <button
+                <Button
                   type="submit"
                   disabled={isCompletingOrder}
-                  class="w-full rounded-lg bg-green-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+                  class="w-full bg-green-600 hover:bg-green-700"
                 >
                   {isCompletingOrder ? "Completing Order..." : "Complete Order"}
-                </button>
+                </Button>
               </form>
             </div>
           {:else}

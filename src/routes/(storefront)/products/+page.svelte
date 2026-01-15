@@ -1,5 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import { Input } from "$lib/components/storefront/ui/input";
+  import { Button } from "$lib/components/storefront/ui/button";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -64,12 +66,11 @@
     <aside class="w-64 flex-shrink-0">
       <!-- Search -->
       <form method="GET" class="mb-6">
-        <input
+        <Input
           type="text"
           name="q"
           value={data.search ?? ""}
           placeholder="Search products..."
-          class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
         />
       </form>
 
@@ -181,7 +182,7 @@
             {#if data.currentPage > 1}
               <a
                 href="?page={data.currentPage - 1}"
-                class="rounded-lg border px-4 py-2 hover:bg-gray-50"
+                class="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
               >
                 Previous
               </a>
@@ -192,7 +193,7 @@
             {#if data.pagination.hasMore}
               <a
                 href="?page={data.currentPage + 1}"
-                class="rounded-lg border px-4 py-2 hover:bg-gray-50"
+                class="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
               >
                 Next
               </a>
