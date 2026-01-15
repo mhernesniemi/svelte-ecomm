@@ -25,10 +25,9 @@
         <div>
           <h1 class="mb-4 text-4xl font-bold md:text-5xl">Opinionated Commerce</h1>
           <p class="mb-10 text-lg leading-[1.75] text-gray-600">
-            A lightweight, ecommerce kit for <span class="font-semibold text-gray-900"
-              >TypeScript</span
-            >, <span class="font-semibold text-gray-900">SvelteKit</span> and
-            <span class="font-semibold text-gray-900">Drizzle</span>, <br />
+            Lightweight but powerful e-commerce gear for <span class="font-semibold text-gray-900"
+              >SvelteKit</span
+            ><br />
             that is truly <span class="font-semibold text-gray-900">100% customizable</span> and owned
             by you.
           </p>
