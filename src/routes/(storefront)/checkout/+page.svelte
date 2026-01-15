@@ -70,7 +70,14 @@
 
           {#if form?.error}
             <Alert variant="destructive" class="mb-4">
-              {form.error}
+              <p>{form.error}</p>
+              {#if form?.stockErrors?.length}
+                <ul class="mt-2 list-inside list-disc text-sm">
+                  {#each form.stockErrors as stockError}
+                    <li>{stockError}</li>
+                  {/each}
+                </ul>
+              {/if}
             </Alert>
           {/if}
 
@@ -362,12 +369,26 @@
 
           {#if currentPaymentInfo}
             <div class="mt-6 border-t pt-6">
-              <Alert variant="success" class="mb-4">
-                <p class="mb-2 font-medium">Payment Ready</p>
-                <p class="text-sm">
-                  Transaction ID: {currentPaymentInfo.providerTransactionId}
-                </p>
-              </Alert>
+              {#if form?.stockErrors?.length}
+                <Alert variant="destructive" class="mb-4">
+                  <p class="mb-2 font-medium">Stock Issue</p>
+                  <ul class="list-inside list-disc text-sm">
+                    {#each form.stockErrors as stockError}
+                      <li>{stockError}</li>
+                    {/each}
+                  </ul>
+                  <p class="mt-2 text-sm">
+                    <a href="/cart" class="underline">Return to cart</a> to adjust quantities.
+                  </p>
+                </Alert>
+              {:else}
+                <Alert variant="success" class="mb-4">
+                  <p class="mb-2 font-medium">Payment Ready</p>
+                  <p class="text-sm">
+                    Transaction ID: {currentPaymentInfo.providerTransactionId}
+                  </p>
+                </Alert>
+              {/if}
               <form
                 method="POST"
                 action="?/completeOrder"

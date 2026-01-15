@@ -3,7 +3,9 @@
     "allow": [
       "Bash(bunx:*)",
       "Bash(bun add:*)",
-      "Bash(bun run build:*)"
+      "Bash(bun run build:*)",
+      "Bash(xargs:*)",
+      "Bash(bun run check:*)"
     ]
   }
 }

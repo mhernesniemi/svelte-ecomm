@@ -235,6 +235,15 @@ export const actions: Actions = {
 			return fail(400, { error: "Payment required" });
 		}
 
+		// Validate stock availability before proceeding
+		const stockCheck = await orderService.validateStock(cart.id);
+		if (!stockCheck.valid) {
+			return fail(400, {
+				error: "Some items are no longer available in the requested quantity",
+				stockErrors: stockCheck.errors
+			});
+		}
+
 		try {
 			// Transition order to payment_pending (marks cart as inactive)
 			await orderService.transitionState(cart.id, "payment_pending");

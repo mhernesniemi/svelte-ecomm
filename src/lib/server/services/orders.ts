@@ -280,6 +280,17 @@ export class OrderService {
 
 		if (!variant) throw new Error("Variant not found");
 
+		// Check stock availability
+		const existingLine = order.lines.find((l) => l.variantId === input.variantId);
+		const existingQuantity = existingLine?.quantity ?? 0;
+		const totalQuantity = existingQuantity + input.quantity;
+
+		if (totalQuantity > variant.stock) {
+			throw new Error(
+				`Only ${variant.stock} items available${existingQuantity > 0 ? ` (${existingQuantity} already in cart)` : ""}`
+			);
+		}
+
 		// Get product name for snapshot
 		const [productTrans] = await db
 			.select()
@@ -294,9 +305,7 @@ export class OrderService {
 			.where(eq(productVariantTranslations.variantId, variant.id))
 			.limit(1);
 
-		// Check if line already exists for this variant
-		const existingLine = order.lines.find((l) => l.variantId === input.variantId);
-
+		// Update existing line or create new one
 		if (existingLine) {
 			// Update quantity
 			const newQuantity = existingLine.quantity + input.quantity;
@@ -352,6 +361,16 @@ export class OrderService {
 		const [line] = await db.select().from(orderLines).where(eq(orderLines.id, lineId));
 
 		if (!line) throw new Error("Line not found");
+
+		// Check stock availability
+		const [variant] = await db
+			.select()
+			.from(productVariants)
+			.where(eq(productVariants.id, line.variantId));
+
+		if (variant && quantity > variant.stock) {
+			throw new Error(`Only ${variant.stock} items available`);
+		}
 
 		const [updated] = await db
 			.update(orderLines)
@@ -493,6 +512,12 @@ export class OrderService {
 
 		// Update promotion usage counts when order is paid
 		if (newState === "paid") {
+			// Validate stock one final time before payment completion
+			const stockCheck = await this.validateStock(orderId);
+			if (!stockCheck.valid) {
+				throw new Error(`Stock unavailable: ${stockCheck.errors.join(", ")}`);
+			}
+
 			const appliedPromotions = await db
 				.select()
 				.from(orderPromotions)
@@ -546,6 +571,32 @@ export class OrderService {
 			.returning();
 
 		return updated;
+	}
+
+	/**
+	 * Validate stock availability for all items in the order
+	 * Used before completing checkout
+	 */
+	async validateStock(orderId: number): Promise<{ valid: boolean; errors: string[] }> {
+		const order = await this.getById(orderId);
+		if (!order) return { valid: false, errors: ["Order not found"] };
+
+		const errors: string[] = [];
+
+		for (const line of order.lines) {
+			const [variant] = await db
+				.select()
+				.from(productVariants)
+				.where(eq(productVariants.id, line.variantId));
+
+			if (!variant) {
+				errors.push(`${line.productName} is no longer available`);
+			} else if (line.quantity > variant.stock) {
+				errors.push(`${line.productName}: only ${variant.stock} available`);
+			}
+		}
+
+		return { valid: errors.length === 0, errors };
 	}
 
 	// ============================================================================
