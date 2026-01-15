@@ -10,11 +10,11 @@
   const navItems: NavItem[] = [
     { href: "/admin", label: "Dashboard", icon: "home" },
     { href: "/admin/products", label: "Products", icon: "package" },
+    { href: "/admin/facets", label: "Facets", icon: "filter" },
     { href: "/admin/collections", label: "Collections", icon: "folder" },
     { href: "/admin/orders", label: "Orders", icon: "shopping-cart" },
-    { href: "/admin/reviews", label: "Reviews", icon: "star" },
     { href: "/admin/customers", label: "Customers", icon: "users" },
-    { href: "/admin/facets", label: "Facets", icon: "filter" },
+    { href: "/admin/reviews", label: "Reviews", icon: "star" },
     { href: "/admin/promotions", label: "Promotions", icon: "tag" }
   ];
 
