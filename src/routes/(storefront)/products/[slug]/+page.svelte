@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
   import { addToCart } from "$lib/remote/cart.remote";
   import { toggleWishlist } from "$lib/remote/wishlist.remote";
   import { invalidateAll } from "$app/navigation";
@@ -6,9 +7,9 @@
   import { Input } from "$lib/components/storefront/ui/input";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
-  import type { PageData } from "./$types";
+  import type { PageData, ActionData } from "./$types";
 
-  let { data }: { data: PageData } = $props();
+  let { data, form }: { data: PageData; form: ActionData } = $props();
 
   const product = $derived(data.product);
   const enTrans = $derived(product.translations.find((t) => t.languageCode === "en"));
@@ -38,6 +39,21 @@
   function getVariantName(variant: (typeof product.variants)[0]): string {
     const trans = variant.translations.find((t) => t.languageCode === "en");
     return trans?.name ?? variant.sku;
+  }
+
+  // Review form state
+  let reviewNickname = $state("");
+  let reviewRating = $state(0);
+  let reviewComment = $state("");
+  let isSubmittingReview = $state(false);
+  let hoverRating = $state(0);
+
+  function formatDate(date: Date | string): string {
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
   }
 
   async function handleAddToCart() {
@@ -244,5 +260,162 @@
         </div>
       {/if}
     </div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="mt-12 border-t pt-8">
+    <div class="mb-6 flex items-center justify-between">
+      <h2 class="text-2xl font-bold">Customer Reviews</h2>
+      {#if data.rating.count > 0}
+        <div class="flex items-center gap-2">
+          <span class="text-2xl font-bold">{data.rating.average.toFixed(1)}</span>
+          <div class="flex text-yellow-400">
+            {#each [1, 2, 3, 4, 5] as star}
+              <span class="text-xl">{star <= Math.round(data.rating.average) ? "★" : "☆"}</span>
+            {/each}
+          </div>
+          <span class="text-gray-500">({data.rating.count} {data.rating.count === 1 ? "review" : "reviews"})</span>
+        </div>
+      {/if}
+    </div>
+
+    <!-- Review Form -->
+    {#if data.customerId}
+      {#if data.customerReview}
+        <div class="mb-8 rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <p class="text-sm text-blue-800">
+            You have already reviewed this product.
+            {#if data.customerReview.status === "pending"}
+              Your review is pending approval.
+            {/if}
+          </p>
+        </div>
+      {:else}
+        <div class="mb-8 rounded-lg border bg-gray-50 p-6">
+          <h3 class="mb-4 text-lg font-medium">Write a Review</h3>
+
+          {#if form?.reviewError}
+            <Alert variant="destructive" class="mb-4">{form.reviewError}</Alert>
+          {/if}
+
+          {#if form?.reviewSuccess}
+            <Alert variant="success" class="mb-4">
+              Thank you for your review! It will be visible after approval.
+            </Alert>
+          {:else}
+            <form
+              method="POST"
+              action="?/submitReview"
+              use:enhance={() => {
+                isSubmittingReview = true;
+                return async ({ update }) => {
+                  await update();
+                  isSubmittingReview = false;
+                  if (!form?.reviewError) {
+                    reviewNickname = "";
+                    reviewRating = 0;
+                    reviewComment = "";
+                  }
+                };
+              }}
+            >
+              <!-- Nickname -->
+              <div class="mb-4">
+                <label for="review-nickname" class="mb-2 block text-sm font-medium text-gray-700">
+                  Your Nickname <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="review-nickname"
+                  name="nickname"
+                  bind:value={reviewNickname}
+                  required
+                  maxlength="100"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Enter a display name for your review"
+                />
+              </div>
+
+              <!-- Star Rating -->
+              <div class="mb-4">
+                <label class="mb-2 block text-sm font-medium text-gray-700">Your Rating <span class="text-red-500">*</span></label>
+                <div class="flex gap-1">
+                  {#each [1, 2, 3, 4, 5] as star}
+                    <button
+                      type="button"
+                      onclick={() => (reviewRating = star)}
+                      onmouseenter={() => (hoverRating = star)}
+                      onmouseleave={() => (hoverRating = 0)}
+                      class="text-3xl transition-colors {star <= (hoverRating || reviewRating)
+                        ? 'text-yellow-400'
+                        : 'text-gray-300'}"
+                    >
+                      ★
+                    </button>
+                  {/each}
+                </div>
+                <input type="hidden" name="rating" value={reviewRating} />
+              </div>
+
+              <!-- Comment -->
+              <div class="mb-4">
+                <label for="review-comment" class="mb-2 block text-sm font-medium text-gray-700">
+                  Your Review (optional)
+                </label>
+                <textarea
+                  id="review-comment"
+                  name="comment"
+                  bind:value={reviewComment}
+                  rows="4"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  placeholder="Share your experience with this product..."
+                ></textarea>
+              </div>
+
+              <Button type="submit" disabled={isSubmittingReview || reviewRating === 0 || !reviewNickname.trim()}>
+                {isSubmittingReview ? "Submitting..." : "Submit Review"}
+              </Button>
+            </form>
+          {/if}
+        </div>
+      {/if}
+    {:else}
+      <div class="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-4">
+        <p class="text-gray-600">
+          <a href="/sign-in" class="text-blue-600 hover:underline">Sign in</a> to leave a review.
+        </p>
+      </div>
+    {/if}
+
+    <!-- Reviews List -->
+    {#if data.reviews.length === 0}
+      <p class="text-gray-500">No reviews yet. Be the first to review this product!</p>
+    {:else}
+      <div class="space-y-6">
+        {#each data.reviews as review}
+          <div class="border-b pb-6 last:border-b-0">
+            <div class="mb-2 flex items-start justify-between">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-medium">{review.nickname}</span>
+                  {#if review.isVerifiedPurchase}
+                    <Badge variant="success">Verified Purchase</Badge>
+                  {/if}
+                </div>
+                <div class="mt-1 flex text-yellow-400">
+                  {#each [1, 2, 3, 4, 5] as star}
+                    <span>{star <= review.rating ? "★" : "☆"}</span>
+                  {/each}
+                </div>
+              </div>
+              <span class="text-sm text-gray-500">{formatDate(review.createdAt)}</span>
+            </div>
+            {#if review.comment}
+              <p class="text-gray-700">{review.comment}</p>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    {/if}
   </div>
 </div>

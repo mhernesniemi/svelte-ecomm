@@ -10,3 +10,4 @@ export { promotionService, PromotionService } from "./promotions.js";
 export { paymentService, PaymentService } from "./payments/index.js";
 export { shippingService, ShippingService } from "./shipping/index.js";
 export { wishlistService, WishlistService } from "./wishlist.js";
+export { reviewService, ReviewService } from "./reviews.js";

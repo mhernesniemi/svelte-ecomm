@@ -26,7 +26,8 @@ import type {
 	collectionTranslations,
 	collectionFilters,
 	wishlists,
-	wishlistItems
+	wishlistItems,
+	reviews
 } from "$lib/server/db/schema.js";
 
 // ============================================================================
@@ -257,6 +258,26 @@ export type WishlistItem = InferSelectModel<typeof wishlistItems>;
 export type NewWishlistItem = InferInsertModel<typeof wishlistItems>;
 
 // ============================================================================
+// REVIEW TYPES
+// ============================================================================
+
+export type Review = InferSelectModel<typeof reviews>;
+export type NewReview = InferInsertModel<typeof reviews>;
+
+export type ReviewStatus = "pending" | "approved" | "rejected";
+
+/** Review with customer info */
+export interface ReviewWithCustomer extends Review {
+	customer: Customer;
+}
+
+/** Review with product and customer info (for admin) */
+export interface ReviewWithRelations extends Review {
+	product: ProductWithTranslations;
+	customer: Customer;
+}
+
+// ============================================================================
 // FILTER & QUERY TYPES
 // ============================================================================
 
@@ -409,4 +430,12 @@ export interface AddCollectionFilterInput {
 	field: CollectionFilterField;
 	operator: CollectionFilterOperator;
 	value: unknown;
+}
+
+export interface CreateReviewInput {
+	productId: number;
+	customerId: number;
+	nickname: string;
+	rating: number;
+	comment?: string;
 }

@@ -556,6 +556,36 @@ export const collectionFilters = pgTable(
 );
 
 // ============================================================================
+// REVIEWS
+// ============================================================================
+
+export const reviews = pgTable(
+	"reviews",
+	{
+		id: serial("id").primaryKey(),
+		productId: integer("product_id")
+			.references(() => products.id, { onDelete: "cascade" })
+			.notNull(),
+		customerId: integer("customer_id")
+			.references(() => customers.id, { onDelete: "cascade" })
+			.notNull(),
+		nickname: varchar("nickname", { length: 100 }).notNull(),
+		rating: integer("rating").notNull(),
+		comment: text("comment"),
+		isVerifiedPurchase: boolean("is_verified_purchase").default(false).notNull(),
+		status: varchar("status", { length: 20 }).default("pending").notNull(), // pending, approved, rejected
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull()
+	},
+	(table) => [
+		index("reviews_product_idx").on(table.productId),
+		index("reviews_customer_idx").on(table.customerId),
+		index("reviews_status_idx").on(table.status),
+		uniqueIndex("reviews_product_customer_idx").on(table.productId, table.customerId)
+	]
+);
+
+// ============================================================================
 // WISHLISTS
 // ============================================================================
 
@@ -603,6 +633,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 	variants: many(productVariants),
 	facetValues: many(productFacetValues),
 	assets: many(productAssets),
+	reviews: many(reviews),
 	featuredAsset: one(assets, {
 		fields: [products.featuredAssetId],
 		references: [assets.id]
@@ -721,7 +752,8 @@ export const productVariantAssetsRelations = relations(productVariantAssets, ({ 
 
 export const customersRelations = relations(customers, ({ many }) => ({
 	addresses: many(addresses),
-	orders: many(orders)
+	orders: many(orders),
+	reviews: many(reviews)
 }));
 
 export const addressesRelations = relations(addresses, ({ one }) => ({
@@ -818,6 +850,17 @@ export const collectionFiltersRelations = relations(collectionFilters, ({ one })
 	collection: one(collections, {
 		fields: [collectionFilters.collectionId],
 		references: [collections.id]
+	})
+}));
+
+export const reviewsRelations = relations(reviews, ({ one }) => ({
+	product: one(products, {
+		fields: [reviews.productId],
+		references: [products.id]
+	}),
+	customer: one(customers, {
+		fields: [reviews.customerId],
+		references: [customers.id]
 	})
 }));
 
