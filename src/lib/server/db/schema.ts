@@ -556,6 +556,45 @@ export const collectionFilters = pgTable(
 );
 
 // ============================================================================
+// WISHLISTS
+// ============================================================================
+
+export const wishlists = pgTable(
+	"wishlists",
+	{
+		id: serial("id").primaryKey(),
+		customerId: integer("customer_id").references(() => customers.id, { onDelete: "cascade" }),
+		guestToken: varchar("guest_token", { length: 64 }).unique(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull()
+	},
+	(table) => [
+		index("wishlists_customer_idx").on(table.customerId),
+		index("wishlists_guest_token_idx").on(table.guestToken)
+	]
+);
+
+export const wishlistItems = pgTable(
+	"wishlist_items",
+	{
+		id: serial("id").primaryKey(),
+		wishlistId: integer("wishlist_id")
+			.references(() => wishlists.id, { onDelete: "cascade" })
+			.notNull(),
+		productId: integer("product_id")
+			.references(() => products.id, { onDelete: "cascade" })
+			.notNull(),
+		variantId: integer("variant_id").references(() => productVariants.id, { onDelete: "cascade" }),
+		addedAt: timestamp("added_at").defaultNow().notNull()
+	},
+	(table) => [
+		index("wishlist_items_wishlist_idx").on(table.wishlistId),
+		index("wishlist_items_product_idx").on(table.productId),
+		uniqueIndex("wishlist_items_wishlist_product_idx").on(table.wishlistId, table.productId)
+	]
+);
+
+// ============================================================================
 // RELATIONS
 // ============================================================================
 
@@ -779,5 +818,28 @@ export const collectionFiltersRelations = relations(collectionFilters, ({ one })
 	collection: one(collections, {
 		fields: [collectionFilters.collectionId],
 		references: [collections.id]
+	})
+}));
+
+export const wishlistsRelations = relations(wishlists, ({ one, many }) => ({
+	customer: one(customers, {
+		fields: [wishlists.customerId],
+		references: [customers.id]
+	}),
+	items: many(wishlistItems)
+}));
+
+export const wishlistItemsRelations = relations(wishlistItems, ({ one }) => ({
+	wishlist: one(wishlists, {
+		fields: [wishlistItems.wishlistId],
+		references: [wishlists.id]
+	}),
+	product: one(products, {
+		fields: [wishlistItems.productId],
+		references: [products.id]
+	}),
+	variant: one(productVariants, {
+		fields: [wishlistItems.variantId],
+		references: [productVariants.id]
 	})
 }));

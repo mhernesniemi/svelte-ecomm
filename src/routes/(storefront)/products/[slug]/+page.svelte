@@ -1,5 +1,7 @@
 <script lang="ts">
   import { addToCart } from "$lib/remote/cart.remote";
+  import { toggleWishlist } from "$lib/remote/wishlist.remote";
+  import { invalidateAll } from "$app/navigation";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -10,8 +12,13 @@
   let selectedVariantId = $state<number | null>(null);
   let quantity = $state(1);
   let isAddingToCart = $state(false);
+  let isTogglingWishlist = $state(false);
+  let wishlistOverride = $state<boolean | null>(null);
   let message = $state<{ type: "success" | "error"; text: string } | null>(null);
   let selectedImageIndex = $state(0);
+
+  // Use override if set (after toggle), otherwise use server data
+  const isWishlisted = $derived(wishlistOverride ?? data.isWishlisted);
 
   const images = $derived(product.assets.length > 0 ? product.assets : (product.featuredAsset ? [product.featuredAsset] : []));
 
@@ -41,6 +48,21 @@
       message = { type: "error", text: "Failed to add item to cart" };
     } finally {
       isAddingToCart = false;
+    }
+  }
+
+  async function handleToggleWishlist() {
+    isTogglingWishlist = true;
+    try {
+      const result = await toggleWishlist({ productId: product.id, variantId: selectedVariantId ?? undefined });
+      wishlistOverride = result.added;
+      // Invalidate to update header wishlist count
+      await invalidateAll();
+    } catch {
+      message = { type: "error", text: "Failed to update wishlist" };
+      setTimeout(() => (message = null), 3000);
+    } finally {
+      isTogglingWishlist = false;
     }
   }
 </script>
@@ -97,7 +119,20 @@
 
     <!-- Product Info -->
     <div>
-      <h1 class="mb-4 text-3xl font-bold">{enTrans?.name ?? "Product"}</h1>
+      <div class="mb-4 flex items-start justify-between">
+        <h1 class="text-3xl font-bold">{enTrans?.name ?? "Product"}</h1>
+        <button
+          type="button"
+          onclick={handleToggleWishlist}
+          disabled={isTogglingWishlist}
+          class="rounded-full p-2 transition-colors {isWishlisted ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'} disabled:opacity-50"
+          aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+        >
+          <svg class="h-7 w-7" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </button>
+      </div>
 
       {#if enTrans?.description}
         <p class="mb-6 text-gray-600">{enTrans.description}</p>

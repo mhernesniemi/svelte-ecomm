@@ -24,7 +24,9 @@ import type {
 	orderShipping,
 	collections,
 	collectionTranslations,
-	collectionFilters
+	collectionFilters,
+	wishlists,
+	wishlistItems
 } from "$lib/server/db/schema.js";
 
 // ============================================================================
@@ -243,6 +245,16 @@ export interface CollectionWithRelations extends Collection {
 export interface CollectionWithCount extends CollectionWithTranslations {
 	productCount: number;
 }
+
+// ============================================================================
+// WISHLIST TYPES
+// ============================================================================
+
+export type Wishlist = InferSelectModel<typeof wishlists>;
+export type NewWishlist = InferInsertModel<typeof wishlists>;
+
+export type WishlistItem = InferSelectModel<typeof wishlistItems>;
+export type NewWishlistItem = InferInsertModel<typeof wishlistItems>;
 
 // ============================================================================
 // FILTER & QUERY TYPES

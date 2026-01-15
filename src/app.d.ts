@@ -13,7 +13,9 @@ declare global {
 			};
 			customer: Customer | null;
 			cartToken: string | null;
-			newCartToken?: string; // Set when creating a new guest cart
+			newCartToken?: string;
+			wishlistToken: string | null;
+			newWishlistToken?: string;
 		}
 		// interface PageData {}
 		// interface PageState {}

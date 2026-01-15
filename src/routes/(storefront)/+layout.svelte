@@ -1,7 +1,10 @@
 <script lang="ts">
   import { SignedIn, SignedOut, UserButton, SignInButton } from "svelte-clerk";
+  import type { LayoutData } from "./$types";
 
-  let { children } = $props();
+  let { children, data }: { children: any; data: LayoutData } = $props();
+
+  const wishlistCount = $derived(data.wishlistCount);
 </script>
 
 <div class="min-h-screen bg-white">
@@ -13,6 +16,18 @@
 
         <nav class="flex items-center gap-6">
           <a href="/products" class="text-gray-600 hover:text-gray-900">Products</a>
+
+          {#if wishlistCount > 0}
+            <a href="/wishlist" class="relative text-gray-600 hover:text-gray-900" aria-label="Wishlist">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+              <span class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                {wishlistCount}
+              </span>
+            </a>
+          {/if}
+
           <a href="/cart" class="text-gray-600 hover:text-gray-900" aria-label="Shopping cart">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path

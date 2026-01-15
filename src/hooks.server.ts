@@ -10,10 +10,13 @@ import { customers } from "$lib/server/db/schema.js";
 import { eq } from "drizzle-orm";
 import { CLERK_SECRET_KEY } from "$env/static/private";
 import { orderService } from "$lib/server/services/orders.js";
-import { shippingService, paymentService } from "$lib/server/services/index.js";
+import { shippingService, paymentService, wishlistService } from "$lib/server/services/index.js";
 
 const CART_COOKIE_NAME = "cart_token";
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+
+const WISHLIST_COOKIE_NAME = "wishlist_token";
+const WISHLIST_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
 // Clerk authentication handler
 const clerkHandler = withClerkHandler();
@@ -95,6 +98,35 @@ const cartHandler: Handle = async ({ event, resolve }) => {
 	return response;
 };
 
+// Wishlist handler - manages wishlist token for guests and transfer on login
+const wishlistHandler: Handle = async ({ event, resolve }) => {
+	const wishlistToken = event.cookies.get(WISHLIST_COOKIE_NAME) ?? null;
+	event.locals.wishlistToken = wishlistToken;
+
+	// Transfer guest wishlist to customer on login
+	if (event.locals.customer && wishlistToken) {
+		try {
+			await wishlistService.transferToCustomer(wishlistToken, event.locals.customer.id);
+			event.cookies.delete(WISHLIST_COOKIE_NAME, { path: "/" });
+			event.locals.wishlistToken = null;
+		} catch {
+			// Transfer failed - ignore
+		}
+	}
+
+	const response = await resolve(event);
+
+	// Set new wishlist token cookie if created
+	if (event.locals.newWishlistToken) {
+		response.headers.append(
+			"Set-Cookie",
+			`${WISHLIST_COOKIE_NAME}=${event.locals.newWishlistToken}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${WISHLIST_COOKIE_MAX_AGE}`
+		);
+	}
+
+	return response;
+};
+
 // Shipping initialization handler - initializes default shipping methods on first startup
 let shippingMethodsInitialized = false;
 
@@ -134,4 +166,11 @@ const paymentInit: Handle = async ({ event, resolve }) => {
 };
 
 // Combine handlers in sequence
-export const handle = sequence(clerkHandler, customerSync, cartHandler, shippingInit, paymentInit);
+export const handle = sequence(
+	clerkHandler,
+	customerSync,
+	cartHandler,
+	wishlistHandler,
+	shippingInit,
+	paymentInit
+);
