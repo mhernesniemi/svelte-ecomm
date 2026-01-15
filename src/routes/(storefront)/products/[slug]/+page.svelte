@@ -4,7 +4,6 @@
   import { toggleWishlist } from "$lib/remote/wishlist.remote";
   import { invalidateAll } from "$app/navigation";
   import { Button } from "$lib/components/storefront/ui/button";
-  import { Input } from "$lib/components/storefront/ui/input";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
   import type { PageData, ActionData } from "./$types";
@@ -25,7 +24,13 @@
   // Use override if set (after toggle), otherwise use server data
   const isWishlisted = $derived(wishlistOverride ?? data.isWishlisted);
 
-  const images = $derived(product.assets.length > 0 ? product.assets : (product.featuredAsset ? [product.featuredAsset] : []));
+  const images = $derived(
+    product.assets.length > 0
+      ? product.assets
+      : product.featuredAsset
+        ? [product.featuredAsset]
+        : []
+  );
 
   // Initialize selected variant when product loads
   $effect(() => {
@@ -74,7 +79,10 @@
   async function handleToggleWishlist() {
     isTogglingWishlist = true;
     try {
-      const result = await toggleWishlist({ productId: product.id, variantId: selectedVariantId ?? undefined });
+      const result = await toggleWishlist({
+        productId: product.id,
+        variantId: selectedVariantId ?? undefined
+      });
       wishlistOverride = result.added;
       // Invalidate to update header wishlist count
       await invalidateAll();
@@ -124,7 +132,10 @@
             <button
               type="button"
               onclick={() => (selectedImageIndex = index)}
-              class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-colors {selectedImageIndex === index ? 'border-blue-500' : 'border-transparent hover:border-gray-300'}"
+              class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-colors {selectedImageIndex ===
+              index
+                ? 'border-blue-500'
+                : 'border-transparent hover:border-gray-300'}"
             >
               <img
                 src="{image.source}?tr=w-100,h-100,fo-auto"
@@ -145,11 +156,23 @@
           type="button"
           onclick={handleToggleWishlist}
           disabled={isTogglingWishlist}
-          class="rounded-full p-2 transition-colors {isWishlisted ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500'} disabled:opacity-50"
+          class="rounded-full p-2 transition-colors {isWishlisted
+            ? 'text-red-500 hover:text-red-600'
+            : 'text-gray-400 hover:text-red-500'} disabled:opacity-50"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <svg class="h-7 w-7" fill={isWishlisted ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          <svg
+            class="h-7 w-7"
+            fill={isWishlisted ? "currentColor" : "none"}
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+            />
           </svg>
         </button>
       </div>
@@ -246,19 +269,6 @@
           </Button>
         </div>
       {/if}
-
-      <!-- Facet Values / Tags -->
-      {#if product.facetValues.length > 0}
-        <div class="border-t pt-6">
-          <h3 class="mb-2 text-sm font-medium text-gray-700">Details</h3>
-          <div class="flex flex-wrap gap-2">
-            {#each product.facetValues as fv}
-              {@const name = fv.translations.find((t) => t.languageCode === "en")?.name ?? fv.code}
-              <Badge variant="secondary">{name}</Badge>
-            {/each}
-          </div>
-        </div>
-      {/if}
     </div>
   </div>
 
@@ -274,7 +284,9 @@
               <span class="text-xl">{star <= Math.round(data.rating.average) ? "★" : "☆"}</span>
             {/each}
           </div>
-          <span class="text-gray-500">({data.rating.count} {data.rating.count === 1 ? "review" : "reviews"})</span>
+          <span class="text-gray-500"
+            >({data.rating.count} {data.rating.count === 1 ? "review" : "reviews"})</span
+          >
         </div>
       {/if}
     </div>
@@ -338,7 +350,9 @@
 
               <!-- Star Rating -->
               <div class="mb-4">
-                <label class="mb-2 block text-sm font-medium text-gray-700">Your Rating <span class="text-red-500">*</span></label>
+                <label class="mb-2 block text-sm font-medium text-gray-700"
+                  >Your Rating <span class="text-red-500">*</span></label
+                >
                 <div class="flex gap-1">
                   {#each [1, 2, 3, 4, 5] as star}
                     <button
@@ -372,7 +386,10 @@
                 ></textarea>
               </div>
 
-              <Button type="submit" disabled={isSubmittingReview || reviewRating === 0 || !reviewNickname.trim()}>
+              <Button
+                type="submit"
+                disabled={isSubmittingReview || reviewRating === 0 || !reviewNickname.trim()}
+              >
                 {isSubmittingReview ? "Submitting..." : "Submit Review"}
               </Button>
             </form>
