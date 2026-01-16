@@ -147,7 +147,7 @@ export class ProductService {
 	/**
 	 * Create a new product
 	 */
-	async create(input: CreateProductInput): Promise<ProductWithRelations> {
+	async create(input: CreateProductInput): Promise<Product> {
 		const [product] = await db
 			.insert(products)
 			.values({
@@ -168,7 +168,7 @@ export class ProductService {
 			);
 		}
 
-		return this.getById(product.id) as Promise<ProductWithRelations>;
+		return product;
 	}
 
 	/**

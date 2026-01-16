@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -43,7 +44,7 @@
     </div>
   {/if}
 
-  <form method="POST" class="rounded-lg bg-white shadow">
+  <form method="POST" use:enhance class="rounded-lg bg-white shadow">
     <!-- Language Tabs -->
     <div class="border-b">
       <div class="flex">

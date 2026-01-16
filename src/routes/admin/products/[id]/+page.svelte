@@ -647,7 +647,7 @@
         <Button variant="outline" onclick={() => (showDeleteConfirm = false)}>
           Cancel
         </Button>
-        <form method="POST" action="?/delete" class="inline">
+        <form method="POST" action="?/delete" use:enhance class="inline">
           <Button type="submit" variant="destructive">
             Delete
           </Button>
