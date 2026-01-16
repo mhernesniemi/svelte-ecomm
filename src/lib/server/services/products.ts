@@ -43,7 +43,7 @@ export class ProductService {
 			language = this.defaultLanguage,
 			facets: facetFilters,
 			search,
-			enabled = true,
+			visibility = "public",
 			limit = 20,
 			offset = 0
 		} = options;
@@ -51,8 +51,12 @@ export class ProductService {
 		// Build base query conditions
 		const conditions = [isNull(products.deletedAt)];
 
-		if (enabled !== undefined) {
-			conditions.push(eq(products.enabled, enabled));
+		if (visibility !== undefined) {
+			if (Array.isArray(visibility)) {
+				conditions.push(inArray(products.visibility, visibility));
+			} else {
+				conditions.push(eq(products.visibility, visibility));
+			}
 		}
 
 		// Get product IDs that match facet filters
@@ -147,7 +151,7 @@ export class ProductService {
 		const [product] = await db
 			.insert(products)
 			.values({
-				enabled: input.enabled ?? true
+				visibility: input.visibility ?? "public"
 			})
 			.returning();
 
@@ -175,10 +179,10 @@ export class ProductService {
 		if (!existing) return null;
 
 		// Update product fields
-		if (input.enabled !== undefined) {
+		if (input.visibility !== undefined) {
 			await db
 				.update(products)
-				.set({ enabled: input.enabled })
+				.set({ visibility: input.visibility })
 				.where(eq(products.id, id));
 		}
 

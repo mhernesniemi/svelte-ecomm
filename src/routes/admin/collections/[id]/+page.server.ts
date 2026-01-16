@@ -26,10 +26,10 @@ export const load: PageServerLoad = async ({ params }) => {
 	// Load facets for filter builder
 	const facets = await facetService.list("en");
 
-	// Load products for manual selection
+	// Load all products for manual selection (admin sees all visibility states)
 	const { items: products } = await productService.list({
 		language: "en",
-		enabled: undefined,
+		visibility: ["public", "private", "hidden"],
 		limit: 100
 	});
 
@@ -109,8 +109,8 @@ export const actions: Actions = {
 			if (field === "facet" || field === "product" || field === "variant") {
 				// Array of IDs
 				value = valueStr.split(",").map((v) => Number(v.trim())).filter((v) => !isNaN(v));
-			} else if (field === "enabled") {
-				value = valueStr === "true";
+			} else if (field === "visibility") {
+				value = valueStr; // "public", "private", or "hidden"
 			} else if (field === "price" || field === "stock") {
 				value = Number(valueStr);
 			} else {

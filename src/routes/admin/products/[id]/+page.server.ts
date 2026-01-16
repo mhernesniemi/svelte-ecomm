@@ -36,7 +36,7 @@ export const actions: Actions = {
 		const slugFi = formData.get("slug_fi") as string;
 		const descriptionEn = formData.get("description_en") as string;
 		const descriptionFi = formData.get("description_fi") as string;
-		const enabled = formData.get("enabled") === "on";
+		const visibility = formData.get("visibility") as "public" | "private" | "hidden";
 
 		if (!nameEn || !slugEn) {
 			return fail(400, { error: "English name and slug are required" });
@@ -44,7 +44,7 @@ export const actions: Actions = {
 
 		try {
 			await productService.update(id, {
-				enabled,
+				visibility,
 				translations: [
 					{
 						languageCode: "en",

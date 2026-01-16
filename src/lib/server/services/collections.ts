@@ -83,16 +83,16 @@ export class CollectionService {
 		},
 
 		/**
-		 * Enabled filter - get products by enabled status
-		 * value: boolean
+		 * Visibility filter - get products by visibility
+		 * value: "public" | "private" | "hidden"
 		 */
-		enabled: async (_currentIds, filter) => {
-			const enabled = filter.value as boolean;
+		visibility: async (_currentIds, filter) => {
+			const visibility = filter.value as "public" | "private" | "hidden";
 
 			const matches = await db
 				.selectDistinct({ id: products.id })
 				.from(products)
-				.where(and(eq(products.enabled, enabled), isNull(products.deletedAt)));
+				.where(and(eq(products.visibility, visibility), isNull(products.deletedAt)));
 
 			return new Set(matches.map((r) => r.id));
 		},
@@ -619,7 +619,7 @@ export class CollectionService {
 	 * Load product with all relations (copied from ProductService for self-containment)
 	 */
 	private async loadProductRelations(
-		product: { id: number; enabled: boolean; featuredAssetId: number | null; deletedAt: Date | null; createdAt: Date; updatedAt: Date },
+		product: { id: number; visibility: "public" | "private" | "hidden"; featuredAssetId: number | null; deletedAt: Date | null; createdAt: Date; updatedAt: Date },
 		language: string
 	): Promise<ProductWithRelations> {
 		// Load translations

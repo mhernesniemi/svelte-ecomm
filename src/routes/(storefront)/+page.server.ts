@@ -2,10 +2,10 @@ import { productService } from "$lib/server/services/products.js";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-	// Get featured products
+	// Get featured products (public only)
 	const result = await productService.list({
 		language: "en",
-		enabled: true,
+		visibility: "public",
 		limit: 8
 	});
 

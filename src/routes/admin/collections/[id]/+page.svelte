@@ -39,7 +39,7 @@
   function getFieldLabel(field: string): string {
     const labels: Record<string, string> = {
       facet: "Facet Values",
-      enabled: "Enabled Status",
+      visibility: "Visibility",
       price: "Price",
       stock: "Stock",
       product: "Products",
@@ -411,7 +411,7 @@
               <option value="price">Price Range</option>
               <option value="stock">Stock Level</option>
               <option value="product">Select Products</option>
-              <option value="enabled">Enabled Status</option>
+              <option value="visibility">Visibility</option>
             </select>
           </div>
 
@@ -432,7 +432,7 @@
                 <option value="lte">less than or equal</option>
               {:else if newFilterField === "stock"}
                 <option value="gt">greater than</option>
-              {:else if newFilterField === "enabled"}
+              {:else if newFilterField === "visibility"}
                 <option value="eq">equals</option>
               {:else}
                 <option value="in">in</option>
@@ -452,15 +452,16 @@
             {:else if newFilterField === "product"}
               <input type="hidden" name="value" value={selectedProducts.join(",")} />
               <div class="text-sm text-gray-500">Select products below</div>
-            {:else if newFilterField === "enabled"}
+            {:else if newFilterField === "visibility"}
               <select
                 id="value"
                 name="value"
                 bind:value={newFilterValue}
                 class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               >
-                <option value="true">Enabled</option>
-                <option value="false">Disabled</option>
+                <option value="public">Public</option>
+                <option value="private">Private (B2B only)</option>
+                <option value="hidden">Hidden</option>
               </select>
             {:else if newFilterField === "price"}
               <input

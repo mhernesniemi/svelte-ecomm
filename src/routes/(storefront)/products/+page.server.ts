@@ -21,10 +21,10 @@ export const load: PageServerLoad = async ({ url }) => {
 		}
 	}
 
-	// Fetch products with filters
+	// Fetch products with filters (public only)
 	const result = await productService.list({
 		language: "en",
-		enabled: true,
+		visibility: "public",
 		facets: Object.keys(facetFilters).length > 0 ? facetFilters : undefined,
 		search,
 		limit,

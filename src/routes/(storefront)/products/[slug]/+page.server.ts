@@ -7,7 +7,12 @@ import type { PageServerLoad, Actions } from "./$types";
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const product = await productService.getBySlug(params.slug, "en");
 
-	if (!product || !product.enabled) {
+	if (!product || product.visibility === "hidden") {
+		throw error(404, "Product not found");
+	}
+
+	// Private products require approved B2B status
+	if (product.visibility === "private" && locals.customer?.b2bStatus !== "approved") {
 		throw error(404, "Product not found");
 	}
 

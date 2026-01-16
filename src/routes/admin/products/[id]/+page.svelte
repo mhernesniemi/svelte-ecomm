@@ -235,16 +235,24 @@
         </div>
       </div>
 
-      <!-- Common Fields -->
+      <!-- Visibility -->
       <div class="border-t pt-6">
-        <label class="flex items-center gap-2">
-          <input
-            type="checkbox"
-            name="enabled"
-            checked={data.product.enabled}
-            class="rounded border-gray-300 text-blue-600"
-          />
-          <span class="text-sm font-medium text-gray-700">Product is active</span>
+        <label class="block">
+          <span class="text-sm font-medium text-gray-700">Visibility</span>
+          <select
+            name="visibility"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="public" selected={data.product.visibility === "public"}>
+              Public - Visible to everyone
+            </option>
+            <option value="private" selected={data.product.visibility === "private"}>
+              Private - B2B customers only
+            </option>
+            <option value="hidden" selected={data.product.visibility === "hidden"}>
+              Hidden - Not visible
+            </option>
+          </select>
         </label>
       </div>
     </div>

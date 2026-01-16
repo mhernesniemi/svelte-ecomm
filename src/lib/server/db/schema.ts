@@ -25,7 +25,11 @@ export const products = pgTable(
 	"products",
 	{
 		id: serial("id").primaryKey(),
-		enabled: boolean("enabled").default(true).notNull(),
+		visibility: text("visibility", {
+			enum: ["public", "private", "hidden"]
+		})
+			.default("public")
+			.notNull(),
 		featuredAssetId: integer("featured_asset_id"),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -34,7 +38,7 @@ export const products = pgTable(
 			.$onUpdate(() => new Date())
 			.notNull()
 	},
-	(table) => [index("products_enabled_idx").on(table.enabled)]
+	(table) => [index("products_visibility_idx").on(table.visibility)]
 );
 
 export const productTranslations = pgTable(
@@ -101,6 +105,29 @@ export const productVariantTranslations = pgTable(
 			table.variantId,
 			table.languageCode
 		)
+	]
+);
+
+// B2B Group Pricing - groupId references customerGroups (defined later in file)
+export const productVariantGroupPrices = pgTable(
+	"product_variant_group_prices",
+	{
+		id: serial("id").primaryKey(),
+		variantId: integer("variant_id")
+			.references(() => productVariants.id, { onDelete: "cascade" })
+			.notNull(),
+		groupId: integer("group_id").notNull(),
+		price: integer("price").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull()
+	},
+	(table) => [
+		uniqueIndex("variant_group_price_unique").on(table.variantId, table.groupId),
+		index("variant_group_prices_variant_idx").on(table.variantId),
+		index("variant_group_prices_group_idx").on(table.groupId)
 	]
 );
 
@@ -260,6 +287,26 @@ export const productVariantAssets = pgTable(
 );
 
 // ============================================================================
+// CUSTOMER GROUPS (B2B)
+// ============================================================================
+
+export const customerGroups = pgTable(
+	"customer_groups",
+	{
+		id: serial("id").primaryKey(),
+		code: varchar("code", { length: 100 }).notNull().unique(),
+		name: varchar("name", { length: 255 }).notNull(),
+		description: text("description"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull()
+	},
+	(table) => [uniqueIndex("customer_groups_code_idx").on(table.code)]
+);
+
+// ============================================================================
 // CUSTOMERS
 // ============================================================================
 
@@ -273,6 +320,12 @@ export const customers = pgTable(
 		lastName: varchar("last_name", { length: 100 }).notNull(),
 		phone: varchar("phone", { length: 50 }),
 		isAdmin: boolean("is_admin").default(false).notNull(),
+		groupId: integer("group_id").references(() => customerGroups.id, { onDelete: "set null" }),
+		b2bStatus: text("b2b_status", {
+			enum: ["retail", "pending", "approved", "rejected"]
+		})
+			.default("retail")
+			.notNull(),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
@@ -283,7 +336,9 @@ export const customers = pgTable(
 	(table) => [
 		uniqueIndex("customers_email_idx").on(table.email),
 		uniqueIndex("customers_clerk_user_id_idx").on(table.clerkUserId),
-		index("customers_name_idx").on(table.firstName, table.lastName)
+		index("customers_name_idx").on(table.firstName, table.lastName),
+		index("customers_group_idx").on(table.groupId),
+		index("customers_b2b_status_idx").on(table.b2bStatus)
 	]
 );
 
@@ -594,7 +649,7 @@ export const collectionFilters = pgTable(
 			.references(() => collections.id, { onDelete: "cascade" })
 			.notNull(),
 		field: text("field", {
-			enum: ["facet", "price", "stock", "enabled", "product", "variant"]
+			enum: ["facet", "price", "stock", "visibility", "product", "variant"]
 		}).notNull(),
 		operator: text("operator", {
 			enum: ["eq", "in", "gte", "lte", "gt", "contains"]
@@ -719,7 +774,8 @@ export const productVariantsRelations = relations(productVariants, ({ one, many 
 		fields: [productVariants.featuredAssetId],
 		references: [assets.id]
 	}),
-	orderLines: many(orderLines)
+	orderLines: many(orderLines),
+	groupPrices: many(productVariantGroupPrices)
 }));
 
 export const productVariantTranslationsRelations = relations(
@@ -728,6 +784,20 @@ export const productVariantTranslationsRelations = relations(
 		variant: one(productVariants, {
 			fields: [productVariantTranslations.variantId],
 			references: [productVariants.id]
+		})
+	})
+);
+
+export const productVariantGroupPricesRelations = relations(
+	productVariantGroupPrices,
+	({ one }) => ({
+		variant: one(productVariants, {
+			fields: [productVariantGroupPrices.variantId],
+			references: [productVariants.id]
+		}),
+		group: one(customerGroups, {
+			fields: [productVariantGroupPrices.groupId],
+			references: [customerGroups.id]
 		})
 	})
 );
@@ -810,7 +880,16 @@ export const productVariantAssetsRelations = relations(productVariantAssets, ({ 
 	})
 }));
 
-export const customersRelations = relations(customers, ({ many }) => ({
+export const customerGroupsRelations = relations(customerGroups, ({ many }) => ({
+	customers: many(customers),
+	groupPrices: many(productVariantGroupPrices)
+}));
+
+export const customersRelations = relations(customers, ({ one, many }) => ({
+	group: one(customerGroups, {
+		fields: [customers.groupId],
+		references: [customerGroups.id]
+	}),
 	addresses: many(addresses),
 	orders: many(orders),
 	reviews: many(reviews)

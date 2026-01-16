@@ -15,10 +15,10 @@ export const load: PageServerLoad = async () => {
 	// Load facets for filter builder
 	const facets = await facetService.list("en");
 
-	// Load products for manual selection
+	// Load all products for manual selection (admin sees all visibility states)
 	const { items: products } = await productService.list({
 		language: "en",
-		enabled: undefined,
+		visibility: ["public", "private", "hidden"],
 		limit: 100
 	});
 

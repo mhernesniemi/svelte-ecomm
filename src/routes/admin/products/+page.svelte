@@ -101,8 +101,18 @@
                 {product.variants.length} variant{product.variants.length !== 1 ? "s" : ""}
               </td>
               <td class="px-6 py-4">
-                <Badge variant={product.enabled ? "success" : "secondary"}>
-                  {product.enabled ? "Active" : "Disabled"}
+                <Badge
+                  variant={product.visibility === "public"
+                    ? "success"
+                    : product.visibility === "private"
+                      ? "outline"
+                      : "secondary"}
+                >
+                  {product.visibility === "public"
+                    ? "Public"
+                    : product.visibility === "private"
+                      ? "Private"
+                      : "Hidden"}
                 </Badge>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">

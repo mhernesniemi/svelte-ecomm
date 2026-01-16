@@ -8,11 +8,13 @@ import type {
 	productTranslations,
 	productVariants,
 	productVariantTranslations,
+	productVariantGroupPrices,
 	facets,
 	facetTranslations,
 	facetValues,
 	facetValueTranslations,
 	assets,
+	customerGroups,
 	customers,
 	addresses,
 	orders,
@@ -45,6 +47,12 @@ export type NewProductVariant = InferInsertModel<typeof productVariants>;
 
 export type ProductVariantTranslation = InferSelectModel<typeof productVariantTranslations>;
 export type NewProductVariantTranslation = InferInsertModel<typeof productVariantTranslations>;
+
+export type ProductVariantGroupPrice = InferSelectModel<typeof productVariantGroupPrices>;
+export type NewProductVariantGroupPrice = InferInsertModel<typeof productVariantGroupPrices>;
+
+/** Product visibility - derived from schema enum */
+export type ProductVisibility = Product["visibility"];
 
 /** Product with translations loaded */
 export interface ProductWithTranslations extends Product {
@@ -110,6 +118,13 @@ export type NewAsset = InferInsertModel<typeof assets>;
 export type AssetType = Asset["type"];
 
 // ============================================================================
+// CUSTOMER GROUPS (B2B)
+// ============================================================================
+
+export type CustomerGroup = InferSelectModel<typeof customerGroups>;
+export type NewCustomerGroup = InferInsertModel<typeof customerGroups>;
+
+// ============================================================================
 // CUSTOMER TYPES
 // ============================================================================
 
@@ -119,9 +134,17 @@ export type NewCustomer = InferInsertModel<typeof customers>;
 export type Address = InferSelectModel<typeof addresses>;
 export type NewAddress = InferInsertModel<typeof addresses>;
 
+/** B2B status - derived from schema enum */
+export type B2bStatus = Customer["b2bStatus"];
+
 /** Customer with addresses */
 export interface CustomerWithAddresses extends Customer {
 	addresses: Address[];
+}
+
+/** Customer with group */
+export interface CustomerWithGroup extends Customer {
+	group?: CustomerGroup | null;
 }
 
 // ============================================================================
@@ -277,7 +300,7 @@ export interface ProductListOptions {
 	language?: string;
 	facets?: FacetFilter;
 	search?: string;
-	enabled?: boolean;
+	visibility?: ProductVisibility | ProductVisibility[];
 	limit?: number;
 	offset?: number;
 }
@@ -309,7 +332,7 @@ export interface PaginatedResult<T> {
 // ============================================================================
 
 export interface CreateProductInput {
-	enabled?: boolean;
+	visibility?: ProductVisibility;
 	translations: {
 		languageCode: string;
 		name: string;
@@ -319,7 +342,7 @@ export interface CreateProductInput {
 }
 
 export interface UpdateProductInput {
-	enabled?: boolean;
+	visibility?: ProductVisibility;
 	translations?: {
 		languageCode: string;
 		name?: string;
