@@ -123,7 +123,7 @@
   {/if}
 
   <!-- Product Form -->
-  <form method="POST" action="?/update" class="mb-8 rounded-lg bg-white shadow">
+  <form method="POST" action="?/update" use:enhance class="mb-8 rounded-lg bg-white shadow">
     <!-- Language Tabs -->
     <div class="border-b">
       <div class="flex">
@@ -388,7 +388,7 @@
       </Alert>
     {/if}
 
-    <form method="POST" action="?/updateFacetValues" class="p-6">
+    <form method="POST" action="?/updateFacetValues" use:enhance class="p-6">
       {#if data.facets.length === 0}
         <p class="text-gray-500">No facets defined. Create facets first in the Facets section.</p>
       {:else}
@@ -464,7 +464,7 @@
 
     <!-- Add Variant Form -->
     {#if showAddVariant}
-      <form method="POST" action="?/addVariant" class="border-b bg-gray-50 p-6">
+      <form method="POST" action="?/addVariant" use:enhance class="border-b bg-gray-50 p-6">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label for="variant_sku" class="mb-1 block text-sm font-medium text-gray-700"
@@ -594,7 +594,7 @@
             {#if editingVariantFacets === variant.id}
               <tr class="bg-gray-50">
                 <td colspan="6" class="px-6 py-4">
-                  <form method="POST" action="?/updateVariantFacetValues">
+                  <form method="POST" action="?/updateVariantFacetValues" use:enhance>
                     <input type="hidden" name="variantId" value={variant.id} />
                     <div class="space-y-4">
                       {#each data.facets as facet}
