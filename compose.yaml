@@ -7,7 +7,7 @@ services:
         environment:
             POSTGRES_USER: root
             POSTGRES_PASSWORD: mysecretpassword
-            POSTGRES_DB: local_sveltecomm
+            POSTGRES_DB: hoikka
         volumes:
             - pgdata:/var/lib/postgresql
 volumes:

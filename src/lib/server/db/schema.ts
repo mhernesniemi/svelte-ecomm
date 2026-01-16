@@ -593,8 +593,12 @@ export const collectionFilters = pgTable(
 		collectionId: integer("collection_id")
 			.references(() => collections.id, { onDelete: "cascade" })
 			.notNull(),
-		field: varchar("field", { length: 100 }).notNull(), // 'facet', 'price', 'stock', 'enabled', 'product', 'variant'
-		operator: varchar("operator", { length: 50 }).notNull(), // 'eq', 'in', 'gte', 'lte', 'gt', 'contains'
+		field: text("field", {
+			enum: ["facet", "price", "stock", "enabled", "product", "variant"]
+		}).notNull(),
+		operator: text("operator", {
+			enum: ["eq", "in", "gte", "lte", "gt", "contains"]
+		}).notNull(),
 		value: jsonb("value").notNull(), // flexible payload
 		createdAt: timestamp("created_at").defaultNow().notNull()
 	},

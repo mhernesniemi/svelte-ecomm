@@ -209,23 +209,11 @@ export type NewCollectionTranslation = InferInsertModel<typeof collectionTransla
 export type CollectionFilter = InferSelectModel<typeof collectionFilters>;
 export type NewCollectionFilter = InferInsertModel<typeof collectionFilters>;
 
-/** Collection filter field types */
-export type CollectionFilterField =
-	| "facet" // Filter by facet values
-	| "enabled" // Filter by enabled status
-	| "price" // Filter by variant price
-	| "stock" // Filter by variant stock
-	| "product" // Manual product selection
-	| "variant"; // Manual variant selection
+/** Collection filter field - derived from schema enum */
+export type CollectionFilterField = CollectionFilter["field"];
 
-/** Collection filter operators */
-export type CollectionFilterOperator =
-	| "eq" // equals
-	| "in" // in array
-	| "gte" // greater than or equal
-	| "lte" // less than or equal
-	| "gt" // greater than
-	| "contains"; // contains (for facet by code)
+/** Collection filter operator - derived from schema enum */
+export type CollectionFilterOperator = CollectionFilter["operator"];
 
 /** Collection with translations */
 export interface CollectionWithTranslations extends Collection {
