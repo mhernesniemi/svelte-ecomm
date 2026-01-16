@@ -151,6 +151,7 @@ export class ProductService {
 		const [product] = await db
 			.insert(products)
 			.values({
+				type: input.type ?? "physical",
 				visibility: input.visibility ?? "public"
 			})
 			.returning();
@@ -179,11 +180,13 @@ export class ProductService {
 		if (!existing) return null;
 
 		// Update product fields
-		if (input.visibility !== undefined) {
-			await db
-				.update(products)
-				.set({ visibility: input.visibility })
-				.where(eq(products.id, id));
+		const updates: { type?: "physical" | "digital"; visibility?: "public" | "private" | "hidden" } =
+			{};
+		if (input.type !== undefined) updates.type = input.type;
+		if (input.visibility !== undefined) updates.visibility = input.visibility;
+
+		if (Object.keys(updates).length > 0) {
+			await db.update(products).set(updates).where(eq(products.id, id));
 		}
 
 		// Update translations

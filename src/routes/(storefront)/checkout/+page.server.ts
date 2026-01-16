@@ -3,6 +3,7 @@
  */
 import { fail, redirect } from "@sveltejs/kit";
 import { orderService, shippingService, paymentService } from "$lib/server/services/index.js";
+import { digitalDeliveryService } from "$lib/server/services/digitalDelivery.js";
 import type { PageServerLoad, Actions } from "./$types.js";
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -256,7 +257,7 @@ export const actions: Actions = {
 			if (paymentStatus === "completed") {
 				await orderService.transitionState(cart.id, "paid");
 
-				// Create shipment
+				// Create shipment for physical products
 				const order = await orderService.getById(cart.id);
 				if (order) {
 					try {
@@ -264,6 +265,17 @@ export const actions: Actions = {
 					} catch (e) {
 						console.error("Error creating shipment:", e);
 						// Don't fail the order if shipment creation fails
+					}
+
+					// Deliver digital products via email
+					try {
+						const deliveryResult = await digitalDeliveryService.deliverOrder(cart.id);
+						if (deliveryResult.errors.length > 0) {
+							console.error("Digital delivery errors:", deliveryResult.errors);
+						}
+					} catch (e) {
+						console.error("Error delivering digital products:", e);
+						// Don't fail the order if digital delivery fails
 					}
 				}
 			}

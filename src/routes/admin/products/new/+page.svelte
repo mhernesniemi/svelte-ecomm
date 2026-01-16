@@ -163,7 +163,22 @@
       </div>
 
       <!-- Common Fields -->
-      <div class="border-t pt-6">
+      <div class="border-t pt-6 space-y-4">
+        <label class="block">
+          <span class="text-sm font-medium text-gray-700">Product Type</span>
+          <select
+            name="type"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          >
+            <option value="physical" selected={form?.values?.type !== "digital"}>
+              Physical - Requires shipping
+            </option>
+            <option value="digital" selected={form?.values?.type === "digital"}>
+              Digital - Delivered via email
+            </option>
+          </select>
+        </label>
+
         <label class="block">
           <span class="text-sm font-medium text-gray-700">Visibility</span>
           <select

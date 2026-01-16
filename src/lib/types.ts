@@ -55,6 +55,9 @@ export type NewProductVariantGroupPrice = InferInsertModel<typeof productVariant
 /** Product visibility - derived from schema enum */
 export type ProductVisibility = Product["visibility"];
 
+/** Product type - physical or digital */
+export type ProductType = Product["type"];
+
 /** Product with translations loaded */
 export interface ProductWithTranslations extends Product {
 	translations: ProductTranslation[];
@@ -336,6 +339,7 @@ export interface PaginatedResult<T> {
 // ============================================================================
 
 export interface CreateProductInput {
+	type?: ProductType;
 	visibility?: ProductVisibility;
 	translations: {
 		languageCode: string;
@@ -346,6 +350,7 @@ export interface CreateProductInput {
 }
 
 export interface UpdateProductInput {
+	type?: ProductType;
 	visibility?: ProductVisibility;
 	translations?: {
 		languageCode: string;

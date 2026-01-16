@@ -25,6 +25,11 @@ export const products = pgTable(
 	"products",
 	{
 		id: serial("id").primaryKey(),
+		type: text("type", {
+			enum: ["physical", "digital"]
+		})
+			.default("physical")
+			.notNull(),
 		visibility: text("visibility", {
 			enum: ["public", "private", "hidden"]
 		})

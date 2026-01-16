@@ -619,7 +619,7 @@ export class CollectionService {
 	 * Load product with all relations (copied from ProductService for self-containment)
 	 */
 	private async loadProductRelations(
-		product: { id: number; visibility: "public" | "private" | "hidden"; featuredAssetId: number | null; deletedAt: Date | null; createdAt: Date; updatedAt: Date },
+		product: { id: number; type: "physical" | "digital"; visibility: "public" | "private" | "hidden"; featuredAssetId: number | null; deletedAt: Date | null; createdAt: Date; updatedAt: Date },
 		language: string
 	): Promise<ProductWithRelations> {
 		// Load translations
