@@ -22,6 +22,16 @@ export type PaymentInfo = {
 // Payment status values must match the database enum
 export type PaymentStatus = "pending" | "authorized" | "settled" | "declined" | "refunded";
 
+// Statuses that indicate a successful/captured payment
+const SUCCESSFUL_STATUSES: PaymentStatus[] = ["settled"];
+
+/**
+ * Check if a payment status indicates successful payment capture
+ */
+export function isPaymentSuccessful(status: PaymentStatus): boolean {
+	return SUCCESSFUL_STATUSES.includes(status);
+}
+
 export type RefundInfo = {
 	refundedAmount: number; // Amount in cents
 	refundId?: string;

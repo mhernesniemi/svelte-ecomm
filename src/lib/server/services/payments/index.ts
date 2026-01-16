@@ -256,5 +256,6 @@ export class PaymentService {
 // Export singleton instance
 export const paymentService = new PaymentService();
 
-// Re-export types for convenience
+// Re-export types and helpers for convenience
 export type { PaymentInfo, PaymentStatus, RefundInfo } from "./types.js";
+export { isPaymentSuccessful } from "./types.js";

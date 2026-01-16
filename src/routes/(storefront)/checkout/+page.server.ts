@@ -2,7 +2,7 @@
  * Checkout page server actions
  */
 import { fail, redirect } from "@sveltejs/kit";
-import { orderService, shippingService, paymentService } from "$lib/server/services/index.js";
+import { orderService, shippingService, paymentService, isPaymentSuccessful } from "$lib/server/services/index.js";
 import { digitalDeliveryService } from "$lib/server/services/digitalDelivery.js";
 import { db } from "$lib/server/db/index.js";
 import { orderLines, productVariants, products, customers } from "$lib/server/db/schema.js";
@@ -358,8 +358,8 @@ export const actions: Actions = {
 			const payment = orderPayments[0];
 			const paymentStatus = await paymentService.confirmPayment(payment.id);
 
-			// If payment is settled, transition order to paid
-			if (paymentStatus === "settled") {
+			// If payment is successful, transition order to paid
+			if (isPaymentSuccessful(paymentStatus)) {
 				await orderService.transitionState(cart.id, "paid");
 
 				const order = await orderService.getById(cart.id);
