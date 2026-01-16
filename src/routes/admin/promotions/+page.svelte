@@ -11,13 +11,16 @@
   }
 </script>
 
-<div>
-  <div class="mb-8 flex items-center justify-between">
-    <h1 class="text-2xl font-bold">Promotions</h1>
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Promotions</h1>
+      <p class="mt-1 text-sm text-gray-600">Manage discount codes and promotions</p>
+    </div>
     <button
       type="button"
       onclick={() => (showCreateForm = !showCreateForm)}
-      class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
     >
       Add Promotion
     </button>
@@ -121,24 +124,74 @@
   {/if}
 
   <!-- Promotions Table -->
-  <div class="overflow-hidden rounded-lg bg-white shadow">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Discount</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Min Order</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usage</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200 bg-white">
-        {#if data.promotions.length === 0}
+  {#if data.promotions.length === 0}
+    <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
+      <svg
+        class="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"
+        />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No promotions</h3>
+      <p class="mt-1 text-sm text-gray-500">Get started by creating a new promotion.</p>
+      <div class="mt-6">
+        <button
+          type="button"
+          onclick={() => (showCreateForm = true)}
+          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Add Promotion
+        </button>
+      </div>
+    </div>
+  {:else}
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
           <tr>
-            <td colspan="6" class="px-6 py-12 text-center text-gray-500"> No promotions yet </td>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+            >
+              Code
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+            >
+              Discount
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+            >
+              Min Order
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+            >
+              Usage
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+            >
+              Status
+            </th>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
           </tr>
-        {:else}
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
           {#each data.promotions as promo}
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4 font-mono font-medium">{promo.code}</td>
@@ -179,8 +232,8 @@
               </td>
             </tr>
           {/each}
-        {/if}
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
+  {/if}
 </div>

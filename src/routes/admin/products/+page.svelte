@@ -10,58 +10,81 @@
   }
 </script>
 
-<div>
-  <div class="mb-8 flex items-center justify-between">
-    <h1 class="text-2xl font-bold">Products</h1>
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Products</h1>
+      <p class="mt-1 text-sm text-gray-600">Manage your product catalog</p>
+    </div>
     <a
       href="/admin/products/new"
-      class="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
+      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
     >
       Add Product
     </a>
   </div>
 
-  <div class="overflow-hidden rounded-lg bg-white shadow">
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-          >
-            Product
-          </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-          >
-            Variants
-          </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-          >
-            Status
-          </th>
-          <th
-            class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
-          >
-            Created
-          </th>
-          <th
-            class="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase"
-          >
-            Actions
-          </th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200 bg-white">
-        {#if data.products.length === 0}
+  {#if data.products.length === 0}
+    <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
+      <svg
+        class="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+        />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No products</h3>
+      <p class="mt-1 text-sm text-gray-500">Get started by creating a new product.</p>
+      <div class="mt-6">
+        <a
+          href="/admin/products/new"
+          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Add Product
+        </a>
+      </div>
+    </div>
+  {:else}
+    <div class="overflow-hidden rounded-lg bg-white shadow">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
           <tr>
-            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-              No products yet. <a href="/admin/products/new" class="text-blue-600 hover:underline"
-                >Create your first product</a
-              >
-            </td>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+            >
+              Product
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+            >
+              Variants
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+            >
+              Status
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase"
+            >
+              Created
+            </th>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
           </tr>
-        {:else}
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
           {#each data.products as product}
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4">
@@ -125,38 +148,38 @@
               </td>
             </tr>
           {/each}
-        {/if}
-      </tbody>
-    </table>
+        </tbody>
+      </table>
 
-    <!-- Pagination -->
-    {#if data.pagination.total > data.pagination.limit}
-      <div class="flex items-center justify-between border-t bg-gray-50 px-6 py-3">
-        <div class="text-sm text-gray-500">
-          Showing {data.pagination.offset + 1} to {Math.min(
-            data.pagination.offset + data.pagination.limit,
-            data.pagination.total
-          )} of {data.pagination.total} products
+      <!-- Pagination -->
+      {#if data.pagination.total > data.pagination.limit}
+        <div class="flex items-center justify-between border-t bg-gray-50 px-6 py-3">
+          <div class="text-sm text-gray-500">
+            Showing {data.pagination.offset + 1} to {Math.min(
+              data.pagination.offset + data.pagination.limit,
+              data.pagination.total
+            )} of {data.pagination.total} products
+          </div>
+          <div class="flex gap-2">
+            {#if data.currentPage > 1}
+              <a
+                href="?page={data.currentPage - 1}"
+                class="rounded border px-3 py-1 text-sm hover:bg-gray-100"
+              >
+                Previous
+              </a>
+            {/if}
+            {#if data.pagination.hasMore}
+              <a
+                href="?page={data.currentPage + 1}"
+                class="rounded border px-3 py-1 text-sm hover:bg-gray-100"
+              >
+                Next
+              </a>
+            {/if}
+          </div>
         </div>
-        <div class="flex gap-2">
-          {#if data.currentPage > 1}
-            <a
-              href="?page={data.currentPage - 1}"
-              class="rounded border px-3 py-1 text-sm hover:bg-gray-100"
-            >
-              Previous
-            </a>
-          {/if}
-          {#if data.pagination.hasMore}
-            <a
-              href="?page={data.currentPage + 1}"
-              class="rounded border px-3 py-1 text-sm hover:bg-gray-100"
-            >
-              Next
-            </a>
-          {/if}
-        </div>
-      </div>
-    {/if}
-  </div>
+      {/if}
+    </div>
+  {/if}
 </div>

@@ -12,13 +12,16 @@
   }
 </script>
 
-<div>
-  <div class="mb-8 flex items-center justify-between">
-    <h1 class="text-2xl font-bold">Facets</h1>
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Facets</h1>
+      <p class="mt-1 text-sm text-gray-600">Manage product attributes for filtering</p>
+    </div>
     <button
       type="button"
       onclick={() => (showCreateFacet = !showCreateFacet)}
-      class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
     >
       Add Facet
     </button>
@@ -80,12 +83,35 @@
   {/if}
 
   <!-- Facets List -->
-  <div class="space-y-6">
-    {#if data.facets.length === 0}
-      <div class="rounded-lg bg-white p-12 text-center text-gray-500 shadow">
-        No facets yet. Create your first facet to start categorizing products.
+  {#if data.facets.length === 0}
+    <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
+      <svg
+        class="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"
+        />
+      </svg>
+      <h3 class="mt-2 text-sm font-medium text-gray-900">No facets</h3>
+      <p class="mt-1 text-sm text-gray-500">Get started by creating a new facet.</p>
+      <div class="mt-6">
+        <button
+          type="button"
+          onclick={() => (showCreateFacet = true)}
+          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Add Facet
+        </button>
       </div>
-    {:else}
+    </div>
+  {:else}
+    <div class="space-y-6">
       {#each data.facets as facet}
         <div class="rounded-lg bg-white shadow">
           <div class="flex items-center justify-between border-b px-6 py-4">
@@ -177,6 +203,6 @@
           </div>
         </div>
       {/each}
-    {/if}
-  </div>
+    </div>
+  {/if}
 </div>
