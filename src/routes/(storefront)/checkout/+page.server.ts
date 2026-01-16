@@ -358,8 +358,8 @@ export const actions: Actions = {
 			const payment = orderPayments[0];
 			const paymentStatus = await paymentService.confirmPayment(payment.id);
 
-			// If payment is completed, transition order to paid
-			if (paymentStatus === "completed") {
+			// If payment is settled, transition order to paid
+			if (paymentStatus === "settled") {
 				await orderService.transitionState(cart.id, "paid");
 
 				const order = await orderService.getById(cart.id);
