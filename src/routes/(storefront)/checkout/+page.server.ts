@@ -4,7 +4,25 @@
 import { fail, redirect } from "@sveltejs/kit";
 import { orderService, shippingService, paymentService } from "$lib/server/services/index.js";
 import { digitalDeliveryService } from "$lib/server/services/digitalDelivery.js";
+import { db } from "$lib/server/db/index.js";
+import { orderLines, productVariants, products, customers } from "$lib/server/db/schema.js";
+import { eq } from "drizzle-orm";
 import type { PageServerLoad, Actions } from "./$types.js";
+
+/**
+ * Check if all items in the cart are digital products
+ */
+async function isCartDigitalOnly(cartId: number): Promise<boolean> {
+	const lines = await db
+		.select({ productType: products.type })
+		.from(orderLines)
+		.innerJoin(productVariants, eq(orderLines.variantId, productVariants.id))
+		.innerJoin(products, eq(productVariants.productId, products.id))
+		.where(eq(orderLines.orderId, cartId));
+
+	if (lines.length === 0) return false;
+	return lines.every((line) => line.productType === "digital");
+}
 
 export const load: PageServerLoad = async ({ locals }) => {
 	// Use locals.cartToken and locals.customer?.id (set by hooks.server.ts)
@@ -15,18 +33,22 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (!cart) {
 		return {
 			cart: null,
-			shippingRates: []
+			shippingRates: [],
+			isDigitalOnly: false
 		};
 	}
 
-	// Get available shipping rates
-	const shippingRates = await shippingService.getAvailableRates(cart);
+	// Check if cart contains only digital products
+	const isDigitalOnly = await isCartDigitalOnly(cart.id);
+
+	// Get available shipping rates (only for physical products)
+	const shippingRates = isDigitalOnly ? [] : await shippingService.getAvailableRates(cart);
 
 	// Get available payment methods
 	const paymentMethods = await paymentService.getActiveMethods();
 
-	// Check if shipping method is already set
-	const orderShipping = await shippingService.getOrderShipping(cart.id);
+	// Check if shipping method is already set (not needed for digital)
+	const orderShipping = isDigitalOnly ? null : await shippingService.getOrderShipping(cart.id);
 
 	// Check if payment is already created
 	const orderPayments = await paymentService.getByOrderId(cart.id);
@@ -40,13 +62,32 @@ export const load: PageServerLoad = async ({ locals }) => {
 		};
 	}
 
+	// Get customer data for prefilling (from order or customer record)
+	let customerEmail = cart.customerEmail || null;
+	let customerFullName = cart.shippingFullName || null;
+	if (locals.customer?.id) {
+		const [customer] = await db
+			.select({ email: customers.email, firstName: customers.firstName, lastName: customers.lastName })
+			.from(customers)
+			.where(eq(customers.id, locals.customer.id));
+		if (customer) {
+			if (!customerEmail) customerEmail = customer.email || null;
+			if (!customerFullName && (customer.firstName || customer.lastName)) {
+				customerFullName = [customer.firstName, customer.lastName].filter(Boolean).join(" ");
+			}
+		}
+	}
+
 	return {
 		cart,
 		shippingRates,
 		paymentMethods,
 		orderShipping,
 		existingPayment,
-		paymentInfo
+		paymentInfo,
+		isDigitalOnly,
+		customerEmail,
+		customerFullName
 	};
 };
 
@@ -94,6 +135,50 @@ export const actions: Actions = {
 			success: true,
 			cart: updatedCart,
 			shippingRates
+		};
+	},
+
+	setContactInfo: async ({ request, locals }) => {
+		const cart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
+		if (!cart) {
+			return fail(404, { error: "Cart not found" });
+		}
+
+		const data = await request.formData();
+		const fullName = data.get("fullName")?.toString();
+		const email = data.get("email")?.toString();
+
+		if (!fullName || !email) {
+			return fail(400, { error: "Full name and email are required" });
+		}
+
+		// Store full name in shipping field (reuse existing field)
+		await orderService.setShippingAddress(cart.id, {
+			fullName,
+			streetLine1: "Digital Delivery",
+			city: "N/A",
+			postalCode: "00000",
+			country: "FI"
+		});
+
+		// Store email on the order
+		await orderService.setCustomerEmail(cart.id, email);
+
+		const updatedCart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
+
+		const paymentMethods = await paymentService.getActiveMethods();
+
+		return {
+			success: true,
+			cart: updatedCart,
+			contactInfoSet: true,
+			paymentMethods
 		};
 	},
 
@@ -153,9 +238,18 @@ export const actions: Actions = {
 			return fail(404, { error: "Cart not found" });
 		}
 
-		// Cart must have shipping address and method set
-		if (!cart.shippingPostalCode) {
-			return fail(400, { error: "Shipping address required" });
+		// Check if digital-only order
+		const isDigitalOnly = await isCartDigitalOnly(cart.id);
+
+		// For physical orders: need shipping address; for digital: need contact info
+		if (isDigitalOnly) {
+			if (!cart.customerEmail) {
+				return fail(400, { error: "Contact information required" });
+			}
+		} else {
+			if (!cart.shippingPostalCode) {
+				return fail(400, { error: "Shipping address required" });
+			}
 		}
 
 		const data = await request.formData();
@@ -219,15 +313,24 @@ export const actions: Actions = {
 			return fail(404, { error: "Cart not found" });
 		}
 
-		// Validate that all required information is present
-		if (!cart.shippingPostalCode) {
-			return fail(400, { error: "Shipping address required" });
-		}
+		// Check if digital-only order
+		const isDigitalOnly = await isCartDigitalOnly(cart.id);
 
-		// Check if shipping method is set
-		const orderShipping = await shippingService.getOrderShipping(cart.id);
-		if (!orderShipping) {
-			return fail(400, { error: "Shipping method required" });
+		// Validate required information based on order type
+		if (isDigitalOnly) {
+			if (!cart.customerEmail) {
+				return fail(400, { error: "Contact information required" });
+			}
+		} else {
+			if (!cart.shippingPostalCode) {
+				return fail(400, { error: "Shipping address required" });
+			}
+
+			// Check if shipping method is set (only for physical products)
+			const orderShipping = await shippingService.getOrderShipping(cart.id);
+			if (!orderShipping) {
+				return fail(400, { error: "Shipping method required" });
+			}
 		}
 
 		// Check if payment exists
@@ -236,13 +339,15 @@ export const actions: Actions = {
 			return fail(400, { error: "Payment required" });
 		}
 
-		// Validate stock availability before proceeding
-		const stockCheck = await orderService.validateStock(cart.id);
-		if (!stockCheck.valid) {
-			return fail(400, {
-				error: "Some items are no longer available in the requested quantity",
-				stockErrors: stockCheck.errors
-			});
+		// Validate stock availability (skip for digital products)
+		if (!isDigitalOnly) {
+			const stockCheck = await orderService.validateStock(cart.id);
+			if (!stockCheck.valid) {
+				return fail(400, {
+					error: "Some items are no longer available in the requested quantity",
+					stockErrors: stockCheck.errors
+				});
+			}
 		}
 
 		try {
@@ -257,14 +362,16 @@ export const actions: Actions = {
 			if (paymentStatus === "completed") {
 				await orderService.transitionState(cart.id, "paid");
 
-				// Create shipment for physical products
 				const order = await orderService.getById(cart.id);
 				if (order) {
-					try {
-						await shippingService.createShipment(order);
-					} catch (e) {
-						console.error("Error creating shipment:", e);
-						// Don't fail the order if shipment creation fails
+					// Create shipment only for physical products
+					if (!isDigitalOnly) {
+						try {
+							await shippingService.createShipment(order);
+						} catch (e) {
+							console.error("Error creating shipment:", e);
+							// Don't fail the order if shipment creation fails
+						}
 					}
 
 					// Deliver digital products via email

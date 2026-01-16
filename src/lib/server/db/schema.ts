@@ -419,6 +419,8 @@ export const orders = pgTable(
 		shippingCity: varchar("shipping_city", { length: 100 }),
 		shippingPostalCode: varchar("shipping_postal_code", { length: 20 }),
 		shippingCountry: varchar("shipping_country", { length: 100 }),
+		// Contact email (for order confirmations and digital delivery)
+		customerEmail: varchar("customer_email", { length: 255 }),
 		// Timestamps
 		orderPlacedAt: timestamp("order_placed_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),

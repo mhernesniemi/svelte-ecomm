@@ -571,6 +571,19 @@ export class OrderService {
 	}
 
 	/**
+	 * Set customer email for order confirmations and digital delivery
+	 */
+	async setCustomerEmail(orderId: number, email: string): Promise<Order> {
+		const [updated] = await db
+			.update(orders)
+			.set({ customerEmail: email })
+			.where(eq(orders.id, orderId))
+			.returning();
+
+		return updated;
+	}
+
+	/**
 	 * Validate stock availability for all items in the order
 	 * Used before completing checkout
 	 */

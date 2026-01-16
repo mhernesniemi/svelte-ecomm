@@ -5,14 +5,7 @@
 import { Resend } from "resend";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
-import {
-	orders,
-	orderLines,
-	productVariants,
-	products,
-	productTranslations,
-	customers
-} from "../db/schema.js";
+import { orders, orderLines, productVariants, products, productTranslations } from "../db/schema.js";
 import { env } from "$env/dynamic/private";
 
 export class DigitalDeliveryService {
@@ -38,14 +31,9 @@ export class DigitalDeliveryService {
 			return { sent: 0, errors: ["Order not found"] };
 		}
 
-		// Load customer
-		let customer = null;
-		if (order.customerId) {
-			[customer] = await db.select().from(customers).where(eq(customers.id, order.customerId));
-		}
-
-		if (!customer?.email) {
-			return { sent: 0, errors: ["No customer email for order"] };
+		// Use email from order snapshot
+		if (!order.customerEmail) {
+			return { sent: 0, errors: ["No customer email on order"] };
 		}
 
 		// Load order lines with variants and products
@@ -61,7 +49,7 @@ export class DigitalDeliveryService {
 			.where(eq(orderLines.orderId, orderId));
 
 		// Process each digital product
-		for (const { line, product } of lines) {
+		for (const { product } of lines) {
 			if (product.type !== "digital") continue;
 
 			// Load product name
@@ -76,10 +64,10 @@ export class DigitalDeliveryService {
 			try {
 				await this.resend.emails.send({
 					from: this.fromEmail,
-					to: customer.email,
+					to: order.customerEmail,
 					subject: `Your order ${order.code} - ${productName}`,
 					html: this.buildEmailContent({
-						customerFirstName: customer.firstName,
+						customerName: order.shippingFullName || "Customer",
 						productName,
 						orderCode: order.code
 					})
@@ -99,12 +87,12 @@ export class DigitalDeliveryService {
 	 * Build email content for digital product delivery
 	 */
 	private buildEmailContent(data: {
-		customerFirstName: string;
+		customerName: string;
 		productName: string;
 		orderCode: string;
 	}): string {
 		return `
-			<p>Hi ${data.customerFirstName},</p>
+			<p>Hi ${data.customerName},</p>
 			<p>Thank you for your order!</p>
 			<p><strong>Your product:</strong> ${data.productName}<br>
 			<strong>Order ID:</strong> ${data.orderCode}</p>

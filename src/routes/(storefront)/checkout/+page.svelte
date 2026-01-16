@@ -14,12 +14,15 @@
   let isCompletingOrder = $state(false);
 
   // Combine form and data for reactive state
-  // After form submission, form object contains the updated data
   const currentOrderShipping = $derived(form?.orderShipping ?? data.orderShipping);
   const currentPaymentMethods = $derived(form?.paymentMethods ?? data.paymentMethods);
   const currentPaymentInfo = $derived(form?.paymentInfo ?? data.paymentInfo);
   const currentCart = $derived(form?.cart ?? data.cart);
   const currentShippingRates = $derived(form?.shippingRates ?? data.shippingRates);
+  const isDigitalOnly = $derived(data.isDigitalOnly);
+  const contactInfoSet = $derived(
+    form?.contactInfoSet || (isDigitalOnly && currentCart?.customerEmail)
+  );
 
   // Initialize selected shipping rate if already set
   $effect(() => {
@@ -34,13 +37,20 @@
     }
   });
 
+  // Form data for physical products (shipping address)
   let addressFormData = $state({
-    fullName: data.cart?.shippingFullName ?? "",
+    fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
     streetLine1: data.cart?.shippingStreetLine1 ?? "",
     streetLine2: data.cart?.shippingStreetLine2 ?? "",
     city: data.cart?.shippingCity ?? "",
     postalCode: data.cart?.shippingPostalCode ?? "",
     country: data.cart?.shippingCountry ?? "FI"
+  });
+
+  // Form data for digital products (contact info)
+  let contactFormData = $state({
+    fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
+    email: data.customerEmail ?? data.cart?.customerEmail ?? ""
   });
 
   function formatPrice(cents: number): string {
@@ -64,201 +74,247 @@
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <!-- Main Content -->
       <div class="space-y-6 lg:col-span-2">
-        <!-- Shipping Address -->
-        <div class="rounded-lg bg-white p-6 shadow">
-          <h2 class="mb-4 text-xl font-semibold">Shipping Address</h2>
-
-          {#if form?.error}
-            <Alert variant="destructive" class="mb-4">
-              <p>{form.error}</p>
-              {#if form?.stockErrors?.length}
-                <ul class="mt-2 list-inside list-disc text-sm">
-                  {#each form.stockErrors as stockError}
-                    <li>{stockError}</li>
-                  {/each}
-                </ul>
-              {/if}
-            </Alert>
-          {/if}
-
-          <form method="POST" action="?/setShippingAddress" use:enhance>
-            <div class="space-y-4">
-              <div>
-                <Label for="fullName">
-                  Full Name <span class="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  bind:value={addressFormData.fullName}
-                  required
-                  class="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label for="streetLine1">
-                  Street Address <span class="text-red-500">*</span>
-                </Label>
-                <Input
-                  type="text"
-                  id="streetLine1"
-                  name="streetLine1"
-                  bind:value={addressFormData.streetLine1}
-                  required
-                  class="mt-1"
-                />
-              </div>
-
-              <div>
-                <Label for="streetLine2">
-                  Apartment, suite, etc. (optional)
-                </Label>
-                <Input
-                  type="text"
-                  id="streetLine2"
-                  name="streetLine2"
-                  bind:value={addressFormData.streetLine2}
-                  class="mt-1"
-                />
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <Label for="postalCode">
-                    Postal Code <span class="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    id="postalCode"
-                    name="postalCode"
-                    bind:value={addressFormData.postalCode}
-                    required
-                    class="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label for="city">
-                    City <span class="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    id="city"
-                    name="city"
-                    bind:value={addressFormData.city}
-                    required
-                    class="mt-1"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label for="country">
-                  Country <span class="text-red-500">*</span>
-                </Label>
-                <select
-                  id="country"
-                  name="country"
-                  bind:value={addressFormData.country}
-                  required
-                  class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
-                >
-                  <option value="FI">Finland</option>
-                  <option value="SE">Sweden</option>
-                  <option value="NO">Norway</option>
-                  <option value="DK">Denmark</option>
-                </select>
-              </div>
-
-              <Button type="submit" class="w-full">
-                Save Address
-              </Button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Shipping Method Selection -->
-        {#if currentCart?.shippingPostalCode && currentShippingRates.length > 0}
-          <div class="rounded-lg bg-white p-6 shadow">
-            <h2 class="mb-4 text-xl font-semibold">Shipping Method</h2>
-
-            <div class="space-y-3">
-              {#each currentShippingRates as rate}
-                <label
-                  class="flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50 {selectedShippingRate?.id ===
-                  rate.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-300'}"
-                >
-                  <input
-                    type="radio"
-                    name="shippingMethod"
-                    value={rate.id}
-                    checked={selectedShippingRate?.id === rate.id}
-                    onchange={() => selectShippingRate(rate)}
-                    class="mt-1 mr-3"
-                  />
-                  <div class="flex-1">
-                    <div class="flex items-start justify-between">
-                      <div>
-                        <p class="font-medium">{rate.name}</p>
-                        {#if rate.description}
-                          <p class="mt-1 text-sm text-gray-500">{rate.description}</p>
-                        {/if}
-                        {#if rate.estimatedDeliveryDays}
-                          <p class="mt-1 text-sm text-gray-500">
-                            Estimated delivery: {rate.estimatedDeliveryDays} business day{rate.estimatedDeliveryDays !==
-                            1
-                              ? "s"
-                              : ""}
-                          </p>
-                        {/if}
-                      </div>
-                      <p class="ml-4 font-semibold">{formatPrice(rate.price)} EUR</p>
-                    </div>
-                  </div>
-                </label>
-              {/each}
-            </div>
-
-            {#if selectedShippingRate && !currentOrderShipping}
-              <form method="POST" action="?/setShippingMethod" use:enhance class="mt-4">
-                <input type="hidden" name="methodId" value={selectedShippingRate.methodId} />
-                <input type="hidden" name="rateId" value={selectedShippingRate.id} />
-                <input type="hidden" name="price" value={selectedShippingRate.price} />
-                <Button type="submit" class="w-full">
-                  Select Shipping Method
-                </Button>
-              </form>
-            {:else if currentOrderShipping}
-              <Alert variant="success" class="mt-4">
-                <p class="text-sm font-medium">
-                  Shipping method selected: {currentShippingRates.find(
-                    (r: (typeof currentShippingRates)[number]) =>
-                      r.methodId === currentOrderShipping?.shippingMethodId
-                  )?.name || "Selected"}
-                </p>
-              </Alert>
+        {#if form?.error}
+          <Alert variant="destructive">
+            <p>{form.error}</p>
+            {#if form?.stockErrors?.length}
+              <ul class="mt-2 list-inside list-disc text-sm">
+                {#each form.stockErrors as stockError}
+                  <li>{stockError}</li>
+                {/each}
+              </ul>
             {/if}
-          </div>
-        {:else if currentCart?.shippingPostalCode}
-          <Alert variant="warning">
-            <p class="text-sm">
-              No shipping methods available for this address. Please check your address.
-            </p>
-          </Alert>
-        {:else}
-          <Alert variant="default">
-            <p class="text-sm">
-              Please enter your shipping address to see available shipping methods.
-            </p>
           </Alert>
         {/if}
 
+        {#if isDigitalOnly}
+          <!-- Contact Info for Digital Products -->
+          <div class="rounded-lg bg-white p-6 shadow">
+            <h2 class="mb-4 text-xl font-semibold">Contact Information</h2>
+            <p class="mb-4 text-sm text-gray-600">
+              Your digital product will be delivered to this email address after payment.
+            </p>
+
+            {#if contactInfoSet}
+              <Alert variant="success">
+                <p class="font-medium">Contact information saved</p>
+                <p class="text-sm">{currentCart?.shippingFullName}</p>
+                <p class="text-sm">{currentCart?.customerEmail}</p>
+              </Alert>
+            {:else}
+              <form method="POST" action="?/setContactInfo" use:enhance>
+                <div class="space-y-4">
+                  <div>
+                    <Label for="fullName">
+                      Full Name <span class="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      id="fullName"
+                      name="fullName"
+                      bind:value={contactFormData.fullName}
+                      required
+                      class="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label for="email">
+                      Email Address <span class="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="email"
+                      id="email"
+                      name="email"
+                      bind:value={contactFormData.email}
+                      required
+                      class="mt-1"
+                    />
+                  </div>
+
+                  <Button type="submit" class="w-full">Continue to Payment</Button>
+                </div>
+              </form>
+            {/if}
+          </div>
+        {:else}
+          <!-- Shipping Address for Physical Products -->
+          <div class="rounded-lg bg-white p-6 shadow">
+            <h2 class="mb-4 text-xl font-semibold">Shipping Address</h2>
+
+            <form method="POST" action="?/setShippingAddress" use:enhance>
+              <div class="space-y-4">
+                <div>
+                  <Label for="fullName">
+                    Full Name <span class="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    id="fullName"
+                    name="fullName"
+                    bind:value={addressFormData.fullName}
+                    required
+                    class="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label for="streetLine1">
+                    Street Address <span class="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    type="text"
+                    id="streetLine1"
+                    name="streetLine1"
+                    bind:value={addressFormData.streetLine1}
+                    required
+                    class="mt-1"
+                  />
+                </div>
+
+                <div>
+                  <Label for="streetLine2">Apartment, suite, etc. (optional)</Label>
+                  <Input
+                    type="text"
+                    id="streetLine2"
+                    name="streetLine2"
+                    bind:value={addressFormData.streetLine2}
+                    class="mt-1"
+                  />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label for="postalCode">
+                      Postal Code <span class="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      id="postalCode"
+                      name="postalCode"
+                      bind:value={addressFormData.postalCode}
+                      required
+                      class="mt-1"
+                    />
+                  </div>
+
+                  <div>
+                    <Label for="city">
+                      City <span class="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      type="text"
+                      id="city"
+                      name="city"
+                      bind:value={addressFormData.city}
+                      required
+                      class="mt-1"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label for="country">
+                    Country <span class="text-red-500">*</span>
+                  </Label>
+                  <select
+                    id="country"
+                    name="country"
+                    bind:value={addressFormData.country}
+                    required
+                    class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
+                  >
+                    <option value="FI">Finland</option>
+                    <option value="SE">Sweden</option>
+                    <option value="NO">Norway</option>
+                    <option value="DK">Denmark</option>
+                  </select>
+                </div>
+
+                <Button type="submit" class="w-full">Save Address</Button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Shipping Method Selection (only for physical products) -->
+          {#if currentCart?.shippingPostalCode && currentShippingRates.length > 0}
+            <div class="rounded-lg bg-white p-6 shadow">
+              <h2 class="mb-4 text-xl font-semibold">Shipping Method</h2>
+
+              <div class="space-y-3">
+                {#each currentShippingRates as rate}
+                  <label
+                    class="flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50 {selectedShippingRate?.id ===
+                    rate.id
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-300'}"
+                  >
+                    <input
+                      type="radio"
+                      name="shippingMethod"
+                      value={rate.id}
+                      checked={selectedShippingRate?.id === rate.id}
+                      onchange={() => selectShippingRate(rate)}
+                      class="mt-1 mr-3"
+                    />
+                    <div class="flex-1">
+                      <div class="flex items-start justify-between">
+                        <div>
+                          <p class="font-medium">{rate.name}</p>
+                          {#if rate.description}
+                            <p class="mt-1 text-sm text-gray-500">{rate.description}</p>
+                          {/if}
+                          {#if rate.estimatedDeliveryDays}
+                            <p class="mt-1 text-sm text-gray-500">
+                              Estimated delivery: {rate.estimatedDeliveryDays} business day{rate.estimatedDeliveryDays !==
+                              1
+                                ? "s"
+                                : ""}
+                            </p>
+                          {/if}
+                        </div>
+                        <p class="ml-4 font-semibold">{formatPrice(rate.price)} EUR</p>
+                      </div>
+                    </div>
+                  </label>
+                {/each}
+              </div>
+
+              {#if selectedShippingRate && !currentOrderShipping}
+                <form method="POST" action="?/setShippingMethod" use:enhance class="mt-4">
+                  <input type="hidden" name="methodId" value={selectedShippingRate.methodId} />
+                  <input type="hidden" name="rateId" value={selectedShippingRate.id} />
+                  <input type="hidden" name="price" value={selectedShippingRate.price} />
+                  <Button type="submit" class="w-full">Select Shipping Method</Button>
+                </form>
+              {:else if currentOrderShipping}
+                <Alert variant="success" class="mt-4">
+                  <p class="text-sm font-medium">
+                    Shipping method selected: {currentShippingRates.find(
+                      (r: (typeof currentShippingRates)[number]) =>
+                        r.methodId === currentOrderShipping?.shippingMethodId
+                    )?.name || "Selected"}
+                  </p>
+                </Alert>
+              {/if}
+            </div>
+          {:else if currentCart?.shippingPostalCode}
+            <Alert variant="warning">
+              <p class="text-sm">
+                No shipping methods available for this address. Please check your address.
+              </p>
+            </Alert>
+          {:else}
+            <Alert variant="default">
+              <p class="text-sm">
+                Please enter your shipping address to see available shipping methods.
+              </p>
+            </Alert>
+          {/if}
+        {/if}
+
         <!-- Payment Method Selection -->
-        {#if currentCart?.shippingPostalCode && currentOrderShipping && currentPaymentMethods?.length > 0}
+        {#if (isDigitalOnly && contactInfoSet && currentPaymentMethods?.length > 0) || (!isDigitalOnly && currentCart?.shippingPostalCode && currentOrderShipping && currentPaymentMethods?.length > 0)}
           <div class="rounded-lg bg-white p-6 shadow">
             <h2 class="mb-4 text-xl font-semibold">Payment Method</h2>
 
@@ -312,11 +368,13 @@
               </Alert>
             {/if}
           </div>
-        {:else if currentCart?.shippingPostalCode && !currentOrderShipping}
+        {:else if !isDigitalOnly && currentCart?.shippingPostalCode && !currentOrderShipping}
           <Alert variant="default">
-            <p class="text-sm">
-              Please select a shipping method first to see payment options.
-            </p>
+            <p class="text-sm">Please select a shipping method first to see payment options.</p>
+          </Alert>
+        {:else if isDigitalOnly && !contactInfoSet}
+          <Alert variant="default">
+            <p class="text-sm">Please enter your contact information to see payment options.</p>
           </Alert>
         {/if}
       </div>
@@ -356,10 +414,12 @@
               </div>
             {/if}
 
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Shipping</span>
-              <span class="font-medium">{formatPrice(currentCart.shipping)} EUR</span>
-            </div>
+            {#if !isDigitalOnly}
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Shipping</span>
+                <span class="font-medium">{formatPrice(currentCart.shipping)} EUR</span>
+              </div>
+            {/if}
 
             <div class="flex justify-between border-t pt-2 text-lg font-bold">
               <span>Total</span>
@@ -412,7 +472,13 @@
           {:else}
             <div class="mt-6 border-t pt-6">
               <p class="mb-4 text-sm text-gray-500">
-                {#if !currentCart?.shippingPostalCode}
+                {#if isDigitalOnly}
+                  {#if !contactInfoSet}
+                    Enter your contact information to proceed.
+                  {:else}
+                    Select payment method to proceed.
+                  {/if}
+                {:else if !currentCart?.shippingPostalCode}
                   Enter shipping address to proceed.
                 {:else if !currentOrderShipping}
                   Select shipping method to proceed.
