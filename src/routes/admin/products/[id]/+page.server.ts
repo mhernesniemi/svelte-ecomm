@@ -177,6 +177,33 @@ export const actions: Actions = {
 		}
 	},
 
+	updateVariant: async ({ request }) => {
+		const formData = await request.formData();
+
+		const variantId = Number(formData.get("variantId"));
+		const sku = formData.get("sku") as string;
+		const price = Number(formData.get("price")) * 100; // Convert to cents
+		const stock = Number(formData.get("stock")) || 0;
+		const nameEn = formData.get("variant_name_en") as string;
+
+		if (!variantId || !sku || isNaN(price)) {
+			return fail(400, { variantError: "Variant ID, SKU and price are required" });
+		}
+
+		try {
+			await productService.updateVariant(variantId, {
+				sku,
+				price,
+				stock,
+				translations: [{ languageCode: "en", name: nameEn || null }]
+			});
+
+			return { variantSuccess: true };
+		} catch (e) {
+			return fail(500, { variantError: "Failed to update variant" });
+		}
+	},
+
 	addImage: async ({ params, request }) => {
 		const productId = Number(params.id);
 		const formData = await request.formData();

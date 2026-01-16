@@ -12,7 +12,7 @@
 
   let activeTab = $state<"en" | "fi">("en");
   let showDeleteConfirm = $state(false);
-  let showAddVariant = $state(false);
+  let editingVariant = $state<(typeof data.product.variants)[number] | "new" | null>(null);
   let editingVariantFacets = $state<number | null>(null);
   let isUploading = $state(false);
   let uploadError = $state<string | null>(null);
@@ -443,7 +443,7 @@
       <h2 class="text-lg font-semibold">Variants</h2>
       <button
         type="button"
-        onclick={() => (showAddVariant = !showAddVariant)}
+        onclick={() => (editingVariant = editingVariant === "new" ? null : "new")}
         class="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
       >
         Add Variant
@@ -452,7 +452,7 @@
 
     {#if form?.variantSuccess}
       <Alert variant="success" class="mx-6 mt-4">
-        Variant added successfully
+        Variant saved successfully
       </Alert>
     {/if}
 
@@ -462,9 +462,30 @@
       </Alert>
     {/if}
 
-    <!-- Add Variant Form -->
-    {#if showAddVariant}
-      <form method="POST" action="?/addVariant" use:enhance class="border-b bg-gray-50 p-6">
+    <!-- Add/Edit Variant Form -->
+    {#if editingVariant}
+      {@const isEditing = editingVariant !== "new"}
+      {@const variant = isEditing ? editingVariant : null}
+      {@const variantNameEn = variant?.translations.find((t) => t.languageCode === "en")?.name ?? ""}
+      <form
+        method="POST"
+        action={isEditing ? "?/updateVariant" : "?/addVariant"}
+        use:enhance={() => {
+          return async ({ result, update }) => {
+            await update();
+            if (result.type === "success") {
+              editingVariant = null;
+            }
+          };
+        }}
+        class="border-b bg-gray-50 p-6"
+      >
+        {#if isEditing && variant}
+          <input type="hidden" name="variantId" value={variant.id} />
+        {/if}
+        <div class="mb-4 text-sm font-medium text-gray-700">
+          {isEditing ? "Edit Variant" : "Add New Variant"}
+        </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label for="variant_sku" class="mb-1 block text-sm font-medium text-gray-700"
@@ -474,6 +495,7 @@
               type="text"
               id="variant_sku"
               name="sku"
+              value={variant?.sku ?? ""}
               required
               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
@@ -488,6 +510,7 @@
               name="price"
               step="0.01"
               min="0"
+              value={variant ? (variant.price / 100).toFixed(2) : ""}
               required
               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
@@ -501,7 +524,7 @@
               id="variant_stock"
               name="stock"
               min="0"
-              value="0"
+              value={variant?.stock ?? 0}
               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
@@ -513,6 +536,7 @@
               type="text"
               id="variant_name_en"
               name="variant_name_en"
+              value={variantNameEn}
               class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
             />
           </div>
@@ -520,13 +544,13 @@
         <div class="mt-4 flex justify-end gap-2">
           <button
             type="button"
-            onclick={() => (showAddVariant = false)}
+            onclick={() => (editingVariant = null)}
             class="rounded border px-3 py-1 text-sm"
           >
             Cancel
           </button>
           <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-sm text-white">
-            Add Variant
+            {isEditing ? "Save Changes" : "Add Variant"}
           </button>
         </div>
       </form>
@@ -579,15 +603,22 @@
                   </div>
                 {/if}
               </td>
-              <td class="px-6 py-4 text-right text-sm">
+              <td class="px-6 py-4 text-right text-sm space-x-3">
+                <button
+                  type="button"
+                  onclick={() => (editingVariant = editingVariant === variant ? null : variant)}
+                  class="text-blue-600 hover:text-blue-800"
+                >
+                  Edit
+                </button>
                 <button
                   type="button"
                   onclick={() =>
                     (editingVariantFacets =
                       editingVariantFacets === variant.id ? null : variant.id)}
-                  class="text-blue-600 hover:text-blue-800"
+                  class="text-gray-600 hover:text-gray-800"
                 >
-                  {editingVariantFacets === variant.id ? "Cancel" : "Edit Facets"}
+                  {editingVariantFacets === variant.id ? "Cancel" : "Facets"}
                 </button>
               </td>
             </tr>
