@@ -306,6 +306,25 @@ export const customerGroups = pgTable(
 	(table) => [uniqueIndex("customer_groups_code_idx").on(table.code)]
 );
 
+// Customer-Group many-to-many join
+export const customerGroupMembers = pgTable(
+	"customer_group_members",
+	{
+		customerId: integer("customer_id")
+			.references(() => customers.id, { onDelete: "cascade" })
+			.notNull(),
+		groupId: integer("group_id")
+			.references(() => customerGroups.id, { onDelete: "cascade" })
+			.notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull()
+	},
+	(table) => [
+		primaryKey({ columns: [table.customerId, table.groupId] }),
+		index("customer_group_members_customer_idx").on(table.customerId),
+		index("customer_group_members_group_idx").on(table.groupId)
+	]
+);
+
 // ============================================================================
 // CUSTOMERS
 // ============================================================================
@@ -320,7 +339,6 @@ export const customers = pgTable(
 		lastName: varchar("last_name", { length: 100 }).notNull(),
 		phone: varchar("phone", { length: 50 }),
 		isAdmin: boolean("is_admin").default(false).notNull(),
-		groupId: integer("group_id").references(() => customerGroups.id, { onDelete: "set null" }),
 		b2bStatus: text("b2b_status", {
 			enum: ["retail", "pending", "approved", "rejected"]
 		})
@@ -337,7 +355,6 @@ export const customers = pgTable(
 		uniqueIndex("customers_email_idx").on(table.email),
 		uniqueIndex("customers_clerk_user_id_idx").on(table.clerkUserId),
 		index("customers_name_idx").on(table.firstName, table.lastName),
-		index("customers_group_idx").on(table.groupId),
 		index("customers_b2b_status_idx").on(table.b2bStatus)
 	]
 );
@@ -881,15 +898,23 @@ export const productVariantAssetsRelations = relations(productVariantAssets, ({ 
 }));
 
 export const customerGroupsRelations = relations(customerGroups, ({ many }) => ({
-	customers: many(customers),
+	members: many(customerGroupMembers),
 	groupPrices: many(productVariantGroupPrices)
 }));
 
-export const customersRelations = relations(customers, ({ one, many }) => ({
-	group: one(customerGroups, {
-		fields: [customers.groupId],
-		references: [customerGroups.id]
+export const customerGroupMembersRelations = relations(customerGroupMembers, ({ one }) => ({
+	customer: one(customers, {
+		fields: [customerGroupMembers.customerId],
+		references: [customers.id]
 	}),
+	group: one(customerGroups, {
+		fields: [customerGroupMembers.groupId],
+		references: [customerGroups.id]
+	})
+}));
+
+export const customersRelations = relations(customers, ({ many }) => ({
+	groupMemberships: many(customerGroupMembers),
 	addresses: many(addresses),
 	orders: many(orders),
 	reviews: many(reviews)

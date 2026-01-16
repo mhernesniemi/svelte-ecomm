@@ -15,6 +15,7 @@ import type {
 	facetValueTranslations,
 	assets,
 	customerGroups,
+	customerGroupMembers,
 	customers,
 	addresses,
 	orders,
@@ -124,6 +125,9 @@ export type AssetType = Asset["type"];
 export type CustomerGroup = InferSelectModel<typeof customerGroups>;
 export type NewCustomerGroup = InferInsertModel<typeof customerGroups>;
 
+export type CustomerGroupMember = InferSelectModel<typeof customerGroupMembers>;
+export type NewCustomerGroupMember = InferInsertModel<typeof customerGroupMembers>;
+
 // ============================================================================
 // CUSTOMER TYPES
 // ============================================================================
@@ -142,9 +146,9 @@ export interface CustomerWithAddresses extends Customer {
 	addresses: Address[];
 }
 
-/** Customer with group */
-export interface CustomerWithGroup extends Customer {
-	group?: CustomerGroup | null;
+/** Customer with groups */
+export interface CustomerWithGroups extends Customer {
+	groups: CustomerGroup[];
 }
 
 // ============================================================================

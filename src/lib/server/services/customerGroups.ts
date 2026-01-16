@@ -1,0 +1,213 @@
+/**
+ * Customer Groups Service
+ * Handles B2B customer group management
+ */
+import { eq, desc, sql, and, like } from "drizzle-orm";
+import { db } from "../db/index.js";
+import { customerGroups, customerGroupMembers, customers } from "../db/schema.js";
+import type { CustomerGroup, NewCustomerGroup, Customer } from "$lib/types.js";
+
+function slugify(text: string): string {
+	return text
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/(^-|-$)/g, "");
+}
+
+export class CustomerGroupService {
+	/**
+	 * Generate a unique code by appending a numeric suffix if needed
+	 */
+	private async generateUniqueCode(baseCode: string, excludeId?: number): Promise<string> {
+		// Find all codes that start with the base code
+		const existing = await db
+			.select({ code: customerGroups.code, id: customerGroups.id })
+			.from(customerGroups)
+			.where(like(customerGroups.code, `${baseCode}%`));
+
+		const existingCodes = new Set(
+			existing.filter((g) => g.id !== excludeId).map((g) => g.code)
+		);
+
+		if (!existingCodes.has(baseCode)) {
+			return baseCode;
+		}
+
+		// Find the next available suffix
+		let suffix = 2;
+		while (existingCodes.has(`${baseCode}-${suffix}`)) {
+			suffix++;
+		}
+
+		return `${baseCode}-${suffix}`;
+	}
+
+	/**
+	 * Create a new customer group
+	 */
+	async create(input: { name: string; description?: string }): Promise<CustomerGroup> {
+		const baseCode = slugify(input.name);
+		const code = await this.generateUniqueCode(baseCode);
+
+		const [group] = await db
+			.insert(customerGroups)
+			.values({
+				code,
+				name: input.name,
+				description: input.description
+			})
+			.returning();
+
+		return group;
+	}
+
+	/**
+	 * Get customer group by ID
+	 */
+	async getById(id: number): Promise<CustomerGroup | null> {
+		const [group] = await db.select().from(customerGroups).where(eq(customerGroups.id, id));
+
+		return group ?? null;
+	}
+
+	/**
+	 * List all customer groups with customer counts
+	 */
+	async list(): Promise<(CustomerGroup & { customerCount: number })[]> {
+		const groups = await db.select().from(customerGroups).orderBy(desc(customerGroups.createdAt));
+
+		// Get customer counts for each group
+		const groupsWithCounts = await Promise.all(
+			groups.map(async (group) => {
+				const countResult = await db
+					.select({ count: sql<number>`count(*)` })
+					.from(customerGroupMembers)
+					.where(eq(customerGroupMembers.groupId, group.id));
+
+				return {
+					...group,
+					customerCount: Number(countResult[0]?.count ?? 0)
+				};
+			})
+		);
+
+		return groupsWithCounts;
+	}
+
+	/**
+	 * Update customer group
+	 */
+	async update(
+		id: number,
+		input: { name?: string; description?: string }
+	): Promise<CustomerGroup | null> {
+		const [group] = await db.select().from(customerGroups).where(eq(customerGroups.id, id));
+
+		if (!group) return null;
+
+		const updateData: Partial<NewCustomerGroup> = {};
+		if (input.name) {
+			updateData.name = input.name;
+			const baseCode = slugify(input.name);
+			updateData.code = await this.generateUniqueCode(baseCode, id);
+		}
+		if (input.description !== undefined) {
+			updateData.description = input.description;
+		}
+
+		const [updated] = await db
+			.update(customerGroups)
+			.set(updateData)
+			.where(eq(customerGroups.id, id))
+			.returning();
+
+		return updated;
+	}
+
+	/**
+	 * Delete customer group
+	 */
+	async delete(id: number): Promise<boolean> {
+		await db.delete(customerGroups).where(eq(customerGroups.id, id));
+		return true;
+	}
+
+	/**
+	 * Get customers in a group
+	 */
+	async getCustomers(groupId: number): Promise<Customer[]> {
+		const result = await db
+			.select({
+				customer: customers
+			})
+			.from(customerGroupMembers)
+			.innerJoin(customers, eq(customerGroupMembers.customerId, customers.id))
+			.where(eq(customerGroupMembers.groupId, groupId))
+			.orderBy(desc(customers.createdAt));
+
+		return result.map((r) => r.customer);
+	}
+
+	/**
+	 * Get groups for a customer
+	 */
+	async getGroupsForCustomer(customerId: number): Promise<CustomerGroup[]> {
+		const result = await db
+			.select({
+				group: customerGroups
+			})
+			.from(customerGroupMembers)
+			.innerJoin(customerGroups, eq(customerGroupMembers.groupId, customerGroups.id))
+			.where(eq(customerGroupMembers.customerId, customerId));
+
+		return result.map((r) => r.group);
+	}
+
+	/**
+	 * Add customer to group
+	 */
+	async addCustomer(groupId: number, customerId: number): Promise<boolean> {
+		await db
+			.insert(customerGroupMembers)
+			.values({ groupId, customerId })
+			.onConflictDoNothing();
+
+		return true;
+	}
+
+	/**
+	 * Remove customer from group
+	 */
+	async removeCustomer(groupId: number, customerId: number): Promise<boolean> {
+		await db
+			.delete(customerGroupMembers)
+			.where(
+				and(
+					eq(customerGroupMembers.groupId, groupId),
+					eq(customerGroupMembers.customerId, customerId)
+				)
+			);
+
+		return true;
+	}
+
+	/**
+	 * Check if customer is in group
+	 */
+	async isCustomerInGroup(groupId: number, customerId: number): Promise<boolean> {
+		const [membership] = await db
+			.select()
+			.from(customerGroupMembers)
+			.where(
+				and(
+					eq(customerGroupMembers.groupId, groupId),
+					eq(customerGroupMembers.customerId, customerId)
+				)
+			);
+
+		return !!membership;
+	}
+}
+
+// Export singleton instance
+export const customerGroupService = new CustomerGroupService();
