@@ -25,11 +25,11 @@
         <div>
           <h1 class="mb-4 text-4xl font-bold md:text-5xl">Opinionated Commerce</h1>
           <p class="mb-10 text-lg leading-[1.75] text-gray-600">
-            Lightweight but powerful e-commerce gear for <span class="font-semibold text-gray-900"
-              >SvelteKit</span
-            ><br />
-            that is truly <span class="font-semibold text-gray-900">100% customizable</span> and owned
-            by you.
+            Lightweight but powerful e-commerce gear, built with <span
+              class="font-semibold text-gray-900">SvelteKit</span
+            >.<br />
+            It is truly <span class="font-semibold text-gray-900">100% customizable</span> and owned by
+            you!
           </p>
           <div class="flex items-center gap-4">
             <img src="/kuvitus2.png" alt="Svelte" class="h-20 w-20" />
