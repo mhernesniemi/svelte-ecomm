@@ -9,7 +9,8 @@ sidebar_position: 1
 - [Bun](https://bun.sh) runtime (v1.0+)
 - PostgreSQL 15+
 - Clerk account (for authentication)
-- Stripe account (for payments)
+- ImageKit account (for image hosting)
+- Stripe account (optional - for payments)
 
 ## Setup
 
@@ -37,10 +38,17 @@ DATABASE_URL="postgresql://user:pass@localhost:5432/hoikka"
 PUBLIC_CLERK_PUBLISHABLE_KEY="pk_..."
 CLERK_SECRET_KEY="sk_..."
 
-# Stripe Payments
-STRIPE_SECRET_KEY="sk_..."
-STRIPE_WEBHOOK_SECRET="whsec_..."
+# Stripe Payments (optional - use mock provider for development)
+# STRIPE_SECRET_KEY="sk_..."
+# STRIPE_WEBHOOK_SECRET="whsec_..."
+
+# ImageKit (image hosting)
+IMAGEKIT_PUBLIC_KEY="public_..."
+IMAGEKIT_PRIVATE_KEY="private_..."
+IMAGEKIT_URL_ENDPOINT="https://ik.imagekit.io/your_id"
 ```
+
+Get ImageKit credentials from your [ImageKit Dashboard](https://imagekit.io/dashboard).
 
 ## Database Setup
 

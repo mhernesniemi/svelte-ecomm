@@ -1,0 +1,26 @@
+{
+  "id": "features/assets",
+  "title": "Assets & Images",
+  "description": "Hoikka uses ImageKit for image hosting and transformation.",
+  "source": "@site/docs/features/assets.md",
+  "sourceDirName": "features",
+  "slug": "/features/assets",
+  "permalink": "/features/assets",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 7,
+  "frontMatter": {
+    "sidebar_position": 7
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Shipping",
+    "permalink": "/features/shipping"
+  },
+  "next": {
+    "title": "Integrations Overview",
+    "permalink": "/integrations/overview"
+  }
+}

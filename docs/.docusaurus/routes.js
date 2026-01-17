@@ -39,15 +39,15 @@ export default [
   },
   {
     path: '/',
-    component: ComponentCreator('/', '6fb'),
+    component: ComponentCreator('/', '549'),
     routes: [
       {
         path: '/',
-        component: ComponentCreator('/', 'a4c'),
+        component: ComponentCreator('/', 'eb6'),
         routes: [
           {
             path: '/',
-            component: ComponentCreator('/', '879'),
+            component: ComponentCreator('/', 'd67'),
             routes: [
               {
                 path: '/api/endpoints',
@@ -82,6 +82,12 @@ export default [
               {
                 path: '/core/services',
                 component: ComponentCreator('/core/services', 'a78'),
+                exact: true,
+                sidebar: "docs"
+              },
+              {
+                path: '/features/assets',
+                component: ComponentCreator('/features/assets', '258'),
                 exact: true,
                 sidebar: "docs"
               },

@@ -32,6 +32,7 @@ const sidebars: SidebarsConfig = {
         'features/collections',
         'features/payments',
         'features/shipping',
+        'features/assets',
       ],
     },
     {

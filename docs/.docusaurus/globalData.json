@@ -41,6 +41,11 @@
               "sidebar": "docs"
             },
             {
+              "id": "features/assets",
+              "path": "/features/assets",
+              "sidebar": "docs"
+            },
+            {
               "id": "features/cart",
               "path": "/features/cart",
               "sidebar": "docs"

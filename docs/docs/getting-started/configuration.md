@@ -23,14 +23,26 @@ CLERK_SECRET_KEY="sk_test_..."
 
 Get these from your [Clerk Dashboard](https://dashboard.clerk.com).
 
-### Payments (Stripe)
+### Payments (Stripe) - Optional
 
 ```bash
 STRIPE_SECRET_KEY="sk_test_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
 ```
 
-Get these from your [Stripe Dashboard](https://dashboard.stripe.com).
+Stripe is optional for getting started. A mock payment provider is available for development and testing. When ready for production, get credentials from your [Stripe Dashboard](https://dashboard.stripe.com).
+
+### Images (ImageKit)
+
+```bash
+IMAGEKIT_PUBLIC_KEY="public_..."
+IMAGEKIT_PRIVATE_KEY="private_..."
+IMAGEKIT_URL_ENDPOINT="https://ik.imagekit.io/your_id"
+```
+
+Get these from your [ImageKit Dashboard](https://imagekit.io/dashboard):
+1. Go to Developer Options
+2. Copy Public Key, Private Key, and URL Endpoint
 
 ## Optional Variables
 
