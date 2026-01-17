@@ -1,0 +1,26 @@
+{
+  "id": "features/payments",
+  "title": "Payments",
+  "description": "Hoikka uses a provider pattern for payments, with Stripe as the default.",
+  "source": "@site/docs/features/payments.md",
+  "sourceDirName": "features",
+  "slug": "/features/payments",
+  "permalink": "/features/payments",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 5,
+  "frontMatter": {
+    "sidebar_position": 5
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Collections",
+    "permalink": "/features/collections"
+  },
+  "next": {
+    "title": "Shipping",
+    "permalink": "/features/shipping"
+  }
+}

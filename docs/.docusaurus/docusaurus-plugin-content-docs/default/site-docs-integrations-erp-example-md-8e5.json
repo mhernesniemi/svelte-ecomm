@@ -1,0 +1,26 @@
+{
+  "id": "integrations/erp-example",
+  "title": "ERP Integration Example",
+  "description": "Complete example showing how to integrate an external ERP system.",
+  "source": "@site/docs/integrations/erp-example.md",
+  "sourceDirName": "integrations",
+  "slug": "/integrations/erp-example",
+  "permalink": "/integrations/erp-example",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 6,
+  "frontMatter": {
+    "sidebar_position": 6
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Webhooks",
+    "permalink": "/integrations/webhooks"
+  },
+  "next": {
+    "title": "API Endpoints",
+    "permalink": "/api/endpoints"
+  }
+}

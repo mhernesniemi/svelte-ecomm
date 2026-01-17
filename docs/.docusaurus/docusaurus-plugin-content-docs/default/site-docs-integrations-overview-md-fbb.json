@@ -1,0 +1,26 @@
+{
+  "id": "integrations/overview",
+  "title": "Integrations Overview",
+  "description": "Hoikka includes PostgreSQL-native utilities for integrating external systems (ERP, PIM, etc.) without Redis or other external dependencies.",
+  "source": "@site/docs/integrations/overview.md",
+  "sourceDirName": "integrations",
+  "slug": "/integrations/overview",
+  "permalink": "/integrations/overview",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Shipping",
+    "permalink": "/features/shipping"
+  },
+  "next": {
+    "title": "Job Queue",
+    "permalink": "/integrations/job-queue"
+  }
+}

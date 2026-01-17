@@ -1,0 +1,138 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/",
+          "mainDocId": "intro",
+          "docs": [
+            {
+              "id": "api/endpoints",
+              "path": "/api/endpoints",
+              "sidebar": "docs"
+            },
+            {
+              "id": "api/form-actions",
+              "path": "/api/form-actions",
+              "sidebar": "docs"
+            },
+            {
+              "id": "core/architecture",
+              "path": "/core/architecture",
+              "sidebar": "docs"
+            },
+            {
+              "id": "core/database",
+              "path": "/core/database",
+              "sidebar": "docs"
+            },
+            {
+              "id": "core/providers",
+              "path": "/core/providers",
+              "sidebar": "docs"
+            },
+            {
+              "id": "core/services",
+              "path": "/core/services",
+              "sidebar": "docs"
+            },
+            {
+              "id": "features/cart",
+              "path": "/features/cart",
+              "sidebar": "docs"
+            },
+            {
+              "id": "features/collections",
+              "path": "/features/collections",
+              "sidebar": "docs"
+            },
+            {
+              "id": "features/orders",
+              "path": "/features/orders",
+              "sidebar": "docs"
+            },
+            {
+              "id": "features/payments",
+              "path": "/features/payments",
+              "sidebar": "docs"
+            },
+            {
+              "id": "features/products",
+              "path": "/features/products",
+              "sidebar": "docs"
+            },
+            {
+              "id": "features/shipping",
+              "path": "/features/shipping",
+              "sidebar": "docs"
+            },
+            {
+              "id": "getting-started/configuration",
+              "path": "/getting-started/configuration",
+              "sidebar": "docs"
+            },
+            {
+              "id": "getting-started/installation",
+              "path": "/getting-started/installation",
+              "sidebar": "docs"
+            },
+            {
+              "id": "getting-started/project-structure",
+              "path": "/getting-started/project-structure",
+              "sidebar": "docs"
+            },
+            {
+              "id": "integrations/erp-example",
+              "path": "/integrations/erp-example",
+              "sidebar": "docs"
+            },
+            {
+              "id": "integrations/events",
+              "path": "/integrations/events",
+              "sidebar": "docs"
+            },
+            {
+              "id": "integrations/job-queue",
+              "path": "/integrations/job-queue",
+              "sidebar": "docs"
+            },
+            {
+              "id": "integrations/overview",
+              "path": "/integrations/overview",
+              "sidebar": "docs"
+            },
+            {
+              "id": "integrations/sync-runner",
+              "path": "/integrations/sync-runner",
+              "sidebar": "docs"
+            },
+            {
+              "id": "integrations/webhooks",
+              "path": "/integrations/webhooks",
+              "sidebar": "docs"
+            },
+            {
+              "id": "intro",
+              "path": "/",
+              "sidebar": "docs"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "docs": {
+              "link": {
+                "path": "/",
+                "label": "intro"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

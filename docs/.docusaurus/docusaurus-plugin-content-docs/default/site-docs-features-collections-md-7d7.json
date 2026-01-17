@@ -1,0 +1,26 @@
+{
+  "id": "features/collections",
+  "title": "Collections",
+  "description": "Collections group products for navigation and merchandising. They can be manual or rule-based (smart collections).",
+  "source": "@site/docs/features/collections.md",
+  "sourceDirName": "features",
+  "slug": "/features/collections",
+  "permalink": "/features/collections",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 4,
+  "frontMatter": {
+    "sidebar_position": 4
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Cart",
+    "permalink": "/features/cart"
+  },
+  "next": {
+    "title": "Payments",
+    "permalink": "/features/payments"
+  }
+}

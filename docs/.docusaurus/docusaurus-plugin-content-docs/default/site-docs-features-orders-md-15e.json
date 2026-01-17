@@ -1,0 +1,26 @@
+{
+  "id": "features/orders",
+  "title": "Orders",
+  "description": "Orders track customer purchases through their lifecycle.",
+  "source": "@site/docs/features/orders.md",
+  "sourceDirName": "features",
+  "slug": "/features/orders",
+  "permalink": "/features/orders",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 2,
+  "frontMatter": {
+    "sidebar_position": 2
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Products",
+    "permalink": "/features/products"
+  },
+  "next": {
+    "title": "Cart",
+    "permalink": "/features/cart"
+  }
+}

@@ -26,3 +26,4 @@ vite.config.ts.timestamp-*
 # AI
 claude/settings.local.json
 .claude/settings.local.json
+

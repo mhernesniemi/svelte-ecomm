@@ -1,0 +1,26 @@
+{
+  "id": "api/endpoints",
+  "title": "API Endpoints",
+  "description": "Hoikka uses a mix of API routes for AJAX operations and form actions for mutations.",
+  "source": "@site/docs/api/endpoints.md",
+  "sourceDirName": "api",
+  "slug": "/api/endpoints",
+  "permalink": "/api/endpoints",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 1,
+  "frontMatter": {
+    "sidebar_position": 1
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "ERP Integration Example",
+    "permalink": "/integrations/erp-example"
+  },
+  "next": {
+    "title": "Form Actions",
+    "permalink": "/api/form-actions"
+  }
+}

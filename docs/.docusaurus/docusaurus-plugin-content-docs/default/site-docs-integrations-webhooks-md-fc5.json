@@ -1,0 +1,26 @@
+{
+  "id": "integrations/webhooks",
+  "title": "Webhooks",
+  "description": "Handle incoming webhooks from external systems with signature verification.",
+  "source": "@site/docs/integrations/webhooks.md",
+  "sourceDirName": "integrations",
+  "slug": "/integrations/webhooks",
+  "permalink": "/integrations/webhooks",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "sidebarPosition": 5,
+  "frontMatter": {
+    "sidebar_position": 5
+  },
+  "sidebar": "docs",
+  "previous": {
+    "title": "Sync Runner",
+    "permalink": "/integrations/sync-runner"
+  },
+  "next": {
+    "title": "ERP Integration Example",
+    "permalink": "/integrations/erp-example"
+  }
+}
