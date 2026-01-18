@@ -1,6 +1,7 @@
 import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { assetService } from "$lib/server/services/assets.js";
+import { categoryService } from "$lib/server/services/categories.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -17,11 +18,17 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Product not found");
 	}
 
-	const facets = await facetService.list("en");
+	const [facets, categories, productCategories] = await Promise.all([
+		facetService.list("en"),
+		categoryService.list(),
+		categoryService.getProductCategories(id)
+	]);
 
 	return {
 		product,
-		facets
+		facets,
+		categories,
+		productCategories
 	};
 };
 
@@ -260,6 +267,19 @@ export const actions: Actions = {
 			return { featuredSet: true };
 		} catch (e) {
 			return fail(500, { imageError: "Failed to set featured image" });
+		}
+	},
+
+	updateCategories: async ({ params, request }) => {
+		const productId = Number(params.id);
+		const formData = await request.formData();
+		const categoryIds = formData.getAll("categoryIds").map(Number).filter((id) => !isNaN(id));
+
+		try {
+			await categoryService.setProductCategories(productId, categoryIds);
+			return { categorySuccess: true };
+		} catch (e) {
+			return fail(500, { categoryError: "Failed to update categories" });
 		}
 	}
 };

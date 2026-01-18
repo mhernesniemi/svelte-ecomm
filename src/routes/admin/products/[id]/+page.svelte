@@ -23,6 +23,9 @@
     Object.fromEntries(data.product.variants.map((v) => [v.id, v.facetValues.map((fv) => fv.id)]))
   );
 
+  // Selected categories
+  let selectedCategories = $state(data.productCategories.map((c) => c.id));
+
   function getTranslation(lang: string) {
     return data.product.translations.find((t) => t.languageCode === lang);
   }
@@ -431,6 +434,61 @@
             class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           >
             Save Facet Values
+          </button>
+        </div>
+      {/if}
+    </form>
+  </div>
+
+  <!-- Categories Section -->
+  <div class="mb-8 rounded-lg bg-white shadow">
+    <div class="border-b px-6 py-4">
+      <h2 class="text-lg font-semibold">Categories</h2>
+      <p class="text-sm text-gray-500">Assign this product to categories for navigation</p>
+    </div>
+
+    {#if form?.categorySuccess}
+      <Alert variant="success" class="mx-6 mt-4">
+        Categories updated
+      </Alert>
+    {/if}
+
+    {#if form?.categoryError}
+      <Alert variant="destructive" class="mx-6 mt-4">
+        {form.categoryError}
+      </Alert>
+    {/if}
+
+    <form method="POST" action="?/updateCategories" use:enhance class="p-6">
+      {#if data.categories.length === 0}
+        <p class="text-gray-500">No categories defined. Create categories first in the Categories section.</p>
+      {:else}
+        <div class="flex flex-wrap gap-2">
+          {#each data.categories as category}
+            {@const categoryName =
+              category.translations.find((t) => t.languageCode === "en")?.name ?? category.slug}
+            <label
+              class="cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors {selectedCategories.includes(category.id)
+                ? 'border-2 border-green-300 bg-green-100 text-green-800'
+                : 'border-2 border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200'}"
+            >
+              <input
+                type="checkbox"
+                name="categoryIds"
+                value={category.id}
+                bind:group={selectedCategories}
+                class="sr-only"
+              />
+              {categoryName}
+            </label>
+          {/each}
+        </div>
+        <div class="mt-6 border-t pt-4">
+          <button
+            type="submit"
+            class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          >
+            Save Categories
           </button>
         </div>
       {/if}

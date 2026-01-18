@@ -685,6 +685,65 @@ export const collectionFilters = pgTable(
 );
 
 // ============================================================================
+// CATEGORIES (Hierarchical navigation tree)
+// ============================================================================
+
+export const categories = pgTable(
+	"categories",
+	{
+		id: serial("id").primaryKey(),
+		parentId: integer("parent_id"),
+		slug: varchar("slug", { length: 255 }).notNull().unique(),
+		position: integer("position").default(0).notNull(),
+		featuredAssetId: integer("featured_asset_id").references(() => assets.id),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull()
+	},
+	(table) => [
+		uniqueIndex("categories_slug_idx").on(table.slug),
+		index("categories_parent_idx").on(table.parentId)
+	]
+);
+
+export const categoryTranslations = pgTable(
+	"category_translations",
+	{
+		id: serial("id").primaryKey(),
+		categoryId: integer("category_id")
+			.references(() => categories.id, { onDelete: "cascade" })
+			.notNull(),
+		languageCode: varchar("language_code", { length: 10 }).notNull(),
+		name: varchar("name", { length: 255 }).notNull()
+	},
+	(table) => [
+		uniqueIndex("category_translations_category_lang_idx").on(
+			table.categoryId,
+			table.languageCode
+		)
+	]
+);
+
+export const productCategories = pgTable(
+	"product_categories",
+	{
+		productId: integer("product_id")
+			.references(() => products.id, { onDelete: "cascade" })
+			.notNull(),
+		categoryId: integer("category_id")
+			.references(() => categories.id, { onDelete: "cascade" })
+			.notNull()
+	},
+	(table) => [
+		primaryKey({ columns: [table.productId, table.categoryId] }),
+		index("product_categories_product_idx").on(table.productId),
+		index("product_categories_category_idx").on(table.categoryId)
+	]
+);
+
+// ============================================================================
 // REVIEWS
 // ============================================================================
 
@@ -773,6 +832,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
 	facetValues: many(productFacetValues),
 	assets: many(productAssets),
 	reviews: many(reviews),
+	categories: many(productCategories),
 	featuredAsset: one(assets, {
 		fields: [products.featuredAssetId],
 		references: [assets.id]
@@ -1021,6 +1081,39 @@ export const collectionFiltersRelations = relations(collectionFilters, ({ one })
 	collection: one(collections, {
 		fields: [collectionFilters.collectionId],
 		references: [collections.id]
+	})
+}));
+
+export const categoriesRelations = relations(categories, ({ one, many }) => ({
+	parent: one(categories, {
+		fields: [categories.parentId],
+		references: [categories.id],
+		relationName: "parentChild"
+	}),
+	children: many(categories, { relationName: "parentChild" }),
+	translations: many(categoryTranslations),
+	products: many(productCategories),
+	featuredAsset: one(assets, {
+		fields: [categories.featuredAssetId],
+		references: [assets.id]
+	})
+}));
+
+export const categoryTranslationsRelations = relations(categoryTranslations, ({ one }) => ({
+	category: one(categories, {
+		fields: [categoryTranslations.categoryId],
+		references: [categories.id]
+	})
+}));
+
+export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
+	product: one(products, {
+		fields: [productCategories.productId],
+		references: [products.id]
+	}),
+	category: one(categories, {
+		fields: [productCategories.categoryId],
+		references: [categories.id]
 	})
 }));
 

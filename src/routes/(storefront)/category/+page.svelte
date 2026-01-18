@@ -1,0 +1,94 @@
+<script lang="ts">
+  import type { PageData } from "./$types";
+
+  let { data }: { data: PageData } = $props();
+
+  function getName(translations: { languageCode: string; name: string }[]): string {
+    return translations.find((t) => t.languageCode === "en")?.name ?? "";
+  }
+
+  function buildPath(node: (typeof data.tree)[0], parents: string[] = []): string {
+    return "/category/" + [...parents, node.slug].join("/");
+  }
+</script>
+
+<svelte:head>
+  <title>Categories | Hoikka</title>
+</svelte:head>
+
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Categories</h1>
+    <p class="mt-2 text-gray-600">Browse products by category</p>
+  </div>
+
+  {#if data.tree.length === 0}
+    <div class="py-16 text-center">
+      <svg
+        class="mx-auto h-12 w-12 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+        />
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-gray-900">No categories yet</h3>
+      <p class="mt-2 text-gray-500">
+        <a href="/products" class="text-blue-600 hover:text-blue-700">View all products</a>
+      </p>
+    </div>
+  {:else}
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {#each data.tree as rootCategory}
+        <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <a
+            href={buildPath(rootCategory)}
+            class="text-lg font-semibold text-gray-900 hover:text-blue-600"
+          >
+            {getName(rootCategory.translations)}
+          </a>
+
+          {#if rootCategory.children.length > 0}
+            <ul class="mt-4 space-y-2">
+              {#each rootCategory.children as child}
+                <li>
+                  <a
+                    href={buildPath(child, [rootCategory.slug])}
+                    class="text-sm text-gray-600 hover:text-blue-600"
+                  >
+                    {getName(child.translations)}
+                  </a>
+
+                  {#if child.children.length > 0}
+                    <ul class="ml-4 mt-1 space-y-1">
+                      {#each child.children.slice(0, 3) as grandchild}
+                        <li>
+                          <a
+                            href={buildPath(grandchild, [rootCategory.slug, child.slug])}
+                            class="text-xs text-gray-500 hover:text-blue-600"
+                          >
+                            {getName(grandchild.translations)}
+                          </a>
+                        </li>
+                      {/each}
+                      {#if child.children.length > 3}
+                        <li class="text-xs text-gray-400">
+                          +{child.children.length - 3} more
+                        </li>
+                      {/if}
+                    </ul>
+                  {/if}
+                </li>
+              {/each}
+            </ul>
+          {/if}
+        </div>
+      {/each}
+    </div>
+  {/if}
+</div>
