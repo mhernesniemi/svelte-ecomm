@@ -6,7 +6,7 @@
   let isLoading = $state(false);
 </script>
 
-<div class="flex min-h-screen items-center justify-center bg-gray-900">
+<div class="flex min-h-screen items-center justify-center bg-gray-900 font-sans">
   <div class="w-full max-w-sm">
     <div class="rounded-lg bg-white p-8 shadow-lg">
       <h1 class="mb-2 text-2xl font-bold text-gray-900">Hoikka Admin</h1>

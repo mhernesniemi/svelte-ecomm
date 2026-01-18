@@ -2,7 +2,7 @@
 	import type { Command as CommandPrimitive, Dialog as DialogPrimitive } from "bits-ui";
 	import type { Snippet } from "svelte";
 	import Command from "./command.svelte";
-	import * as Dialog from "$lib/components/storefront/ui/dialog/index.js";
+	import * as Dialog from "$lib/components/admin/ui/dialog/index.js";
 	import type { WithoutChildrenOrChild } from "$lib/utils.js";
 
 	let {
