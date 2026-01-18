@@ -142,7 +142,10 @@
               href="/products/{getProductSlug(product)}"
               class="group overflow-hidden rounded-lg border bg-white transition-shadow hover:shadow-lg"
             >
-              <div class="relative aspect-square bg-gray-100">
+              <div
+                class="relative aspect-square bg-gray-100"
+                style="view-transition-name: product-image-{product.id}"
+              >
                 {#if product.featuredAsset}
                   <img
                     src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto"

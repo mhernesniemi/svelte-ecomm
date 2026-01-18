@@ -1,8 +1,20 @@
 <script lang="ts">
   import { SignedIn, SignedOut, UserButton, SignInButton, useClerkContext } from "svelte-clerk";
-  import { invalidateAll, goto } from "$app/navigation";
+  import { invalidateAll, goto, onNavigate } from "$app/navigation";
   import { throttle } from "$lib/utils";
   import type { LayoutData } from "./$types";
+
+  // Enable view transitions for navigation
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) return;
+
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve();
+        await navigation.complete;
+      });
+    });
+  });
 
   let { children, data }: { children: any; data: LayoutData } = $props();
 

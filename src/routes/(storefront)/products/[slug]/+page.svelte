@@ -104,7 +104,10 @@
     <!-- Product Images -->
     <div>
       <!-- Main Image -->
-      <div class="aspect-square overflow-hidden rounded-lg bg-gray-100">
+      <div
+        class="aspect-square overflow-hidden rounded-lg bg-gray-100"
+        style="view-transition-name: product-image-{product.id}"
+      >
         {#if images.length > 0}
           <img
             src="{images[selectedImageIndex].source}?tr=w-600,h-600,fo-auto"

@@ -88,7 +88,10 @@
 					class="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
 				>
 					{#if product.featuredAsset}
-						<div class="aspect-square overflow-hidden">
+						<div
+							class="aspect-square overflow-hidden"
+							style="view-transition-name: product-image-{product.id}"
+						>
 							<img
 								src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto"
 								alt={trans?.name ?? "Product"}
@@ -98,6 +101,7 @@
 					{:else}
 						<div
 							class="flex aspect-square items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
+							style="view-transition-name: product-image-{product.id}"
 						>
 							<svg
 								class="h-16 w-16 text-gray-400"
