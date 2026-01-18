@@ -18,16 +18,16 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Product not found");
 	}
 
-	const [facets, categories, productCategories] = await Promise.all([
+	const [facets, categoryTree, productCategories] = await Promise.all([
 		facetService.list("en"),
-		categoryService.list(),
+		categoryService.getTree(),
 		categoryService.getProductCategories(id)
 	]);
 
 	return {
 		product,
 		facets,
-		categories,
+		categoryTree,
 		productCategories
 	};
 };

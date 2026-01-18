@@ -6,6 +6,11 @@
   import { Alert } from "$lib/components/admin/ui/alert";
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Dialog from "$lib/components/admin/ui/dialog";
+  import * as Popover from "$lib/components/admin/ui/popover";
+  import * as Command from "$lib/components/admin/ui/command";
+  import Check from "@lucide/svelte/icons/check";
+  import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
+  import X from "@lucide/svelte/icons/x";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -25,6 +30,48 @@
 
   // Selected categories
   let selectedCategories = $state(data.productCategories.map((c) => c.id));
+  let categoryComboboxOpen = $state(false);
+
+  // Helper to get translated name
+  function getCategoryName(translations: { languageCode: string; name: string }[]): string {
+    return translations.find((t) => t.languageCode === "en")?.name ?? "";
+  }
+
+  // Flatten tree into list with depth info for display
+  type FlatCategory = {
+    id: number;
+    name: string;
+    depth: number;
+    translations: { languageCode: string; name: string }[];
+  };
+
+  function flattenTree(nodes: typeof data.categoryTree, depth = 0): FlatCategory[] {
+    return nodes.flatMap((node) => [
+      { id: node.id, name: getCategoryName(node.translations), depth, translations: node.translations },
+      ...flattenTree(node.children, depth + 1)
+    ]);
+  }
+
+  const flatCategories = flattenTree(data.categoryTree);
+
+  // Get selected category objects for display
+  function getSelectedCategoryObjects() {
+    return flatCategories.filter((c) => selectedCategories.includes(c.id));
+  }
+
+  // Toggle category selection
+  function toggleCategory(id: number) {
+    if (selectedCategories.includes(id)) {
+      selectedCategories = selectedCategories.filter((c) => c !== id);
+    } else {
+      selectedCategories = [...selectedCategories, id];
+    }
+  }
+
+  // Remove a category from selection
+  function removeCategory(id: number) {
+    selectedCategories = selectedCategories.filter((c) => c !== id);
+  }
 
   function getTranslation(lang: string) {
     return data.product.translations.find((t) => t.languageCode === lang);
@@ -460,29 +507,76 @@
     {/if}
 
     <form method="POST" action="?/updateCategories" use:enhance class="p-6">
-      {#if data.categories.length === 0}
+      {#if data.categoryTree.length === 0}
         <p class="text-gray-500">No categories defined. Create categories first in the Categories section.</p>
       {:else}
-        <div class="flex flex-wrap gap-2">
-          {#each data.categories as category}
-            {@const categoryName =
-              category.translations.find((t) => t.languageCode === "en")?.name ?? category.slug}
-            <label
-              class="cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors {selectedCategories.includes(category.id)
-                ? 'border-2 border-green-300 bg-green-100 text-green-800'
-                : 'border-2 border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-            >
-              <input
-                type="checkbox"
-                name="categoryIds"
-                value={category.id}
-                bind:group={selectedCategories}
-                class="sr-only"
-              />
-              {categoryName}
-            </label>
-          {/each}
+        <div class="flex flex-wrap items-start gap-4">
+          <!-- Combobox -->
+          <Popover.Root bind:open={categoryComboboxOpen}>
+            <Popover.Trigger>
+              <button
+                type="button"
+                role="combobox"
+                aria-expanded={categoryComboboxOpen}
+                aria-haspopup="listbox"
+                class="flex w-56 items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <span class="text-gray-500">Select categories...</span>
+                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </button>
+            </Popover.Trigger>
+            <Popover.Content class="w-56 p-0" align="start">
+              <Command.Root>
+                <Command.Input placeholder="Search categories..." />
+                <Command.List class="max-h-64">
+                  <Command.Empty>No category found.</Command.Empty>
+                  <Command.Group>
+                    {#each flatCategories as category}
+                      <Command.Item
+                        value={category.name}
+                        onSelect={() => toggleCategory(category.id)}
+                        class="cursor-pointer"
+                      >
+                        <div
+                          class="flex w-full items-center gap-2"
+                          style="padding-left: {category.depth * 12}px"
+                        >
+                          <div class="flex h-4 w-4 items-center justify-center">
+                            {#if selectedCategories.includes(category.id)}
+                              <Check class="h-4 w-4" />
+                            {/if}
+                          </div>
+                          <span>{category.name}</span>
+                        </div>
+                      </Command.Item>
+                    {/each}
+                  </Command.Group>
+                </Command.List>
+              </Command.Root>
+            </Popover.Content>
+          </Popover.Root>
+
+          <!-- Selected categories as badges -->
+          {#if selectedCategories.length > 0}
+            <div class="flex flex-1 flex-wrap items-center gap-2">
+              {#each getSelectedCategoryObjects() as category}
+                <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2.5 py-1 text-sm text-blue-800">
+                  {category.name}
+                  <button
+                    type="button"
+                    onclick={() => removeCategory(category.id)}
+                    class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    aria-label="Remove {category.name}"
+                  >
+                    <X class="h-3 w-3" />
+                  </button>
+                </span>
+                <input type="hidden" name="categoryIds" value={category.id} />
+              {/each}
+            </div>
+          {/if}
         </div>
+
         <div class="mt-6 border-t pt-4">
           <button
             type="submit"
