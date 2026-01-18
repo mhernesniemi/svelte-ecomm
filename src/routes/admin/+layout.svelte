@@ -1,5 +1,9 @@
 <script lang="ts">
   import { page } from "$app/stores";
+  import { enhance } from "$app/forms";
+  import type { LayoutData } from "./$types";
+
+  let { children, data }: { children: any; data: LayoutData } = $props();
 
   interface NavItem {
     href: string;
@@ -25,8 +29,6 @@
     }
     return $page.url.pathname.startsWith(href);
   }
-
-  let { children } = $props();
 </script>
 
 <div class="min-h-screen bg-gray-100 font-sans">
@@ -137,7 +139,18 @@
     </nav>
 
     <div class="absolute right-0 bottom-0 left-0 border-t border-gray-800 p-4">
-      <a href="/" class="text-sm text-gray-400 hover:text-white"> View Storefront </a>
+      {#if data.adminUser}
+        <div class="mb-3 text-sm">
+          <p class="font-medium text-white">{data.adminUser.name}</p>
+          <p class="text-gray-400">{data.adminUser.email}</p>
+        </div>
+        <div class="flex items-center justify-between">
+          <a href="/" class="text-sm text-gray-400 hover:text-white">Storefront</a>
+          <form method="POST" action="/admin/logout" use:enhance>
+            <button type="submit" class="text-sm text-gray-400 hover:text-white">Logout</button>
+          </form>
+        </div>
+      {/if}
     </div>
   </aside>
 

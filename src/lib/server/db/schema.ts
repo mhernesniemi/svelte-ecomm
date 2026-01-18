@@ -1059,6 +1059,57 @@ export const wishlistItemsRelations = relations(wishlistItems, ({ one }) => ({
 }));
 
 // ============================================================================
+// ADMIN USERS
+// ============================================================================
+
+export const users = pgTable(
+	"users",
+	{
+		id: serial("id").primaryKey(),
+		email: varchar("email", { length: 255 }).notNull().unique(),
+		passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+		name: varchar("name", { length: 255 }).notNull(),
+		role: text("role", { enum: ["admin", "staff"] })
+			.default("staff")
+			.notNull(),
+		lastLoginAt: timestamp("last_login_at"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.$onUpdate(() => new Date())
+			.notNull()
+	},
+	(table) => [uniqueIndex("users_email_idx").on(table.email)]
+);
+
+export const userSessions = pgTable(
+	"user_sessions",
+	{
+		id: varchar("id", { length: 64 }).primaryKey(),
+		userId: integer("user_id")
+			.references(() => users.id, { onDelete: "cascade" })
+			.notNull(),
+		expiresAt: timestamp("expires_at").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull()
+	},
+	(table) => [
+		index("user_sessions_user_idx").on(table.userId),
+		index("user_sessions_expires_idx").on(table.expiresAt)
+	]
+);
+
+export const usersRelations = relations(users, ({ many }) => ({
+	sessions: many(userSessions)
+}));
+
+export const userSessionsRelations = relations(userSessions, ({ one }) => ({
+	user: one(users, {
+		fields: [userSessions.userId],
+		references: [users.id]
+	})
+}));
+
+// ============================================================================
 // JOB QUEUE
 // ============================================================================
 

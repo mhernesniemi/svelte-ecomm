@@ -1,6 +1,7 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 import type { Customer } from "$lib/types.js";
+import type { User } from "$lib/server/services/auth.js";
 
 declare global {
 	namespace App {
@@ -16,6 +17,9 @@ declare global {
 			newCartToken?: string;
 			wishlistToken: string | null;
 			newWishlistToken?: string;
+			// Admin user (separate from customer)
+			adminUser: User | null;
+			adminSessionId: string | null;
 		}
 		// interface PageData {}
 		// interface PageState {}

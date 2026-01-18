@@ -1,23 +1,22 @@
 /**
  * Admin layout server - protects all admin routes
- * Only users with isAdmin=true can access
+ * Uses separate admin user auth (not Clerk)
  */
 import { redirect } from "@sveltejs/kit";
 import type { LayoutServerLoad } from "./$types";
 
-export const load: LayoutServerLoad = async ({ locals }) => {
-	// Check if user is logged in
-	const { userId } = locals.auth();
-	if (!userId) {
-		throw redirect(303, "/sign-in?redirect=/admin");
+export const load: LayoutServerLoad = async ({ locals, url }) => {
+	// Skip auth for login page
+	if (url.pathname === "/admin/login") {
+		return { adminUser: null };
 	}
 
-	// Check if user is admin
-	if (!locals.customer?.isAdmin) {
-		throw redirect(303, "/");
+	// Check if admin user is logged in
+	if (!locals.adminUser) {
+		throw redirect(303, "/admin/login");
 	}
 
 	return {
-		customer: locals.customer
+		adminUser: locals.adminUser
 	};
 };
