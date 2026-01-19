@@ -56,6 +56,17 @@
   let saveAddressForFuture = $state(false);
   const showAddressPicker = $derived(savedAddresses.length > 0 && !cartHasAddress && !preferManualEntry);
 
+  // Auto-select default saved address on mount
+  let autoSelectForm = $state<HTMLFormElement | null>(null);
+  let hasAutoSelected = $state(false);
+
+  $effect(() => {
+    if (autoSelectForm && !hasAutoSelected && showAddressPicker && savedAddresses.length > 0) {
+      hasAutoSelected = true;
+      autoSelectForm.requestSubmit();
+    }
+  });
+
   // Form data for digital products (contact info)
   let contactFormData = $state({
     fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
@@ -152,6 +163,18 @@
             <h2 class="mb-4 text-xl font-semibold">Shipping Address</h2>
 
             {#if showAddressPicker}
+              <!-- Hidden form for auto-selecting default address -->
+              {@const defaultAddress = savedAddresses.find((a: typeof savedAddresses[0]) => a.isDefault) || savedAddresses[0]}
+              <form
+                method="POST"
+                action="?/useSavedAddress"
+                use:enhance
+                bind:this={autoSelectForm}
+                class="hidden"
+              >
+                <input type="hidden" name="addressId" value={defaultAddress?.id} />
+              </form>
+
               <!-- Saved Addresses Picker -->
               <div class="mb-4 space-y-3">
                 {#each savedAddresses as address}
