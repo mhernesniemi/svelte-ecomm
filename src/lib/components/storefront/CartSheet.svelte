@@ -23,7 +23,6 @@
   } = $props();
 
   let isOpen = $state(false);
-  let isUpdating = $state(false);
 
   const lines = $derived(cart?.lines ?? []);
   const subtotal = $derived(cart?.subtotal ?? 0);
@@ -35,23 +34,13 @@
   }
 
   async function updateQuantity(lineId: number, newQuantity: number) {
-    isUpdating = true;
-    try {
-      await updateCartLineQuantity({ lineId, quantity: newQuantity });
-      await invalidateAll();
-    } finally {
-      isUpdating = false;
-    }
+    await updateCartLineQuantity({ lineId, quantity: newQuantity });
+    await invalidateAll();
   }
 
   async function removeLine(lineId: number) {
-    isUpdating = true;
-    try {
-      await removeCartLine({ lineId });
-      await invalidateAll();
-    } finally {
-      isUpdating = false;
-    }
+    await removeCartLine({ lineId });
+    await invalidateAll();
   }
 </script>
 
@@ -122,8 +111,7 @@
                   <button
                     type="button"
                     onclick={() => removeLine(line.id)}
-                    disabled={isUpdating}
-                    class="rounded p-1 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600 disabled:opacity-50"
+                    class="rounded p-1 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
                     aria-label="Remove item"
                   >
                     <Trash2 class="h-4 w-4" />
@@ -135,8 +123,7 @@
                     <button
                       type="button"
                       onclick={() => updateQuantity(line.id, line.quantity - 1)}
-                      disabled={isUpdating}
-                      class="flex h-7 w-7 items-center justify-center text-gray-500 transition-colors hover:text-gray-700 disabled:opacity-50"
+                      class="flex h-7 w-7 items-center justify-center text-gray-500 transition-colors hover:text-gray-700"
                       aria-label="Decrease quantity"
                     >
                       <Minus class="h-3 w-3" />
@@ -145,8 +132,7 @@
                     <button
                       type="button"
                       onclick={() => updateQuantity(line.id, line.quantity + 1)}
-                      disabled={isUpdating}
-                      class="flex h-7 w-7 items-center justify-center text-gray-500 transition-colors hover:text-gray-700 disabled:opacity-50"
+                      class="flex h-7 w-7 items-center justify-center text-gray-500 transition-colors hover:text-gray-700"
                       aria-label="Increase quantity"
                     >
                       <Plus class="h-3 w-3" />

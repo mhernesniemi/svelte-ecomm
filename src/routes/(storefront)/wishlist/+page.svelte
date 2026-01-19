@@ -36,12 +36,6 @@
 		return item.product.featuredAsset?.source ?? item.product.assets[0]?.source ?? null;
 	}
 
-	$effect(() => {
-		if (form?.addedToCart) {
-			message = { type: "success", text: "Added to cart!" };
-			setTimeout(() => (message = null), 3000);
-		}
-	});
 </script>
 
 <div class="mx-auto max-w-4xl px-4 py-8">

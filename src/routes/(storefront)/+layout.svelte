@@ -174,7 +174,7 @@
             </a>
           {/if}
 
-          <CartSheet {cart} itemCount={cartItemCount} />
+          <CartSheet cart={cart} itemCount={cartItemCount} />
 
           <!-- Auth UI -->
           <SignedIn>

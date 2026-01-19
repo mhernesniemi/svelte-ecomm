@@ -68,8 +68,6 @@
     try {
       await addToCart({ variantId: selectedVariantId, quantity });
       await invalidateAll();
-      message = { type: "success", text: "Added to cart!" };
-      setTimeout(() => (message = null), 3000);
     } catch {
       message = { type: "error", text: "Failed to add item to cart" };
     } finally {
