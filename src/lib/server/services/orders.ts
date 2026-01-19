@@ -609,6 +609,14 @@ export class OrderService {
 		return { valid: errors.length === 0, errors };
 	}
 
+	/**
+	 * Recalculate order totals (subtotal, discount, shipping, total)
+	 * Call this after modifying order lines, promotions, or shipping
+	 */
+	async updateTotals(orderId: number): Promise<void> {
+		await this.recalculateTotals(orderId);
+	}
+
 	// ============================================================================
 	// PRIVATE HELPERS
 	// ============================================================================
@@ -623,8 +631,7 @@ export class OrderService {
 			...order,
 			lines: lines.map((l) => ({ ...l, variant: null })),
 			payments: [], // Load payments separately if needed
-			customer: null,
-			shipping: null // Load shipping separately if needed
+			customer: null
 		};
 	}
 

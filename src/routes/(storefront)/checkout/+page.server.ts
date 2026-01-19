@@ -262,7 +262,7 @@ export const actions: Actions = {
 		);
 
 		// Recalculate totals with new shipping cost
-		await orderService.getById(cart.id);
+		await orderService.updateTotals(cart.id);
 
 		const updatedCart = await orderService.getActiveCart({
 			customerId: locals.customer?.id,
