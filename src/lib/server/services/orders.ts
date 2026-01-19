@@ -18,7 +18,9 @@ import {
 	productTranslations,
 	productVariantTranslations,
 	promotions,
-	orderShipping
+	orderShipping,
+	products,
+	assets
 } from "../db/schema.js";
 import type {
 	Order,
@@ -622,14 +624,25 @@ export class OrderService {
 	// ============================================================================
 
 	private async loadOrderRelations(order: Order): Promise<OrderWithRelations> {
-		const lines = await db.select().from(orderLines).where(eq(orderLines.orderId, order.id));
-
-		// Note: We're not loading full variant data here to keep it lightweight
-		// The line already contains snapshot data (productName, variantName, sku)
+		// Join order lines with variant -> product -> featured asset to get images
+		const linesWithImages = await db
+			.select({
+				line: orderLines,
+				imageUrl: assets.source
+			})
+			.from(orderLines)
+			.leftJoin(productVariants, eq(orderLines.variantId, productVariants.id))
+			.leftJoin(products, eq(productVariants.productId, products.id))
+			.leftJoin(assets, eq(products.featuredAssetId, assets.id))
+			.where(eq(orderLines.orderId, order.id));
 
 		return {
 			...order,
-			lines: lines.map((l) => ({ ...l, variant: null })),
+			lines: linesWithImages.map(({ line, imageUrl }) => ({
+				...line,
+				variant: null,
+				imageUrl: imageUrl ?? null
+			})),
 			payments: [], // Load payments separately if needed
 			customer: null
 		};

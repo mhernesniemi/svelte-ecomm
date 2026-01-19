@@ -2,6 +2,7 @@
   import { SignedIn, SignedOut, UserButton, SignInButton, useClerkContext } from "svelte-clerk";
   import { invalidateAll, goto, onNavigate } from "$app/navigation";
   import { throttle } from "$lib/utils";
+  import CartSheet from "$lib/components/storefront/CartSheet.svelte";
   import type { LayoutData } from "./$types";
 
   // Enable view transitions for navigation
@@ -31,6 +32,8 @@
   });
 
   const wishlistCount = $derived(data.wishlistCount);
+  const cart = $derived(data.cart);
+  const cartItemCount = $derived(data.cartItemCount);
 
   // Search state
   type SearchResult = {
@@ -171,16 +174,7 @@
             </a>
           {/if}
 
-          <a href="/cart" class="text-gray-600 hover:text-gray-900" aria-label="Shopping cart">
-            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </a>
+          <CartSheet {cart} itemCount={cartItemCount} />
 
           <!-- Auth UI -->
           <SignedIn>

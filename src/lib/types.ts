@@ -191,6 +191,7 @@ export interface OrderWithRelations extends Order {
 /** Order line with variant info */
 export interface OrderLineWithVariant extends OrderLine {
 	variant?: ProductVariant | null;
+	imageUrl?: string | null;
 }
 
 // ============================================================================

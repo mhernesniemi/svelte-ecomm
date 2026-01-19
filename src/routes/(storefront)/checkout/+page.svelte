@@ -573,7 +573,7 @@
                     {/each}
                   </ul>
                   <p class="mt-2 text-sm">
-                    <a href="/cart" class="underline">Return to cart</a> to adjust quantities.
+                    Please adjust quantities in your cart.
                   </p>
                 </Alert>
               {:else}

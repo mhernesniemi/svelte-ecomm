@@ -57,7 +57,6 @@
 	{#if message}
 		<Alert variant="success" class="mb-6">
 			{message.text}
-			<a href="/cart" class="ml-2 underline">View cart</a>
 		</Alert>
 	{/if}
 

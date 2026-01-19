@@ -67,6 +67,7 @@
     message = null;
     try {
       await addToCart({ variantId: selectedVariantId, quantity });
+      await invalidateAll();
       message = { type: "success", text: "Added to cart!" };
       setTimeout(() => (message = null), 3000);
     } catch {
@@ -226,9 +227,6 @@
       {#if message}
         <Alert variant={message.type === "error" ? "destructive" : "success"} class="mb-4">
           {message.text}
-          {#if message.type === "success"}
-            <a href="/cart" class="ml-2 underline">View cart</a>
-          {/if}
         </Alert>
       {/if}
 

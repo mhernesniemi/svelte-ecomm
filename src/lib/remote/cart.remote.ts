@@ -1,6 +1,6 @@
 /**
  * Cart Remote Functions
- * Used by product page for add-to-cart without page reload
+ * Used for cart operations without page reload
  */
 import { command, getRequestEvent } from "$app/server";
 import { orderService } from "$lib/server/services/orders.js";
@@ -38,6 +38,46 @@ export const addToCart = command(
 			variantId: input.variantId,
 			quantity: input.quantity
 		});
+
+		return { success: true };
+	}
+);
+
+export const updateCartLineQuantity = command(
+	"unchecked",
+	async (input: { lineId: number; quantity: number }) => {
+		const event = getRequestEvent();
+		const customerId = event.locals.customer?.id ?? null;
+		const cartToken = event.locals.cartToken ?? null;
+
+		const cart = await orderService.getActiveCart({ customerId, cartToken });
+		if (!cart) {
+			throw new Error("No active cart found");
+		}
+
+		if (input.quantity <= 0) {
+			await orderService.removeLine(cart.id, input.lineId);
+		} else {
+			await orderService.updateLineQuantity(cart.id, input.lineId, input.quantity);
+		}
+
+		return { success: true };
+	}
+);
+
+export const removeCartLine = command(
+	"unchecked",
+	async (input: { lineId: number }) => {
+		const event = getRequestEvent();
+		const customerId = event.locals.customer?.id ?? null;
+		const cartToken = event.locals.cartToken ?? null;
+
+		const cart = await orderService.getActiveCart({ customerId, cartToken });
+		if (!cart) {
+			throw new Error("No active cart found");
+		}
+
+		await orderService.removeLine(cart.id, input.lineId);
 
 		return { success: true };
 	}
