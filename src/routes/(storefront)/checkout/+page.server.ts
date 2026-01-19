@@ -88,7 +88,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 		isDigitalOnly,
 		customerEmail,
 		customerFullName,
-		savedAddresses
+		savedAddresses,
+		isLoggedIn: !!locals.customer?.id
 	};
 };
 
@@ -159,10 +160,10 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const fullName = data.get("fullName")?.toString();
 		const streetLine1 = data.get("streetLine1")?.toString();
-		const streetLine2 = data.get("streetLine2")?.toString();
 		const city = data.get("city")?.toString();
 		const postalCode = data.get("postalCode")?.toString();
 		const country = data.get("country")?.toString() || "FI";
+		const saveToAddressBook = data.get("saveToAddressBook") === "on";
 
 		if (!fullName || !streetLine1 || !city || !postalCode) {
 			return fail(400, { error: "Missing required address fields" });
@@ -171,11 +172,22 @@ export const actions: Actions = {
 		await orderService.setShippingAddress(cart.id, {
 			fullName,
 			streetLine1,
-			streetLine2: streetLine2 || undefined,
 			city,
 			postalCode,
 			country
 		});
+
+		// Save to address book if requested and user is logged in
+		if (saveToAddressBook && locals.customer?.id) {
+			await customerService.addAddress(locals.customer.id, {
+				fullName,
+				streetLine1,
+				city,
+				postalCode,
+				country,
+				isDefault: false
+			});
+		}
 
 		// Reload cart to get updated shipping rates
 		const updatedCart = await orderService.getActiveCart({

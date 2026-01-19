@@ -41,7 +41,6 @@
   let addressFormData = $state({
     fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
     streetLine1: data.cart?.shippingStreetLine1 ?? "",
-    streetLine2: data.cart?.shippingStreetLine2 ?? "",
     city: data.cart?.shippingCity ?? "",
     postalCode: data.cart?.shippingPostalCode ?? "",
     country: data.cart?.shippingCountry ?? "FI"
@@ -227,17 +226,6 @@
                   />
                 </div>
 
-                <div>
-                  <Label for="streetLine2">Apartment, suite, etc. (optional)</Label>
-                  <Input
-                    type="text"
-                    id="streetLine2"
-                    name="streetLine2"
-                    bind:value={addressFormData.streetLine2}
-                    class="mt-1"
-                  />
-                </div>
-
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <Label for="postalCode">
@@ -285,6 +273,17 @@
                     <option value="DK">Denmark</option>
                   </select>
                 </div>
+
+                {#if data.isLoggedIn}
+                  <label class="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      name="saveToAddressBook"
+                      class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span class="text-sm text-gray-700">Save to my address book</span>
+                  </label>
+                {/if}
 
                 <Button type="submit" class="w-full">Save Address</Button>
               </div>
