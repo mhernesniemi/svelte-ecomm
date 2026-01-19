@@ -52,6 +52,8 @@
 
   // Show address picker only if: has saved addresses AND no address set on cart AND user hasn't chosen manual entry
   let preferManualEntry = $state(false);
+  let isEditingAddress = $state(false);
+  let saveAddressForFuture = $state(false);
   const showAddressPicker = $derived(savedAddresses.length > 0 && !cartHasAddress && !preferManualEntry);
 
   // Form data for digital products (contact info)
@@ -189,115 +191,160 @@
               >
                 + Use a different address
               </button>
+            {:else if cartHasAddress && !isEditingAddress}
+              <!-- Address Summary (read-only) -->
+              <div class="rounded-lg border border-gray-200 p-4">
+                <div class="flex items-start justify-between">
+                  <div>
+                    {#if currentCart?.shippingFullName}
+                      <p class="font-medium">{currentCart.shippingFullName}</p>
+                    {/if}
+                    <p class="text-sm text-gray-600">{currentCart?.shippingStreetLine1}</p>
+                    <p class="text-sm text-gray-600">{currentCart?.shippingPostalCode} {currentCart?.shippingCity}</p>
+                    <p class="text-sm text-gray-600">{currentCart?.shippingCountry}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onclick={() => {
+                      // Pre-fill form with current values
+                      addressFormData = {
+                        fullName: currentCart?.shippingFullName ?? "",
+                        streetLine1: currentCart?.shippingStreetLine1 ?? "",
+                        city: currentCart?.shippingCity ?? "",
+                        postalCode: currentCart?.shippingPostalCode ?? "",
+                        country: currentCart?.shippingCountry ?? "FI"
+                      };
+                      isEditingAddress = true;
+                    }}
+                    class="text-sm font-medium text-blue-600 hover:text-blue-800"
+                  >
+                    Edit
+                  </button>
+                </div>
+              </div>
             {:else}
               <!-- Address Form -->
-
-            <form method="POST" action="?/setShippingAddress" use:enhance={() => {
-              return async ({ update }) => {
-                await update({ reset: false });
-              };
-            }}>
-              <div class="space-y-4">
-                <div>
-                  <Label for="fullName">
-                    Full Name <span class="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    bind:value={addressFormData.fullName}
-                    required
-                    class="mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label for="streetLine1">
-                    Street Address <span class="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    type="text"
-                    id="streetLine1"
-                    name="streetLine1"
-                    bind:value={addressFormData.streetLine1}
-                    required
-                    class="mt-1"
-                  />
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
+              <form method="POST" action="?/setShippingAddress" use:enhance={() => {
+                return async ({ update }) => {
+                  await update({ reset: false });
+                  isEditingAddress = false;
+                };
+              }}>
+                <div class="space-y-4">
                   <div>
-                    <Label for="postalCode">
-                      Postal Code <span class="text-red-500">*</span>
+                    <Label for="fullName">
+                      Full Name <span class="text-red-500">*</span>
                     </Label>
                     <Input
                       type="text"
-                      id="postalCode"
-                      name="postalCode"
-                      bind:value={addressFormData.postalCode}
+                      id="fullName"
+                      name="fullName"
+                      bind:value={addressFormData.fullName}
                       required
                       class="mt-1"
                     />
                   </div>
 
                   <div>
-                    <Label for="city">
-                      City <span class="text-red-500">*</span>
+                    <Label for="streetLine1">
+                      Street Address <span class="text-red-500">*</span>
                     </Label>
                     <Input
                       type="text"
-                      id="city"
-                      name="city"
-                      bind:value={addressFormData.city}
+                      id="streetLine1"
+                      name="streetLine1"
+                      bind:value={addressFormData.streetLine1}
                       required
                       class="mt-1"
                     />
                   </div>
+
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label for="postalCode">
+                        Postal Code <span class="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        id="postalCode"
+                        name="postalCode"
+                        bind:value={addressFormData.postalCode}
+                        required
+                        class="mt-1"
+                      />
+                    </div>
+
+                    <div>
+                      <Label for="city">
+                        City <span class="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        type="text"
+                        id="city"
+                        name="city"
+                        bind:value={addressFormData.city}
+                        required
+                        class="mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label for="country">
+                      Country <span class="text-red-500">*</span>
+                    </Label>
+                    <select
+                      id="country"
+                      name="country"
+                      bind:value={addressFormData.country}
+                      required
+                      class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
+                    >
+                      <option value="FI">Finland</option>
+                      <option value="SE">Sweden</option>
+                      <option value="NO">Norway</option>
+                      <option value="DK">Denmark</option>
+                    </select>
+                  </div>
+
+                  {#if data.isLoggedIn}
+                    <label class="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        bind:checked={saveAddressForFuture}
+                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span class="text-sm text-gray-700">Save this address for future orders</span>
+                    </label>
+                  {/if}
+
+                  <div class="flex gap-3">
+                    {#if isEditingAddress}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        class="flex-1"
+                        onclick={() => (isEditingAddress = false)}
+                      >
+                        Cancel
+                      </Button>
+                    {/if}
+                    <Button type="submit" class="flex-1">
+                      {isEditingAddress ? "Update Address" : "Continue"}
+                    </Button>
+                  </div>
                 </div>
+              </form>
 
-                <div>
-                  <Label for="country">
-                    Country <span class="text-red-500">*</span>
-                  </Label>
-                  <select
-                    id="country"
-                    name="country"
-                    bind:value={addressFormData.country}
-                    required
-                    class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"
-                  >
-                    <option value="FI">Finland</option>
-                    <option value="SE">Sweden</option>
-                    <option value="NO">Norway</option>
-                    <option value="DK">Denmark</option>
-                  </select>
-                </div>
-
-                {#if data.isLoggedIn}
-                  <label class="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      name="saveToAddressBook"
-                      class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span class="text-sm text-gray-700">Save to my address book</span>
-                  </label>
-                {/if}
-
-                <Button type="submit" class="w-full">Save Address</Button>
-              </div>
-            </form>
-
-            {#if savedAddresses.length > 0 && !cartHasAddress}
-              <button
-                type="button"
-                onclick={() => (preferManualEntry = false)}
-                class="mt-4 text-sm text-gray-600 hover:text-gray-800"
-              >
-                &larr; Use a saved address
-              </button>
-            {/if}
+              {#if savedAddresses.length > 0 && !cartHasAddress && !isEditingAddress}
+                <button
+                  type="button"
+                  onclick={() => (preferManualEntry = false)}
+                  class="mt-4 text-sm text-gray-600 hover:text-gray-800"
+                >
+                  &larr; Use a saved address
+                </button>
+              {/if}
             {/if}
           </div>
 
@@ -525,6 +572,9 @@
                   };
                 }}
               >
+                {#if saveAddressForFuture}
+                  <input type="hidden" name="saveToAddressBook" value="on" />
+                {/if}
                 <Button
                   type="submit"
                   disabled={isCompletingOrder}

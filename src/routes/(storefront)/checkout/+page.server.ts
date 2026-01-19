@@ -163,7 +163,6 @@ export const actions: Actions = {
 		const city = data.get("city")?.toString();
 		const postalCode = data.get("postalCode")?.toString();
 		const country = data.get("country")?.toString() || "FI";
-		const saveToAddressBook = data.get("saveToAddressBook") === "on";
 
 		if (!fullName || !streetLine1 || !city || !postalCode) {
 			return fail(400, { error: "Missing required address fields" });
@@ -176,18 +175,6 @@ export const actions: Actions = {
 			postalCode,
 			country
 		});
-
-		// Save to address book if requested and user is logged in
-		if (saveToAddressBook && locals.customer?.id) {
-			await customerService.addAddress(locals.customer.id, {
-				fullName,
-				streetLine1,
-				city,
-				postalCode,
-				country,
-				isDefault: false
-			});
-		}
 
 		// Reload cart to get updated shipping rates
 		const updatedCart = await orderService.getActiveCart({
@@ -380,6 +367,9 @@ export const actions: Actions = {
 			return fail(404, { error: "Cart not found" });
 		}
 
+		const data = await request.formData();
+		const saveToAddressBook = data.get("saveToAddressBook") === "on";
+
 		// Check if digital-only order
 		const isDigitalOnly = await isCartDigitalOnly(cart.id);
 
@@ -418,6 +408,23 @@ export const actions: Actions = {
 		}
 
 		try {
+			// Save address to customer's address book if requested
+			if (saveToAddressBook && locals.customer?.id && !isDigitalOnly && cart.shippingStreetLine1) {
+				try {
+					await customerService.addAddress(locals.customer.id, {
+						fullName: cart.shippingFullName || undefined,
+						streetLine1: cart.shippingStreetLine1,
+						city: cart.shippingCity || "",
+						postalCode: cart.shippingPostalCode || "",
+						country: cart.shippingCountry || "FI",
+						isDefault: false
+					});
+				} catch (e) {
+					console.error("Error saving address to address book:", e);
+					// Don't fail the order if address book save fails
+				}
+			}
+
 			// Transition order to payment_pending (marks cart as inactive)
 			await orderService.transitionState(cart.id, "payment_pending");
 
