@@ -69,3 +69,82 @@ Admin dashboard with protected routes.
 ### `/src/routes/api`
 
 API endpoints for AJAX operations and webhooks.
+
+## Architecture Overview
+
+Hoikka follows a **service-oriented architecture** that maps to MVC concepts, adapted for SvelteKit's patterns:
+
+### Model Layer
+
+**`src/lib/server/db/`** - Database schema and client using Drizzle ORM. Defines data structure for products, variants, categories, orders, etc.
+
+### Controller Layer
+
+Split into two parts:
+
+**1. Services (`src/lib/server/services/`)** - Business logic, reusable across routes:
+
+```typescript
+productService.getById(), .create(), .update()
+categoryService.getTree(), .setProductCategories()
+orderService.create(), .updateStatus()
+```
+
+**2. Route handlers (`+page.server.ts`)** - Thin controllers that wire HTTP to services:
+
+```typescript
+export const load = async ({ params }) => {
+  const product = await productService.getById(id);
+  return { product };
+};
+
+export const actions = {
+  update: async ({ request }) => {
+    await productService.update(id, data);
+  }
+};
+```
+
+### View Layer
+
+**`src/routes/**/+page.svelte`** - Svelte components that receive data from load functions and render UI.
+
+### Request Flow
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  REQUEST                                                │
+└────────────────────────┬────────────────────────────────┘
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│  +page.server.ts (thin controller)                      │
+│  - load() → fetch data                                  │
+│  - actions → handle form submissions                    │
+└────────────────────────┬────────────────────────────────┘
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│  services/*.ts (business logic)                         │
+│  - productService, orderService, etc.                   │
+│  - validation, complex operations                       │
+└────────────────────────┬────────────────────────────────┘
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│  db/schema.ts + Drizzle ORM (model)                     │
+│  - data structure, relationships                        │
+└─────────────────────────────────────────────────────────┘
+                         ▲
+                         │ data
+                         ▼
+┌─────────────────────────────────────────────────────────┐
+│  +page.svelte (view)                                    │
+│  - renders UI with data from load()                     │
+│  - forms POST to actions                                │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Design Principles
+
+1. **Services are singletons** - One instance shared across requests
+2. **Route handlers are thin** - Just validate input and call services
+3. **Views receive typed data** - Via `PageData` from load functions
+4. **Forms use progressive enhancement** - Work without JS via `use:enhance`
