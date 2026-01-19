@@ -47,6 +47,14 @@
     country: data.cart?.shippingCountry ?? "FI"
   });
 
+  // Saved addresses
+  const savedAddresses = $derived(form?.savedAddresses ?? data.savedAddresses ?? []);
+  const cartHasAddress = $derived(!!currentCart?.shippingPostalCode);
+
+  // Show address picker only if: has saved addresses AND no address set on cart AND user hasn't chosen manual entry
+  let preferManualEntry = $state(false);
+  const showAddressPicker = $derived(savedAddresses.length > 0 && !cartHasAddress && !preferManualEntry);
+
   // Form data for digital products (contact info)
   let contactFormData = $state({
     fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
@@ -142,7 +150,54 @@
           <div class="rounded-lg bg-white p-6 shadow">
             <h2 class="mb-4 text-xl font-semibold">Shipping Address</h2>
 
-            <form method="POST" action="?/setShippingAddress" use:enhance>
+            {#if showAddressPicker}
+              <!-- Saved Addresses Picker -->
+              <div class="mb-4 space-y-3">
+                {#each savedAddresses as address}
+                  <form method="POST" action="?/useSavedAddress" use:enhance>
+                    <input type="hidden" name="addressId" value={address.id} />
+                    <button
+                      type="submit"
+                      class="w-full rounded-lg border border-gray-300 p-4 text-left transition-colors hover:border-blue-500 hover:bg-blue-50"
+                    >
+                      <div class="flex items-start justify-between">
+                        <div>
+                          {#if address.fullName}
+                            <p class="font-medium">{address.fullName}</p>
+                          {/if}
+                          <p class="text-sm text-gray-600">{address.streetLine1}</p>
+                          {#if address.streetLine2}
+                            <p class="text-sm text-gray-600">{address.streetLine2}</p>
+                          {/if}
+                          <p class="text-sm text-gray-600">{address.postalCode} {address.city}</p>
+                          <p class="text-sm text-gray-600">{address.country}</p>
+                        </div>
+                        {#if address.isDefault}
+                          <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                            Default
+                          </span>
+                        {/if}
+                      </div>
+                    </button>
+                  </form>
+                {/each}
+              </div>
+
+              <button
+                type="button"
+                onclick={() => (preferManualEntry = true)}
+                class="text-sm text-blue-600 hover:text-blue-800"
+              >
+                + Use a different address
+              </button>
+            {:else}
+              <!-- Address Form -->
+
+            <form method="POST" action="?/setShippingAddress" use:enhance={() => {
+              return async ({ update }) => {
+                await update({ reset: false });
+              };
+            }}>
               <div class="space-y-4">
                 <div>
                   <Label for="fullName">
@@ -234,6 +289,17 @@
                 <Button type="submit" class="w-full">Save Address</Button>
               </div>
             </form>
+
+            {#if savedAddresses.length > 0 && !cartHasAddress}
+              <button
+                type="button"
+                onclick={() => (preferManualEntry = false)}
+                class="mt-4 text-sm text-gray-600 hover:text-gray-800"
+              >
+                &larr; Use a saved address
+              </button>
+            {/if}
+            {/if}
           </div>
 
           <!-- Shipping Method Selection (only for physical products) -->

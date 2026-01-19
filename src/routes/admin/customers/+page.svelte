@@ -11,27 +11,35 @@
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+          <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Customer</th>
+          <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Email</th>
+          <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Phone</th>
+          <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Joined</th>
+          <th class="px-6 py-3 text-right text-sm font-medium text-gray-500">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200 bg-white">
         {#if data.customers.length === 0}
           <tr>
-            <td colspan="4" class="px-6 py-12 text-center text-gray-500"> No customers yet </td>
+            <td colspan="5" class="px-6 py-12 text-center text-gray-500"> No customers yet </td>
           </tr>
         {:else}
           {#each data.customers as customer}
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4">
-                <p class="font-medium">{customer.firstName} {customer.lastName}</p>
+                <a href="/admin/customers/{customer.id}" class="font-medium text-blue-600 hover:text-blue-800">
+                  {customer.firstName} {customer.lastName}
+                </a>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">{customer.email}</td>
               <td class="px-6 py-4 text-sm text-gray-500">{customer.phone ?? "-"}</td>
               <td class="px-6 py-4 text-sm text-gray-500">
                 {new Date(customer.createdAt).toLocaleDateString()}
+              </td>
+              <td class="px-6 py-4 text-right text-sm">
+                <a href="/admin/customers/{customer.id}" class="font-medium text-blue-600 hover:text-blue-800">
+                  View
+                </a>
               </td>
             </tr>
           {/each}

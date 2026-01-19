@@ -2,7 +2,7 @@
  * Checkout page server actions
  */
 import { fail, redirect } from "@sveltejs/kit";
-import { orderService, shippingService, paymentService, isPaymentSuccessful } from "$lib/server/services/index.js";
+import { orderService, shippingService, paymentService, isPaymentSuccessful, customerService } from "$lib/server/services/index.js";
 import { digitalDeliveryService } from "$lib/server/services/digitalDelivery.js";
 import { db } from "$lib/server/db/index.js";
 import { orderLines, productVariants, products, customers } from "$lib/server/db/schema.js";
@@ -65,16 +65,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// Get customer data for prefilling (from order or customer record)
 	let customerEmail = cart.customerEmail || null;
 	let customerFullName = cart.shippingFullName || null;
+	let savedAddresses: Awaited<ReturnType<typeof customerService.getById>>["addresses"] = [];
+
 	if (locals.customer?.id) {
-		const [customer] = await db
-			.select({ email: customers.email, firstName: customers.firstName, lastName: customers.lastName })
-			.from(customers)
-			.where(eq(customers.id, locals.customer.id));
-		if (customer) {
-			if (!customerEmail) customerEmail = customer.email || null;
-			if (!customerFullName && (customer.firstName || customer.lastName)) {
-				customerFullName = [customer.firstName, customer.lastName].filter(Boolean).join(" ");
+		const customerWithAddresses = await customerService.getById(locals.customer.id);
+		if (customerWithAddresses) {
+			if (!customerEmail) customerEmail = customerWithAddresses.email || null;
+			if (!customerFullName && (customerWithAddresses.firstName || customerWithAddresses.lastName)) {
+				customerFullName = [customerWithAddresses.firstName, customerWithAddresses.lastName].filter(Boolean).join(" ");
 			}
+			savedAddresses = customerWithAddresses.addresses || [];
 		}
 	}
 
@@ -87,11 +87,66 @@ export const load: PageServerLoad = async ({ locals }) => {
 		paymentInfo,
 		isDigitalOnly,
 		customerEmail,
-		customerFullName
+		customerFullName,
+		savedAddresses
 	};
 };
 
 export const actions: Actions = {
+	useSavedAddress: async ({ request, locals }) => {
+		const cart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
+		if (!cart) {
+			return fail(404, { error: "Cart not found" });
+		}
+
+		if (!locals.customer?.id) {
+			return fail(401, { error: "Not authenticated" });
+		}
+
+		const data = await request.formData();
+		const addressId = Number(data.get("addressId"));
+
+		if (!addressId) {
+			return fail(400, { error: "Address ID required" });
+		}
+
+		// Get the customer with addresses to verify ownership
+		const customerWithAddresses = await customerService.getById(locals.customer.id);
+		const address = customerWithAddresses?.addresses.find((a) => a.id === addressId);
+
+		if (!address) {
+			return fail(404, { error: "Address not found" });
+		}
+
+		// Set the shipping address from the saved address
+		await orderService.setShippingAddress(cart.id, {
+			fullName: address.fullName || undefined,
+			streetLine1: address.streetLine1,
+			streetLine2: address.streetLine2 || undefined,
+			city: address.city,
+			postalCode: address.postalCode,
+			country: address.country
+		});
+
+		// Reload cart to get updated shipping rates
+		const updatedCart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
+		const shippingRates = updatedCart
+			? await shippingService.getAvailableRates(updatedCart)
+			: [];
+
+		return {
+			success: true,
+			cart: updatedCart,
+			shippingRates
+		};
+	},
+
 	setShippingAddress: async ({ request, locals }) => {
 		const cart = await orderService.getActiveCart({
 			customerId: locals.customer?.id,
