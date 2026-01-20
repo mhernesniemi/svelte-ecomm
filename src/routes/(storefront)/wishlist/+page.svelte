@@ -133,11 +133,11 @@
                     use:enhance={() => {
                       addingId = variantId;
                       return async ({ update, result }) => {
-                        await update();
-                        addingId = null;
                         if (result.type === "success") {
                           cartSheet.open();
                         }
+                        addingId = null;
+                        update(); // Don't await - refresh data in background
                       };
                     }}
                   >

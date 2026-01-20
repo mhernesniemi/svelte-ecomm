@@ -74,8 +74,8 @@
     message = null;
     try {
       await addToCart({ variantId: selectedVariantId, quantity });
-      await invalidateAll();
       cartSheet.open();
+      invalidateAll(); // Don't await - refresh data in background
     } catch {
       message = { type: "error", text: "Failed to add item to cart" };
     } finally {
