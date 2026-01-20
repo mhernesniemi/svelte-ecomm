@@ -12,6 +12,11 @@ This is a **full-stack e-commerce platform** built with:
 ## Implementation Goals
 
 - This should be lightweight and easy to understand and maintain.
+- When adding a new feature, consider that it's probably needed also in the admin panel and storefront.
+
+## Important to note
+
+- This project uses Svelte 5, so look at the Svelte 5 documentation for the best practices. Avoid using outdated Svelte 4 specific code.
 
 ## Tools
 
@@ -19,7 +24,7 @@ This is a **full-stack e-commerce platform** built with:
 
 ## UI Guidelines
 
-- Use shadcn/svelte for UI components where they provide value and install a new one only if it's not available.
+- Use shadcn/svelte for UI components where they provide value and install a new shadcn/svelte component if it's not available.
 - No dark theme
 - Use global focus styles for all interactive elements
 
@@ -39,3 +44,4 @@ This is a **full-stack e-commerce platform** built with:
 - Smart Collections with facet-based filtering
 - Guest carts with cookie-based tokens
 - Provider pattern for payments/shipping
+- See ARCHITECTURE.md for more details.
