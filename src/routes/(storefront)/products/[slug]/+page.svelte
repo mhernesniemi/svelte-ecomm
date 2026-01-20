@@ -6,6 +6,8 @@
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
+  import Minus from "@lucide/svelte/icons/minus";
+  import Plus from "@lucide/svelte/icons/plus";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -210,17 +212,6 @@
         </div>
       {/if}
 
-      <!-- Stock Status -->
-      {#if selectedVariant}
-        <div class="mb-6">
-          {#if selectedVariant.stock > 0}
-            <span class="text-sm text-green-600">In stock ({selectedVariant.stock} available)</span>
-          {:else}
-            <span class="text-sm text-red-600">Out of stock</span>
-          {/if}
-        </div>
-      {/if}
-
       <!-- Success/Error Messages -->
       {#if message}
         <Alert variant={message.type === "error" ? "destructive" : "success"} class="mb-4">
@@ -228,38 +219,54 @@
         </Alert>
       {/if}
 
+      <!-- Stock Status -->
+      {#if selectedVariant}
+        <div class="mb-2 text-sm">
+          {#if selectedVariant.stock > 0}
+            <span class="text-green-600">In stock ({selectedVariant.stock} available)</span>
+          {:else}
+            <span class="text-red-600">Out of stock</span>
+          {/if}
+        </div>
+      {/if}
       <!-- Quantity & Add to Cart -->
       {#if selectedVariant && selectedVariant.stock > 0}
         <div class="mb-6 flex items-center gap-4">
-          <div class="flex items-center rounded-lg border">
+          <div class="flex items-center rounded-lg bg-gray-100">
             <button
               type="button"
               onclick={() => quantity > 1 && (quantity -= 1)}
-              class="px-3 py-2 hover:bg-gray-50"
+              disabled={quantity <= 1}
+              class="flex h-10 w-10 items-center justify-center text-gray-600 hover:bg-gray-50 disabled:text-gray-300 disabled:hover:bg-transparent"
               aria-label="Decrease quantity"
             >
-              -
+              <Minus class="h-4 w-4" />
             </button>
             <input
               type="number"
               bind:value={quantity}
               min="1"
               max={selectedVariant.stock}
-              class="w-12 border-x py-2 text-center"
+              class="h-10 w-12 [appearance:textfield] border-0 bg-transparent
+              text-center
+              [&::-webkit-inner-spin-button]:appearance-none
+              [&::-webkit-outer-spin-button]:appearance-none"
               aria-label="Quantity"
             />
             <button
               type="button"
               onclick={() => quantity < selectedVariant.stock && (quantity += 1)}
-              class="px-3 py-2 hover:bg-gray-50"
+              disabled={quantity >= selectedVariant.stock}
+              class="flex h-10 w-10 items-center justify-center text-gray-600 hover:bg-gray-50 disabled:text-gray-300 disabled:hover:bg-transparent"
               aria-label="Increase quantity"
             >
-              +
+              <Plus class="h-4 w-4" />
             </button>
           </div>
 
           <Button
             type="button"
+            size="lg"
             onclick={handleAddToCart}
             disabled={isAddingToCart}
             class="flex-1 py-3"

@@ -1,5 +1,19 @@
 {
 	"files.associations": {
 		"*.css": "tailwindcss"
+	},
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"editor.formatOnSave": true,
+	"[svelte]": {
+		"editor.defaultFormatter": "svelte.svelte-vscode"
+	},
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": "always"
+	},
+	"eslint.validate": ["typescript", "svelte"],
+	"eslint.run": "onSave",
+	"eslint.enable": true,
+	"eslint.options": {
+		"configFile": ".eslint.config.js"
 	}
 }
