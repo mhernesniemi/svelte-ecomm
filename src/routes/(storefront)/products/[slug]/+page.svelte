@@ -348,14 +348,17 @@
               </div>
 
               <!-- Star Rating -->
-              <div class="mb-4">
-                <label class="mb-2 block text-sm font-medium text-gray-700"
-                  >Your Rating <span class="text-red-500">*</span></label
+              <fieldset class="mb-4">
+                <legend class="mb-2 block text-sm font-medium text-gray-700"
+                  >Your Rating <span class="text-red-500">*</span></legend
                 >
-                <div class="flex gap-1">
+                <div class="flex gap-1" role="radiogroup" aria-label="Rating">
                   {#each [1, 2, 3, 4, 5] as star}
                     <button
                       type="button"
+                      role="radio"
+                      aria-checked={reviewRating === star}
+                      aria-label="{star} star{star > 1 ? 's' : ''}"
                       onclick={() => (reviewRating = star)}
                       onmouseenter={() => (hoverRating = star)}
                       onmouseleave={() => (hoverRating = 0)}
@@ -368,7 +371,7 @@
                   {/each}
                 </div>
                 <input type="hidden" name="rating" value={reviewRating} />
-              </div>
+              </fieldset>
 
               <!-- Comment -->
               <div class="mb-4">

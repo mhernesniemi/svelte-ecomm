@@ -39,7 +39,7 @@
 
 <div class="space-y-6">
 	<div class="flex items-center gap-4">
-		<a href="/admin/collections" class="text-gray-500 hover:text-gray-700">
+		<a href="/admin/collections" class="text-gray-500 hover:text-gray-700" aria-label="Back to collections">
 			<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path
 					stroke-linecap="round"

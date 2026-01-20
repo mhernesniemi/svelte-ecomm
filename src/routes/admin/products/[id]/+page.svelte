@@ -666,6 +666,7 @@
                   type="button"
                   role="combobox"
                   aria-expanded={categoryComboboxOpen}
+                  aria-controls="category-listbox"
                   aria-haspopup="listbox"
                   class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 >
@@ -676,7 +677,7 @@
               <Popover.Content class="w-72 p-0" align="start">
                 <Command.Root>
                   <Command.Input placeholder="Search categories..." />
-                  <Command.List class="max-h-64">
+                  <Command.List id="category-listbox" class="max-h-64">
                     <Command.Empty>No category found.</Command.Empty>
                     <Command.Group>
                       {#each flatCategories as category}
