@@ -156,7 +156,7 @@ export class CategoryService {
 			ORDER BY a.depth DESC
 		`);
 
-		return (result.rows as { id: number; slug: string; name: string }[]).map((row) => ({
+		return (result as unknown as { id: number; slug: string; name: string }[]).map((row) => ({
 			id: row.id,
 			slug: row.slug,
 			name: row.name ?? row.slug
@@ -177,7 +177,7 @@ export class CategoryService {
 			SELECT id FROM descendants
 		`);
 
-		return (result.rows as { id: number }[]).map((row) => row.id);
+		return (result as unknown as { id: number }[]).map((row) => row.id);
 	}
 
 	/**

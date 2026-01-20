@@ -26,11 +26,17 @@ export class PaymentService {
 	/**
 	 * Create a new payment for an order
 	 */
-	async createPayment(orderId: number, amount: number, method = "mock"): Promise<Payment> {
+	async createPayment(
+		orderId: number,
+		paymentMethodId: number,
+		amount: number,
+		method = "mock"
+	): Promise<Payment> {
 		const [payment] = await db
 			.insert(payments)
 			.values({
 				orderId,
+				paymentMethodId,
 				method,
 				amount,
 				state: "pending"
@@ -222,8 +228,12 @@ export class PaymentService {
 	/**
 	 * Create and immediately process a payment (convenience method)
 	 */
-	async createAndProcess(orderId: number, amount: number): Promise<PaymentResult> {
-		const payment = await this.createPayment(orderId, amount);
+	async createAndProcess(
+		orderId: number,
+		paymentMethodId: number,
+		amount: number
+	): Promise<PaymentResult> {
+		const payment = await this.createPayment(orderId, paymentMethodId, amount);
 		return this.processPayment(payment.id);
 	}
 

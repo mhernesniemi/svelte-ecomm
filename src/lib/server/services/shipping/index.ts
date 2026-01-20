@@ -16,7 +16,7 @@ import type { ShippingProvider, ShippingRate, ShipmentInfo } from "./types.js";
 import { PostiProvider, MatkahuoltoProvider } from "./providers/index.js";
 
 // Provider registry - maps provider codes to provider instances
-const PROVIDERS: Map<string, ShippingProvider> = new Map([
+const PROVIDERS = new Map<string, ShippingProvider>([
 	["posti_standard", new PostiProvider()],
 	["matkahuolto_standard", new MatkahuoltoProvider()]
 ]);

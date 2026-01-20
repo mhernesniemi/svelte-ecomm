@@ -211,9 +211,9 @@
               <dd>
                 <span
                   class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize
-									{data.payment.state === 'completed' || data.payment.state === 'settled'
+									{data.payment.state === 'settled'
                     ? 'bg-green-100 text-green-800'
-                    : data.payment.state === 'failed' || data.payment.state === 'declined'
+                    : data.payment.state === 'declined'
                       ? 'bg-red-100 text-red-800'
                       : data.payment.state === 'refunded'
                         ? 'bg-yellow-100 text-yellow-800'
@@ -252,7 +252,7 @@
             </form>
           {/if}
 
-          {#if (data.payment.state === "completed" || data.payment.state === "settled") && data.payment.transactionId}
+          {#if data.payment.state === "settled" && data.payment.transactionId}
             <form method="POST" action="?/refundPayment" class="mt-4">
               <button
                 type="submit"

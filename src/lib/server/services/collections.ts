@@ -348,12 +348,17 @@ export class CollectionService {
 			.where(and(eq(collections.enabled, true), eq(collections.isPrivate, false)))
 			.orderBy(collections.position, desc(collections.createdAt));
 
-		// Load translations and counts
+		// Load translations, counts, and featured assets
 		return Promise.all(
 			collectionList.map(async (c) => {
-				const withTranslations = await this.loadCollectionTranslations(c, language);
-				const productCount = await this.getProductCount(c.id);
-				return { ...withTranslations, productCount };
+				const [withTranslations, productCount, featuredAsset] = await Promise.all([
+					this.loadCollectionTranslations(c, language),
+					this.getProductCount(c.id),
+					c.featuredAssetId
+						? db.select().from(assets).where(eq(assets.id, c.featuredAssetId)).limit(1)
+						: Promise.resolve([])
+				]);
+				return { ...withTranslations, productCount, featuredAsset: featuredAsset[0] ?? null };
 			})
 		);
 	}
@@ -450,8 +455,9 @@ export class CollectionService {
 				if (matchingProductIds === null) {
 					matchingProductIds = filterResults;
 				} else {
+					const currentIds: Set<number> = matchingProductIds;
 					matchingProductIds = new Set(
-						[...matchingProductIds].filter((id) => filterResults.has(id))
+						[...currentIds].filter((id) => filterResults.has(id))
 					);
 				}
 
@@ -526,8 +532,9 @@ export class CollectionService {
 				if (matchingProductIds === null) {
 					matchingProductIds = filterResults;
 				} else {
+					const currentIds: Set<number> = matchingProductIds;
 					matchingProductIds = new Set(
-						[...matchingProductIds].filter((id) => filterResults.has(id))
+						[...currentIds].filter((id) => filterResults.has(id))
 					);
 				}
 

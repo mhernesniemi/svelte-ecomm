@@ -4,7 +4,7 @@
  */
 import { db } from "$lib/server/db/index.js";
 import { users, userSessions } from "$lib/server/db/schema.js";
-import { eq, and, gt } from "drizzle-orm";
+import { eq, and, gt, lt } from "drizzle-orm";
 import { randomBytes, scrypt, timingSafeEqual } from "crypto";
 
 const SESSION_DURATION_DAYS = 7;
@@ -160,8 +160,8 @@ class AuthService {
 	 * Clean up expired sessions
 	 */
 	async cleanupExpiredSessions(): Promise<number> {
-		const result = await db.delete(userSessions).where(gt(new Date(), userSessions.expiresAt));
-		return result.rowCount ?? 0;
+		const result = await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date()));
+		return result.length;
 	}
 }
 

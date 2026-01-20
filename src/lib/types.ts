@@ -261,6 +261,7 @@ export interface CollectionWithRelations extends Collection {
 /** Collection with product count */
 export interface CollectionWithCount extends CollectionWithTranslations {
 	productCount: number;
+	featuredAsset?: Asset | null;
 }
 
 // ============================================================================

@@ -202,7 +202,7 @@ export const actions: Actions = {
 				sku,
 				price,
 				stock,
-				translations: [{ languageCode: "en", name: nameEn || null }]
+				translations: [{ languageCode: "en", name: nameEn || undefined }]
 			});
 
 			return { variantSuccess: true };

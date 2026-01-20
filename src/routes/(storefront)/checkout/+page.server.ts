@@ -65,7 +65,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// Get customer data for prefilling (from order or customer record)
 	let customerEmail = cart.customerEmail || null;
 	let customerFullName = cart.shippingFullName || null;
-	let savedAddresses: Awaited<ReturnType<typeof customerService.getById>>["addresses"] = [];
+	let savedAddresses: NonNullable<Awaited<ReturnType<typeof customerService.getById>>>["addresses"] = [];
 
 	if (locals.customer?.id) {
 		const customerWithAddresses = await customerService.getById(locals.customer.id);
@@ -124,7 +124,7 @@ export const actions: Actions = {
 
 		// Set the shipping address from the saved address
 		await orderService.setShippingAddress(cart.id, {
-			fullName: address.fullName || undefined,
+			fullName: address.fullName || "",
 			streetLine1: address.streetLine1,
 			streetLine2: address.streetLine2 || undefined,
 			city: address.city,

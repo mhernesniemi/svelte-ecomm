@@ -1,9 +1,17 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import type { Snippet } from "svelte";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
+
+// Type utilities for shadcn-svelte components
+export type WithElementRef<T, E extends HTMLElement = HTMLElement> = T & {
+	ref?: E | null;
+};
+
+export type WithoutChildrenOrChild<T> = Omit<T, "children" | "child">;
 
 /**
  * Throttle function calls to max once per wait period

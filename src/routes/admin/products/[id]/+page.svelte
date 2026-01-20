@@ -346,7 +346,7 @@
         <!-- Add/Edit Variant Form -->
         {#if editingVariant}
           {@const isEditing = editingVariant !== "new"}
-          {@const variant = isEditing ? editingVariant : null}
+          {@const variant = typeof editingVariant === "object" ? editingVariant : null}
           {@const variantNameEn = variant?.translations.find((t) => t.languageCode === "en")?.name ?? ""}
           <form
             method="POST"
