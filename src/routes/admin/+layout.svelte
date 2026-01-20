@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "./admin.css";
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
   import type { LayoutData } from "./$types";
