@@ -13,6 +13,7 @@
   import Heart from "@lucide/svelte/icons/heart";
   import CheckCircle from "@lucide/svelte/icons/check-circle";
   import type { PageData, ActionData } from "./$types";
+  import ArrowLeft from "@lucide/svelte/icons/arrow-left";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -103,7 +104,9 @@
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
   <nav class="mb-6">
-    <a href="/products" class="text-sm text-blue-600 hover:underline">&larr; Back to Products</a>
+    <a href="/products" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
+      ><ArrowLeft class="h-4 w-4" /> Back to Products</a
+    >
   </nav>
 
   <div class="grid grid-cols-1 md:grid-cols-2">
