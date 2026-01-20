@@ -1,13 +1,18 @@
 /**
  * Wishlist Remote Functions
- * For toggling wishlist from product pages without page reload
+ *
+ * Uses SvelteKit's `command()` for RPC-style server calls without page reload.
+ * See cart.remote.ts for detailed explanation of the command() pattern.
  */
 import { command, getRequestEvent } from "$app/server";
 import { wishlistService } from "$lib/server/services/wishlist.js";
 
 const WISHLIST_COOKIE_NAME = "wishlist_token";
-const WISHLIST_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
+const WISHLIST_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
+/**
+ * Toggle a product in/out of the wishlist. Returns { added: boolean }.
+ */
 export const toggleWishlist = command(
 	"unchecked",
 	async (input: { productId: number; variantId?: number }) => {
@@ -41,6 +46,9 @@ export const toggleWishlist = command(
 	}
 );
 
+/**
+ * Check if a product is in the user's wishlist.
+ */
 export const isInWishlist = command("unchecked", async (input: { productId: number }) => {
 	const event = getRequestEvent();
 	return wishlistService.hasItem({
@@ -50,6 +58,9 @@ export const isInWishlist = command("unchecked", async (input: { productId: numb
 	});
 });
 
+/**
+ * Get all product IDs in the user's wishlist.
+ */
 export const getWishlistProductIds = command("unchecked", async () => {
 	const event = getRequestEvent();
 	return wishlistService.getProductIds({
