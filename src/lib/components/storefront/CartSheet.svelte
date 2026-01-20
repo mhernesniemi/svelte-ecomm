@@ -86,7 +86,7 @@
         <div class="space-y-3">
           {#each lines as line (line.id)}
             <div class="flex gap-3 rounded-lg border border-gray-100 bg-gray-50/50 p-3">
-              <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-gray-100">
+              <div class="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-gray-100">
                 {#if line.imageUrl}
                   <img
                     src={line.imageUrl}
@@ -148,7 +148,7 @@
     </div>
 
     {#if lines.length > 0}
-      <SheetFooter class="border-t bg-gray-50/50 -mx-6 px-6 pt-4 pb-2 mt-auto">
+      <SheetFooter class="border-t bg-gray-50/50 px-6 pt-4 pb-2 mt-auto">
         <div class="w-full space-y-4">
           <div class="space-y-2">
             <div class="flex justify-between text-sm">
@@ -169,7 +169,7 @@
             </div>
           </div>
 
-          <div class="space-y-2">
+          <div class="mb-4">
             <a
               href="/checkout"
               onclick={() => (isOpen = false)}
@@ -177,14 +177,6 @@
             >
               Proceed to Checkout
             </a>
-
-            <button
-              type="button"
-              onclick={() => (isOpen = false)}
-              class="flex w-full items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-gray-900"
-            >
-              Continue Shopping
-            </button>
           </div>
         </div>
       </SheetFooter>
