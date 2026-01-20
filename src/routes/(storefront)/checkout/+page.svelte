@@ -91,7 +91,7 @@
   {:else}
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <!-- Main Content -->
-      <div class="space-y-6 lg:col-span-2">
+      <div class="space-y-10 lg:col-span-2">
         {#if form?.error}
           <Alert variant="destructive">
             <p>{form.error}</p>
