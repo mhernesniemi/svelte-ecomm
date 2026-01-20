@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Package from "@lucide/svelte/icons/package";
+  import ImageIcon from "@lucide/svelte/icons/image";
+
   let { data } = $props();
 
   function getTranslation(
@@ -65,19 +68,7 @@
   <!-- Products Grid -->
   {#if data.products.length === 0}
     <div class="py-16 text-center">
-      <svg
-        class="mx-auto h-12 w-12 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-        />
-      </svg>
+      <Package class="mx-auto h-12 w-12 text-gray-400" />
       <h3 class="mt-4 text-lg font-medium text-gray-900">No products in this collection</h3>
       <p class="mt-2 text-gray-500">
         <a href="/products" class="text-blue-600 hover:text-blue-700">View all products</a>
@@ -108,19 +99,7 @@
               class="flex aspect-square items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
               style="view-transition-name: product-image-{product.id}"
             >
-              <svg
-                class="h-16 w-16 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
+              <ImageIcon class="h-16 w-16 text-gray-400" />
             </div>
           {/if}
 

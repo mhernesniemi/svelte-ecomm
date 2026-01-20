@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import type { PageData } from "./$types";
+  import Tag from "@lucide/svelte/icons/tag";
 
   let { data }: { data: PageData } = $props();
 
@@ -85,19 +86,7 @@
   <!-- Facets List -->
   {#if data.facets.length === 0}
     <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
-      <svg
-        class="mx-auto h-12 w-12 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"
-        />
-      </svg>
+      <Tag class="mx-auto h-12 w-12 text-gray-400" />
       <h3 class="mt-2 text-sm font-medium text-gray-900">No facets</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new facet.</p>
       <div class="mt-6">

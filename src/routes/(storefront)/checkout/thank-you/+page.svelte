@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PageData } from "./$types.js";
+  import Check from "@lucide/svelte/icons/check";
 
   let { data }: { data: PageData } = $props();
 
@@ -11,9 +12,7 @@
 <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
   <div class="mb-8 text-center">
     <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-      <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-      </svg>
+      <Check class="h-8 w-8 text-green-600" />
     </div>
     <h1 class="mb-2 text-3xl font-bold">Thank You for Your Order!</h1>
     <p class="text-gray-600">

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import FolderOpen from "@lucide/svelte/icons/folder-open";
 
   let { data } = $props();
 
@@ -27,19 +28,7 @@
 
   {#if data.collections.length === 0}
     <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
-      <svg
-        class="mx-auto h-12 w-12 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-        />
-      </svg>
+      <FolderOpen class="mx-auto h-12 w-12 text-gray-400" />
       <h3 class="mt-2 text-sm font-medium text-gray-900">No collections</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new collection.</p>
       <div class="mt-6">

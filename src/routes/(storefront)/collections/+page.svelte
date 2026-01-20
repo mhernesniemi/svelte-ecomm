@@ -1,4 +1,6 @@
 <script lang="ts">
+  import FolderOpen from "@lucide/svelte/icons/folder-open";
+
   let { data } = $props();
 
   function getTranslation(
@@ -23,19 +25,7 @@
 
   {#if data.collections.length === 0}
     <div class="py-16 text-center">
-      <svg
-        class="mx-auto h-12 w-12 text-gray-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-        />
-      </svg>
+      <FolderOpen class="mx-auto h-12 w-12 text-gray-400" />
       <h3 class="mt-4 text-lg font-medium text-gray-900">No collections available</h3>
       <p class="mt-2 text-gray-500">
         <a href="/products" class="text-blue-600 hover:text-blue-700">View all products</a>
@@ -61,19 +51,7 @@
             <div
               class="flex aspect-video items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
             >
-              <svg
-                class="h-16 w-16 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-                />
-              </svg>
+              <FolderOpen class="h-16 w-16 text-gray-400" />
             </div>
           {/if}
 
