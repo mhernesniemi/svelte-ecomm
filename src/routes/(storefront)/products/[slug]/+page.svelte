@@ -10,6 +10,7 @@
   import Plus from "@lucide/svelte/icons/plus";
   import ImageIcon from "@lucide/svelte/icons/image";
   import Heart from "@lucide/svelte/icons/heart";
+  import CheckCircle from "@lucide/svelte/icons/check-circle";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -103,7 +104,7 @@
     <a href="/products" class="text-sm text-blue-600 hover:underline">&larr; Back to Products</a>
   </nav>
 
-  <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+  <div class="grid grid-cols-1 md:grid-cols-2">
     <!-- Product Images -->
     <div>
       <!-- Main Image -->
@@ -131,7 +132,7 @@
             <button
               type="button"
               onclick={() => (selectedImageIndex = index)}
-              class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-colors {selectedImageIndex ===
+              class="h-16 w-16 shrink-0 overflow-hidden rounded-lg border-2 transition-colors {selectedImageIndex ===
               index
                 ? 'border-blue-500'
                 : 'border-transparent hover:border-gray-300'}"
@@ -148,10 +149,15 @@
     </div>
 
     <!-- Product Info -->
-    <div>
-      <div class="mb-4 flex items-start justify-between">
+    <div class="ml-10">
+      <div class="mb-8 flex items-center justify-between">
         <h1 class="text-3xl font-bold">{enTrans?.name ?? "Product"}</h1>
-        <button
+        {#if selectedVariant}
+          <p class="text-xl font-semibold">
+            {(selectedVariant.price / 100).toFixed(2)} EUR
+          </p>
+        {/if}
+        <!-- <button
           type="button"
           onclick={handleToggleWishlist}
           disabled={isTogglingWishlist}
@@ -161,22 +167,16 @@
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart class="h-7 w-7" fill={isWishlisted ? "currentColor" : "none"} />
-        </button>
+        </button> -->
       </div>
 
       {#if enTrans?.description}
-        <p class="mb-6 text-gray-600">{enTrans.description}</p>
-      {/if}
-
-      {#if selectedVariant}
-        <p class="mb-6 text-2xl font-bold">
-          {(selectedVariant.price / 100).toFixed(2)} EUR
-        </p>
+        <p class="mb-12 text-gray-600">{enTrans.description}</p>
       {/if}
 
       <!-- Variant Selection -->
       {#if product.variants.length > 1}
-        <div class="mb-6">
+        <div class="mb-12">
           <p class="mb-2 block text-sm font-medium text-gray-700">Select Variant</p>
           <div class="flex flex-wrap gap-2" role="group" aria-label="Product variants">
             {#each product.variants as variant}
@@ -204,53 +204,24 @@
 
       <!-- Stock Status -->
       {#if selectedVariant}
-        <div class="mb-2 text-sm">
+        <div class="mb-3 text-sm">
           {#if selectedVariant.stock > 0}
-            <span class="text-green-600">In stock ({selectedVariant.stock} available)</span>
+            <div class="flex items-center gap-2">
+              <CheckCircle class="h-4 w-4 text-green-600" />
+              <span class="text-green-600">In stock</span>
+            </div>
           {:else}
             <span class="text-red-600">Out of stock</span>
           {/if}
         </div>
       {/if}
 
-      <!-- Quantity & Add to Cart -->
+      <!-- Add to Cart -->
       {#if selectedVariant && selectedVariant.stock > 0}
-        <div class="mb-6 flex items-center gap-4">
-          <div class="flex items-center rounded-lg bg-gray-100">
-            <button
-              type="button"
-              onclick={() => quantity > 1 && (quantity -= 1)}
-              disabled={quantity <= 1}
-              class="flex h-10 w-10 items-center justify-center text-gray-600 hover:bg-gray-50 disabled:text-gray-300 disabled:hover:bg-transparent"
-              aria-label="Decrease quantity"
-            >
-              <Minus class="h-4 w-4" />
-            </button>
-            <input
-              type="number"
-              bind:value={quantity}
-              min="1"
-              max={selectedVariant.stock}
-              class="h-10 w-12 [appearance:textfield] border-0 bg-transparent
-              text-center
-              [&::-webkit-inner-spin-button]:appearance-none
-              [&::-webkit-outer-spin-button]:appearance-none"
-              aria-label="Quantity"
-            />
-            <button
-              type="button"
-              onclick={() => quantity < selectedVariant.stock && (quantity += 1)}
-              disabled={quantity >= selectedVariant.stock}
-              class="flex h-10 w-10 items-center justify-center text-gray-600 hover:bg-gray-50 disabled:text-gray-300 disabled:hover:bg-transparent"
-              aria-label="Increase quantity"
-            >
-              <Plus class="h-4 w-4" />
-            </button>
-          </div>
-
+        <div>
           <Button
             type="button"
-            size="lg"
+            size="xl"
             onclick={handleAddToCart}
             disabled={isAddingToCart}
             class="flex-1 py-3"
