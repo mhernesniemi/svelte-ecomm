@@ -51,7 +51,7 @@
 	>
 		{@render children?.()}
 		<SheetPrimitive.Close
-			class="absolute right-3 top-3 rounded-full hover:bg-gray-100 p-2 opacity-70 transition-opacity hover:opacity-100 disabled:pointer-events-none"
+			class="absolute right-3 top-3 rounded-full bg-gray-200/75 p-2 opacity-70 transition-opacity hover:opacity-100 disabled:pointer-events-none"
 		>
 			<XIcon class="h-5 w-5" />
 			<span class="sr-only">Close</span>

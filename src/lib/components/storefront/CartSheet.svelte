@@ -62,7 +62,7 @@
 
   <SheetContent side="right" class="flex w-full flex-col sm:max-w-md">
     <SheetHeader class="pb-4">
-      <SheetTitle class="text-lg">Shopping Cart</SheetTitle>
+      <SheetTitle class="text-xl">Shopping Cart</SheetTitle>
     </SheetHeader>
 
     <div class="flex-1 overflow-y-auto py-4">
@@ -73,18 +73,17 @@
           </div>
           <p class="mb-1 font-medium text-gray-900">Your cart is empty</p>
           <p class="mb-6 text-sm text-gray-500">Add some items to get started</p>
-          <a
-            href="/products"
+          <button
             onclick={() => (isOpen = false)}
             class="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-6 text-sm font-medium text-white hover:bg-blue-700"
           >
-            Browse Products
-          </a>
+            Continue Shopping
+          </button>
         </div>
       {:else}
-        <div class="space-y-3">
+        <div class="divide-y divide-gray-200">
           {#each lines as line (line.id)}
-            <div class="flex gap-3 rounded-lg border border-gray-100 bg-gray-50/50 p-3">
+            <div class="flex gap-3 p-3">
               <div class="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-gray-100">
                 {#if line.imageUrl}
                   <img
@@ -147,7 +146,7 @@
     </div>
 
     {#if lines.length > 0}
-      <SheetFooter class="border-t bg-gray-50/50 px-6 pt-4 pb-2 mt-auto">
+      <SheetFooter class="border-t border-gray-200 bg-gray-50/50 px-6 pt-4 pb-2 mt-auto">
         <div class="w-full space-y-4">
           <div class="space-y-2">
             <div class="flex justify-between text-sm">
