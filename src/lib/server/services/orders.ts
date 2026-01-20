@@ -31,6 +31,7 @@ import type {
 	OrderState
 } from "$lib/types.js";
 import { nanoid } from "nanoid";
+import { reservationService } from "./reservations.js";
 
 // Generate a secure cart token for guest users
 function generateCartToken(): string {
@@ -281,14 +282,18 @@ export class OrderService {
 
 		if (!variant) throw new Error("Variant not found");
 
-		// Check stock availability
+		// Check stock availability using reservations (excludes this order's existing reservations)
+		const availableStock = await reservationService.getAvailableStockExcludingOrder(
+			input.variantId,
+			orderId
+		);
 		const existingLine = order.lines.find((l) => l.variantId === input.variantId);
 		const existingQuantity = existingLine?.quantity ?? 0;
 		const totalQuantity = existingQuantity + input.quantity;
 
-		if (totalQuantity > variant.stock) {
+		if (totalQuantity > availableStock) {
 			throw new Error(
-				`Only ${variant.stock} items available${existingQuantity > 0 ? ` (${existingQuantity} already in cart)` : ""}`
+				`Only ${availableStock} items available${existingQuantity > 0 ? ` (${existingQuantity} already in cart)` : ""}`
 			);
 		}
 
@@ -319,6 +324,9 @@ export class OrderService {
 				.where(eq(orderLines.id, existingLine.id))
 				.returning();
 
+			// Update reservation quantity
+			await reservationService.updateQuantity(existingLine.id, newQuantity);
+
 			await this.recalculateTotals(orderId);
 			return updated;
 		}
@@ -337,6 +345,9 @@ export class OrderService {
 				sku: variant.sku
 			})
 			.returning();
+
+		// Create reservation for the new line
+		await reservationService.reserve(input.variantId, orderId, line.id, input.quantity);
 
 		await this.recalculateTotals(orderId);
 		return line;
@@ -363,14 +374,14 @@ export class OrderService {
 
 		if (!line) throw new Error("Line not found");
 
-		// Check stock availability
-		const [variant] = await db
-			.select()
-			.from(productVariants)
-			.where(eq(productVariants.id, line.variantId));
+		// Check stock availability using reservations (excludes this order's existing reservations)
+		const availableStock = await reservationService.getAvailableStockExcludingOrder(
+			line.variantId,
+			orderId
+		);
 
-		if (variant && quantity > variant.stock) {
-			throw new Error(`Only ${variant.stock} items available`);
+		if (quantity > availableStock) {
+			throw new Error(`Only ${availableStock} items available`);
 		}
 
 		const [updated] = await db
@@ -381,6 +392,9 @@ export class OrderService {
 			})
 			.where(eq(orderLines.id, lineId))
 			.returning();
+
+		// Update reservation quantity
+		await reservationService.updateQuantity(lineId, quantity);
 
 		await this.recalculateTotals(orderId);
 		return updated;
@@ -393,6 +407,9 @@ export class OrderService {
 		const order = await this.getById(orderId);
 		if (!order) throw new Error("Order not found");
 		if (!order.active) throw new Error("Cannot modify completed order");
+
+		// Release reservation for this line
+		await reservationService.release(lineId);
 
 		await db.delete(orderLines).where(eq(orderLines.id, lineId));
 		await this.recalculateTotals(orderId);
@@ -502,6 +519,8 @@ export class OrderService {
 			if (!order.orderPlacedAt) {
 				updateData.orderPlacedAt = new Date();
 			}
+			// Extend reservations during checkout (additional 15 minutes)
+			await reservationService.extendForOrder(orderId);
 		}
 
 		const [updated] = await db
@@ -537,6 +556,24 @@ export class OrderService {
 					.set({ stock: sql`${productVariants.stock} - ${line.quantity}` })
 					.where(eq(productVariants.id, line.variantId));
 			}
+
+			// Release reservations since stock has been permanently deducted
+			await reservationService.releaseForOrder(orderId);
+		}
+
+		// Handle cancellation
+		if (newState === "cancelled") {
+			// If order was paid, restore stock
+			if (currentState === "paid" || currentState === "shipped") {
+				for (const line of order.lines) {
+					await db
+						.update(productVariants)
+						.set({ stock: sql`${productVariants.stock} + ${line.quantity}` })
+						.where(eq(productVariants.id, line.variantId));
+				}
+			}
+			// Release any remaining reservations
+			await reservationService.releaseForOrder(orderId);
 		}
 
 		return updated;
@@ -587,7 +624,7 @@ export class OrderService {
 
 	/**
 	 * Validate stock availability for all items in the order
-	 * Used before completing checkout
+	 * Uses reservation system to check available stock
 	 */
 	async validateStock(orderId: number): Promise<{ valid: boolean; errors: string[] }> {
 		const order = await this.getById(orderId);
@@ -603,8 +640,15 @@ export class OrderService {
 
 			if (!variant) {
 				errors.push(`${line.productName} is no longer available`);
-			} else if (line.quantity > variant.stock) {
-				errors.push(`${line.productName}: only ${variant.stock} available`);
+			} else {
+				// Check available stock excluding this order's reservations
+				const availableStock = await reservationService.getAvailableStockExcludingOrder(
+					line.variantId,
+					orderId
+				);
+				if (line.quantity > availableStock) {
+					errors.push(`${line.productName}: only ${availableStock} available`);
+				}
 			}
 		}
 

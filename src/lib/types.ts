@@ -30,7 +30,8 @@ import type {
 	collectionFilters,
 	wishlists,
 	wishlistItems,
-	reviews
+	reviews,
+	stockReservations
 } from "$lib/server/db/schema.js";
 
 // ============================================================================
@@ -193,6 +194,13 @@ export interface OrderLineWithVariant extends OrderLine {
 	variant?: ProductVariant | null;
 	imageUrl?: string | null;
 }
+
+// ============================================================================
+// STOCK RESERVATION TYPES
+// ============================================================================
+
+export type StockReservation = InferSelectModel<typeof stockReservations>;
+export type NewStockReservation = InferInsertModel<typeof stockReservations>;
 
 // ============================================================================
 // PROMOTION TYPES

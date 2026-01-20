@@ -465,6 +465,35 @@ export const orderLines = pgTable(
 );
 
 // ============================================================================
+// STOCK RESERVATIONS
+// ============================================================================
+
+export const stockReservations = pgTable(
+	"stock_reservations",
+	{
+		id: serial("id").primaryKey(),
+		variantId: integer("variant_id")
+			.references(() => productVariants.id, { onDelete: "cascade" })
+			.notNull(),
+		orderId: integer("order_id")
+			.references(() => orders.id, { onDelete: "cascade" })
+			.notNull(),
+		orderLineId: integer("order_line_id")
+			.references(() => orderLines.id, { onDelete: "cascade" })
+			.notNull(),
+		quantity: integer("quantity").notNull(),
+		expiresAt: timestamp("expires_at").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull()
+	},
+	(table) => [
+		index("stock_reservations_variant_idx").on(table.variantId),
+		index("stock_reservations_expires_idx").on(table.expiresAt),
+		index("stock_reservations_order_idx").on(table.orderId),
+		index("stock_reservations_line_idx").on(table.orderLineId)
+	]
+);
+
+// ============================================================================
 // PAYMENTS
 // ============================================================================
 
@@ -859,7 +888,8 @@ export const productVariantsRelations = relations(productVariants, ({ one, many 
 		references: [assets.id]
 	}),
 	orderLines: many(orderLines),
-	groupPrices: many(productVariantGroupPrices)
+	groupPrices: many(productVariantGroupPrices),
+	reservations: many(stockReservations)
 }));
 
 export const productVariantTranslationsRelations = relations(
@@ -1002,7 +1032,8 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
 	lines: many(orderLines),
 	payments: many(payments),
 	promotions: many(orderPromotions),
-	shipping: one(orderShipping)
+	shipping: one(orderShipping),
+	reservations: many(stockReservations)
 }));
 
 export const orderLinesRelations = relations(orderLines, ({ one }) => ({
@@ -1013,6 +1044,22 @@ export const orderLinesRelations = relations(orderLines, ({ one }) => ({
 	variant: one(productVariants, {
 		fields: [orderLines.variantId],
 		references: [productVariants.id]
+	}),
+	reservation: one(stockReservations)
+}));
+
+export const stockReservationsRelations = relations(stockReservations, ({ one }) => ({
+	variant: one(productVariants, {
+		fields: [stockReservations.variantId],
+		references: [productVariants.id]
+	}),
+	order: one(orders, {
+		fields: [stockReservations.orderId],
+		references: [orders.id]
+	}),
+	orderLine: one(orderLines, {
+		fields: [stockReservations.orderLineId],
+		references: [orderLines.id]
 	})
 }));
 
