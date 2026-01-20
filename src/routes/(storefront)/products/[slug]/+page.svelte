@@ -150,14 +150,9 @@
 
     <!-- Product Info -->
     <div class="ml-10">
-      <div class="mb-8 flex items-center justify-between">
+      <div class="mb-4 flex items-center justify-between">
         <h1 class="text-3xl font-bold">{enTrans?.name ?? "Product"}</h1>
-        {#if selectedVariant}
-          <p class="text-xl font-semibold">
-            {(selectedVariant.price / 100).toFixed(2)} EUR
-          </p>
-        {/if}
-        <!-- <button
+        <button
           type="button"
           onclick={handleToggleWishlist}
           disabled={isTogglingWishlist}
@@ -166,9 +161,15 @@
             : 'text-gray-400 hover:text-red-500'} disabled:opacity-50"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <Heart class="h-7 w-7" fill={isWishlisted ? "currentColor" : "none"} />
-        </button> -->
+          <Heart class="h-6 w-6" fill={isWishlisted ? "currentColor" : "none"} />
+        </button>
       </div>
+
+      {#if selectedVariant}
+        <div class="mb-8 text-xl font-semibold">
+          {(selectedVariant.price / 100).toFixed(2)} EUR
+        </div>
+      {/if}
 
       {#if enTrans?.description}
         <p class="mb-12 text-gray-600">{enTrans.description}</p>
@@ -218,17 +219,15 @@
 
       <!-- Add to Cart -->
       {#if selectedVariant && selectedVariant.stock > 0}
-        <div>
-          <Button
-            type="button"
-            size="xl"
-            onclick={handleAddToCart}
-            disabled={isAddingToCart}
-            class="flex-1 py-3"
-          >
-            {isAddingToCart ? "Adding..." : "Add to Cart"}
-          </Button>
-        </div>
+        <Button
+          type="button"
+          size="xl"
+          onclick={handleAddToCart}
+          disabled={isAddingToCart}
+          class="flex-1 py-3"
+        >
+          {isAddingToCart ? "Adding..." : "Add to Cart"}
+        </Button>
       {/if}
     </div>
   </div>
