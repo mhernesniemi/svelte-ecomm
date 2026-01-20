@@ -182,14 +182,14 @@
 
       <!-- Variant Selection -->
       {#if product.variants.length > 1}
-        <div class="mb-12">
+        <div class="mb-8">
           <p class="mb-2 block text-sm font-medium text-gray-700">Select Variant</p>
           <div class="flex flex-wrap gap-2" role="group" aria-label="Product variants">
             {#each product.variants as variant}
               <button
                 type="button"
                 onclick={() => (selectedVariantId = variant.id)}
-                class="rounded-lg border px-4 py-2 transition-colors {selectedVariantId ===
+                class="rounded-lg border px-3 py-1 text-sm transition-colors {selectedVariantId ===
                 variant.id
                   ? 'border-blue-600 bg-blue-50 text-blue-600'
                   : 'border-gray-300 hover:border-gray-400'}"
