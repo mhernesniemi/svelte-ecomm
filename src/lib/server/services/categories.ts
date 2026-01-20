@@ -229,10 +229,7 @@ export class CategoryService {
 	 * Assign product to category
 	 */
 	async addProduct(categoryId: number, productId: number): Promise<void> {
-		await db
-			.insert(productCategories)
-			.values({ categoryId, productId })
-			.onConflictDoNothing();
+		await db.insert(productCategories).values({ categoryId, productId }).onConflictDoNothing();
 	}
 
 	/**
@@ -272,9 +269,9 @@ export class CategoryService {
 		await db.delete(productCategories).where(eq(productCategories.productId, productId));
 
 		if (categoryIds.length > 0) {
-			await db.insert(productCategories).values(
-				categoryIds.map((categoryId) => ({ productId, categoryId }))
-			);
+			await db
+				.insert(productCategories)
+				.values(categoryIds.map((categoryId) => ({ productId, categoryId })));
 		}
 	}
 

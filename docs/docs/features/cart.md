@@ -11,16 +11,16 @@ Hoikka uses cookie-based cart tokens for guest-friendly shopping.
 ```typescript
 // In +page.server.ts
 export const load = async ({ cookies }) => {
-  const token = cookies.get('cart_token') ?? crypto.randomUUID();
+	const token = cookies.get("cart_token") ?? crypto.randomUUID();
 
-  // Set cookie if new
-  cookies.set('cart_token', token, {
-    path: '/',
-    maxAge: 60 * 60 * 24 * 30  // 30 days
-  });
+	// Set cookie if new
+	cookies.set("cart_token", token, {
+		path: "/",
+		maxAge: 60 * 60 * 24 * 30 // 30 days
+	});
 
-  const cart = await cartService.getOrCreate(token);
-  return { cart };
+	const cart = await cartService.getOrCreate(token);
+	return { cart };
 };
 ```
 
@@ -58,20 +58,20 @@ await cartService.clear(cartId);
 
 ```typescript
 interface Cart {
-  id: number;
-  token: string;
-  lines: CartLine[];
-  subtotal: number;
-  createdAt: Date;
+	id: number;
+	token: string;
+	lines: CartLine[];
+	subtotal: number;
+	createdAt: Date;
 }
 
 interface CartLine {
-  id: number;
-  variantId: number;
-  variant: ProductVariant;
-  quantity: number;
-  unitPrice: number;
-  total: number;
+	id: number;
+	variantId: number;
+	variant: ProductVariant;
+	quantity: number;
+	unitPrice: number;
+	total: number;
 }
 ```
 
@@ -80,8 +80,8 @@ interface CartLine {
 ```typescript
 // At checkout
 const order = await orderService.createFromCart(cart.id, {
-  shippingAddress: formData.shippingAddress,
-  billingAddress: formData.billingAddress
+	shippingAddress: formData.shippingAddress,
+	billingAddress: formData.billingAddress
 });
 
 // Cart is cleared after successful order creation

@@ -38,7 +38,10 @@ const memoryHandlers = new Map<string, EventHandler<unknown>[]>();
  * Subscribe to an event (in-memory, immediate execution)
  * Use this for non-critical side effects that don't need persistence
  */
-export function on<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): () => void {
+export function on<K extends keyof EventMap>(
+	event: K,
+	handler: EventHandler<EventMap[K]>
+): () => void {
 	const handlers = memoryHandlers.get(event) || [];
 	handlers.push(handler as EventHandler<unknown>);
 	memoryHandlers.set(event, handlers);
@@ -57,7 +60,10 @@ export function on<K extends keyof EventMap>(event: K, handler: EventHandler<Eve
  * Emit an event (in-memory, immediate execution)
  * Handlers run concurrently, failures are logged but don't stop other handlers
  */
-export async function emit<K extends keyof EventMap>(event: K, payload: EventMap[K]): Promise<void> {
+export async function emit<K extends keyof EventMap>(
+	event: K,
+	payload: EventMap[K]
+): Promise<void> {
 	const handlers = memoryHandlers.get(event) || [];
 
 	if (handlers.length === 0) return;

@@ -53,7 +53,10 @@ class AuthService {
 	/**
 	 * Authenticate a user with email and password
 	 */
-	async login(email: string, password: string): Promise<{ user: User; sessionId: string } | null> {
+	async login(
+		email: string,
+		password: string
+	): Promise<{ user: User; sessionId: string } | null> {
 		const user = await db.query.users.findFirst({
 			where: eq(users.email, email.toLowerCase())
 		});

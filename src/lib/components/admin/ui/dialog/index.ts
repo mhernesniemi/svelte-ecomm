@@ -32,5 +32,5 @@ export {
 	Title as DialogTitle,
 	Trigger as DialogTrigger,
 	Close as DialogClose,
-	Portal as DialogPortal,
+	Portal as DialogPortal
 };

@@ -12,10 +12,10 @@ Hoikka uses a provider pattern for payments and shipping, making it easy to add 
 
 ```typescript
 interface PaymentProvider {
-  code: string;
-  createPayment(order: Order): Promise<PaymentInfo>;
-  confirmPayment(transactionId: string): Promise<PaymentStatus>;
-  refundPayment?(transactionId: string, amount: number): Promise<RefundInfo>;
+	code: string;
+	createPayment(order: Order): Promise<PaymentInfo>;
+	confirmPayment(transactionId: string): Promise<PaymentStatus>;
+	refundPayment?(transactionId: string, amount: number): Promise<RefundInfo>;
 }
 ```
 
@@ -24,27 +24,27 @@ interface PaymentProvider {
 ```typescript
 // src/lib/server/services/payments/providers/klarna.ts
 export class KlarnaProvider implements PaymentProvider {
-  code = 'klarna';
+	code = "klarna";
 
-  async createPayment(order: Order): Promise<PaymentInfo> {
-    // Create Klarna payment session
-    const session = await klarnaClient.createSession({
-      amount: order.total,
-      currency: 'EUR',
-      // ...
-    });
+	async createPayment(order: Order): Promise<PaymentInfo> {
+		// Create Klarna payment session
+		const session = await klarnaClient.createSession({
+			amount: order.total,
+			currency: "EUR"
+			// ...
+		});
 
-    return {
-      transactionId: session.id,
-      redirectUrl: session.redirect_url,
-      status: 'pending'
-    };
-  }
+		return {
+			transactionId: session.id,
+			redirectUrl: session.redirect_url,
+			status: "pending"
+		};
+	}
 
-  async confirmPayment(transactionId: string): Promise<PaymentStatus> {
-    const payment = await klarnaClient.getPayment(transactionId);
-    return payment.status === 'CAPTURED' ? 'settled' : 'pending';
-  }
+	async confirmPayment(transactionId: string): Promise<PaymentStatus> {
+		const payment = await klarnaClient.getPayment(transactionId);
+		return payment.status === "CAPTURED" ? "settled" : "pending";
+	}
 }
 ```
 
@@ -52,9 +52,9 @@ Register it:
 
 ```typescript
 // src/lib/server/services/payments/index.ts
-import { KlarnaProvider } from './providers/klarna';
+import { KlarnaProvider } from "./providers/klarna";
 
-PROVIDERS.set('klarna', new KlarnaProvider());
+PROVIDERS.set("klarna", new KlarnaProvider());
 ```
 
 ## Shipping Providers
@@ -63,10 +63,10 @@ PROVIDERS.set('klarna', new KlarnaProvider());
 
 ```typescript
 interface ShippingProvider {
-  code: string;
-  getRates(order: Order): Promise<ShippingRate[]>;
-  createShipment(order: Order): Promise<ShipmentInfo>;
-  trackShipment(trackingNumber: string): Promise<ShipmentStatus>;
+	code: string;
+	getRates(order: Order): Promise<ShippingRate[]>;
+	createShipment(order: Order): Promise<ShipmentInfo>;
+	trackShipment(trackingNumber: string): Promise<ShipmentStatus>;
 }
 ```
 
@@ -75,33 +75,35 @@ interface ShippingProvider {
 ```typescript
 // src/lib/server/services/shipping/providers/dhl.ts
 export class DhlProvider implements ShippingProvider {
-  code = 'dhl';
+	code = "dhl";
 
-  async getRates(order: Order): Promise<ShippingRate[]> {
-    const rates = await dhlClient.getRates({
-      from: WAREHOUSE_ADDRESS,
-      to: order.shippingAddress,
-      weight: calculateWeight(order)
-    });
+	async getRates(order: Order): Promise<ShippingRate[]> {
+		const rates = await dhlClient.getRates({
+			from: WAREHOUSE_ADDRESS,
+			to: order.shippingAddress,
+			weight: calculateWeight(order)
+		});
 
-    return rates.map(rate => ({
-      id: rate.serviceCode,
-      name: rate.serviceName,
-      price: rate.totalPrice,
-      estimatedDays: rate.transitDays
-    }));
-  }
+		return rates.map((rate) => ({
+			id: rate.serviceCode,
+			name: rate.serviceName,
+			price: rate.totalPrice,
+			estimatedDays: rate.transitDays
+		}));
+	}
 
-  // ... other methods
+	// ... other methods
 }
 ```
 
 ## Built-in Providers
 
 ### Payments
+
 - **Stripe** - Full integration with Payment Intents
 - **Mock** - For development/testing
 
 ### Shipping
+
 - **Posti** - Finnish postal service
 - **Matkahuolto** - Finnish parcel service

@@ -1,26 +1,26 @@
 {
-  "id": "integrations/sync-runner",
-  "title": "Sync Runner",
-  "description": "Reusable pattern for synchronizing data from external systems (ERP, PIM, etc.).",
-  "source": "@site/docs/integrations/sync-runner.md",
-  "sourceDirName": "integrations",
-  "slug": "/integrations/sync-runner",
-  "permalink": "/integrations/sync-runner",
-  "draft": false,
-  "unlisted": false,
-  "tags": [],
-  "version": "current",
-  "sidebarPosition": 4,
-  "frontMatter": {
-    "sidebar_position": 4
-  },
-  "sidebar": "docs",
-  "previous": {
-    "title": "Events",
-    "permalink": "/integrations/events"
-  },
-  "next": {
-    "title": "Webhooks",
-    "permalink": "/integrations/webhooks"
-  }
+	"id": "integrations/sync-runner",
+	"title": "Sync Runner",
+	"description": "Reusable pattern for synchronizing data from external systems (ERP, PIM, etc.).",
+	"source": "@site/docs/integrations/sync-runner.md",
+	"sourceDirName": "integrations",
+	"slug": "/integrations/sync-runner",
+	"permalink": "/integrations/sync-runner",
+	"draft": false,
+	"unlisted": false,
+	"tags": [],
+	"version": "current",
+	"sidebarPosition": 4,
+	"frontMatter": {
+		"sidebar_position": 4
+	},
+	"sidebar": "docs",
+	"previous": {
+		"title": "Events",
+		"permalink": "/integrations/events"
+	},
+	"next": {
+		"title": "Webhooks",
+		"permalink": "/integrations/webhooks"
+	}
 }

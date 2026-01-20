@@ -5,7 +5,7 @@
 
 /* Global focus styles */
 *:focus-visible {
-	@apply outline-none ring-2 ring-blue-500 ring-offset-2;
+	@apply ring-2 ring-blue-500 ring-offset-2 outline-none;
 }
 
 input:focus-visible,

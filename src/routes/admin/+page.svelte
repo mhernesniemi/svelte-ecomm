@@ -45,13 +45,13 @@
             <div class="text-right">
               <p class="font-medium">{(order.total / 100).toFixed(2)} {order.currencyCode}</p>
               <Badge
-                variant={order.state === 'paid'
-                  ? 'success'
-                  : order.state === 'created'
-                    ? 'secondary'
-                    : order.state === 'shipped'
-                      ? 'default'
-                      : 'warning'}
+                variant={order.state === "paid"
+                  ? "success"
+                  : order.state === "created"
+                    ? "secondary"
+                    : order.state === "shipped"
+                      ? "default"
+                      : "warning"}
               >
                 {order.state}
               </Badge>

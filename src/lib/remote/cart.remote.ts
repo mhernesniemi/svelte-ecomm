@@ -65,20 +65,17 @@ export const updateCartLineQuantity = command(
 	}
 );
 
-export const removeCartLine = command(
-	"unchecked",
-	async (input: { lineId: number }) => {
-		const event = getRequestEvent();
-		const customerId = event.locals.customer?.id ?? null;
-		const cartToken = event.locals.cartToken ?? null;
+export const removeCartLine = command("unchecked", async (input: { lineId: number }) => {
+	const event = getRequestEvent();
+	const customerId = event.locals.customer?.id ?? null;
+	const cartToken = event.locals.cartToken ?? null;
 
-		const cart = await orderService.getActiveCart({ customerId, cartToken });
-		if (!cart) {
-			throw new Error("No active cart found");
-		}
-
-		await orderService.removeLine(cart.id, input.lineId);
-
-		return { success: true };
+	const cart = await orderService.getActiveCart({ customerId, cartToken });
+	if (!cart) {
+		throw new Error("No active cart found");
 	}
-);
+
+	await orderService.removeLine(cart.id, input.lineId);
+
+	return { success: true };
+});

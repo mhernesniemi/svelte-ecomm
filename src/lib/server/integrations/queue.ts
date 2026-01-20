@@ -231,7 +231,12 @@ async function processOne(queue: string): Promise<boolean> {
 
 	if (!handler) {
 		console.error(`[Queue] No handler registered for job type: ${job.type}`);
-		await failJob(job.id, `No handler for job type: ${job.type}`, job.attempts, job.maxAttempts);
+		await failJob(
+			job.id,
+			`No handler for job type: ${job.type}`,
+			job.attempts,
+			job.maxAttempts
+		);
 		return true;
 	}
 

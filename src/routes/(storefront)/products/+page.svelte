@@ -66,12 +66,7 @@
     <aside class="w-64 flex-shrink-0">
       <!-- Search -->
       <form method="GET" class="mb-6">
-        <Input
-          type="text"
-          name="q"
-          value={data.search ?? ""}
-          placeholder="Search products..."
-        />
+        <Input type="text" name="q" value={data.search ?? ""} placeholder="Search products..." />
       </form>
 
       {#if hasActiveFilters}

@@ -1,1 +1,357 @@
-{"version":{"pluginId":"default","version":"current","label":"Next","banner":null,"badge":false,"noIndex":false,"className":"docs-version-current","isLast":true,"docsSidebars":{"docs":[{"type":"link","href":"/","label":"Introduction","docId":"intro","unlisted":false},{"type":"category","label":"Getting Started","items":[{"type":"link","href":"/getting-started/installation","label":"Installation","docId":"getting-started/installation","unlisted":false},{"type":"link","href":"/getting-started/configuration","label":"Configuration","docId":"getting-started/configuration","unlisted":false},{"type":"link","href":"/getting-started/project-structure","label":"Project Structure","docId":"getting-started/project-structure","unlisted":false}],"collapsed":true,"collapsible":true},{"type":"category","label":"Core Concepts","items":[{"type":"link","href":"/core/architecture","label":"Architecture","docId":"core/architecture","unlisted":false},{"type":"link","href":"/core/database","label":"Database","docId":"core/database","unlisted":false},{"type":"link","href":"/core/services","label":"Services","docId":"core/services","unlisted":false},{"type":"link","href":"/core/providers","label":"Providers","docId":"core/providers","unlisted":false}],"collapsed":true,"collapsible":true},{"type":"category","label":"Features","items":[{"type":"link","href":"/features/products","label":"Products","docId":"features/products","unlisted":false},{"type":"link","href":"/features/orders","label":"Orders","docId":"features/orders","unlisted":false},{"type":"link","href":"/features/cart","label":"Cart","docId":"features/cart","unlisted":false},{"type":"link","href":"/features/collections","label":"Collections","docId":"features/collections","unlisted":false},{"type":"link","href":"/features/payments","label":"Payments","docId":"features/payments","unlisted":false},{"type":"link","href":"/features/shipping","label":"Shipping","docId":"features/shipping","unlisted":false},{"type":"link","href":"/features/assets","label":"Assets & Images","docId":"features/assets","unlisted":false}],"collapsed":true,"collapsible":true},{"type":"category","label":"Integrations","items":[{"type":"link","href":"/integrations/overview","label":"Integrations Overview","docId":"integrations/overview","unlisted":false},{"type":"link","href":"/integrations/job-queue","label":"Job Queue","docId":"integrations/job-queue","unlisted":false},{"type":"link","href":"/integrations/events","label":"Events","docId":"integrations/events","unlisted":false},{"type":"link","href":"/integrations/sync-runner","label":"Sync Runner","docId":"integrations/sync-runner","unlisted":false},{"type":"link","href":"/integrations/webhooks","label":"Webhooks","docId":"integrations/webhooks","unlisted":false},{"type":"link","href":"/integrations/erp-example","label":"ERP Integration Example","docId":"integrations/erp-example","unlisted":false}],"collapsed":true,"collapsible":true},{"type":"category","label":"API Reference","items":[{"type":"link","href":"/api/endpoints","label":"API Endpoints","docId":"api/endpoints","unlisted":false},{"type":"link","href":"/api/form-actions","label":"Form Actions","docId":"api/form-actions","unlisted":false}],"collapsed":true,"collapsible":true}]},"docs":{"api/endpoints":{"id":"api/endpoints","title":"API Endpoints","description":"Hoikka uses a mix of API routes for AJAX operations and form actions for mutations.","sidebar":"docs"},"api/form-actions":{"id":"api/form-actions","title":"Form Actions","description":"Most admin operations use SvelteKit form actions with progressive enhancement.","sidebar":"docs"},"core/architecture":{"id":"core/architecture","title":"Architecture","description":"Hoikka follows a service-oriented architecture with clear separation of concerns.","sidebar":"docs"},"core/database":{"id":"core/database","title":"Database","description":"Hoikka uses PostgreSQL with Drizzle ORM. Schema is defined in TypeScript.","sidebar":"docs"},"core/providers":{"id":"core/providers","title":"Providers","description":"Hoikka uses a provider pattern for payments and shipping, making it easy to add new integrations.","sidebar":"docs"},"core/services":{"id":"core/services","title":"Services","description":"All business logic lives in src/lib/server/services/. Each service is a singleton class.","sidebar":"docs"},"features/assets":{"id":"features/assets","title":"Assets & Images","description":"Hoikka uses ImageKit for image hosting and transformation.","sidebar":"docs"},"features/cart":{"id":"features/cart","title":"Cart","description":"Hoikka uses cookie-based cart tokens for guest-friendly shopping.","sidebar":"docs"},"features/collections":{"id":"features/collections","title":"Collections","description":"Collections group products for navigation and merchandising. They can be manual or rule-based (smart collections).","sidebar":"docs"},"features/orders":{"id":"features/orders","title":"Orders","description":"Orders track customer purchases through their lifecycle.","sidebar":"docs"},"features/payments":{"id":"features/payments","title":"Payments","description":"Hoikka uses a provider pattern for payments, with Stripe as the default.","sidebar":"docs"},"features/products":{"id":"features/products","title":"Products","description":"Products in Hoikka support variants, translations, and facets (attributes).","sidebar":"docs"},"features/shipping":{"id":"features/shipping","title":"Shipping","description":"Hoikka supports multiple shipping providers with a unified interface.","sidebar":"docs"},"getting-started/configuration":{"id":"getting-started/configuration","title":"Configuration","description":"Hoikka uses environment variables for configuration. No XML, YAML, or admin panels needed.","sidebar":"docs"},"getting-started/installation":{"id":"getting-started/installation","title":"Installation","description":"Prerequisites","sidebar":"docs"},"getting-started/project-structure":{"id":"getting-started/project-structure","title":"Project Structure","description":"Key Directories","sidebar":"docs"},"integrations/erp-example":{"id":"integrations/erp-example","title":"ERP Integration Example","description":"Complete example showing how to integrate an external ERP system.","sidebar":"docs"},"integrations/events":{"id":"integrations/events","title":"Events","description":"Two modes of operation: in-memory (immediate) or persistent (via job queue).","sidebar":"docs"},"integrations/job-queue":{"id":"integrations/job-queue","title":"Job Queue","description":"PostgreSQL-backed job queue with automatic retry and exponential backoff.","sidebar":"docs"},"integrations/overview":{"id":"integrations/overview","title":"Integrations Overview","description":"Hoikka includes PostgreSQL-native utilities for integrating external systems (ERP, PIM, etc.) without Redis or other external dependencies.","sidebar":"docs"},"integrations/sync-runner":{"id":"integrations/sync-runner","title":"Sync Runner","description":"Reusable pattern for synchronizing data from external systems (ERP, PIM, etc.).","sidebar":"docs"},"integrations/webhooks":{"id":"integrations/webhooks","title":"Webhooks","description":"Handle incoming webhooks from external systems with signature verification.","sidebar":"docs"},"intro":{"id":"intro","title":"Introduction","description":"Hoikka is a lightweight e-commerce platform for SvelteKit that is 100% customizable and owned by you.","sidebar":"docs"}}}}
+{
+	"version": {
+		"pluginId": "default",
+		"version": "current",
+		"label": "Next",
+		"banner": null,
+		"badge": false,
+		"noIndex": false,
+		"className": "docs-version-current",
+		"isLast": true,
+		"docsSidebars": {
+			"docs": [
+				{
+					"type": "link",
+					"href": "/",
+					"label": "Introduction",
+					"docId": "intro",
+					"unlisted": false
+				},
+				{
+					"type": "category",
+					"label": "Getting Started",
+					"items": [
+						{
+							"type": "link",
+							"href": "/getting-started/installation",
+							"label": "Installation",
+							"docId": "getting-started/installation",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/getting-started/configuration",
+							"label": "Configuration",
+							"docId": "getting-started/configuration",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/getting-started/project-structure",
+							"label": "Project Structure",
+							"docId": "getting-started/project-structure",
+							"unlisted": false
+						}
+					],
+					"collapsed": true,
+					"collapsible": true
+				},
+				{
+					"type": "category",
+					"label": "Core Concepts",
+					"items": [
+						{
+							"type": "link",
+							"href": "/core/architecture",
+							"label": "Architecture",
+							"docId": "core/architecture",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/core/database",
+							"label": "Database",
+							"docId": "core/database",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/core/services",
+							"label": "Services",
+							"docId": "core/services",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/core/providers",
+							"label": "Providers",
+							"docId": "core/providers",
+							"unlisted": false
+						}
+					],
+					"collapsed": true,
+					"collapsible": true
+				},
+				{
+					"type": "category",
+					"label": "Features",
+					"items": [
+						{
+							"type": "link",
+							"href": "/features/products",
+							"label": "Products",
+							"docId": "features/products",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/features/orders",
+							"label": "Orders",
+							"docId": "features/orders",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/features/cart",
+							"label": "Cart",
+							"docId": "features/cart",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/features/collections",
+							"label": "Collections",
+							"docId": "features/collections",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/features/payments",
+							"label": "Payments",
+							"docId": "features/payments",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/features/shipping",
+							"label": "Shipping",
+							"docId": "features/shipping",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/features/assets",
+							"label": "Assets & Images",
+							"docId": "features/assets",
+							"unlisted": false
+						}
+					],
+					"collapsed": true,
+					"collapsible": true
+				},
+				{
+					"type": "category",
+					"label": "Integrations",
+					"items": [
+						{
+							"type": "link",
+							"href": "/integrations/overview",
+							"label": "Integrations Overview",
+							"docId": "integrations/overview",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/integrations/job-queue",
+							"label": "Job Queue",
+							"docId": "integrations/job-queue",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/integrations/events",
+							"label": "Events",
+							"docId": "integrations/events",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/integrations/sync-runner",
+							"label": "Sync Runner",
+							"docId": "integrations/sync-runner",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/integrations/webhooks",
+							"label": "Webhooks",
+							"docId": "integrations/webhooks",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/integrations/erp-example",
+							"label": "ERP Integration Example",
+							"docId": "integrations/erp-example",
+							"unlisted": false
+						}
+					],
+					"collapsed": true,
+					"collapsible": true
+				},
+				{
+					"type": "category",
+					"label": "API Reference",
+					"items": [
+						{
+							"type": "link",
+							"href": "/api/endpoints",
+							"label": "API Endpoints",
+							"docId": "api/endpoints",
+							"unlisted": false
+						},
+						{
+							"type": "link",
+							"href": "/api/form-actions",
+							"label": "Form Actions",
+							"docId": "api/form-actions",
+							"unlisted": false
+						}
+					],
+					"collapsed": true,
+					"collapsible": true
+				}
+			]
+		},
+		"docs": {
+			"api/endpoints": {
+				"id": "api/endpoints",
+				"title": "API Endpoints",
+				"description": "Hoikka uses a mix of API routes for AJAX operations and form actions for mutations.",
+				"sidebar": "docs"
+			},
+			"api/form-actions": {
+				"id": "api/form-actions",
+				"title": "Form Actions",
+				"description": "Most admin operations use SvelteKit form actions with progressive enhancement.",
+				"sidebar": "docs"
+			},
+			"core/architecture": {
+				"id": "core/architecture",
+				"title": "Architecture",
+				"description": "Hoikka follows a service-oriented architecture with clear separation of concerns.",
+				"sidebar": "docs"
+			},
+			"core/database": {
+				"id": "core/database",
+				"title": "Database",
+				"description": "Hoikka uses PostgreSQL with Drizzle ORM. Schema is defined in TypeScript.",
+				"sidebar": "docs"
+			},
+			"core/providers": {
+				"id": "core/providers",
+				"title": "Providers",
+				"description": "Hoikka uses a provider pattern for payments and shipping, making it easy to add new integrations.",
+				"sidebar": "docs"
+			},
+			"core/services": {
+				"id": "core/services",
+				"title": "Services",
+				"description": "All business logic lives in src/lib/server/services/. Each service is a singleton class.",
+				"sidebar": "docs"
+			},
+			"features/assets": {
+				"id": "features/assets",
+				"title": "Assets & Images",
+				"description": "Hoikka uses ImageKit for image hosting and transformation.",
+				"sidebar": "docs"
+			},
+			"features/cart": {
+				"id": "features/cart",
+				"title": "Cart",
+				"description": "Hoikka uses cookie-based cart tokens for guest-friendly shopping.",
+				"sidebar": "docs"
+			},
+			"features/collections": {
+				"id": "features/collections",
+				"title": "Collections",
+				"description": "Collections group products for navigation and merchandising. They can be manual or rule-based (smart collections).",
+				"sidebar": "docs"
+			},
+			"features/orders": {
+				"id": "features/orders",
+				"title": "Orders",
+				"description": "Orders track customer purchases through their lifecycle.",
+				"sidebar": "docs"
+			},
+			"features/payments": {
+				"id": "features/payments",
+				"title": "Payments",
+				"description": "Hoikka uses a provider pattern for payments, with Stripe as the default.",
+				"sidebar": "docs"
+			},
+			"features/products": {
+				"id": "features/products",
+				"title": "Products",
+				"description": "Products in Hoikka support variants, translations, and facets (attributes).",
+				"sidebar": "docs"
+			},
+			"features/shipping": {
+				"id": "features/shipping",
+				"title": "Shipping",
+				"description": "Hoikka supports multiple shipping providers with a unified interface.",
+				"sidebar": "docs"
+			},
+			"getting-started/configuration": {
+				"id": "getting-started/configuration",
+				"title": "Configuration",
+				"description": "Hoikka uses environment variables for configuration. No XML, YAML, or admin panels needed.",
+				"sidebar": "docs"
+			},
+			"getting-started/installation": {
+				"id": "getting-started/installation",
+				"title": "Installation",
+				"description": "Prerequisites",
+				"sidebar": "docs"
+			},
+			"getting-started/project-structure": {
+				"id": "getting-started/project-structure",
+				"title": "Project Structure",
+				"description": "Key Directories",
+				"sidebar": "docs"
+			},
+			"integrations/erp-example": {
+				"id": "integrations/erp-example",
+				"title": "ERP Integration Example",
+				"description": "Complete example showing how to integrate an external ERP system.",
+				"sidebar": "docs"
+			},
+			"integrations/events": {
+				"id": "integrations/events",
+				"title": "Events",
+				"description": "Two modes of operation: in-memory (immediate) or persistent (via job queue).",
+				"sidebar": "docs"
+			},
+			"integrations/job-queue": {
+				"id": "integrations/job-queue",
+				"title": "Job Queue",
+				"description": "PostgreSQL-backed job queue with automatic retry and exponential backoff.",
+				"sidebar": "docs"
+			},
+			"integrations/overview": {
+				"id": "integrations/overview",
+				"title": "Integrations Overview",
+				"description": "Hoikka includes PostgreSQL-native utilities for integrating external systems (ERP, PIM, etc.) without Redis or other external dependencies.",
+				"sidebar": "docs"
+			},
+			"integrations/sync-runner": {
+				"id": "integrations/sync-runner",
+				"title": "Sync Runner",
+				"description": "Reusable pattern for synchronizing data from external systems (ERP, PIM, etc.).",
+				"sidebar": "docs"
+			},
+			"integrations/webhooks": {
+				"id": "integrations/webhooks",
+				"title": "Webhooks",
+				"description": "Handle incoming webhooks from external systems with signature verification.",
+				"sidebar": "docs"
+			},
+			"intro": {
+				"id": "intro",
+				"title": "Introduction",
+				"description": "Hoikka is a lightweight e-commerce platform for SvelteKit that is 100% customizable and owned by you.",
+				"sidebar": "docs"
+			}
+		}
+	}
+}

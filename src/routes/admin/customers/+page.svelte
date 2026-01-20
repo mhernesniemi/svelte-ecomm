@@ -27,8 +27,12 @@
           {#each data.customers as customer}
             <tr class="hover:bg-gray-50">
               <td class="px-6 py-4">
-                <a href="/admin/customers/{customer.id}" class="font-medium text-blue-600 hover:text-blue-800">
-                  {customer.firstName} {customer.lastName}
+                <a
+                  href="/admin/customers/{customer.id}"
+                  class="font-medium text-blue-600 hover:text-blue-800"
+                >
+                  {customer.firstName}
+                  {customer.lastName}
                 </a>
               </td>
               <td class="px-6 py-4 text-sm text-gray-500">{customer.email}</td>
@@ -37,7 +41,10 @@
                 {new Date(customer.createdAt).toLocaleDateString()}
               </td>
               <td class="px-6 py-4 text-right text-sm">
-                <a href="/admin/customers/{customer.id}" class="font-medium text-blue-600 hover:text-blue-800">
+                <a
+                  href="/admin/customers/{customer.id}"
+                  class="font-medium text-blue-600 hover:text-blue-800"
+                >
                   View
                 </a>
               </td>

@@ -1,26 +1,26 @@
 {
-  "id": "core/services",
-  "title": "Services",
-  "description": "All business logic lives in src/lib/server/services/. Each service is a singleton class.",
-  "source": "@site/docs/core/services.md",
-  "sourceDirName": "core",
-  "slug": "/core/services",
-  "permalink": "/core/services",
-  "draft": false,
-  "unlisted": false,
-  "tags": [],
-  "version": "current",
-  "sidebarPosition": 3,
-  "frontMatter": {
-    "sidebar_position": 3
-  },
-  "sidebar": "docs",
-  "previous": {
-    "title": "Database",
-    "permalink": "/core/database"
-  },
-  "next": {
-    "title": "Providers",
-    "permalink": "/core/providers"
-  }
+	"id": "core/services",
+	"title": "Services",
+	"description": "All business logic lives in src/lib/server/services/. Each service is a singleton class.",
+	"source": "@site/docs/core/services.md",
+	"sourceDirName": "core",
+	"slug": "/core/services",
+	"permalink": "/core/services",
+	"draft": false,
+	"unlisted": false,
+	"tags": [],
+	"version": "current",
+	"sidebarPosition": 3,
+	"frontMatter": {
+		"sidebar_position": 3
+	},
+	"sidebar": "docs",
+	"previous": {
+		"title": "Database",
+		"permalink": "/core/database"
+	},
+	"next": {
+		"title": "Providers",
+		"permalink": "/core/providers"
+	}
 }

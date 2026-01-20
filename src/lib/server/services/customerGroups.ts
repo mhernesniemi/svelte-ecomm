@@ -74,7 +74,10 @@ export class CustomerGroupService {
 	 * List all customer groups with customer counts
 	 */
 	async list(): Promise<(CustomerGroup & { customerCount: number })[]> {
-		const groups = await db.select().from(customerGroups).orderBy(desc(customerGroups.createdAt));
+		const groups = await db
+			.select()
+			.from(customerGroups)
+			.orderBy(desc(customerGroups.createdAt));
 
 		// Get customer counts for each group
 		const groupsWithCounts = await Promise.all(
@@ -167,10 +170,7 @@ export class CustomerGroupService {
 	 * Add customer to group
 	 */
 	async addCustomer(groupId: number, customerId: number): Promise<boolean> {
-		await db
-			.insert(customerGroupMembers)
-			.values({ groupId, customerId })
-			.onConflictDoNothing();
+		await db.insert(customerGroupMembers).values({ groupId, customerId }).onConflictDoNothing();
 
 		return true;
 	}

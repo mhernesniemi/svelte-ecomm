@@ -41,7 +41,8 @@
         </div>
 
         <div class="mb-6">
-          <label for="password" class="mb-1 block text-sm font-medium text-gray-700">Password</label>
+          <label for="password" class="mb-1 block text-sm font-medium text-gray-700">Password</label
+          >
           <input
             type="password"
             id="password"

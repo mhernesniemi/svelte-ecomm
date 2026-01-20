@@ -22,13 +22,23 @@ export const actions: Actions = {
 		const descriptionEn = formData.get("description_en") as string;
 		const descriptionFi = formData.get("description_fi") as string;
 		const type = (formData.get("type") as "physical" | "digital") || "physical";
-		const visibility = (formData.get("visibility") as "public" | "private" | "hidden") || "public";
+		const visibility =
+			(formData.get("visibility") as "public" | "private" | "hidden") || "public";
 
 		// Validation
 		if (!nameEn || !slugEn) {
 			return fail(400, {
 				error: "English name and slug are required",
-				values: { nameEn, nameFi, slugEn, slugFi, descriptionEn, descriptionFi, type, visibility }
+				values: {
+					nameEn,
+					nameFi,
+					slugEn,
+					slugFi,
+					descriptionEn,
+					descriptionFi,
+					type,
+					visibility
+				}
 			});
 		}
 
@@ -61,7 +71,16 @@ export const actions: Actions = {
 			if (isRedirect(error)) throw error;
 			return fail(500, {
 				error: "Failed to create product",
-				values: { nameEn, nameFi, slugEn, slugFi, descriptionEn, descriptionFi, type, visibility }
+				values: {
+					nameEn,
+					nameFi,
+					slugEn,
+					slugFi,
+					descriptionEn,
+					descriptionFi,
+					type,
+					visibility
+				}
 			});
 		}
 	}

@@ -39,9 +39,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	});
 
 	// Fetch full product data
-	const products = await Promise.all(
-		productIds.map((id) => productService.getById(id))
-	).then((results) => results.filter(Boolean));
+	const products = await Promise.all(productIds.map((id) => productService.getById(id))).then(
+		(results) => results.filter(Boolean)
+	);
 
 	return {
 		category,

@@ -113,14 +113,20 @@ export class WishlistService {
 	}): Promise<{ item: WishlistItem; guestToken: string | null }> {
 		const { productId, variantId, customerId, guestToken } = opts;
 
-		const { wishlist, guestToken: newToken } = await this.getOrCreate({ customerId, guestToken });
+		const { wishlist, guestToken: newToken } = await this.getOrCreate({
+			customerId,
+			guestToken
+		});
 
 		// Check if already exists
 		const [existing] = await db
 			.select()
 			.from(wishlistItems)
 			.where(
-				and(eq(wishlistItems.wishlistId, wishlist.id), eq(wishlistItems.productId, productId))
+				and(
+					eq(wishlistItems.wishlistId, wishlist.id),
+					eq(wishlistItems.productId, productId)
+				)
 			);
 
 		if (existing) {
@@ -158,7 +164,10 @@ export class WishlistService {
 		const result = await db
 			.delete(wishlistItems)
 			.where(
-				and(eq(wishlistItems.wishlistId, wishlist.id), eq(wishlistItems.productId, productId))
+				and(
+					eq(wishlistItems.wishlistId, wishlist.id),
+					eq(wishlistItems.productId, productId)
+				)
 			);
 
 		await this.touch(wishlist.id);
@@ -210,7 +219,10 @@ export class WishlistService {
 			.select()
 			.from(wishlistItems)
 			.where(
-				and(eq(wishlistItems.wishlistId, wishlist.id), eq(wishlistItems.productId, productId))
+				and(
+					eq(wishlistItems.wishlistId, wishlist.id),
+					eq(wishlistItems.productId, productId)
+				)
 			);
 
 		return !!item;

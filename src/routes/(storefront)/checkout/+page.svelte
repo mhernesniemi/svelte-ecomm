@@ -55,7 +55,9 @@
   let isEditingAddress = $state(false);
   let saveAddressForFuture = $state(false);
   let isEditingShipping = $state(false);
-  const showAddressPicker = $derived(savedAddresses.length > 0 && !cartHasAddress && !preferManualEntry);
+  const showAddressPicker = $derived(
+    savedAddresses.length > 0 && !cartHasAddress && !preferManualEntry
+  );
 
   // Auto-select default saved address on mount
   let autoSelectForm = $state<HTMLFormElement | null>(null);
@@ -87,8 +89,8 @@
   <h1 class="mb-8 text-3xl font-bold">Checkout</h1>
 
   {#if !currentCart || currentCart.lines.length === 0}
-      <p class="mb-4 text-gray-500">Your cart is empty</p>
-      <a href="/products" class="text-blue-600 underline hover:text-blue-700">Browse products</a>
+    <p class="mb-4 text-gray-500">Your cart is empty</p>
+    <a href="/products" class="text-blue-600 underline hover:text-blue-700">Browse products</a>
   {:else}
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <!-- Main Content -->
@@ -163,7 +165,9 @@
 
             {#if showAddressPicker}
               <!-- Hidden form for auto-selecting default address -->
-              {@const defaultAddress = savedAddresses.find((a: typeof savedAddresses[0]) => a.isDefault) || savedAddresses[0]}
+              {@const defaultAddress =
+                savedAddresses.find((a: (typeof savedAddresses)[0]) => a.isDefault) ||
+                savedAddresses[0]}
               <form
                 method="POST"
                 action="?/useSavedAddress"
@@ -196,7 +200,9 @@
                           <p class="text-sm text-gray-600">{address.country}</p>
                         </div>
                         {#if address.isDefault}
-                          <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                          <span
+                            class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800"
+                          >
                             Default
                           </span>
                         {/if}
@@ -222,7 +228,10 @@
                       <p class="font-medium">{currentCart.shippingFullName}</p>
                     {/if}
                     <p class="text-sm text-gray-600">{currentCart?.shippingStreetLine1}</p>
-                    <p class="text-sm text-gray-600">{currentCart?.shippingPostalCode} {currentCart?.shippingCity}</p>
+                    <p class="text-sm text-gray-600">
+                      {currentCart?.shippingPostalCode}
+                      {currentCart?.shippingCity}
+                    </p>
                     <p class="text-sm text-gray-600">{currentCart?.shippingCountry}</p>
                   </div>
                   <button
@@ -246,12 +255,16 @@
               </div>
             {:else}
               <!-- Address Form -->
-              <form method="POST" action="?/setShippingAddress" use:enhance={() => {
-                return async ({ update }) => {
-                  await update({ reset: false });
-                  isEditingAddress = false;
-                };
-              }}>
+              <form
+                method="POST"
+                action="?/setShippingAddress"
+                use:enhance={() => {
+                  return async ({ update }) => {
+                    await update({ reset: false });
+                    isEditingAddress = false;
+                  };
+                }}
+              >
                 <div class="space-y-4">
                   <div>
                     <Label for="fullName">
@@ -390,7 +403,10 @@
                       {/if}
                       {#if selectedRate?.estimatedDeliveryDays}
                         <p class="mt-1 text-sm text-gray-500">
-                          Estimated delivery: {selectedRate.estimatedDeliveryDays} business day{selectedRate.estimatedDeliveryDays !== 1 ? "s" : ""}
+                          Estimated delivery: {selectedRate.estimatedDeliveryDays} business day{selectedRate.estimatedDeliveryDays !==
+                          1
+                            ? "s"
+                            : ""}
                         </p>
                       {/if}
                       <p class="mt-1 font-semibold">{formatPrice(selectedRate?.price ?? 0)} EUR</p>
@@ -434,7 +450,10 @@
                             {/if}
                             {#if rate.estimatedDeliveryDays}
                               <p class="mt-1 text-sm text-gray-500">
-                                Estimated delivery: {rate.estimatedDeliveryDays} business day{rate.estimatedDeliveryDays !== 1 ? "s" : ""}
+                                Estimated delivery: {rate.estimatedDeliveryDays} business day{rate.estimatedDeliveryDays !==
+                                1
+                                  ? "s"
+                                  : ""}
                               </p>
                             {/if}
                           </div>
@@ -626,9 +645,7 @@
                       <li>{stockError}</li>
                     {/each}
                   </ul>
-                  <p class="mt-2 text-sm">
-                    Please adjust quantities in your cart.
-                  </p>
+                  <p class="mt-2 text-sm">Please adjust quantities in your cart.</p>
                 </Alert>
               {:else}
                 <Alert variant="success" class="mb-4">

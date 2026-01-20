@@ -1,26 +1,26 @@
 {
-  "id": "core/providers",
-  "title": "Providers",
-  "description": "Hoikka uses a provider pattern for payments and shipping, making it easy to add new integrations.",
-  "source": "@site/docs/core/providers.md",
-  "sourceDirName": "core",
-  "slug": "/core/providers",
-  "permalink": "/core/providers",
-  "draft": false,
-  "unlisted": false,
-  "tags": [],
-  "version": "current",
-  "sidebarPosition": 4,
-  "frontMatter": {
-    "sidebar_position": 4
-  },
-  "sidebar": "docs",
-  "previous": {
-    "title": "Services",
-    "permalink": "/core/services"
-  },
-  "next": {
-    "title": "Products",
-    "permalink": "/features/products"
-  }
+	"id": "core/providers",
+	"title": "Providers",
+	"description": "Hoikka uses a provider pattern for payments and shipping, making it easy to add new integrations.",
+	"source": "@site/docs/core/providers.md",
+	"sourceDirName": "core",
+	"slug": "/core/providers",
+	"permalink": "/core/providers",
+	"draft": false,
+	"unlisted": false,
+	"tags": [],
+	"version": "current",
+	"sidebarPosition": 4,
+	"frontMatter": {
+		"sidebar_position": 4
+	},
+	"sidebar": "docs",
+	"previous": {
+		"title": "Services",
+		"permalink": "/core/services"
+	},
+	"next": {
+		"title": "Products",
+		"permalink": "/features/products"
+	}
 }

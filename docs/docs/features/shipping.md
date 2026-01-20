@@ -23,30 +23,25 @@ const rates = await shippingService.getShippingRates(order);
 
 // Returns available options
 [
-  {
-    id: 'posti_express',
-    name: 'Posti Express',
-    price: 1290,
-    estimatedDays: 1
-  },
-  {
-    id: 'matkahuolto_pickup',
-    name: 'Pickup Point',
-    price: 590,
-    estimatedDays: 2
-  }
-]
+	{
+		id: "posti_express",
+		name: "Posti Express",
+		price: 1290,
+		estimatedDays: 1
+	},
+	{
+		id: "matkahuolto_pickup",
+		name: "Pickup Point",
+		price: 590,
+		estimatedDays: 2
+	}
+];
 ```
 
 ## Setting Shipping Method
 
 ```typescript
-await shippingService.setShippingMethod(
-  orderId,
-  methodId,
-  rateId,
-  price
-);
+await shippingService.setShippingMethod(orderId, methodId, rateId, price);
 ```
 
 ## Creating Shipment
@@ -67,12 +62,12 @@ const status = await shippingService.trackShipment(orderId);
 
 ## Shipping States
 
-| State | Description |
-|-------|-------------|
-| `pending` | Awaiting shipment creation |
-| `shipped` | Shipment created, in transit |
-| `in_transit` | Package is being delivered |
-| `delivered` | Package delivered |
+| State        | Description                  |
+| ------------ | ---------------------------- |
+| `pending`    | Awaiting shipment creation   |
+| `shipped`    | Shipment created, in transit |
+| `in_transit` | Package is being delivered   |
+| `delivered`  | Package delivered            |
 
 ## Built-in Providers
 

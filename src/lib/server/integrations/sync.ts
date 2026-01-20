@@ -143,7 +143,10 @@ export async function runSync<TExternal, TLocal>(
  * Sync a single item (useful for webhook handlers)
  */
 export async function syncSingleItem<TExternal, TLocal>(
-	job: Pick<SyncJob<TExternal, TLocal>, "name" | "getExternalId" | "findLocal" | "create" | "update">,
+	job: Pick<
+		SyncJob<TExternal, TLocal>,
+		"name" | "getExternalId" | "findLocal" | "create" | "update"
+	>,
 	item: TExternal
 ): Promise<{ action: "created" | "updated"; externalId: string }> {
 	const externalId = job.getExternalId(item);

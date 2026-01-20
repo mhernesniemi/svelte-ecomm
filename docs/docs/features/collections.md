@@ -21,32 +21,32 @@ Define rules to automatically include products:
 
 ```typescript
 const collection = await collectionService.create({
-  slug: 'summer-sale',
-  translations: [{ languageCode: 'en', name: 'Summer Sale' }],
-  rules: {
-    conditions: [
-      {
-        type: 'facet',
-        facetId: 5,        // Category facet
-        valueIds: [12, 13]  // T-Shirts, Shorts
-      },
-      {
-        type: 'price',
-        operator: 'lt',
-        value: 5000  // Under 50€
-      }
-    ],
-    match: 'all'  // Products must match ALL conditions
-  }
+	slug: "summer-sale",
+	translations: [{ languageCode: "en", name: "Summer Sale" }],
+	rules: {
+		conditions: [
+			{
+				type: "facet",
+				facetId: 5, // Category facet
+				valueIds: [12, 13] // T-Shirts, Shorts
+			},
+			{
+				type: "price",
+				operator: "lt",
+				value: 5000 // Under 50€
+			}
+		],
+		match: "all" // Products must match ALL conditions
+	}
 });
 ```
 
 ### Rule Types
 
-| Type | Description |
-|------|-------------|
+| Type    | Description                         |
+| ------- | ----------------------------------- |
 | `facet` | Products with specific facet values |
-| `price` | Price range (lt, gt, eq, between) |
+| `price` | Price range (lt, gt, eq, between)   |
 
 ### Match Mode
 
@@ -62,9 +62,9 @@ Collections can be nested:
 // Children: "Men's", "Women's", "Kids"
 
 const collection = await collectionService.create({
-  slug: 'mens-clothing',
-  parentId: clothingCollectionId,
-  // ...
+	slug: "mens-clothing",
+	parentId: clothingCollectionId
+	// ...
 });
 ```
 

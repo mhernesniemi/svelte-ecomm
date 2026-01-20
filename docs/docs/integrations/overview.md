@@ -8,13 +8,13 @@ Hoikka includes PostgreSQL-native utilities for integrating external systems (ER
 
 ## Why PostgreSQL?
 
-| Aspect | Redis/BullMQ | PostgreSQL |
-|--------|--------------|------------|
-| Persistence | Requires config | Built-in |
-| Transactions | Separate from DB | Same transaction |
-| Infrastructure | Additional service | Already have it |
-| Throughput | ~10,000 jobs/sec | ~1,000 jobs/sec |
-| Complexity | More moving parts | Single database |
+| Aspect         | Redis/BullMQ       | PostgreSQL       |
+| -------------- | ------------------ | ---------------- |
+| Persistence    | Requires config    | Built-in         |
+| Transactions   | Separate from DB   | Same transaction |
+| Infrastructure | Additional service | Already have it  |
+| Throughput     | ~10,000 jobs/sec   | ~1,000 jobs/sec  |
+| Complexity     | More moving parts  | Single database  |
 
 For most e-commerce workloads, PostgreSQL handles job queues easily.
 
@@ -25,13 +25,13 @@ For most e-commerce workloads, PostgreSQL handles job queues easily.
 PostgreSQL-backed job queue with automatic retry:
 
 ```typescript
-import { enqueue, registerHandler, startWorker } from '$lib/server/integrations';
+import { enqueue, registerHandler, startWorker } from "$lib/server/integrations";
 
-registerHandler('email.send', async (payload) => {
-  await sendEmail(payload.to, payload.subject);
+registerHandler("email.send", async (payload) => {
+	await sendEmail(payload.to, payload.subject);
 });
 
-await enqueue('email.send', { to: 'user@example.com', subject: 'Hello' });
+await enqueue("email.send", { to: "user@example.com", subject: "Hello" });
 ```
 
 ### Events
@@ -53,15 +53,15 @@ onPersistent('order.paid', async ({ orderId }) => { ... });
 Reusable pattern for syncing external data:
 
 ```typescript
-import { runSync, registerSyncJob, scheduleSyncJob } from '$lib/server/integrations';
+import { runSync, registerSyncJob, scheduleSyncJob } from "$lib/server/integrations";
 
 const inventorySync = {
-  name: 'erp-inventory',
-  fetchExternal: () => erpClient.getInventory(),
-  // ...
+	name: "erp-inventory",
+	fetchExternal: () => erpClient.getInventory()
+	// ...
 };
 
-await scheduleSyncJob('erp-inventory', syncIntervals.hours(1));
+await scheduleSyncJob("erp-inventory", syncIntervals.hours(1));
 ```
 
 ### Webhooks
@@ -83,7 +83,7 @@ export const POST = createWebhookHandler({
 Retry failed operations with exponential backoff:
 
 ```typescript
-import { withRetry } from '$lib/server/integrations';
+import { withRetry } from "$lib/server/integrations";
 
 await withRetry(() => externalApi.call(), { maxAttempts: 3 });
 ```

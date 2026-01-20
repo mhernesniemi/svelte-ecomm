@@ -180,8 +180,10 @@ export class ProductService {
 		if (!existing) return null;
 
 		// Update product fields
-		const updates: { type?: "physical" | "digital"; visibility?: "public" | "private" | "hidden" } =
-			{};
+		const updates: {
+			type?: "physical" | "digital";
+			visibility?: "public" | "private" | "hidden";
+		} = {};
 		if (input.type !== undefined) updates.type = input.type;
 		if (input.visibility !== undefined) updates.visibility = input.visibility;
 

@@ -136,7 +136,9 @@
                       <Plus class="h-3 w-3" />
                     </button>
                   </div>
-                  <span class="text-sm font-medium text-gray-900">{formatPrice(line.lineTotal)} EUR</span>
+                  <span class="text-sm font-medium text-gray-900"
+                    >{formatPrice(line.lineTotal)} EUR</span
+                  >
                 </div>
               </div>
             </div>
@@ -146,7 +148,7 @@
     </div>
 
     {#if lines.length > 0}
-      <SheetFooter class="border-t border-gray-200 bg-gray-50/50 px-6 pt-4 pb-2 mt-auto">
+      <SheetFooter class="mt-auto border-t border-gray-200 bg-gray-50/50 px-6 pt-4 pb-2">
         <div class="w-full space-y-4">
           <div class="space-y-2">
             <div class="flex justify-between text-sm">

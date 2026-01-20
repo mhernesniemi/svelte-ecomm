@@ -24,13 +24,12 @@ Products use translation tables:
 ```typescript
 // Query with translations
 const product = await db.query.products.findFirst({
-  where: eq(products.id, 123),
-  with: { translations: true }
+	where: eq(products.id, 123),
+	with: { translations: true }
 });
 
 // Get localized name
-const name = product.translations
-  .find(t => t.languageCode === 'en')?.name;
+const name = product.translations.find((t) => t.languageCode === "en")?.name;
 ```
 
 ## Variants
@@ -42,10 +41,10 @@ Each product has one or more variants:
 // Variants: "T-Shirt - Red / M", "T-Shirt - Blue / L"
 
 const variant = {
-  sku: 'TSHIRT-RED-M',
-  price: 2999,  // cents
-  stock: 50,
-  facetValues: [redColor, mediumSize]
+	sku: "TSHIRT-RED-M",
+	price: 2999, // cents
+	stock: 50,
+	facetValues: [redColor, mediumSize]
 };
 ```
 
@@ -62,6 +61,7 @@ Facets define product attributes for filtering:
 ```
 
 Products and variants can have facet values assigned for:
+
 - Filtering in collections
 - Search refinement
 - Variant selection
@@ -72,7 +72,7 @@ Full-text search using PostgreSQL:
 
 ```typescript
 // API endpoint: GET /api/search?q=shirt&lang=en
-const results = await productService.search('shirt', 'en');
+const results = await productService.search("shirt", "en");
 ```
 
 ## Admin Operations
@@ -80,18 +80,16 @@ const results = await productService.search('shirt', 'en');
 ```typescript
 // Create product
 await productService.create({
-  slug: 'blue-shirt',
-  translations: [
-    { languageCode: 'en', name: 'Blue Shirt', description: '...' }
-  ]
+	slug: "blue-shirt",
+	translations: [{ languageCode: "en", name: "Blue Shirt", description: "..." }]
 });
 
 // Add variant
 await variantService.create({
-  productId: 123,
-  sku: 'BLUE-SHIRT-M',
-  price: 4999,
-  stock: 100
+	productId: 123,
+	sku: "BLUE-SHIRT-M",
+	price: 4999,
+	stock: 100
 });
 
 // Update stock

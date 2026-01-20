@@ -2,7 +2,13 @@
  * Checkout page server actions
  */
 import { fail, redirect } from "@sveltejs/kit";
-import { orderService, shippingService, paymentService, isPaymentSuccessful, customerService } from "$lib/server/services/index.js";
+import {
+	orderService,
+	shippingService,
+	paymentService,
+	isPaymentSuccessful,
+	customerService
+} from "$lib/server/services/index.js";
 import { digitalDeliveryService } from "$lib/server/services/digitalDelivery.js";
 import { db } from "$lib/server/db/index.js";
 import { orderLines, productVariants, products, customers } from "$lib/server/db/schema.js";
@@ -65,14 +71,21 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// Get customer data for prefilling (from order or customer record)
 	let customerEmail = cart.customerEmail || null;
 	let customerFullName = cart.shippingFullName || null;
-	let savedAddresses: NonNullable<Awaited<ReturnType<typeof customerService.getById>>>["addresses"] = [];
+	let savedAddresses: NonNullable<
+		Awaited<ReturnType<typeof customerService.getById>>
+	>["addresses"] = [];
 
 	if (locals.customer?.id) {
 		const customerWithAddresses = await customerService.getById(locals.customer.id);
 		if (customerWithAddresses) {
 			if (!customerEmail) customerEmail = customerWithAddresses.email || null;
-			if (!customerFullName && (customerWithAddresses.firstName || customerWithAddresses.lastName)) {
-				customerFullName = [customerWithAddresses.firstName, customerWithAddresses.lastName].filter(Boolean).join(" ");
+			if (
+				!customerFullName &&
+				(customerWithAddresses.firstName || customerWithAddresses.lastName)
+			) {
+				customerFullName = [customerWithAddresses.firstName, customerWithAddresses.lastName]
+					.filter(Boolean)
+					.join(" ");
 			}
 			savedAddresses = customerWithAddresses.addresses || [];
 		}
@@ -409,7 +422,12 @@ export const actions: Actions = {
 
 		try {
 			// Save address to customer's address book if requested
-			if (saveToAddressBook && locals.customer?.id && !isDigitalOnly && cart.shippingStreetLine1) {
+			if (
+				saveToAddressBook &&
+				locals.customer?.id &&
+				!isDigitalOnly &&
+				cart.shippingStreetLine1
+			) {
 				try {
 					await customerService.addAddress(locals.customer.id, {
 						fullName: cart.shippingFullName || undefined,

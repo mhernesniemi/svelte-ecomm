@@ -23,7 +23,12 @@ export const toggleWishlist = command(
 		});
 
 		// Set cookie if new guest wishlist was created
-		if (result.added && result.guestToken && !customerId && result.guestToken !== wishlistToken) {
+		if (
+			result.added &&
+			result.guestToken &&
+			!customerId &&
+			result.guestToken !== wishlistToken
+		) {
 			event.cookies.set(WISHLIST_COOKIE_NAME, result.guestToken, {
 				path: "/",
 				httpOnly: true,

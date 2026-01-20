@@ -94,20 +94,20 @@ orderService.create(), .updateStatus()
 
 ```typescript
 export const load = async ({ params }) => {
-  const product = await productService.getById(id);
-  return { product };
+	const product = await productService.getById(id);
+	return { product };
 };
 
 export const actions = {
-  update: async ({ request }) => {
-    await productService.update(id, data);
-  }
+	update: async ({ request }) => {
+		await productService.update(id, data);
+	}
 };
 ```
 
 ### View Layer
 
-**`src/routes/**/+page.svelte`** - Svelte components that receive data from load functions and render UI.
+**`src/routes/**/+page.svelte`\*\* - Svelte components that receive data from load functions and render UI.
 
 ### Request Flow
 

@@ -29,15 +29,15 @@ const payment = await paymentService.createPayment(orderId, stripeMethodId);
 
 ```svelte
 <script>
-  import { loadStripe } from '@stripe/stripe-js';
+	import { loadStripe } from "@stripe/stripe-js";
 
-  const stripe = await loadStripe(PUBLIC_STRIPE_KEY);
-  const elements = stripe.elements({ clientSecret });
+	const stripe = await loadStripe(PUBLIC_STRIPE_KEY);
+	const elements = stripe.elements({ clientSecret });
 </script>
 
 <form on:submit={handleSubmit}>
-  <div bind:this={paymentElement}></div>
-  <button>Pay {formatPrice(order.total)}</button>
+	<div bind:this={paymentElement}></div>
+	<button>Pay {formatPrice(order.total)}</button>
 </form>
 ```
 
@@ -46,29 +46,29 @@ const payment = await paymentService.createPayment(orderId, stripeMethodId);
 ```typescript
 // src/routes/api/webhooks/stripe/+server.ts
 export const POST = async ({ request }) => {
-  const sig = request.headers.get('stripe-signature');
-  const body = await request.text();
+	const sig = request.headers.get("stripe-signature");
+	const body = await request.text();
 
-  const event = stripe.webhooks.constructEvent(body, sig, WEBHOOK_SECRET);
+	const event = stripe.webhooks.constructEvent(body, sig, WEBHOOK_SECRET);
 
-  if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object;
-    await paymentService.confirmPayment(paymentIntent.id);
-  }
+	if (event.type === "payment_intent.succeeded") {
+		const paymentIntent = event.data.object;
+		await paymentService.confirmPayment(paymentIntent.id);
+	}
 
-  return new Response('OK');
+	return new Response("OK");
 };
 ```
 
 ## Payment States
 
-| State | Description |
-|-------|-------------|
-| `pending` | Payment created, awaiting completion |
-| `authorized` | Payment authorized, not captured |
-| `settled` | Payment captured successfully |
-| `declined` | Payment failed |
-| `refunded` | Payment refunded |
+| State        | Description                          |
+| ------------ | ------------------------------------ |
+| `pending`    | Payment created, awaiting completion |
+| `authorized` | Payment authorized, not captured     |
+| `settled`    | Payment captured successfully        |
+| `declined`   | Payment failed                       |
+| `refunded`   | Payment refunded                     |
 
 ## Refunds
 
@@ -77,7 +77,7 @@ export const POST = async ({ request }) => {
 await paymentService.refundPayment(paymentId);
 
 // Partial refund
-await paymentService.refundPayment(paymentId, 1500);  // 15.00
+await paymentService.refundPayment(paymentId, 1500); // 15.00
 ```
 
 ## Adding Payment Methods

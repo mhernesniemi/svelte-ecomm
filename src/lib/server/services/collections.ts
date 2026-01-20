@@ -119,7 +119,9 @@ export class CollectionService {
 				.selectDistinct({ productId: productVariants.productId })
 				.from(productVariants)
 				.innerJoin(products, eq(productVariants.productId, products.id))
-				.where(and(condition, isNull(productVariants.deletedAt), isNull(products.deletedAt)));
+				.where(
+					and(condition, isNull(productVariants.deletedAt), isNull(products.deletedAt))
+				);
 
 			return new Set(matches.map((r) => r.productId));
 		},
@@ -242,7 +244,10 @@ export class CollectionService {
 	/**
 	 * Update an existing collection
 	 */
-	async update(id: number, input: UpdateCollectionInput): Promise<CollectionWithRelations | null> {
+	async update(
+		id: number,
+		input: UpdateCollectionInput
+	): Promise<CollectionWithRelations | null> {
 		const existing = await this.getById(id);
 		if (!existing) return null;
 
@@ -269,7 +274,10 @@ export class CollectionService {
 						description: t.description
 					})
 					.onConflictDoUpdate({
-						target: [collectionTranslations.collectionId, collectionTranslations.languageCode],
+						target: [
+							collectionTranslations.collectionId,
+							collectionTranslations.languageCode
+						],
 						set: {
 							name: t.name,
 							slug: t.slug,
@@ -358,7 +366,11 @@ export class CollectionService {
 						? db.select().from(assets).where(eq(assets.id, c.featuredAssetId)).limit(1)
 						: Promise.resolve([])
 				]);
-				return { ...withTranslations, productCount, featuredAsset: featuredAsset[0] ?? null };
+				return {
+					...withTranslations,
+					productCount,
+					featuredAsset: featuredAsset[0] ?? null
+				};
 			})
 		);
 	}
@@ -403,7 +415,11 @@ export class CollectionService {
 	 */
 	async updateFilter(
 		filterId: number,
-		filter: { field?: CollectionFilterField; operator?: CollectionFilterOperator; value?: unknown }
+		filter: {
+			field?: CollectionFilterField;
+			operator?: CollectionFilterOperator;
+			value?: unknown;
+		}
 	): Promise<CollectionFilter | null> {
 		const updateData: Partial<CollectionFilter> = {};
 		if (filter.field !== undefined) updateData.field = filter.field;
@@ -504,7 +520,11 @@ export class CollectionService {
 	 * Preview what products would match given filters (for admin UI)
 	 */
 	async previewFilters(
-		filters: { field: CollectionFilterField; operator: CollectionFilterOperator; value: unknown }[],
+		filters: {
+			field: CollectionFilterField;
+			operator: CollectionFilterOperator;
+			value: unknown;
+		}[],
 		options: { language?: string; limit?: number } = {}
 	): Promise<{ products: ProductWithRelations[]; total: number }> {
 		const { language = this.defaultLanguage, limit = 10 } = options;
@@ -570,7 +590,10 @@ export class CollectionService {
 	 * Get count of products in a collection
 	 */
 	async getProductCount(collectionId: number): Promise<number> {
-		const result = await this.getProductsForCollection(collectionId, { limit: 1000000, offset: 0 });
+		const result = await this.getProductsForCollection(collectionId, {
+			limit: 1000000,
+			offset: 0
+		});
 		return result.pagination.total;
 	}
 
@@ -608,7 +631,10 @@ export class CollectionService {
 				.select()
 				.from(collectionTranslations)
 				.where(eq(collectionTranslations.collectionId, collection.id)),
-			db.select().from(collectionFilters).where(eq(collectionFilters.collectionId, collection.id)),
+			db
+				.select()
+				.from(collectionFilters)
+				.where(eq(collectionFilters.collectionId, collection.id)),
 			collection.featuredAssetId
 				? db.select().from(assets).where(eq(assets.id, collection.featuredAssetId)).limit(1)
 				: Promise.resolve([])
@@ -626,7 +652,15 @@ export class CollectionService {
 	 * Load product with all relations (copied from ProductService for self-containment)
 	 */
 	private async loadProductRelations(
-		product: { id: number; type: "physical" | "digital"; visibility: "public" | "private" | "hidden"; featuredAssetId: number | null; deletedAt: Date | null; createdAt: Date; updatedAt: Date },
+		product: {
+			id: number;
+			type: "physical" | "digital";
+			visibility: "public" | "private" | "hidden";
+			featuredAssetId: number | null;
+			deletedAt: Date | null;
+			createdAt: Date;
+			updatedAt: Date;
+		},
 		language: string
 	): Promise<ProductWithRelations> {
 		// Load translations
@@ -639,7 +673,9 @@ export class CollectionService {
 		const variantList = await db
 			.select()
 			.from(productVariants)
-			.where(and(eq(productVariants.productId, product.id), isNull(productVariants.deletedAt)));
+			.where(
+				and(eq(productVariants.productId, product.id), isNull(productVariants.deletedAt))
+			);
 
 		const variants = await Promise.all(
 			variantList.map(async (v) => {

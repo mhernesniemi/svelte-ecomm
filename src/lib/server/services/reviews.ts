@@ -144,12 +144,14 @@ export class ReviewService {
 	/**
 	 * Get all reviews (for admin)
 	 */
-	async list(options: {
-		status?: ReviewStatus;
-		productId?: number;
-		limit?: number;
-		offset?: number;
-	} = {}): Promise<PaginatedResult<ReviewWithRelations>> {
+	async list(
+		options: {
+			status?: ReviewStatus;
+			productId?: number;
+			limit?: number;
+			offset?: number;
+		} = {}
+	): Promise<PaginatedResult<ReviewWithRelations>> {
 		const { status, productId, limit = 20, offset = 0 } = options;
 
 		const conditions = [];
@@ -162,10 +164,7 @@ export class ReviewService {
 
 		const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-		const [countResult] = await db
-			.select({ count: count() })
-			.from(reviews)
-			.where(whereClause);
+		const [countResult] = await db.select({ count: count() }).from(reviews).where(whereClause);
 
 		const total = countResult?.count ?? 0;
 
@@ -187,9 +186,10 @@ export class ReviewService {
 		const productIds = [...new Set(items.map((item) => item.product.id))];
 		const translations =
 			productIds.length > 0
-				? await db.select().from(productTranslations).where(
-						sql`${productTranslations.productId} IN ${productIds}`
-				  )
+				? await db
+						.select()
+						.from(productTranslations)
+						.where(sql`${productTranslations.productId} IN ${productIds}`)
 				: [];
 
 		return {

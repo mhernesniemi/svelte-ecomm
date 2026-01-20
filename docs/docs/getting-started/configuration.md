@@ -41,6 +41,7 @@ IMAGEKIT_URL_ENDPOINT="https://ik.imagekit.io/your_id"
 ```
 
 Get these from your [ImageKit Dashboard](https://imagekit.io/dashboard):
+
 1. Go to Developer Options
 2. Copy Public Key, Private Key, and URL Endpoint
 

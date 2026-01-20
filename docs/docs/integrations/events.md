@@ -11,16 +11,16 @@ Two modes of operation: in-memory (immediate) or persistent (via job queue).
 For non-critical side effects that don't need persistence:
 
 ```typescript
-import { events } from '$lib/server/integrations';
+import { events } from "$lib/server/integrations";
 
 // Subscribe
-events.on('order.paid', async ({ orderId }) => {
-  console.log(`Order ${orderId} was paid`);
-  await notifySlack(`New order: ${orderId}`);
+events.on("order.paid", async ({ orderId }) => {
+	console.log(`Order ${orderId} was paid`);
+	await notifySlack(`New order: ${orderId}`);
 });
 
 // Emit
-await events.emit('order.paid', { orderId: 123 });
+await events.emit("order.paid", { orderId: 123 });
 ```
 
 Handlers run concurrently. Failures are logged but don't stop other handlers.
@@ -30,15 +30,15 @@ Handlers run concurrently. Failures are logged but don't stop other handlers.
 For critical events that must not be lost (e.g., ERP sync):
 
 ```typescript
-import { onPersistent, emitPersistent } from '$lib/server/integrations';
+import { onPersistent, emitPersistent } from "$lib/server/integrations";
 
 // Subscribe (handler runs via job queue with retry)
-onPersistent('order.paid', async ({ orderId }) => {
-  await erpService.pushOrder(orderId);
+onPersistent("order.paid", async ({ orderId }) => {
+	await erpService.pushOrder(orderId);
 });
 
 // Emit (creates a job)
-await emitPersistent('order.paid', { orderId: 123 });
+await emitPersistent("order.paid", { orderId: 123 });
 ```
 
 ## Transactional Events
@@ -46,37 +46,39 @@ await emitPersistent('order.paid', { orderId: 123 });
 Emit events atomically with database operations:
 
 ```typescript
-import { emitInTransaction } from '$lib/server/integrations';
+import { emitInTransaction } from "$lib/server/integrations";
 
 await db.transaction(async (tx) => {
-  // Update order state
-  await tx.update(orders)
-    .set({ state: 'paid' })
-    .where(eq(orders.id, orderId));
+	// Update order state
+	await tx.update(orders).set({ state: "paid" }).where(eq(orders.id, orderId));
 
-  // Event only emitted if transaction commits
-  await emitInTransaction(tx, 'order.paid', { orderId });
+	// Event only emitted if transaction commits
+	await emitInTransaction(tx, "order.paid", { orderId });
 });
 ```
 
 ## Available Events
 
 ### Orders
+
 - `order.created` - `{ orderId: number }`
 - `order.paid` - `{ orderId: number }`
 - `order.shipped` - `{ orderId: number, trackingNumber?: string }`
 - `order.cancelled` - `{ orderId: number, reason?: string }`
 
 ### Products
+
 - `product.created` - `{ productId: number }`
 - `product.updated` - `{ productId: number }`
 - `product.deleted` - `{ productId: number }`
 
 ### Customers
+
 - `customer.created` - `{ customerId: number }`
 - `customer.updated` - `{ customerId: number }`
 
 ### System
+
 - `inventory.low` - `{ variantId, sku, stock, threshold }`
 - `sync.completed` - `{ syncName, created, updated, errors }`
 
@@ -87,7 +89,7 @@ Extend the EventMap type:
 ```typescript
 // src/lib/server/integrations/events.ts
 export type EventMap = {
-  // ... existing events
-  'custom.event': { myData: string };
+	// ... existing events
+	"custom.event": { myData: string };
 };
 ```

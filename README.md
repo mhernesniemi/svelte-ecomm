@@ -6,11 +6,11 @@
 
 Hoikka takes a different approach from traditional e-commerce platforms:
 
-| Traditional Platforms | Hoikka |
-|-----------------------|--------|
-| XML/YAML configuration files | TypeScript code |
-| Admin panels hiding business logic | Logic in your codebase |
-| Plugin systems and hooks | Just edit the code |
+| Traditional Platforms               | Hoikka                      |
+| ----------------------------------- | --------------------------- |
+| XML/YAML configuration files        | TypeScript code             |
+| Admin panels hiding business logic  | Logic in your codebase      |
+| Plugin systems and hooks            | Just edit the code          |
 | External dependencies (Redis, etc.) | PostgreSQL-native solutions |
 
 **Your code, your rules.** No black boxes, no framework abstractions to learn.
@@ -83,14 +83,14 @@ import { enqueue, registerHandler, startWorker } from "$lib/server/integrations"
 
 // Register a job handler
 registerHandler("email.send-confirmation", async (payload) => {
-  await sendEmail(payload.to, payload.subject, payload.body);
+	await sendEmail(payload.to, payload.subject, payload.body);
 });
 
 // Enqueue a job
 await enqueue("email.send-confirmation", {
-  to: "customer@example.com",
-  subject: "Order Confirmed",
-  body: "Your order has been confirmed."
+	to: "customer@example.com",
+	subject: "Order Confirmed",
+	body: "Your order has been confirmed."
 });
 
 // Start the worker (in hooks.server.ts)
@@ -106,11 +106,11 @@ import { db } from "$lib/server/db";
 import { enqueueInTransaction } from "$lib/server/integrations";
 
 await db.transaction(async (tx) => {
-  // Update order
-  await tx.update(orders).set({ state: "paid" }).where(eq(orders.id, orderId));
+	// Update order
+	await tx.update(orders).set({ state: "paid" }).where(eq(orders.id, orderId));
 
-  // Job is created atomically - if transaction fails, job is not created
-  await enqueueInTransaction(tx, "erp.push-order", { orderId });
+	// Job is created atomically - if transaction fails, job is not created
+	await enqueueInTransaction(tx, "erp.push-order", { orderId });
 });
 ```
 
@@ -118,9 +118,9 @@ await db.transaction(async (tx) => {
 
 ```typescript
 await enqueue("my-job", payload, {
-  queue: "high-priority",     // Queue name (default: "default")
-  runAt: new Date(Date.now() + 60000),  // Delay execution
-  maxAttempts: 5              // Retry attempts (default: 3)
+	queue: "high-priority", // Queue name (default: "default")
+	runAt: new Date(Date.now() + 60000), // Delay execution
+	maxAttempts: 5 // Retry attempts (default: 3)
 });
 ```
 
@@ -137,7 +137,7 @@ import { events } from "$lib/server/integrations";
 
 // Subscribe
 events.on("order.paid", async ({ orderId }) => {
-  console.log(`Order ${orderId} was paid`);
+	console.log(`Order ${orderId} was paid`);
 });
 
 // Emit
@@ -153,7 +153,7 @@ import { onPersistent, emitPersistent, emitInTransaction } from "$lib/server/int
 
 // Subscribe (handler runs via job queue with retry)
 onPersistent("order.paid", async ({ orderId }) => {
-  await erpService.pushOrder(orderId);
+	await erpService.pushOrder(orderId);
 });
 
 // Emit (creates a job)
@@ -161,8 +161,8 @@ await emitPersistent("order.paid", { orderId: 123 });
 
 // Emit within transaction (atomic with business logic)
 await db.transaction(async (tx) => {
-  await tx.update(orders).set({ state: "paid" }).where(eq(orders.id, orderId));
-  await emitInTransaction(tx, "order.paid", { orderId });
+	await tx.update(orders).set({ state: "paid" }).where(eq(orders.id, orderId));
+	await emitInTransaction(tx, "order.paid", { orderId });
 });
 ```
 
@@ -184,33 +184,34 @@ import { runSync, registerSyncJob, scheduleSyncJob, syncIntervals } from "$lib/s
 
 // Define a sync job
 const pimProductSync: SyncJob<PimProduct, LocalProduct> = {
-  name: "pim-products",
+	name: "pim-products",
 
-  fetchExternal: () => pimClient.getAllProducts(),
+	fetchExternal: () => pimClient.getAllProducts(),
 
-  getExternalId: (item) => item.id,
+	getExternalId: (item) => item.id,
 
-  findLocal: async (externalId) => {
-    const [product] = await db
-      .select()
-      .from(products)
-      .where(eq(products.externalId, externalId));
-    return product || null;
-  },
+	findLocal: async (externalId) => {
+		const [product] = await db
+			.select()
+			.from(products)
+			.where(eq(products.externalId, externalId));
+		return product || null;
+	},
 
-  create: async (item) => {
-    await db.insert(products).values({
-      externalId: item.id,
-      name: item.name,
-      price: item.price
-    });
-  },
+	create: async (item) => {
+		await db.insert(products).values({
+			externalId: item.id,
+			name: item.name,
+			price: item.price
+		});
+	},
 
-  update: async (item, local) => {
-    await db.update(products)
-      .set({ name: item.name, price: item.price })
-      .where(eq(products.id, local.id));
-  }
+	update: async (item, local) => {
+		await db
+			.update(products)
+			.set({ name: item.name, price: item.price })
+			.where(eq(products.id, local.id));
+	}
 };
 
 // Run immediately
@@ -235,20 +236,20 @@ import { createWebhookHandler, signatureVerifiers } from "$lib/server/integratio
 
 // src/routes/api/webhooks/erp/+server.ts
 export const POST = createWebhookHandler({
-  secret: process.env.ERP_WEBHOOK_SECRET,
-  verifySignature: signatureVerifiers.hmacHeader("x-signature"),
+	secret: process.env.ERP_WEBHOOK_SECRET,
+	verifySignature: signatureVerifiers.hmacHeader("x-signature"),
 
-  handlers: {
-    "inventory.updated": async (payload) => {
-      await updateStock(payload.sku, payload.quantity);
-    },
-    "order.shipped": async (payload) => {
-      await markOrderShipped(payload.orderId);
-    }
-  },
+	handlers: {
+		"inventory.updated": async (payload) => {
+			await updateStock(payload.sku, payload.quantity);
+		},
+		"order.shipped": async (payload) => {
+			await markOrderShipped(payload.orderId);
+		}
+	},
 
-  // Optional: run handlers via job queue for persistence
-  persistent: true
+	// Optional: run handlers via job queue for persistence
+	persistent: true
 });
 ```
 
@@ -268,25 +269,22 @@ Retry failed operations with exponential backoff:
 import { withRetry, isTransientError, createRetryFetch } from "$lib/server/integrations";
 
 // Basic usage
-const result = await withRetry(
-  () => externalApi.createOrder(order),
-  { maxAttempts: 3, delayMs: 1000 }
-);
+const result = await withRetry(() => externalApi.createOrder(order), {
+	maxAttempts: 3,
+	delayMs: 1000
+});
 
 // With options
-await withRetry(
-  () => erpClient.pushOrder(order),
-  {
-    maxAttempts: 5,
-    delayMs: 1000,
-    backoff: true,           // Exponential backoff
-    maxDelayMs: 30000,       // Cap delay at 30s
-    isRetryable: isTransientError,
-    onRetry: (attempt, error, delay) => {
-      console.log(`Retry ${attempt}, waiting ${delay}ms`);
-    }
-  }
-);
+await withRetry(() => erpClient.pushOrder(order), {
+	maxAttempts: 5,
+	delayMs: 1000,
+	backoff: true, // Exponential backoff
+	maxDelayMs: 30000, // Cap delay at 30s
+	isRetryable: isTransientError,
+	onRetry: (attempt, error, delay) => {
+		console.log(`Retry ${attempt}, waiting ${delay}ms`);
+	}
+});
 
 // Create a fetch with automatic retry
 const retryFetch = createRetryFetch({ maxAttempts: 3 });
@@ -300,31 +298,33 @@ const response = await retryFetch("https://api.example.com/data");
 ```typescript
 // src/lib/server/integrations/erp/index.ts
 import {
-  registerHandler,
-  onPersistent,
-  registerSyncJob,
-  scheduleSyncJob,
-  syncIntervals,
-  withRetry,
-  type SyncJob
+	registerHandler,
+	onPersistent,
+	registerSyncJob,
+	scheduleSyncJob,
+	syncIntervals,
+	withRetry,
+	type SyncJob
 } from "$lib/server/integrations";
 
 // Initialize ERP client
 const erpClient = new ErpClient({
-  apiKey: process.env.ERP_API_KEY,
-  baseUrl: process.env.ERP_BASE_URL
+	apiKey: process.env.ERP_API_KEY,
+	baseUrl: process.env.ERP_BASE_URL
 });
 
 // 1. Define inventory sync job
 const inventorySync: SyncJob<ErpItem, LocalVariant> = {
-  name: "erp-inventory",
-  fetchExternal: () => erpClient.getInventory(),
-  getExternalId: (item) => item.sku,
-  findLocal: (sku) => variantService.getBySku(sku),
-  create: async () => { /* products managed in Hoikka */ },
-  update: async (item, local) => {
-    await variantService.updateStock(local.id, item.quantity);
-  }
+	name: "erp-inventory",
+	fetchExternal: () => erpClient.getInventory(),
+	getExternalId: (item) => item.sku,
+	findLocal: (sku) => variantService.getBySku(sku),
+	create: async () => {
+		/* products managed in Hoikka */
+	},
+	update: async (item, local) => {
+		await variantService.updateStock(local.id, item.quantity);
+	}
 };
 
 // 2. Register sync job
@@ -332,26 +332,27 @@ registerSyncJob(inventorySync);
 
 // 3. Push orders to ERP when paid
 onPersistent("order.paid", async ({ orderId }) => {
-  const order = await orderService.getById(orderId);
+	const order = await orderService.getById(orderId);
 
-  await withRetry(
-    () => erpClient.createOrder({
-      reference: order.code,
-      items: order.lines.map(line => ({
-        sku: line.sku,
-        quantity: line.quantity
-      }))
-    }),
-    { maxAttempts: 5, delayMs: 2000 }
-  );
+	await withRetry(
+		() =>
+			erpClient.createOrder({
+				reference: order.code,
+				items: order.lines.map((line) => ({
+					sku: line.sku,
+					quantity: line.quantity
+				}))
+			}),
+		{ maxAttempts: 5, delayMs: 2000 }
+	);
 });
 
 // 4. Initialize on server start
 export async function initErpIntegration() {
-  // Schedule inventory sync every hour
-  await scheduleSyncJob("erp-inventory", syncIntervals.hours(1));
+	// Schedule inventory sync every hour
+	await scheduleSyncJob("erp-inventory", syncIntervals.hours(1));
 
-  console.log("ERP integration initialized");
+	console.log("ERP integration initialized");
 }
 ```
 
@@ -371,13 +372,13 @@ initErpIntegration();
 
 ## Why PostgreSQL for Jobs?
 
-| Aspect | Redis/BullMQ | PostgreSQL (Hoikka) |
-|--------|--------------|---------------------|
-| Persistence | Requires AOF/RDB | Built-in |
-| Transactions | Separate from DB | Same transaction as data |
-| Infrastructure | Additional service | Already have it |
-| Throughput | ~10,000 jobs/sec | ~1,000 jobs/sec |
-| Complexity | More moving parts | Single database |
+| Aspect         | Redis/BullMQ       | PostgreSQL (Hoikka)      |
+| -------------- | ------------------ | ------------------------ |
+| Persistence    | Requires AOF/RDB   | Built-in                 |
+| Transactions   | Separate from DB   | Same transaction as data |
+| Infrastructure | Additional service | Already have it          |
+| Throughput     | ~10,000 jobs/sec   | ~1,000 jobs/sec          |
+| Complexity     | More moving parts  | Single database          |
 
 For most e-commerce workloads, PostgreSQL handles job queues easily. Only consider Redis if you need >1,000 jobs/second.
 

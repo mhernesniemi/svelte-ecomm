@@ -273,7 +273,10 @@ export const actions: Actions = {
 	updateCategories: async ({ params, request }) => {
 		const productId = Number(params.id);
 		const formData = await request.formData();
-		const categoryIds = formData.getAll("categoryIds").map(Number).filter((id) => !isNaN(id));
+		const categoryIds = formData
+			.getAll("categoryIds")
+			.map(Number)
+			.filter((id) => !isNaN(id));
 
 		try {
 			await categoryService.setProductCategories(productId, categoryIds);

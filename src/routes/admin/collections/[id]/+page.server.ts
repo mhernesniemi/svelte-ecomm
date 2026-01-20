@@ -108,7 +108,10 @@ export const actions: Actions = {
 		try {
 			if (field === "facet" || field === "product" || field === "variant") {
 				// Array of IDs
-				value = valueStr.split(",").map((v) => Number(v.trim())).filter((v) => !isNaN(v));
+				value = valueStr
+					.split(",")
+					.map((v) => Number(v.trim()))
+					.filter((v) => !isNaN(v));
 			} else if (field === "visibility") {
 				value = valueStr; // "public", "private", or "hidden"
 			} else if (field === "price" || field === "stock") {

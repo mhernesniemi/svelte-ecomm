@@ -9,31 +9,31 @@ PostgreSQL-backed job queue with automatic retry and exponential backoff.
 ## Basic Usage
 
 ```typescript
-import { enqueue, registerHandler, startWorker } from '$lib/server/integrations';
+import { enqueue, registerHandler, startWorker } from "$lib/server/integrations";
 
 // Register a handler
-registerHandler('email.send', async (payload) => {
-  await sendEmail(payload.to, payload.subject, payload.body);
+registerHandler("email.send", async (payload) => {
+	await sendEmail(payload.to, payload.subject, payload.body);
 });
 
 // Enqueue a job
-await enqueue('email.send', {
-  to: 'user@example.com',
-  subject: 'Order Confirmed',
-  body: 'Your order has been confirmed.'
+await enqueue("email.send", {
+	to: "user@example.com",
+	subject: "Order Confirmed",
+	body: "Your order has been confirmed."
 });
 
 // Start worker (in hooks.server.ts)
-startWorker({ queue: 'default', pollInterval: 1000 });
+startWorker({ queue: "default", pollInterval: 1000 });
 ```
 
 ## Job Options
 
 ```typescript
-await enqueue('my-job', payload, {
-  queue: 'high-priority',     // Queue name (default: 'default')
-  runAt: new Date(Date.now() + 60000),  // Delay execution
-  maxAttempts: 5              // Retry attempts (default: 3)
+await enqueue("my-job", payload, {
+	queue: "high-priority", // Queue name (default: 'default')
+	runAt: new Date(Date.now() + 60000), // Delay execution
+	maxAttempts: 5 // Retry attempts (default: 3)
 });
 ```
 
@@ -42,40 +42,35 @@ await enqueue('my-job', payload, {
 Jobs created atomically with business logic (transactional outbox pattern):
 
 ```typescript
-import { db } from '$lib/server/db';
-import { enqueueInTransaction } from '$lib/server/integrations';
+import { db } from "$lib/server/db";
+import { enqueueInTransaction } from "$lib/server/integrations";
 
 await db.transaction(async (tx) => {
-  // Update order
-  await tx.update(orders).set({ state: 'paid' }).where(eq(orders.id, orderId));
+	// Update order
+	await tx.update(orders).set({ state: "paid" }).where(eq(orders.id, orderId));
 
-  // Job only created if transaction commits
-  await enqueueInTransaction(tx, 'erp.push-order', { orderId });
+	// Job only created if transaction commits
+	await enqueueInTransaction(tx, "erp.push-order", { orderId });
 });
 ```
 
 ## Queue Management
 
 ```typescript
-import {
-  getQueueStats,
-  getFailedJobs,
-  retryJob,
-  cleanupOldJobs
-} from '$lib/server/integrations';
+import { getQueueStats, getFailedJobs, retryJob, cleanupOldJobs } from "$lib/server/integrations";
 
 // Get statistics
 const stats = await getQueueStats();
 // { pending: 5, processing: 1, completed: 100, failed: 2 }
 
 // View failed jobs
-const failed = await getFailedJobs('default', 10);
+const failed = await getFailedJobs("default", 10);
 
 // Retry a failed job
 await retryJob(jobId);
 
 // Cleanup old completed jobs
-const deleted = await cleanupOldJobs(7);  // older than 7 days
+const deleted = await cleanupOldJobs(7); // older than 7 days
 ```
 
 ## Retry Behavior
@@ -95,8 +90,8 @@ After `maxAttempts`, the job is marked as failed.
 
 ```typescript
 // High priority queue
-await enqueue('urgent-task', payload, { queue: 'high-priority' });
+await enqueue("urgent-task", payload, { queue: "high-priority" });
 
 // Start dedicated worker
-startWorker({ queue: 'high-priority', pollInterval: 100 });
+startWorker({ queue: "high-priority", pollInterval: 100 });
 ```

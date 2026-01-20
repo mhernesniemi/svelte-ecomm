@@ -11,36 +11,36 @@ Most admin operations use SvelteKit form actions with progressive enhancement.
 ```typescript
 // src/routes/admin/products/[id]/+page.server.ts
 export const actions = {
-  update: async ({ request, params }) => {
-    const formData = await request.formData();
-    await productService.update(params.id, {
-      slug: formData.get('slug'),
-      // ...
-    });
-  },
+	update: async ({ request, params }) => {
+		const formData = await request.formData();
+		await productService.update(params.id, {
+			slug: formData.get("slug")
+			// ...
+		});
+	},
 
-  delete: async ({ params }) => {
-    await productService.delete(params.id);
-    redirect(303, '/admin/products');
-  },
+	delete: async ({ params }) => {
+		await productService.delete(params.id);
+		redirect(303, "/admin/products");
+	},
 
-  addVariant: async ({ request, params }) => {
-    const formData = await request.formData();
-    await variantService.create({
-      productId: params.id,
-      sku: formData.get('sku'),
-      price: parseInt(formData.get('price')),
-      stock: parseInt(formData.get('stock'))
-    });
-  },
+	addVariant: async ({ request, params }) => {
+		const formData = await request.formData();
+		await variantService.create({
+			productId: params.id,
+			sku: formData.get("sku"),
+			price: parseInt(formData.get("price")),
+			stock: parseInt(formData.get("stock"))
+		});
+	},
 
-  updateVariant: async ({ request }) => {
-    const formData = await request.formData();
-    await variantService.update(formData.get('variantId'), {
-      price: parseInt(formData.get('price')),
-      stock: parseInt(formData.get('stock'))
-    });
-  }
+	updateVariant: async ({ request }) => {
+		const formData = await request.formData();
+		await variantService.update(formData.get("variantId"), {
+			price: parseInt(formData.get("price")),
+			stock: parseInt(formData.get("stock"))
+		});
+	}
 };
 ```
 
@@ -49,30 +49,30 @@ export const actions = {
 ```typescript
 // src/routes/admin/orders/[id]/+page.server.ts
 export const actions = {
-  updateState: async ({ request, params }) => {
-    const formData = await request.formData();
-    const state = formData.get('state');
+	updateState: async ({ request, params }) => {
+		const formData = await request.formData();
+		const state = formData.get("state");
 
-    switch (state) {
-      case 'confirmed':
-        await orderService.confirm(params.id);
-        break;
-      case 'shipped':
-        await orderService.ship(params.id, formData.get('trackingNumber'));
-        break;
-      case 'delivered':
-        await orderService.deliver(params.id);
-        break;
-      case 'cancelled':
-        await orderService.cancel(params.id, formData.get('reason'));
-        break;
-    }
-  },
+		switch (state) {
+			case "confirmed":
+				await orderService.confirm(params.id);
+				break;
+			case "shipped":
+				await orderService.ship(params.id, formData.get("trackingNumber"));
+				break;
+			case "delivered":
+				await orderService.deliver(params.id);
+				break;
+			case "cancelled":
+				await orderService.cancel(params.id, formData.get("reason"));
+				break;
+		}
+	},
 
-  refundPayment: async ({ request }) => {
-    const formData = await request.formData();
-    await paymentService.refundPayment(formData.get('paymentId'));
-  }
+	refundPayment: async ({ request }) => {
+		const formData = await request.formData();
+		await paymentService.refundPayment(formData.get("paymentId"));
+	}
 };
 ```
 
@@ -106,18 +106,18 @@ export const actions = {
 
 ```svelte
 <script>
-  import { enhance } from '$app/forms';
+	import { enhance } from "$app/forms";
 
-  let { form } = $props();
+	let { form } = $props();
 </script>
 
 {#if form?.error}
-  <p class="text-red-600">{form.error}</p>
+	<p class="text-red-600">{form.error}</p>
 {/if}
 
 <form method="POST" action="?/create" use:enhance>
-  <input name="sku" value={form?.sku ?? ''} />
-  <button type="submit">Create</button>
+	<input name="sku" value={form?.sku ?? ""} />
+	<button type="submit">Create</button>
 </form>
 ```
 
@@ -126,15 +126,19 @@ export const actions = {
 With `use:enhance`, forms work without JavaScript but get enhanced UX when JS is available:
 
 ```svelte
-<form method="POST" action="?/delete" use:enhance={() => {
-  return async ({ result, update }) => {
-    if (result.type === 'redirect') {
-      goto(result.location);
-    } else {
-      await update();
-    }
-  };
-}}>
-  <button type="submit">Delete</button>
+<form
+	method="POST"
+	action="?/delete"
+	use:enhance={() => {
+		return async ({ result, update }) => {
+			if (result.type === "redirect") {
+				goto(result.location);
+			} else {
+				await update();
+			}
+		};
+	}}
+>
+	<button type="submit">Delete</button>
 </form>
 ```

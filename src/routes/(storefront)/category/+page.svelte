@@ -65,7 +65,7 @@
                   </a>
 
                   {#if child.children.length > 0}
-                    <ul class="ml-4 mt-1 space-y-1">
+                    <ul class="mt-1 ml-4 space-y-1">
                       {#each child.children.slice(0, 3) as grandchild}
                         <li>
                           <a

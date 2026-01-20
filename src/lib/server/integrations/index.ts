@@ -54,12 +54,7 @@ export {
 } from "./sync.js";
 
 // Retry Utilities
-export {
-	withRetry,
-	isTransientError,
-	createRetryFetch,
-	type RetryOptions
-} from "./retry.js";
+export { withRetry, isTransientError, createRetryFetch, type RetryOptions } from "./retry.js";
 
 // Webhook Handling
 export {

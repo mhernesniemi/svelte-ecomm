@@ -1,23 +1,23 @@
 {
-  "id": "intro",
-  "title": "Introduction",
-  "description": "Hoikka is a lightweight e-commerce platform for SvelteKit that is 100% customizable and owned by you.",
-  "source": "@site/docs/intro.md",
-  "sourceDirName": ".",
-  "slug": "/",
-  "permalink": "/",
-  "draft": false,
-  "unlisted": false,
-  "tags": [],
-  "version": "current",
-  "sidebarPosition": 1,
-  "frontMatter": {
-    "slug": "/",
-    "sidebar_position": 1
-  },
-  "sidebar": "docs",
-  "next": {
-    "title": "Installation",
-    "permalink": "/getting-started/installation"
-  }
+	"id": "intro",
+	"title": "Introduction",
+	"description": "Hoikka is a lightweight e-commerce platform for SvelteKit that is 100% customizable and owned by you.",
+	"source": "@site/docs/intro.md",
+	"sourceDirName": ".",
+	"slug": "/",
+	"permalink": "/",
+	"draft": false,
+	"unlisted": false,
+	"tags": [],
+	"version": "current",
+	"sidebarPosition": 1,
+	"frontMatter": {
+		"slug": "/",
+		"sidebar_position": 1
+	},
+	"sidebar": "docs",
+	"next": {
+		"title": "Installation",
+		"permalink": "/getting-started/installation"
+	}
 }

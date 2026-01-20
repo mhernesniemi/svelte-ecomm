@@ -9,44 +9,39 @@ Reusable pattern for synchronizing data from external systems (ERP, PIM, etc.).
 ## Defining a Sync Job
 
 ```typescript
-import { type SyncJob } from '$lib/server/integrations';
+import { type SyncJob } from "$lib/server/integrations";
 
 const inventorySync: SyncJob<ErpItem, LocalVariant> = {
-  name: 'erp-inventory',
+	name: "erp-inventory",
 
-  // Fetch all items from external system
-  fetchExternal: () => erpClient.getInventory(),
+	// Fetch all items from external system
+	fetchExternal: () => erpClient.getInventory(),
 
-  // Get unique identifier
-  getExternalId: (item) => item.sku,
+	// Get unique identifier
+	getExternalId: (item) => item.sku,
 
-  // Find matching local record
-  findLocal: async (sku) => {
-    const [variant] = await db
-      .select()
-      .from(variants)
-      .where(eq(variants.sku, sku));
-    return variant ?? null;
-  },
+	// Find matching local record
+	findLocal: async (sku) => {
+		const [variant] = await db.select().from(variants).where(eq(variants.sku, sku));
+		return variant ?? null;
+	},
 
-  // Create new record
-  create: async (item) => {
-    await db.insert(variants).values({
-      sku: item.sku,
-      stock: item.quantity
-    });
-  },
+	// Create new record
+	create: async (item) => {
+		await db.insert(variants).values({
+			sku: item.sku,
+			stock: item.quantity
+		});
+	},
 
-  // Update existing record
-  update: async (item, local) => {
-    await db.update(variants)
-      .set({ stock: item.quantity })
-      .where(eq(variants.id, local.id));
-  },
+	// Update existing record
+	update: async (item, local) => {
+		await db.update(variants).set({ stock: item.quantity }).where(eq(variants.id, local.id));
+	},
 
-  // Optional hooks
-  onStart: async () => console.log('Starting sync'),
-  onComplete: async (results) => console.log('Done:', results)
+	// Optional hooks
+	onStart: async () => console.log("Starting sync"),
+	onComplete: async (results) => console.log("Done:", results)
 };
 ```
 
@@ -55,7 +50,7 @@ const inventorySync: SyncJob<ErpItem, LocalVariant> = {
 ### Immediately
 
 ```typescript
-import { runSync } from '$lib/server/integrations';
+import { runSync } from "$lib/server/integrations";
 
 const results = await runSync(inventorySync);
 // {
@@ -70,22 +65,22 @@ const results = await runSync(inventorySync);
 ### Via Queue
 
 ```typescript
-import { registerSyncJob, triggerSync } from '$lib/server/integrations';
+import { registerSyncJob, triggerSync } from "$lib/server/integrations";
 
 // Register for queue execution
 registerSyncJob(inventorySync);
 
 // Trigger manually
-await triggerSync('erp-inventory');
+await triggerSync("erp-inventory");
 ```
 
 ### Scheduled
 
 ```typescript
-import { scheduleSyncJob, syncIntervals } from '$lib/server/integrations';
+import { scheduleSyncJob, syncIntervals } from "$lib/server/integrations";
 
 // Run every hour
-await scheduleSyncJob('erp-inventory', syncIntervals.hours(1));
+await scheduleSyncJob("erp-inventory", syncIntervals.hours(1));
 
 // Other intervals
 syncIntervals.minutes(30);
@@ -98,7 +93,7 @@ syncIntervals.days(1);
 For webhook-triggered updates:
 
 ```typescript
-import { syncSingleItem } from '$lib/server/integrations';
+import { syncSingleItem } from "$lib/server/integrations";
 
 // When webhook receives inventory update
 const result = await syncSingleItem(inventorySync, webhookPayload);
@@ -113,8 +108,8 @@ Errors are collected per item without stopping the sync:
 const results = await runSync(mySync);
 
 if (results.errors.length > 0) {
-  for (const error of results.errors) {
-    console.error(`Failed: ${error.externalId}`, error.message);
-  }
+	for (const error of results.errors) {
+		console.error(`Failed: ${error.externalId}`, error.message);
+	}
 }
 ```

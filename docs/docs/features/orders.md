@@ -13,13 +13,13 @@ pending → confirmed → shipped → delivered
                    ↘ cancelled
 ```
 
-| State | Description |
-|-------|-------------|
-| `pending` | Created, awaiting payment |
-| `confirmed` | Payment received |
-| `shipped` | Shipped to customer |
-| `delivered` | Received by customer |
-| `cancelled` | Order cancelled |
+| State       | Description               |
+| ----------- | ------------------------- |
+| `pending`   | Created, awaiting payment |
+| `confirmed` | Payment received          |
+| `shipped`   | Shipped to customer       |
+| `delivered` | Received by customer      |
+| `cancelled` | Order cancelled           |
 
 ## Creating Orders
 
@@ -47,13 +47,13 @@ const order = await orderService.createFromCart(cartId, {
 await orderService.confirm(orderId);
 
 // When shipped
-await orderService.ship(orderId, 'TRACK123456');
+await orderService.ship(orderId, "TRACK123456");
 
 // When delivered
 await orderService.deliver(orderId);
 
 // Cancel with reason
-await orderService.cancel(orderId, 'Customer requested cancellation');
+await orderService.cancel(orderId, "Customer requested cancellation");
 ```
 
 ## Order Lines
@@ -62,13 +62,13 @@ Each order contains line items:
 
 ```typescript
 order.lines = [
-  {
-    variantId: 456,
-    variant: { sku: 'SHIRT-M', name: 'Blue Shirt - Medium' },
-    quantity: 2,
-    unitPrice: 2999,
-    total: 5998
-  }
+	{
+		variantId: 456,
+		variant: { sku: "SHIRT-M", name: "Blue Shirt - Medium" },
+		quantity: 2,
+		unitPrice: 2999,
+		total: 5998
+	}
 ];
 ```
 
@@ -78,10 +78,10 @@ Orders have a human-readable code:
 
 ```typescript
 // Format: ORD-YYYY-XXXXX
-order.code = 'ORD-2024-00001';
+order.code = "ORD-2024-00001";
 
 // Lookup by code
-const order = await orderService.getByCode('ORD-2024-00001');
+const order = await orderService.getByCode("ORD-2024-00001");
 ```
 
 ## Guest Orders

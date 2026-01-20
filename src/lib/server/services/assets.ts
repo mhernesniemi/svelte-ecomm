@@ -2,11 +2,11 @@
  * Asset Service
  * Handles image storage with ImageKit.io
  */
-import { db } from '$lib/server/db/index.js';
-import { assets, productAssets, products } from '$lib/server/db/schema.js';
-import { eq, asc } from 'drizzle-orm';
-import { env } from '$env/dynamic/private';
-import crypto from 'crypto';
+import { db } from "$lib/server/db/index.js";
+import { assets, productAssets, products } from "$lib/server/db/schema.js";
+import { eq, asc } from "drizzle-orm";
+import { env } from "$env/dynamic/private";
+import crypto from "crypto";
 
 export interface UploadAuthParams {
 	token: string;
@@ -30,15 +30,15 @@ class AssetService {
 	getUploadAuth(): UploadAuthParams {
 		const privateKey = env.IMAGEKIT_PRIVATE_KEY;
 		if (!privateKey) {
-			throw new Error('IMAGEKIT_PRIVATE_KEY not configured');
+			throw new Error("IMAGEKIT_PRIVATE_KEY not configured");
 		}
 
 		const token = crypto.randomUUID();
 		const expire = Math.floor(Date.now() / 1000) + 60 * 30; // 30 minutes
 		const signature = crypto
-			.createHmac('sha1', privateKey)
+			.createHmac("sha1", privateKey)
 			.update(token + expire)
-			.digest('hex');
+			.digest("hex");
 
 		return { token, expire, signature };
 	}
@@ -51,7 +51,7 @@ class AssetService {
 		const urlEndpoint = env.IMAGEKIT_URL_ENDPOINT;
 
 		if (!publicKey || !urlEndpoint) {
-			throw new Error('ImageKit not configured');
+			throw new Error("ImageKit not configured");
 		}
 
 		return { publicKey, urlEndpoint };
@@ -65,10 +65,10 @@ class AssetService {
 			.insert(assets)
 			.values({
 				name: input.name,
-				type: 'image',
-				mimeType: 'image/jpeg', // ImageKit handles conversion
+				type: "image",
+				mimeType: "image/jpeg", // ImageKit handles conversion
 				source: input.url,
-				preview: input.url + '?tr=w-200,h-200',
+				preview: input.url + "?tr=w-200,h-200",
 				width: input.width ?? 0,
 				height: input.height ?? 0,
 				fileSize: input.fileSize ?? 0
@@ -89,7 +89,8 @@ class AssetService {
 			.where(eq(productAssets.productId, productId))
 			.orderBy(asc(productAssets.position));
 
-		const nextPosition = position ?? (existing.length > 0 ? existing[existing.length - 1].position + 1 : 0);
+		const nextPosition =
+			position ?? (existing.length > 0 ? existing[existing.length - 1].position + 1 : 0);
 
 		await db
 			.insert(productAssets)
@@ -98,7 +99,10 @@ class AssetService {
 
 		// Set as featured if first image
 		if (nextPosition === 0) {
-			await db.update(products).set({ featuredAssetId: assetId }).where(eq(products.id, productId));
+			await db
+				.update(products)
+				.set({ featuredAssetId: assetId })
+				.where(eq(products.id, productId));
 		}
 	}
 
@@ -132,7 +136,10 @@ class AssetService {
 	 * Set featured asset for product
 	 */
 	async setFeaturedAsset(productId: number, assetId: number) {
-		await db.update(products).set({ featuredAssetId: assetId }).where(eq(products.id, productId));
+		await db
+			.update(products)
+			.set({ featuredAssetId: assetId })
+			.where(eq(products.id, productId));
 	}
 
 	/**

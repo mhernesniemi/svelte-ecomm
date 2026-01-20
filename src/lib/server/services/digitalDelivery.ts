@@ -5,7 +5,13 @@
 import { Resend } from "resend";
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { orders, orderLines, productVariants, products, productTranslations } from "../db/schema.js";
+import {
+	orders,
+	orderLines,
+	productVariants,
+	products,
+	productTranslations
+} from "../db/schema.js";
 import { env } from "$env/dynamic/private";
 
 export class DigitalDeliveryService {

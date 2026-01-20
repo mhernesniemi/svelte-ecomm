@@ -163,13 +163,10 @@
       </div>
 
       <!-- Common Fields -->
-      <div class="border-t pt-6 space-y-4">
+      <div class="space-y-4 border-t pt-6">
         <label class="block">
           <span class="text-sm font-medium text-gray-700">Product Type</span>
-          <select
-            name="type"
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          >
+          <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
             <option value="physical" selected={form?.values?.type !== "digital"}>
               Physical - Requires shipping
             </option>
@@ -181,11 +178,12 @@
 
         <label class="block">
           <span class="text-sm font-medium text-gray-700">Visibility</span>
-          <select
-            name="visibility"
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-          >
-            <option value="public" selected={form?.values?.visibility !== "private" && form?.values?.visibility !== "hidden"}>
+          <select name="visibility" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            <option
+              value="public"
+              selected={form?.values?.visibility !== "private" &&
+                form?.values?.visibility !== "hidden"}
+            >
               Public - Visible to everyone
             </option>
             <option value="private" selected={form?.values?.visibility === "private"}>

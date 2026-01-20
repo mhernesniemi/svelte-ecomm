@@ -10,5 +10,5 @@ export {
 	alertVariants,
 	Root as Alert,
 	Description as AlertDescription,
-	Title as AlertTitle,
+	Title as AlertTitle
 };

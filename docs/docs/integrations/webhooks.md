@@ -10,20 +10,20 @@ Handle incoming webhooks from external systems with signature verification.
 
 ```typescript
 // src/routes/api/webhooks/erp/+server.ts
-import { createWebhookHandler, signatureVerifiers } from '$lib/server/integrations';
+import { createWebhookHandler, signatureVerifiers } from "$lib/server/integrations";
 
 export const POST = createWebhookHandler({
-  secret: process.env.ERP_WEBHOOK_SECRET,
-  verifySignature: signatureVerifiers.hmacHeader('x-signature'),
+	secret: process.env.ERP_WEBHOOK_SECRET,
+	verifySignature: signatureVerifiers.hmacHeader("x-signature"),
 
-  handlers: {
-    'inventory.updated': async (payload) => {
-      await updateStock(payload.sku, payload.quantity);
-    },
-    'order.shipped': async (payload) => {
-      await markOrderShipped(payload.orderId, payload.trackingNumber);
-    }
-  }
+	handlers: {
+		"inventory.updated": async (payload) => {
+			await updateStock(payload.sku, payload.quantity);
+		},
+		"order.shipped": async (payload) => {
+			await markOrderShipped(payload.orderId, payload.trackingNumber);
+		}
+	}
 });
 ```
 
@@ -32,21 +32,21 @@ export const POST = createWebhookHandler({
 ### HMAC Header (Generic)
 
 ```typescript
-signatureVerifiers.hmacHeader('x-webhook-signature')
-signatureVerifiers.hmacHeader('x-signature', 'sha256=')  // with prefix
+signatureVerifiers.hmacHeader("x-webhook-signature");
+signatureVerifiers.hmacHeader("x-signature", "sha256="); // with prefix
 ```
 
 ### Stripe
 
 ```typescript
-signatureVerifiers.stripe
+signatureVerifiers.stripe;
 // Uses stripe-signature header
 ```
 
 ### GitHub
 
 ```typescript
-signatureVerifiers.github
+signatureVerifiers.github;
 // Uses x-hub-signature-256 header
 ```
 
@@ -56,9 +56,9 @@ Run handlers via job queue for reliability:
 
 ```typescript
 export const POST = createWebhookHandler({
-  // ...
-  persistent: true,  // Handlers run via queue
-  queue: 'webhooks'  // Queue name (default: 'webhooks')
+	// ...
+	persistent: true, // Handlers run via queue
+	queue: "webhooks" // Queue name (default: 'webhooks')
 });
 ```
 
@@ -75,23 +75,23 @@ export const POST = createWebhookHandler({
 
 ## Response Behavior
 
-| Scenario | Response |
-|----------|----------|
-| Invalid JSON | 400 Bad Request |
-| Invalid signature | 401 Unauthorized |
+| Scenario             | Response                    |
+| -------------------- | --------------------------- |
+| Invalid JSON         | 400 Bad Request             |
+| Invalid signature    | 401 Unauthorized            |
 | No handler for event | 200 OK (event acknowledged) |
-| Handler success | 200 OK |
-| Handler error | 500 Internal Server Error |
+| Handler success      | 200 OK                      |
+| Handler error        | 500 Internal Server Error   |
 
 ## Manual Verification
 
 ```typescript
-import { verifyHmacSha256 } from '$lib/server/integrations';
+import { verifyHmacSha256 } from "$lib/server/integrations";
 
 const isValid = verifyHmacSha256(
-  requestBody,
-  signatureHeader,
-  secret,
-  'sha256='  // optional prefix
+	requestBody,
+	signatureHeader,
+	secret,
+	"sha256=" // optional prefix
 );
 ```

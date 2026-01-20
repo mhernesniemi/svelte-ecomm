@@ -229,6 +229,7 @@
           {/if}
         </div>
       {/if}
+
       <!-- Quantity & Add to Cart -->
       {#if selectedVariant && selectedVariant.stock > 0}
         <div class="mb-6 flex items-center gap-4">

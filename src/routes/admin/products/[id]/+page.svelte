@@ -47,7 +47,12 @@
 
   function flattenTree(nodes: typeof data.categoryTree, depth = 0): FlatCategory[] {
     return nodes.flatMap((node) => [
-      { id: node.id, name: getCategoryName(node.translations), depth, translations: node.translations },
+      {
+        id: node.id,
+        name: getCategoryName(node.translations),
+        depth,
+        translations: node.translations
+      },
       ...flattenTree(node.children, depth + 1)
     ]);
   }
@@ -143,7 +148,9 @@
 
 <div>
   <div class="mb-6">
-    <a href="/admin/products" class="text-sm text-blue-600 hover:underline">&larr; Back to Products</a>
+    <a href="/admin/products" class="text-sm text-blue-600 hover:underline"
+      >&larr; Back to Products</a
+    >
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">Edit Product</h1>
       {#if enTrans?.slug}
@@ -237,7 +244,8 @@
                   name="description_en"
                   rows="4"
                   class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                >{enTrans?.description ?? ""}</textarea>
+                  >{enTrans?.description ?? ""}</textarea
+                >
               </div>
             </div>
           </div>
@@ -246,7 +254,9 @@
           <div class={activeTab === "fi" ? "" : "hidden"}>
             <div class="space-y-4">
               <div>
-                <label for="name_fi" class="mb-1 block text-sm font-medium text-gray-700">Name</label>
+                <label for="name_fi" class="mb-1 block text-sm font-medium text-gray-700"
+                  >Name</label
+                >
                 <input
                   type="text"
                   id="name_fi"
@@ -257,7 +267,9 @@
               </div>
 
               <div>
-                <label for="slug_fi" class="mb-1 block text-sm font-medium text-gray-700">Slug</label>
+                <label for="slug_fi" class="mb-1 block text-sm font-medium text-gray-700"
+                  >Slug</label
+                >
                 <input
                   type="text"
                   id="slug_fi"
@@ -276,7 +288,8 @@
                   name="description_fi"
                   rows="4"
                   class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                >{fiTrans?.description ?? ""}</textarea>
+                  >{fiTrans?.description ?? ""}</textarea
+                >
               </div>
             </div>
           </div>
@@ -285,11 +298,10 @@
           <div class="grid grid-cols-2 gap-4 border-t pt-6">
             <label class="block">
               <span class="text-sm font-medium text-gray-700">Product Type</span>
-              <select
-                name="type"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-              >
-                <option value="physical" selected={data.product.type === "physical"}>Physical</option>
+              <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                <option value="physical" selected={data.product.type === "physical"}
+                  >Physical</option
+                >
                 <option value="digital" selected={data.product.type === "digital"}>Digital</option>
               </select>
             </label>
@@ -300,9 +312,15 @@
                 name="visibility"
                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
               >
-                <option value="public" selected={data.product.visibility === "public"}>Public</option>
-                <option value="private" selected={data.product.visibility === "private"}>Private</option>
-                <option value="hidden" selected={data.product.visibility === "hidden"}>Hidden</option>
+                <option value="public" selected={data.product.visibility === "public"}
+                  >Public</option
+                >
+                <option value="private" selected={data.product.visibility === "private"}
+                  >Private</option
+                >
+                <option value="hidden" selected={data.product.visibility === "hidden"}
+                  >Hidden</option
+                >
               </select>
             </label>
           </div>
@@ -347,7 +365,8 @@
         {#if editingVariant}
           {@const isEditing = editingVariant !== "new"}
           {@const variant = typeof editingVariant === "object" ? editingVariant : null}
-          {@const variantNameEn = variant?.translations.find((t) => t.languageCode === "en")?.name ?? ""}
+          {@const variantNameEn =
+            variant?.translations.find((t) => t.languageCode === "en")?.name ?? ""}
           <form
             method="POST"
             action={isEditing ? "?/updateVariant" : "?/addVariant"}
@@ -369,7 +388,9 @@
             </div>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
               <div>
-                <label for="variant_sku" class="mb-1 block text-sm font-medium text-gray-700">SKU *</label>
+                <label for="variant_sku" class="mb-1 block text-sm font-medium text-gray-700"
+                  >SKU *</label
+                >
                 <input
                   type="text"
                   id="variant_sku"
@@ -380,7 +401,9 @@
                 />
               </div>
               <div>
-                <label for="variant_price" class="mb-1 block text-sm font-medium text-gray-700">Price *</label>
+                <label for="variant_price" class="mb-1 block text-sm font-medium text-gray-700"
+                  >Price *</label
+                >
                 <input
                   type="number"
                   id="variant_price"
@@ -393,7 +416,9 @@
                 />
               </div>
               <div>
-                <label for="variant_stock" class="mb-1 block text-sm font-medium text-gray-700">Stock</label>
+                <label for="variant_stock" class="mb-1 block text-sm font-medium text-gray-700"
+                  >Stock</label
+                >
                 <input
                   type="number"
                   id="variant_stock"
@@ -404,7 +429,9 @@
                 />
               </div>
               <div>
-                <label for="variant_name_en" class="mb-1 block text-sm font-medium text-gray-700">Name (EN)</label>
+                <label for="variant_name_en" class="mb-1 block text-sm font-medium text-gray-700"
+                  >Name (EN)</label
+                >
                 <input
                   type="text"
                   id="variant_name_en"
@@ -415,7 +442,11 @@
               </div>
             </div>
             <div class="mt-4 flex justify-end gap-2">
-              <button type="button" onclick={() => (editingVariant = null)} class="rounded border px-3 py-1 text-sm">
+              <button
+                type="button"
+                onclick={() => (editingVariant = null)}
+                class="rounded border px-3 py-1 text-sm"
+              >
                 Cancel
               </button>
               <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-sm text-white">
@@ -433,12 +464,15 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">SKU</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Name</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Price</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Stock</th>
-              <th class="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Facets</th>
-              <th class="px-6 py-3 text-right text-xs font-medium uppercase text-gray-500">Actions</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Facets</th
+              >
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"
+                >Actions</th
+              >
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
@@ -463,7 +497,8 @@
                     {:else}
                       <div class="flex flex-wrap gap-1">
                         {#each variant.facetValues as fv}
-                          {@const name = fv.translations.find((t) => t.languageCode === "en")?.name ?? fv.code}
+                          {@const name =
+                            fv.translations.find((t) => t.languageCode === "en")?.name ?? fv.code}
                           <span class="rounded bg-gray-100 px-2 py-0.5 text-xs">{name}</span>
                         {/each}
                       </div>
@@ -479,7 +514,9 @@
                     </button>
                     <button
                       type="button"
-                      onclick={() => (editingVariantFacets = editingVariantFacets === variant.id ? null : variant.id)}
+                      onclick={() =>
+                        (editingVariantFacets =
+                          editingVariantFacets === variant.id ? null : variant.id)}
                       class="text-gray-600 hover:text-gray-800"
                     >
                       {editingVariantFacets === variant.id ? "Cancel" : "Facets"}
@@ -493,7 +530,9 @@
                         <input type="hidden" name="variantId" value={variant.id} />
                         <div class="space-y-4">
                           {#each data.facets as facet}
-                            {@const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code}
+                            {@const facetName =
+                              facet.translations.find((t) => t.languageCode === "en")?.name ??
+                              facet.code}
                             <div>
                               <p class="mb-2 text-sm font-medium text-gray-700">{facetName}</p>
                               {#if facet.values.length === 0}
@@ -501,9 +540,13 @@
                               {:else}
                                 <div class="flex flex-wrap gap-2">
                                   {#each facet.values as value}
-                                    {@const valueName = value.translations.find((t) => t.languageCode === "en")?.name ?? value.code}
+                                    {@const valueName =
+                                      value.translations.find((t) => t.languageCode === "en")
+                                        ?.name ?? value.code}
                                     <label
-                                      class="cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors {variantFacets[variant.id]?.includes(value.id)
+                                      class="cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors {variantFacets[
+                                        variant.id
+                                      ]?.includes(value.id)
                                         ? 'border-2 border-blue-300 bg-blue-100 text-blue-800'
                                         : 'border-2 border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200'}"
                                     >
@@ -523,7 +566,10 @@
                           {/each}
                         </div>
                         <div class="mt-4">
-                          <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700">
+                          <button
+                            type="submit"
+                            class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+                          >
                             Save Variant Facets
                           </button>
                         </div>
@@ -562,35 +608,60 @@
                   <img
                     src="{asset.source}?tr=w-150,h-150,fo-auto"
                     alt={asset.name}
-                    class="h-24 w-full rounded border object-cover {data.product.featuredAssetId === asset.id ? 'ring-2 ring-blue-500' : ''}"
+                    class="h-24 w-full rounded border object-cover {data.product.featuredAssetId ===
+                    asset.id
+                      ? 'ring-2 ring-blue-500'
+                      : ''}"
                   />
-                  <div class="absolute inset-0 flex items-center justify-center gap-1 rounded bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div
+                    class="absolute inset-0 flex items-center justify-center gap-1 rounded bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
                     {#if data.product.featuredAssetId !== asset.id}
                       <form method="POST" action="?/setFeaturedImage" use:enhance>
                         <input type="hidden" name="assetId" value={asset.id} />
-                        <button type="submit" class="rounded bg-blue-600 px-1.5 py-0.5 text-xs text-white hover:bg-blue-700">
+                        <button
+                          type="submit"
+                          class="rounded bg-blue-600 px-1.5 py-0.5 text-xs text-white hover:bg-blue-700"
+                        >
                           Featured
                         </button>
                       </form>
                     {/if}
                     <form method="POST" action="?/removeImage" use:enhance>
                       <input type="hidden" name="assetId" value={asset.id} />
-                      <button type="submit" class="rounded bg-red-600 px-1.5 py-0.5 text-xs text-white hover:bg-red-700">
+                      <button
+                        type="submit"
+                        class="rounded bg-red-600 px-1.5 py-0.5 text-xs text-white hover:bg-red-700"
+                      >
                         Remove
                       </button>
                     </form>
                   </div>
                   {#if data.product.featuredAssetId === asset.id}
-                    <span class="absolute left-1 top-1 rounded bg-blue-600 px-1 py-0.5 text-[10px] text-white">Featured</span>
+                    <span
+                      class="absolute top-1 left-1 rounded bg-blue-600 px-1 py-0.5 text-[10px] text-white"
+                      >Featured</span
+                    >
                   {/if}
                 </div>
               {/each}
             </div>
           {/if}
 
-          <label class="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 py-4 text-center hover:border-blue-500 hover:bg-gray-50">
-            <input type="file" accept="image/*" multiple class="hidden" onchange={handleImageUpload} disabled={isUploading} />
-            <span class="text-sm text-gray-600">{isUploading ? "Uploading..." : "Upload images"}</span>
+          <label
+            class="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 py-4 text-center hover:border-blue-500 hover:bg-gray-50"
+          >
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              class="hidden"
+              onchange={handleImageUpload}
+              disabled={isUploading}
+            />
+            <span class="text-sm text-gray-600"
+              >{isUploading ? "Uploading..." : "Upload images"}</span
+            >
           </label>
         </div>
       </div>
@@ -611,7 +682,8 @@
           {:else}
             <div class="space-y-4">
               {#each data.facets as facet}
-                {@const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code}
+                {@const facetName =
+                  facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code}
                 <div>
                   <p class="mb-1.5 text-sm font-medium text-gray-700">{facetName}</p>
                   {#if facet.values.length === 0}
@@ -619,13 +691,23 @@
                   {:else}
                     <div class="flex flex-wrap gap-1.5">
                       {#each facet.values as value}
-                        {@const valueName = value.translations.find((t) => t.languageCode === "en")?.name ?? value.code}
+                        {@const valueName =
+                          value.translations.find((t) => t.languageCode === "en")?.name ??
+                          value.code}
                         <label
-                          class="cursor-pointer rounded-full px-2 py-1 text-xs transition-colors {selectedProductFacets.includes(value.id)
+                          class="cursor-pointer rounded-full px-2 py-1 text-xs transition-colors {selectedProductFacets.includes(
+                            value.id
+                          )
                             ? 'border border-blue-300 bg-blue-100 text-blue-800'
                             : 'border border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200'}"
                         >
-                          <input type="checkbox" name="facetValueIds" value={value.id} bind:group={selectedProductFacets} class="sr-only" />
+                          <input
+                            type="checkbox"
+                            name="facetValueIds"
+                            value={value.id}
+                            bind:group={selectedProductFacets}
+                            class="sr-only"
+                          />
                           {valueName}
                         </label>
                       {/each}
@@ -634,7 +716,10 @@
                 </div>
               {/each}
             </div>
-            <button type="submit" class="mt-4 w-full rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700">
+            <button
+              type="submit"
+              class="mt-4 w-full rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
+            >
               Save Facets
             </button>
           {/if}
@@ -681,8 +766,15 @@
                     <Command.Empty>No category found.</Command.Empty>
                     <Command.Group>
                       {#each flatCategories as category}
-                        <Command.Item value={category.name} onSelect={() => toggleCategory(category.id)} class="cursor-pointer">
-                          <div class="flex w-full items-center gap-2" style="padding-left: {category.depth * 12}px">
+                        <Command.Item
+                          value={category.name}
+                          onSelect={() => toggleCategory(category.id)}
+                          class="cursor-pointer"
+                        >
+                          <div
+                            class="flex w-full items-center gap-2"
+                            style="padding-left: {category.depth * 12}px"
+                          >
                             <div class="flex h-4 w-4 items-center justify-center">
                               {#if selectedCategories.includes(category.id)}
                                 <Check class="h-4 w-4" />
@@ -702,7 +794,9 @@
             {#if selectedCategories.length > 0}
               <div class="mt-3 flex flex-wrap gap-1.5">
                 {#each getSelectedCategoryObjects() as category}
-                  <span class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800">
+                  <span
+                    class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800"
+                  >
                     {category.name}
                     <button
                       type="button"
@@ -718,7 +812,10 @@
               </div>
             {/if}
 
-            <button type="submit" class="mt-4 w-full rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700">
+            <button
+              type="submit"
+              class="mt-4 w-full rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
+            >
               Save Categories
             </button>
           {/if}

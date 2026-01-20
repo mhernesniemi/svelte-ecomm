@@ -45,7 +45,8 @@
       >
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label for="group_name" class="mb-1 block text-sm font-medium text-gray-700">Name</label>
+            <label for="group_name" class="mb-1 block text-sm font-medium text-gray-700">Name</label
+            >
             <input
               type="text"
               id="group_name"
@@ -149,12 +150,7 @@
               {#if getCustomersNotInGroup(group.id).length === 0}
                 <p class="text-sm text-gray-500">All customers are already in this group</p>
               {:else}
-                <form
-                  method="POST"
-                  action="?/addCustomer"
-                  use:enhance
-                  class="flex items-end gap-4"
-                >
+                <form method="POST" action="?/addCustomer" use:enhance class="flex items-end gap-4">
                   <input type="hidden" name="groupId" value={group.id} />
                   <div class="flex-1">
                     <select
@@ -164,7 +160,8 @@
                       <option value="">Select a customer...</option>
                       {#each getCustomersNotInGroup(group.id) as customer}
                         <option value={customer.id}>
-                          {customer.firstName} {customer.lastName} ({customer.email})
+                          {customer.firstName}
+                          {customer.lastName} ({customer.email})
                         </option>
                       {/each}
                     </select>
@@ -184,22 +181,15 @@
               {:else}
                 <div class="space-y-2">
                   {#each group.customers as customer}
-                    <div
-                      class="flex items-center justify-between rounded-lg bg-gray-100 px-3 py-2"
-                    >
+                    <div class="flex items-center justify-between rounded-lg bg-gray-100 px-3 py-2">
                       <div>
-                        <span class="font-medium"
-                          >{customer.firstName} {customer.lastName}</span
-                        >
+                        <span class="font-medium">{customer.firstName} {customer.lastName}</span>
                         <span class="ml-2 text-sm text-gray-500">{customer.email}</span>
                       </div>
                       <form method="POST" action="?/removeCustomer" use:enhance>
                         <input type="hidden" name="groupId" value={group.id} />
                         <input type="hidden" name="customerId" value={customer.id} />
-                        <button
-                          type="submit"
-                          class="text-sm text-red-600 hover:text-red-800"
-                        >
+                        <button type="submit" class="text-sm text-red-600 hover:text-red-800">
                           Remove
                         </button>
                       </form>

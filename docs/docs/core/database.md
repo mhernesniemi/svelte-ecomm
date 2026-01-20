@@ -99,21 +99,21 @@ bun run db:push
 ## Querying
 
 ```typescript
-import { db } from '$lib/server/db';
-import { products } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
+import { db } from "$lib/server/db";
+import { products } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
 
 // Simple query
 const product = await db.query.products.findFirst({
-  where: eq(products.id, 123)
+	where: eq(products.id, 123)
 });
 
 // With relations
 const productWithVariants = await db.query.products.findFirst({
-  where: eq(products.id, 123),
-  with: {
-    translations: true,
-    variants: { with: { translations: true } }
-  }
+	where: eq(products.id, 123),
+	with: {
+		translations: true,
+		variants: { with: { translations: true } }
+	}
 });
 ```

@@ -13,17 +13,18 @@ GET /api/search?q={query}&lang={languageCode}
 ```
 
 **Response:**
+
 ```json
 {
-  "products": [
-    {
-      "id": 1,
-      "slug": "blue-shirt",
-      "name": "Blue Shirt",
-      "price": 2999,
-      "image": "/uploads/shirt.jpg"
-    }
-  ]
+	"products": [
+		{
+			"id": 1,
+			"slug": "blue-shirt",
+			"name": "Blue Shirt",
+			"price": 2999,
+			"image": "/uploads/shirt.jpg"
+		}
+	]
 }
 ```
 
@@ -79,9 +80,10 @@ Content-Type: application/json
 ```
 
 **Response (Stripe):**
+
 ```json
 {
-  "clientSecret": "pi_xxx_secret_xxx"
+	"clientSecret": "pi_xxx_secret_xxx"
 }
 ```
 
@@ -120,11 +122,11 @@ API routes that require authentication check the Clerk session:
 
 ```typescript
 export const GET = async ({ locals }) => {
-  const { userId } = locals.auth;
-  if (!userId) {
-    return new Response('Unauthorized', { status: 401 });
-  }
-  // ...
+	const { userId } = locals.auth;
+	if (!userId) {
+		return new Response("Unauthorized", { status: 401 });
+	}
+	// ...
 };
 ```
 
@@ -132,13 +134,13 @@ export const GET = async ({ locals }) => {
 
 ```json
 {
-  "error": "Error message"
+	"error": "Error message"
 }
 ```
 
-| Status | Meaning |
-|--------|---------|
-| 400 | Bad request / validation error |
-| 401 | Unauthorized |
-| 404 | Not found |
-| 500 | Server error |
+| Status | Meaning                        |
+| ------ | ------------------------------ |
+| 400    | Bad request / validation error |
+| 401    | Unauthorized                   |
+| 404    | Not found                      |
+| 500    | Server error                   |

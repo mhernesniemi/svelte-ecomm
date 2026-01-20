@@ -1,26 +1,26 @@
 {
-  "id": "features/cart",
-  "title": "Cart",
-  "description": "Hoikka uses cookie-based cart tokens for guest-friendly shopping.",
-  "source": "@site/docs/features/cart.md",
-  "sourceDirName": "features",
-  "slug": "/features/cart",
-  "permalink": "/features/cart",
-  "draft": false,
-  "unlisted": false,
-  "tags": [],
-  "version": "current",
-  "sidebarPosition": 3,
-  "frontMatter": {
-    "sidebar_position": 3
-  },
-  "sidebar": "docs",
-  "previous": {
-    "title": "Orders",
-    "permalink": "/features/orders"
-  },
-  "next": {
-    "title": "Collections",
-    "permalink": "/features/collections"
-  }
+	"id": "features/cart",
+	"title": "Cart",
+	"description": "Hoikka uses cookie-based cart tokens for guest-friendly shopping.",
+	"source": "@site/docs/features/cart.md",
+	"sourceDirName": "features",
+	"slug": "/features/cart",
+	"permalink": "/features/cart",
+	"draft": false,
+	"unlisted": false,
+	"tags": [],
+	"version": "current",
+	"sidebarPosition": 3,
+	"frontMatter": {
+		"sidebar_position": 3
+	},
+	"sidebar": "docs",
+	"previous": {
+		"title": "Orders",
+		"permalink": "/features/orders"
+	},
+	"next": {
+		"title": "Collections",
+		"permalink": "/features/collections"
+	}
 }

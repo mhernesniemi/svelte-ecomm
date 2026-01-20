@@ -1,52 +1,52 @@
 <script lang="ts" module>
-	import { tv, type VariantProps } from "tailwind-variants";
+  import { tv, type VariantProps } from "tailwind-variants";
 
-	export const buttonVariants = tv({
-		base: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
-		variants: {
-			variant: {
-				default: "bg-blue-600 text-white hover:bg-blue-700",
-				destructive: "bg-red-600 text-white hover:bg-red-700",
-				outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
-				secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-				ghost: "text-gray-700 hover:bg-gray-100",
-				link: "text-blue-600 underline-offset-4 hover:underline",
-			},
-			size: {
-				default: "h-10 px-4 py-2",
-				sm: "h-9 px-3 text-xs",
-				lg: "h-11 px-8",
-				icon: "size-10",
-			},
-		},
-		defaultVariants: {
-			variant: "default",
-			size: "default",
-		},
-	});
+  export const buttonVariants = tv({
+    base: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+    variants: {
+      variant: {
+        default: "bg-blue-600 text-white hover:bg-blue-700",
+        destructive: "bg-red-600 text-white hover:bg-red-700",
+        outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
+        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
+        ghost: "text-gray-700 hover:bg-gray-100",
+        link: "text-blue-600 underline-offset-4 hover:underline"
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 px-3 text-xs",
+        lg: "h-11 px-8",
+        icon: "size-10"
+      }
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default"
+    }
+  });
 
-	export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
-	export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
-	export type ButtonProps = {
-		variant?: ButtonVariant;
-		size?: ButtonSize;
-		class?: string;
-	} & Omit<HTMLButtonAttributes, "class">;
+  export type ButtonVariant = VariantProps<typeof buttonVariants>["variant"];
+  export type ButtonSize = VariantProps<typeof buttonVariants>["size"];
+  export type ButtonProps = {
+    variant?: ButtonVariant;
+    size?: ButtonSize;
+    class?: string;
+  } & Omit<HTMLButtonAttributes, "class">;
 </script>
 
 <script lang="ts">
-	import { cn } from "$lib/utils.js";
-	import type { HTMLButtonAttributes } from "svelte/elements";
+  import { cn } from "$lib/utils.js";
+  import type { HTMLButtonAttributes } from "svelte/elements";
 
-	let {
-		class: className,
-		variant = "default",
-		size = "default",
-		children,
-		...restProps
-	}: ButtonProps & { children?: import("svelte").Snippet } = $props();
+  let {
+    class: className,
+    variant = "default",
+    size = "default",
+    children,
+    ...restProps
+  }: ButtonProps & { children?: import("svelte").Snippet } = $props();
 </script>
 
 <button class={cn(buttonVariants({ variant, size }), className)} {...restProps}>
-	{@render children?.()}
+  {@render children?.()}
 </button>

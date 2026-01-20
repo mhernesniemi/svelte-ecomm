@@ -25,11 +25,11 @@ Usage in routes:
 
 ```typescript
 // src/routes/admin/products/[id]/+page.server.ts
-import { productService } from '$lib/server/services/products';
+import { productService } from "$lib/server/services/products";
 
 export const load = async ({ params }) => {
-  const product = await productService.getById(params.id);
-  return { product };
+	const product = await productService.getById(params.id);
+	return { product };
 };
 ```
 
@@ -39,15 +39,15 @@ Payments and shipping use a provider pattern for easy swapping:
 
 ```typescript
 interface PaymentProvider {
-  code: string;
-  createPayment(order: Order): Promise<PaymentInfo>;
-  confirmPayment(transactionId: string): Promise<PaymentStatus>;
+	code: string;
+	createPayment(order: Order): Promise<PaymentInfo>;
+	confirmPayment(transactionId: string): Promise<PaymentStatus>;
 }
 
 // Register multiple providers
 const PROVIDERS = new Map<string, PaymentProvider>([
-  ['stripe', new StripeProvider()],
-  ['klarna', new KlarnaProvider()],
+	["stripe", new StripeProvider()],
+	["klarna", new KlarnaProvider()]
 ]);
 ```
 
@@ -68,19 +68,19 @@ Most mutations use SvelteKit form actions with progressive enhancement:
 ```typescript
 // +page.server.ts
 export const actions = {
-  update: async ({ request, params }) => {
-    const formData = await request.formData();
-    await productService.update(params.id, {
-      name: formData.get('name'),
-    });
-  }
+	update: async ({ request, params }) => {
+		const formData = await request.formData();
+		await productService.update(params.id, {
+			name: formData.get("name")
+		});
+	}
 };
 ```
 
 ```svelte
 <!-- +page.svelte -->
 <form method="POST" action="?/update" use:enhance>
-  <input name="name" value={product.name} />
-  <button type="submit">Save</button>
+	<input name="name" value={product.name} />
+	<button type="submit">Save</button>
 </form>
 ```

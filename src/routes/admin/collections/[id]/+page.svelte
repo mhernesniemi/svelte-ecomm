@@ -103,7 +103,11 @@
 <div class="space-y-6">
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <a href="/admin/collections" class="text-gray-500 hover:text-gray-700" aria-label="Back to collections">
+      <a
+        href="/admin/collections"
+        class="text-gray-500 hover:text-gray-700"
+        aria-label="Back to collections"
+      >
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
@@ -353,7 +357,11 @@
                 }}
               >
                 <input type="hidden" name="filterId" value={filter.id} />
-                <button type="submit" class="text-red-600 hover:text-red-800" aria-label="Remove filter">
+                <button
+                  type="submit"
+                  class="text-red-600 hover:text-red-800"
+                  aria-label="Remove filter"
+                >
                   <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       stroke-linecap="round"

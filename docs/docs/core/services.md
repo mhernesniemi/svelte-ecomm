@@ -56,7 +56,7 @@ const order = await orderService.getByCode('ORD-2024-001');
 ## Cart Service
 
 ```typescript
-import { cartService } from '$lib/server/services/cart';
+import { cartService } from "$lib/server/services/cart";
 
 // Get or create by token
 const cart = await cartService.getOrCreate(token);
@@ -70,24 +70,24 @@ await cartService.removeItem(cartId, lineId);
 ## Variant Service
 
 ```typescript
-import { variantService } from '$lib/server/services/variants';
+import { variantService } from "$lib/server/services/variants";
 
 // Stock management
 await variantService.updateStock(variantId, newStock);
 await variantService.decrementStock(variantId, quantity);
 
 // Get by SKU
-const variant = await variantService.getBySku('SKU-001');
+const variant = await variantService.getBySku("SKU-001");
 ```
 
 ## Customer Service
 
 ```typescript
-import { customerService } from '$lib/server/services/customers';
+import { customerService } from "$lib/server/services/customers";
 
 // Create from Clerk auth
 const customer = await customerService.getOrCreateFromClerk(clerkUser);
 
 // Query
-const customer = await customerService.getByEmail('user@example.com');
+const customer = await customerService.getByEmail("user@example.com");
 ```

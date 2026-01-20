@@ -28,10 +28,7 @@ export interface RetryOptions {
 /**
  * Execute a function with automatic retries
  */
-export async function withRetry<T>(
-	fn: () => Promise<T>,
-	options: RetryOptions = {}
-): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
 	const {
 		maxAttempts = 3,
 		delayMs = 1000,

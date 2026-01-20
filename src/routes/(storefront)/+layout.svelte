@@ -103,7 +103,7 @@
         <a href="/" class="bg-[#f7d0dd] text-xl font-bold text-gray-900">"Hoikka"</a>
 
         <!-- Search Bar -->
-        <div class="relative mx-4 flex-1 max-w-md">
+        <div class="relative mx-4 max-w-md flex-1">
           <input
             type="text"
             bind:value={searchQuery}
@@ -113,31 +113,44 @@
             class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm"
           />
           {#if isSearching}
-            <div class="absolute right-3 top-1/2 -translate-y-1/2">
+            <div class="absolute top-1/2 right-3 -translate-y-1/2">
               <svg class="h-4 w-4 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             </div>
           {/if}
 
           <!-- Search Results Dropdown -->
           {#if showResults && searchQuery.length >= 2}
-            <div class="absolute top-full left-0 right-0 mt-1 rounded-lg border border-gray-200 bg-white shadow-lg z-50 max-h-96 overflow-y-auto">
+            <div
+              class="absolute top-full right-0 left-0 z-50 mt-1 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
+            >
               {#if searchResults.length > 0}
                 {#each searchResults as result}
                   <button
                     type="button"
                     onclick={() => handleResultClick(result.slug)}
-                    class="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                    class="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left last:border-b-0 hover:bg-gray-50"
                   >
                     {#if result.image}
                       <img src={result.image} alt="" class="h-10 w-10 rounded object-cover" />
                     {:else}
                       <div class="h-10 w-10 rounded bg-gray-100"></div>
                     {/if}
-                    <div class="flex-1 min-w-0">
-                      <p class="text-sm font-medium text-gray-900 truncate">{result.name}</p>
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-medium text-gray-900">{result.name}</p>
                       <p class="text-sm text-gray-500">{formatPrice(result.price)}</p>
                     </div>
                   </button>
@@ -174,7 +187,7 @@
             </a>
           {/if}
 
-          <CartSheet cart={cart} itemCount={cartItemCount} />
+          <CartSheet {cart} itemCount={cartItemCount} />
 
           <!-- Auth UI -->
           <SignedIn>

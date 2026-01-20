@@ -11,12 +11,12 @@ sidebar_position: 1
 
 Hoikka takes a different approach from traditional e-commerce platforms:
 
-| Traditional Platforms | Hoikka |
-|-----------------------|--------|
-| XML/YAML configuration | TypeScript code |
-| Admin panels hiding logic | Logic in your codebase |
-| Plugin systems and hooks | Just edit the code |
-| External dependencies | PostgreSQL-native solutions |
+| Traditional Platforms     | Hoikka                      |
+| ------------------------- | --------------------------- |
+| XML/YAML configuration    | TypeScript code             |
+| Admin panels hiding logic | Logic in your codebase      |
+| Plugin systems and hooks  | Just edit the code          |
+| External dependencies     | PostgreSQL-native solutions |
 
 **Your code, your rules.** No black boxes, no framework abstractions to learn.
 

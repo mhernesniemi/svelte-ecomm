@@ -21,7 +21,10 @@
         <a href="/account/orders" class="block rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-50">
           Order History
         </a>
-        <a href="/account/addresses" class="block rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-50">
+        <a
+          href="/account/addresses"
+          class="block rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-50"
+        >
           Addresses
         </a>
       </nav>

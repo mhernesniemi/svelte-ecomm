@@ -13,7 +13,11 @@ export interface WebhookConfig<TPayload = unknown> {
 	secret?: string;
 
 	/** Custom signature verification function */
-	verifySignature?: (request: Request, body: string, secret: string) => boolean | Promise<boolean>;
+	verifySignature?: (
+		request: Request,
+		body: string,
+		secret: string
+	) => boolean | Promise<boolean>;
 
 	/** Function to extract event type from payload (default: payload.event) */
 	getEventType?: (payload: TPayload) => string;
@@ -52,7 +56,8 @@ export function createWebhookHandler<TPayload = unknown>(config: WebhookConfig<T
 		}
 
 		// Get event type
-		const getEventType = config.getEventType || ((p) => (p as Record<string, unknown>).event as string);
+		const getEventType =
+			config.getEventType || ((p) => (p as Record<string, unknown>).event as string);
 		const eventType = getEventType(payload);
 
 		if (!eventType) {
@@ -68,11 +73,9 @@ export function createWebhookHandler<TPayload = unknown>(config: WebhookConfig<T
 
 		// Run handler via queue (persistent) or immediately
 		if (config.persistent) {
-			await enqueue(
-				`webhook.${eventType}`,
-				payload as Record<string, unknown>,
-				{ queue: config.queue ?? "webhooks" }
-			);
+			await enqueue(`webhook.${eventType}`, payload as Record<string, unknown>, {
+				queue: config.queue ?? "webhooks"
+			});
 			return json({ received: true, event: eventType, queued: true });
 		}
 

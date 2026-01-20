@@ -21,7 +21,13 @@
   }
 
   function buildCategoryPath(breadcrumbs: typeof data.breadcrumbs, upToIndex: number): string {
-    return "/category/" + breadcrumbs.slice(0, upToIndex + 1).map((b) => b.slug).join("/");
+    return (
+      "/category/" +
+      breadcrumbs
+        .slice(0, upToIndex + 1)
+        .map((b) => b.slug)
+        .join("/")
+    );
   }
 </script>
 
@@ -42,7 +48,10 @@
           {#if index === data.breadcrumbs.length - 1}
             <span class="font-medium text-gray-900">{crumb.name}</span>
           {:else}
-            <a href={buildCategoryPath(data.breadcrumbs, index)} class="text-gray-500 hover:text-gray-700">
+            <a
+              href={buildCategoryPath(data.breadcrumbs, index)}
+              class="text-gray-500 hover:text-gray-700"
+            >
               {crumb.name}
             </a>
           {/if}

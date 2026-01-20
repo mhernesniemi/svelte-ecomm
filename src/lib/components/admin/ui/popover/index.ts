@@ -15,5 +15,5 @@ export {
 	Content as PopoverContent,
 	Trigger as PopoverTrigger,
 	Close as PopoverClose,
-	Portal as PopoverPortal,
+	Portal as PopoverPortal
 };

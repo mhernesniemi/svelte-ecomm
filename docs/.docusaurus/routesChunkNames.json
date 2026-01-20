@@ -1,150 +1,150 @@
 {
-  "/__docusaurus/debug-5ff": {
-    "__comp": "__comp---theme-debug-config-23-a-2ff",
-    "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
-    }
-  },
-  "/__docusaurus/debug/config-5ba": {
-    "__comp": "__comp---theme-debug-config-23-a-2ff",
-    "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
-    }
-  },
-  "/__docusaurus/debug/content-a2b": {
-    "__comp": "__comp---theme-debug-contentba-8-ce7",
-    "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
-    },
-    "__props": "__props---docusaurus-debug-content-3-c-0-be2"
-  },
-  "/__docusaurus/debug/globalData-c3c": {
-    "__comp": "__comp---theme-debug-global-dataede-0fa",
-    "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
-    }
-  },
-  "/__docusaurus/debug/metadata-156": {
-    "__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
-    "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
-    }
-  },
-  "/__docusaurus/debug/registry-88c": {
-    "__comp": "__comp---theme-debug-registry-679-501",
-    "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
-    }
-  },
-  "/__docusaurus/debug/routes-000": {
-    "__comp": "__comp---theme-debug-routes-946-699",
-    "__context": {
-      "plugin": "plugin---docusaurus-debugb-38-ad3"
-    }
-  },
-  "/-549": {
-    "__comp": "__comp---theme-docs-root-5-e-9-0b6",
-    "__context": {
-      "plugin": "plugin---aba-d70"
-    }
-  },
-  "/-eb6": {
-    "__comp": "__comp---theme-doc-version-roota-7-b-5de",
-    "__props": "__props---22-d-307"
-  },
-  "/-d67": {
-    "__comp": "__comp---theme-doc-roota-94-67a"
-  },
-  "/api/endpoints-93e": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---api-endpointsd-04-6ad"
-  },
-  "/api/form-actions-9a2": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---api-form-actions-71-b-7e9"
-  },
-  "/core/architecture-eaa": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---core-architectured-37-957"
-  },
-  "/core/database-4ff": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---core-database-8-ef-793"
-  },
-  "/core/providers-a02": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---core-providers-930-20e"
-  },
-  "/core/services-a78": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---core-services-5-f-3-1fd"
-  },
-  "/features/assets-258": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-assets-002-9fc"
-  },
-  "/features/cart-642": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-carted-3-04d"
-  },
-  "/features/collections-699": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-collections-7-d-7-493"
-  },
-  "/features/orders-095": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-orders-15-e-6c5"
-  },
-  "/features/payments-ba0": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-payments-13-f-2e6"
-  },
-  "/features/products-1b2": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-productsece-706"
-  },
-  "/features/shipping-965": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---features-shipping-425-d94"
-  },
-  "/getting-started/configuration-641": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---getting-started-configuration-009-177"
-  },
-  "/getting-started/installation-e0c": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---getting-started-installation-54-f-988"
-  },
-  "/getting-started/project-structure-508": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---getting-started-project-structure-4-c-5-2cc"
-  },
-  "/integrations/erp-example-a4f": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---integrations-erp-example-8-e-5-a1a"
-  },
-  "/integrations/events-410": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---integrations-events-507-2fa"
-  },
-  "/integrations/job-queue-1fb": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---integrations-job-queuee-86-8a4"
-  },
-  "/integrations/overview-eab": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---integrations-overviewfbb-691"
-  },
-  "/integrations/sync-runner-4de": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---integrations-sync-runnerb-29-b4b"
-  },
-  "/integrations/webhooks-d1d": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---integrations-webhooksfc-5-760"
-  },
-  "/-7da": {
-    "__comp": "__comp---theme-doc-item-178-a40",
-    "content": "content---0-e-3-279"
-  }
+	"/__docusaurus/debug-5ff": {
+		"__comp": "__comp---theme-debug-config-23-a-2ff",
+		"__context": {
+			"plugin": "plugin---docusaurus-debugb-38-ad3"
+		}
+	},
+	"/__docusaurus/debug/config-5ba": {
+		"__comp": "__comp---theme-debug-config-23-a-2ff",
+		"__context": {
+			"plugin": "plugin---docusaurus-debugb-38-ad3"
+		}
+	},
+	"/__docusaurus/debug/content-a2b": {
+		"__comp": "__comp---theme-debug-contentba-8-ce7",
+		"__context": {
+			"plugin": "plugin---docusaurus-debugb-38-ad3"
+		},
+		"__props": "__props---docusaurus-debug-content-3-c-0-be2"
+	},
+	"/__docusaurus/debug/globalData-c3c": {
+		"__comp": "__comp---theme-debug-global-dataede-0fa",
+		"__context": {
+			"plugin": "plugin---docusaurus-debugb-38-ad3"
+		}
+	},
+	"/__docusaurus/debug/metadata-156": {
+		"__comp": "__comp---theme-debug-site-metadata-68-e-3d4",
+		"__context": {
+			"plugin": "plugin---docusaurus-debugb-38-ad3"
+		}
+	},
+	"/__docusaurus/debug/registry-88c": {
+		"__comp": "__comp---theme-debug-registry-679-501",
+		"__context": {
+			"plugin": "plugin---docusaurus-debugb-38-ad3"
+		}
+	},
+	"/__docusaurus/debug/routes-000": {
+		"__comp": "__comp---theme-debug-routes-946-699",
+		"__context": {
+			"plugin": "plugin---docusaurus-debugb-38-ad3"
+		}
+	},
+	"/-549": {
+		"__comp": "__comp---theme-docs-root-5-e-9-0b6",
+		"__context": {
+			"plugin": "plugin---aba-d70"
+		}
+	},
+	"/-eb6": {
+		"__comp": "__comp---theme-doc-version-roota-7-b-5de",
+		"__props": "__props---22-d-307"
+	},
+	"/-d67": {
+		"__comp": "__comp---theme-doc-roota-94-67a"
+	},
+	"/api/endpoints-93e": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---api-endpointsd-04-6ad"
+	},
+	"/api/form-actions-9a2": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---api-form-actions-71-b-7e9"
+	},
+	"/core/architecture-eaa": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---core-architectured-37-957"
+	},
+	"/core/database-4ff": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---core-database-8-ef-793"
+	},
+	"/core/providers-a02": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---core-providers-930-20e"
+	},
+	"/core/services-a78": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---core-services-5-f-3-1fd"
+	},
+	"/features/assets-258": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---features-assets-002-9fc"
+	},
+	"/features/cart-642": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---features-carted-3-04d"
+	},
+	"/features/collections-699": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---features-collections-7-d-7-493"
+	},
+	"/features/orders-095": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---features-orders-15-e-6c5"
+	},
+	"/features/payments-ba0": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---features-payments-13-f-2e6"
+	},
+	"/features/products-1b2": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---features-productsece-706"
+	},
+	"/features/shipping-965": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---features-shipping-425-d94"
+	},
+	"/getting-started/configuration-641": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---getting-started-configuration-009-177"
+	},
+	"/getting-started/installation-e0c": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---getting-started-installation-54-f-988"
+	},
+	"/getting-started/project-structure-508": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---getting-started-project-structure-4-c-5-2cc"
+	},
+	"/integrations/erp-example-a4f": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---integrations-erp-example-8-e-5-a1a"
+	},
+	"/integrations/events-410": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---integrations-events-507-2fa"
+	},
+	"/integrations/job-queue-1fb": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---integrations-job-queuee-86-8a4"
+	},
+	"/integrations/overview-eab": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---integrations-overviewfbb-691"
+	},
+	"/integrations/sync-runner-4de": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---integrations-sync-runnerb-29-b4b"
+	},
+	"/integrations/webhooks-d1d": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---integrations-webhooksfc-5-760"
+	},
+	"/-7da": {
+		"__comp": "__comp---theme-doc-item-178-a40",
+		"content": "content---0-e-3-279"
+	}
 }
