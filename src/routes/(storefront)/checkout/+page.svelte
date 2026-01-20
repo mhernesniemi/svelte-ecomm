@@ -86,10 +86,8 @@
   <h1 class="mb-8 text-3xl font-bold">Checkout</h1>
 
   {#if !currentCart || currentCart.lines.length === 0}
-    <div class="rounded-lg bg-white p-8 text-center shadow">
       <p class="mb-4 text-gray-500">Your cart is empty</p>
       <a href="/products" class="text-blue-600 underline hover:text-blue-700">Browse products</a>
-    </div>
   {:else}
     <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
       <!-- Main Content -->
@@ -159,7 +157,7 @@
           </div>
         {:else}
           <!-- Shipping Address for Physical Products -->
-          <div class="rounded-lg bg-white p-6 shadow">
+          <div>
             <h2 class="mb-4 text-xl font-semibold">Shipping Address</h2>
 
             {#if showAddressPicker}
@@ -373,7 +371,7 @@
 
           <!-- Shipping Method Selection (only for physical products) -->
           {#if currentCart?.shippingPostalCode && currentShippingRates.length > 0}
-            <div class="rounded-lg bg-white p-6 shadow">
+            <div>
               <h2 class="mb-4 text-xl font-semibold">Shipping Method</h2>
 
               <div class="space-y-3">
@@ -450,7 +448,7 @@
 
         <!-- Payment Method Selection -->
         {#if (isDigitalOnly && contactInfoSet && currentPaymentMethods?.length > 0) || (!isDigitalOnly && currentCart?.shippingPostalCode && currentOrderShipping && currentPaymentMethods?.length > 0)}
-          <div class="rounded-lg bg-white p-6 shadow">
+          <div>
             <h2 class="mb-4 text-xl font-semibold">Payment Method</h2>
 
             <div class="space-y-3">
