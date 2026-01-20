@@ -3,6 +3,7 @@
   import { addToCart } from "$lib/remote/cart.remote";
   import { toggleWishlist } from "$lib/remote/wishlist.remote";
   import { invalidateAll } from "$app/navigation";
+  import { cartSheet } from "$lib/stores/cart.svelte";
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
@@ -73,6 +74,7 @@
     try {
       await addToCart({ variantId: selectedVariantId, quantity });
       await invalidateAll();
+      cartSheet.open();
     } catch {
       message = { type: "error", text: "Failed to add item to cart" };
     } finally {

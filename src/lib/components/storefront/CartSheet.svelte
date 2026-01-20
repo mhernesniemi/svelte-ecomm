@@ -1,6 +1,7 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
   import { updateCartLineQuantity, removeCartLine } from "$lib/remote/cart.remote";
+  import { cartSheet } from "$lib/stores/cart.svelte";
   import {
     Sheet,
     SheetContent,
@@ -22,8 +23,6 @@
     itemCount: number;
   } = $props();
 
-  let isOpen = $state(false);
-
   const lines = $derived(cart?.lines ?? []);
   const subtotal = $derived(cart?.subtotal ?? 0);
   const discount = $derived(cart?.discount ?? 0);
@@ -43,10 +42,13 @@
   }
 </script>
 
-<Sheet bind:open={isOpen}>
+<Sheet
+  open={cartSheet.isOpen}
+  onOpenChange={(open) => (open ? cartSheet.open() : cartSheet.close())}
+>
   <button
     type="button"
-    onclick={() => (isOpen = true)}
+    onclick={() => cartSheet.open()}
     class="relative text-gray-600 hover:text-gray-900"
     aria-label="Shopping cart"
   >
@@ -74,7 +76,7 @@
           <p class="mb-1 font-medium text-gray-900">Your cart is empty</p>
           <p class="mb-6 text-sm text-gray-500">Add some items to get started</p>
           <button
-            onclick={() => (isOpen = false)}
+            onclick={() => cartSheet.close()}
             class="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-6 text-sm font-medium text-white hover:bg-blue-700"
           >
             Continue Shopping
@@ -167,7 +169,7 @@
           <div class="mb-4">
             <a
               href="/checkout"
-              onclick={() => (isOpen = false)}
+              onclick={() => cartSheet.close()}
               class="flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
               Proceed to Checkout
