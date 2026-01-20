@@ -170,7 +170,7 @@
             name="code"
             bind:value={code}
             required
-            class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
           />
         </div>
 
@@ -209,7 +209,7 @@
                 name="name_en"
                 bind:value={nameEn}
                 required
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               />
             </div>
             <div>
@@ -222,7 +222,7 @@
                 name="slug_en"
                 bind:value={slugEn}
                 required
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               />
             </div>
             <div>
@@ -234,7 +234,7 @@
                 name="description_en"
                 bind:value={descriptionEn}
                 rows="3"
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               ></textarea>
             </div>
           </div>
@@ -249,7 +249,7 @@
                 id="name_fi"
                 name="name_fi"
                 bind:value={nameFi}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               />
             </div>
             <div>
@@ -261,7 +261,7 @@
                 id="slug_fi"
                 name="slug_fi"
                 bind:value={slugFi}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               />
             </div>
             <div>
@@ -273,7 +273,7 @@
                 name="description_fi"
                 bind:value={descriptionFi}
                 rows="3"
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               ></textarea>
             </div>
           </div>
@@ -286,7 +286,7 @@
               id="enabled"
               name="enabled"
               bind:checked={enabled}
-              class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              class="h-4 w-4 rounded border-gray-300 text-blue-600"
             />
             <label for="enabled" class="text-sm font-medium text-gray-700">
               Collection is enabled
@@ -299,7 +299,7 @@
               id="is_private"
               name="is_private"
               bind:checked={isPrivate}
-              class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              class="h-4 w-4 rounded border-gray-300 text-blue-600"
             />
             <label for="is_private" class="text-sm font-medium text-gray-700">
               Private collection
@@ -404,7 +404,7 @@
               id="field"
               name="field"
               bind:value={newFilterField}
-              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
             >
               <option value="">Select type...</option>
               <option value="facet">Facet Values</option>
@@ -423,7 +423,7 @@
               id="operator"
               name="operator"
               bind:value={newFilterOperator}
-              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
             >
               {#if newFilterField === "facet" || newFilterField === "product" || newFilterField === "variant"}
                 <option value="in">in (matches any)</option>
@@ -457,7 +457,7 @@
                 id="value"
                 name="value"
                 bind:value={newFilterValue}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               >
                 <option value="public">Public</option>
                 <option value="private">Private (B2B only)</option>
@@ -470,7 +470,7 @@
                 name="value"
                 bind:value={newFilterValue}
                 placeholder="Price in cents (e.g., 1000 for 10.00)"
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               />
             {:else if newFilterField === "stock"}
               <input
@@ -479,7 +479,7 @@
                 name="value"
                 bind:value={newFilterValue}
                 placeholder="Minimum stock (e.g., 0 for in stock)"
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               />
             {:else}
               <input
@@ -487,7 +487,7 @@
                 id="value"
                 name="value"
                 bind:value={newFilterValue}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
               />
             {/if}
           </div>

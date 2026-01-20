@@ -83,7 +83,7 @@
               name="name_en"
               bind:value={nameEn}
               required
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
 
@@ -98,7 +98,7 @@
                 name="slug_en"
                 bind:value={slugEn}
                 required
-                class="flex-1 rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                class="flex-1 rounded-lg border border-gray-300 px-3 py-2"
               />
               <label class="flex items-center gap-2 text-sm text-gray-500">
                 <input type="checkbox" bind:checked={autoSlugEn} class="rounded border-gray-300" />
@@ -115,7 +115,7 @@
               id="description_en"
               name="description_en"
               rows="4"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2"
               value={form?.values?.descriptionEn ?? ""}
             ></textarea>
           </div>
@@ -132,7 +132,7 @@
               id="name_fi"
               name="name_fi"
               value={form?.values?.nameFi ?? ""}
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
 
@@ -143,7 +143,7 @@
               id="slug_fi"
               name="slug_fi"
               value={form?.values?.slugFi ?? ""}
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>
 
@@ -155,7 +155,7 @@
               id="description_fi"
               name="description_fi"
               rows="4"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2"
               value={form?.values?.descriptionFi ?? ""}
             ></textarea>
           </div>
@@ -168,7 +168,7 @@
           <span class="text-sm font-medium text-gray-700">Product Type</span>
           <select
             name="type"
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           >
             <option value="physical" selected={form?.values?.type !== "digital"}>
               Physical - Requires shipping
@@ -183,7 +183,7 @@
           <span class="text-sm font-medium text-gray-700">Visibility</span>
           <select
             name="visibility"
-            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
           >
             <option value="public" selected={form?.values?.visibility !== "private" && form?.values?.visibility !== "hidden"}>
               Public - Visible to everyone

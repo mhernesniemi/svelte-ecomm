@@ -54,6 +54,7 @@
   let preferManualEntry = $state(false);
   let isEditingAddress = $state(false);
   let saveAddressForFuture = $state(false);
+  let isEditingShipping = $state(false);
   const showAddressPicker = $derived(savedAddresses.length > 0 && !cartHasAddress && !preferManualEntry);
 
   // Auto-select default saved address on mount
@@ -333,7 +334,7 @@
                       <input
                         type="checkbox"
                         bind:checked={saveAddressForFuture}
-                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        class="h-4 w-4 rounded border-gray-300 text-blue-600"
                       />
                       <span class="text-sm text-gray-700">Save this address for future orders</span>
                     </label>
@@ -374,61 +375,116 @@
             <div>
               <h2 class="mb-4 text-xl font-semibold">Shipping Method</h2>
 
-              <div class="space-y-3">
-                {#each currentShippingRates as rate}
-                  <label
-                    class="flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50 {selectedShippingRate?.id ===
-                    rate.id
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-300'}"
-                  >
-                    <input
-                      type="radio"
-                      name="shippingMethod"
-                      value={rate.id}
-                      checked={selectedShippingRate?.id === rate.id}
-                      onchange={() => selectShippingRate(rate)}
-                      class="mt-1 mr-3"
-                    />
-                    <div class="flex-1">
-                      <div class="flex items-start justify-between">
-                        <div>
-                          <p class="font-medium">{rate.name}</p>
-                          {#if rate.description}
-                            <p class="mt-1 text-sm text-gray-500">{rate.description}</p>
-                          {/if}
-                          {#if rate.estimatedDeliveryDays}
-                            <p class="mt-1 text-sm text-gray-500">
-                              Estimated delivery: {rate.estimatedDeliveryDays} business day{rate.estimatedDeliveryDays !==
-                              1
-                                ? "s"
-                                : ""}
-                            </p>
-                          {/if}
-                        </div>
-                        <p class="ml-4 font-semibold">{formatPrice(rate.price)} EUR</p>
-                      </div>
+              {#if currentOrderShipping && !isEditingShipping}
+                <!-- Shipping Method Summary (read-only) -->
+                {@const selectedRate = currentShippingRates.find(
+                  (r: (typeof currentShippingRates)[number]) =>
+                    r.methodId === currentOrderShipping?.shippingMethodId
+                )}
+                <div class="rounded-lg border border-gray-200 p-4">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <p class="font-medium">{selectedRate?.name || "Selected"}</p>
+                      {#if selectedRate?.description}
+                        <p class="mt-1 text-sm text-gray-500">{selectedRate.description}</p>
+                      {/if}
+                      {#if selectedRate?.estimatedDeliveryDays}
+                        <p class="mt-1 text-sm text-gray-500">
+                          Estimated delivery: {selectedRate.estimatedDeliveryDays} business day{selectedRate.estimatedDeliveryDays !== 1 ? "s" : ""}
+                        </p>
+                      {/if}
+                      <p class="mt-1 font-semibold">{formatPrice(selectedRate?.price ?? 0)} EUR</p>
                     </div>
-                  </label>
-                {/each}
-              </div>
+                    <button
+                      type="button"
+                      onclick={() => {
+                        selectedShippingRate = selectedRate ?? null;
+                        isEditingShipping = true;
+                      }}
+                      class="text-sm font-medium text-blue-600 hover:text-blue-800"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                </div>
+              {:else}
+                <!-- Shipping Method Selection Form -->
+                <div class="space-y-3">
+                  {#each currentShippingRates as rate}
+                    <label
+                      class="flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50 {selectedShippingRate?.id ===
+                      rate.id
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-300'}"
+                    >
+                      <input
+                        type="radio"
+                        name="shippingMethod"
+                        value={rate.id}
+                        checked={selectedShippingRate?.id === rate.id}
+                        onchange={() => selectShippingRate(rate)}
+                        class="mt-1 mr-3"
+                      />
+                      <div class="flex-1">
+                        <div class="flex items-start justify-between">
+                          <div>
+                            <p class="font-medium">{rate.name}</p>
+                            {#if rate.description}
+                              <p class="mt-1 text-sm text-gray-500">{rate.description}</p>
+                            {/if}
+                            {#if rate.estimatedDeliveryDays}
+                              <p class="mt-1 text-sm text-gray-500">
+                                Estimated delivery: {rate.estimatedDeliveryDays} business day{rate.estimatedDeliveryDays !== 1 ? "s" : ""}
+                              </p>
+                            {/if}
+                          </div>
+                          <p class="ml-4 font-semibold">{formatPrice(rate.price)} EUR</p>
+                        </div>
+                      </div>
+                    </label>
+                  {/each}
+                </div>
 
-              {#if selectedShippingRate && !currentOrderShipping}
-                <form method="POST" action="?/setShippingMethod" use:enhance class="mt-4">
-                  <input type="hidden" name="methodId" value={selectedShippingRate.methodId} />
-                  <input type="hidden" name="rateId" value={selectedShippingRate.id} />
-                  <input type="hidden" name="price" value={selectedShippingRate.price} />
-                  <Button type="submit" class="w-full">Select Shipping Method</Button>
-                </form>
-              {:else if currentOrderShipping}
-                <Alert variant="success" class="mt-4">
-                  <p class="text-sm font-medium">
-                    Shipping method selected: {currentShippingRates.find(
-                      (r: (typeof currentShippingRates)[number]) =>
-                        r.methodId === currentOrderShipping?.shippingMethodId
-                    )?.name || "Selected"}
-                  </p>
-                </Alert>
+                {#if selectedShippingRate}
+                  <form
+                    method="POST"
+                    action="?/setShippingMethod"
+                    use:enhance={() => {
+                      return async ({ update }) => {
+                        await update({ reset: false });
+                        isEditingShipping = false;
+                      };
+                    }}
+                    class="mt-4"
+                  >
+                    <input type="hidden" name="methodId" value={selectedShippingRate.methodId} />
+                    <input type="hidden" name="rateId" value={selectedShippingRate.id} />
+                    <input type="hidden" name="price" value={selectedShippingRate.price} />
+                    <div class="flex gap-3">
+                      {#if isEditingShipping}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          class="flex-1"
+                          onclick={() => {
+                            // Reset to the currently saved rate
+                            const savedRate = currentShippingRates.find(
+                              (r: (typeof currentShippingRates)[number]) =>
+                                r.methodId === currentOrderShipping?.shippingMethodId
+                            );
+                            selectedShippingRate = savedRate ?? null;
+                            isEditingShipping = false;
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      {/if}
+                      <Button type="submit" class="flex-1">
+                        {isEditingShipping ? "Update Shipping Method" : "Select Shipping Method"}
+                      </Button>
+                    </div>
+                  </form>
+                {/if}
               {/if}
             </div>
           {:else if currentCart?.shippingPostalCode}

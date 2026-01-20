@@ -342,7 +342,7 @@
                   bind:value={reviewNickname}
                   required
                   maxlength="100"
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
                   placeholder="Enter a display name for your review"
                 />
               </div>
@@ -383,7 +383,7 @@
                   name="comment"
                   bind:value={reviewComment}
                   rows="4"
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
                   placeholder="Share your experience with this product..."
                 ></textarea>
               </div>

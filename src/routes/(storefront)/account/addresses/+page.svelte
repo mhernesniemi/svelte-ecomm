@@ -94,7 +94,7 @@
 										type="text"
 										id="fullName"
 										name="fullName"
-										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2"
 									/>
 								</div>
 								<div>
@@ -105,7 +105,7 @@
 										type="text"
 										id="company"
 										name="company"
-										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2"
 									/>
 								</div>
 							</div>
@@ -119,7 +119,7 @@
 									id="streetLine1"
 									name="streetLine1"
 									required
-									class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+									class="w-full rounded-lg border border-gray-300 px-3 py-2"
 								/>
 							</div>
 
@@ -131,7 +131,7 @@
 									type="text"
 									id="streetLine2"
 									name="streetLine2"
-									class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+									class="w-full rounded-lg border border-gray-300 px-3 py-2"
 								/>
 							</div>
 
@@ -145,7 +145,7 @@
 										id="city"
 										name="city"
 										required
-										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2"
 									/>
 								</div>
 								<div>
@@ -157,7 +157,7 @@
 										id="postalCode"
 										name="postalCode"
 										required
-										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2"
 									/>
 								</div>
 								<div>
@@ -168,7 +168,7 @@
 										id="country"
 										name="country"
 										required
-										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2"
 									>
 										<option value="">Select country</option>
 										<option value="FI">Finland</option>
@@ -189,7 +189,7 @@
 									type="tel"
 									id="phoneNumber"
 									name="phoneNumber"
-									class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+									class="w-full rounded-lg border border-gray-300 px-3 py-2"
 								/>
 							</div>
 
@@ -198,7 +198,7 @@
 									type="checkbox"
 									id="isDefault"
 									name="isDefault"
-									class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+									class="h-4 w-4 rounded border-gray-300 text-blue-600"
 								/>
 								<label for="isDefault" class="text-sm text-gray-700">
 									Set as default address
@@ -255,7 +255,7 @@
 											id="edit_fullName"
 											name="fullName"
 											value={address.fullName ?? ""}
-											class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+											class="w-full rounded-lg border border-gray-300 px-3 py-2"
 										/>
 									</div>
 									<div>
@@ -267,7 +267,7 @@
 											id="edit_company"
 											name="company"
 											value={address.company ?? ""}
-											class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+											class="w-full rounded-lg border border-gray-300 px-3 py-2"
 										/>
 									</div>
 								</div>
@@ -282,7 +282,7 @@
 										name="streetLine1"
 										value={address.streetLine1}
 										required
-										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2"
 									/>
 								</div>
 
@@ -295,7 +295,7 @@
 										id="edit_streetLine2"
 										name="streetLine2"
 										value={address.streetLine2 ?? ""}
-										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2"
 									/>
 								</div>
 
@@ -310,7 +310,7 @@
 											name="city"
 											value={address.city}
 											required
-											class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+											class="w-full rounded-lg border border-gray-300 px-3 py-2"
 										/>
 									</div>
 									<div>
@@ -323,7 +323,7 @@
 											name="postalCode"
 											value={address.postalCode}
 											required
-											class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+											class="w-full rounded-lg border border-gray-300 px-3 py-2"
 										/>
 									</div>
 									<div>
@@ -334,7 +334,7 @@
 											id="edit_country"
 											name="country"
 											required
-											class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+											class="w-full rounded-lg border border-gray-300 px-3 py-2"
 										>
 											<option value="">Select country</option>
 											<option value="FI" selected={address.country === "FI"}>Finland</option>
@@ -356,7 +356,7 @@
 										id="edit_phoneNumber"
 										name="phoneNumber"
 										value={address.phoneNumber ?? ""}
-										class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+										class="w-full rounded-lg border border-gray-300 px-3 py-2"
 									/>
 								</div>
 
@@ -366,7 +366,7 @@
 										id="edit_isDefault"
 										name="isDefault"
 										checked={address.isDefault}
-										class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+										class="h-4 w-4 rounded border-gray-300 text-blue-600"
 									/>
 									<label for="edit_isDefault" class="text-sm text-gray-700">
 										Set as default address

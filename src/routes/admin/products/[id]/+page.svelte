@@ -210,7 +210,7 @@
                   name="name_en"
                   value={enTrans?.name ?? ""}
                   required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
 
@@ -224,7 +224,7 @@
                   name="slug_en"
                   value={enTrans?.slug ?? ""}
                   required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
 
@@ -236,7 +236,7 @@
                   id="description_en"
                   name="description_en"
                   rows="4"
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
                 >{enTrans?.description ?? ""}</textarea>
               </div>
             </div>
@@ -252,7 +252,7 @@
                   id="name_fi"
                   name="name_fi"
                   value={fiTrans?.name ?? ""}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
 
@@ -263,7 +263,7 @@
                   id="slug_fi"
                   name="slug_fi"
                   value={fiTrans?.slug ?? ""}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
 
@@ -275,7 +275,7 @@
                   id="description_fi"
                   name="description_fi"
                   rows="4"
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-blue-500"
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
                 >{fiTrans?.description ?? ""}</textarea>
               </div>
             </div>
@@ -287,7 +287,7 @@
               <span class="text-sm font-medium text-gray-700">Product Type</span>
               <select
                 name="type"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
               >
                 <option value="physical" selected={data.product.type === "physical"}>Physical</option>
                 <option value="digital" selected={data.product.type === "digital"}>Digital</option>
@@ -298,7 +298,7 @@
               <span class="text-sm font-medium text-gray-700">Visibility</span>
               <select
                 name="visibility"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
               >
                 <option value="public" selected={data.product.visibility === "public"}>Public</option>
                 <option value="private" selected={data.product.visibility === "private"}>Private</option>
@@ -668,7 +668,7 @@
                   aria-expanded={categoryComboboxOpen}
                   aria-controls="category-listbox"
                   aria-haspopup="listbox"
-                  class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
                 >
                   <span class="text-gray-500">Select categories...</span>
                   <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />

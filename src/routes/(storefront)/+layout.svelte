@@ -110,7 +110,7 @@
             onfocus={() => (showResults = true)}
             onblur={() => setTimeout(() => (showResults = false), 200)}
             placeholder="Search products..."
-            class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+            class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm"
           />
           {#if isSearching}
             <div class="absolute right-3 top-1/2 -translate-y-1/2">

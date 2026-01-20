@@ -27,7 +27,6 @@
   const lines = $derived(cart?.lines ?? []);
   const subtotal = $derived(cart?.subtotal ?? 0);
   const discount = $derived(cart?.discount ?? 0);
-  const total = $derived(cart?.total ?? 0);
 
   function formatPrice(cents: number): string {
     return (cents / 100).toFixed(2);
@@ -62,8 +61,8 @@
   </button>
 
   <SheetContent side="right" class="flex w-full flex-col sm:max-w-md">
-    <SheetHeader class="border-b pb-4">
-      <SheetTitle class="text-lg">Shopping Cart ({itemCount})</SheetTitle>
+    <SheetHeader class="pb-4">
+      <SheetTitle class="text-lg">Shopping Cart</SheetTitle>
     </SheetHeader>
 
     <div class="flex-1 overflow-y-auto py-4">
@@ -162,11 +161,6 @@
                 <span>-{formatPrice(discount)} EUR</span>
               </div>
             {/if}
-
-            <div class="flex justify-between pt-2 text-base font-semibold">
-              <span>Total</span>
-              <span>{formatPrice(total)} EUR</span>
-            </div>
           </div>
 
           <div class="mb-4">
