@@ -1,4 +1,12 @@
 <script lang="ts">
+  import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell
+  } from "$lib/components/admin/ui/table";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -116,31 +124,30 @@
         {#if data.orders.length === 0}
           <p class="text-sm text-gray-500">No orders yet</p>
         {:else}
-          <div class="overflow-hidden rounded-lg border border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Order</th>
-                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Date</th>
-                  <th class="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                  <th class="px-4 py-3 text-right text-sm font-medium text-gray-500">Total</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200 bg-white">
+          <Table class="border-0 shadow-none rounded-none">
+              <TableHeader>
+                <TableRow class="hover:bg-transparent">
+                  <TableHead class="px-4 py-3 text-sm">Order</TableHead>
+                  <TableHead class="px-4 py-3 text-sm">Date</TableHead>
+                  <TableHead class="px-4 py-3 text-sm">Status</TableHead>
+                  <TableHead class="px-4 py-3 text-right text-sm">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {#each data.orders as order}
-                  <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-3 text-sm">
+                  <TableRow>
+                    <TableCell class="px-4 py-3 text-sm">
                       <a
                         href="/admin/orders/{order.id}"
                         class="font-medium text-blue-600 hover:text-blue-800"
                       >
                         #{order.code}
                       </a>
-                    </td>
-                    <td class="px-4 py-3 text-sm text-gray-500">
+                    </TableCell>
+                    <TableCell class="px-4 py-3 text-sm text-gray-500">
                       {formatDate(order.createdAt)}
-                    </td>
-                    <td class="px-4 py-3 text-sm">
+                    </TableCell>
+                    <TableCell class="px-4 py-3 text-sm">
                       <span
                         class="rounded-full px-2 py-0.5 text-xs font-medium {getStateColor(
                           order.state
@@ -148,15 +155,14 @@
                       >
                         {order.state}
                       </span>
-                    </td>
-                    <td class="px-4 py-3 text-right text-sm font-medium">
+                    </TableCell>
+                    <TableCell class="px-4 py-3 text-right text-sm font-medium">
                       {formatPrice(order.total)} EUR
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 {/each}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
         {/if}
       </div>
     </div>

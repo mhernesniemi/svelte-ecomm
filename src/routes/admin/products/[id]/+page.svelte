@@ -5,6 +5,14 @@
   import { Label } from "$lib/components/admin/ui/label";
   import { Alert } from "$lib/components/admin/ui/alert";
   import { Badge } from "$lib/components/admin/ui/badge";
+  import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell
+  } from "$lib/components/admin/ui/table";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -461,37 +469,34 @@
         {/if}
 
         <!-- Variants Table -->
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">SKU</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Facets</th
-              >
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase"
-                >Actions</th
-              >
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
+        <Table class="border-0 shadow-none rounded-none">
+          <TableHeader>
+            <TableRow class="hover:bg-transparent">
+              <TableHead>SKU</TableHead>
+              <TableHead>Name</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead>Facets</TableHead>
+              <TableHead class="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {#if data.product.variants.length === 0}
-              <tr>
-                <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+              <TableRow class="hover:bg-transparent">
+                <TableCell colspan={6} class="py-8 text-center text-gray-500">
                   No variants yet. Add a variant to start selling this product.
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             {:else}
               {#each data.product.variants as variant}
-                <tr>
-                  <td class="px-6 py-4 font-mono text-sm">{variant.sku}</td>
-                  <td class="px-6 py-4 text-sm">
+                <TableRow>
+                  <TableCell class="font-mono text-sm">{variant.sku}</TableCell>
+                  <TableCell class="text-sm">
                     {variant.translations.find((t) => t.languageCode === "en")?.name ?? "-"}
-                  </td>
-                  <td class="px-6 py-4 text-sm">{(variant.price / 100).toFixed(2)} EUR</td>
-                  <td class="px-6 py-4 text-sm">{variant.stock}</td>
-                  <td class="px-6 py-4 text-sm">
+                  </TableCell>
+                  <TableCell class="text-sm">{(variant.price / 100).toFixed(2)} EUR</TableCell>
+                  <TableCell class="text-sm">{variant.stock}</TableCell>
+                  <TableCell class="text-sm">
                     {#if variant.facetValues.length === 0}
                       <span class="text-gray-400">None</span>
                     {:else}
@@ -503,8 +508,8 @@
                         {/each}
                       </div>
                     {/if}
-                  </td>
-                  <td class="space-x-3 px-6 py-4 text-right text-sm">
+                  </TableCell>
+                  <TableCell class="space-x-3 text-right text-sm">
                     <button
                       type="button"
                       onclick={() => (editingVariant = editingVariant === variant ? null : variant)}
@@ -521,11 +526,11 @@
                     >
                       {editingVariantFacets === variant.id ? "Cancel" : "Facets"}
                     </button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
                 {#if editingVariantFacets === variant.id}
-                  <tr class="bg-gray-50">
-                    <td colspan="6" class="px-6 py-4">
+                  <TableRow class="bg-gray-50 hover:bg-gray-50">
+                    <TableCell colspan={6}>
                       <form method="POST" action="?/updateVariantFacetValues" use:enhance>
                         <input type="hidden" name="variantId" value={variant.id} />
                         <div class="space-y-4">
@@ -574,13 +579,13 @@
                           </button>
                         </div>
                       </form>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 {/if}
               {/each}
             {/if}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </div>
 
