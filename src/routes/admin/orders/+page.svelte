@@ -47,9 +47,9 @@
     {/each}
   </div>
 
-  <div class="overflow-hidden rounded-lg bg-white shadow">
+  <div class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
     <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+      <thead class="bg-gray-200/60">
         <tr>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order</th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>

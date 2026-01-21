@@ -43,7 +43,7 @@
   }
 </script>
 
-<div class="min-h-screen bg-gray-100 font-sans">
+<div class="min-h-screen bg-gray-50 font-sans">
   <!-- Sidebar -->
   <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
     <div class="p-6">
