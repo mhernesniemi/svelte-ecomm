@@ -45,7 +45,6 @@
 		"@eslint/js": "^9.39.1",
 		"@internationalized/date": "^3.10.0",
 		"@lucide/svelte": "^0.561.0",
-		"@sveltejs/adapter-node": "^5.4.0",
 		"@sveltejs/adapter-vercel": "^6.3.0",
 		"@sveltejs/kit": "^2.49.1",
 		"@sveltejs/package": "^2.5.7",
@@ -77,10 +76,10 @@
 		"svelte"
 	],
 	"dependencies": {
+		"@neondatabase/serverless": "^0.10.0",
 		"bits-ui": "^2.15.4",
 		"clsx": "^2.1.1",
 		"nanoid": "^5.1.6",
-		"postgres": "^3.4.7",
 		"svelte-clerk": "^0.20.3",
 		"tailwind-merge": "^3.4.0",
 		"tailwind-variants": "^3.2.2",

@@ -321,6 +321,43 @@ export function isWorkerRunning(): boolean {
 }
 
 /**
+ * Process jobs in serverless environment (no long-running loop)
+ * Processes up to maxJobs or until timeoutMs, whichever comes first
+ */
+export interface ProcessJobsOptions {
+	queue?: string;
+	maxJobs?: number;
+	timeoutMs?: number;
+}
+
+export async function processJobs(options: ProcessJobsOptions = {}): Promise<number> {
+	const queue = options.queue ?? "default";
+	const maxJobs = options.maxJobs ?? 50;
+	const timeoutMs = options.timeoutMs ?? 55000; // Default 55s (Vercel limit is 60s)
+
+	const startTime = Date.now();
+	let processed = 0;
+
+	while (processed < maxJobs) {
+		// Check timeout
+		if (Date.now() - startTime > timeoutMs) {
+			console.log(`[Queue] Timeout reached after ${processed} jobs`);
+			break;
+		}
+
+		const hadJob = await processOne(queue);
+		if (!hadJob) {
+			// No more jobs available
+			break;
+		}
+		processed++;
+	}
+
+	console.log(`[Queue] Processed ${processed} jobs in ${Date.now() - startTime}ms`);
+	return processed;
+}
+
+/**
  * Queue statistics
  */
 export interface QueueStats {

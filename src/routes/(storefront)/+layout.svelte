@@ -1,6 +1,7 @@
 <script lang="ts">
   import { SignedIn, SignedOut, UserButton, SignInButton, useClerkContext } from "svelte-clerk";
   import { invalidateAll, goto, onNavigate } from "$app/navigation";
+  import { browser } from "$app/environment";
   import { throttle, formatPrice } from "$lib/utils";
   import CartSheet from "$lib/components/storefront/CartSheet.svelte";
   import type { LayoutData } from "./$types";
@@ -82,7 +83,9 @@
   const throttledSearch = throttle(performSearch, 50);
 
   $effect(() => {
-    throttledSearch(searchQuery);
+    if (browser) {
+      throttledSearch(searchQuery);
+    }
   });
 
   function handleResultClick(slug: string) {
