@@ -13,7 +13,7 @@
   import Plus from "@lucide/svelte/icons/plus";
   import ImageIcon from "@lucide/svelte/icons/image";
   import Heart from "@lucide/svelte/icons/heart";
-  import CheckCircle from "@lucide/svelte/icons/check-circle";
+  import CheckIcon from "@lucide/svelte/icons/check";
   import type { PageData, ActionData } from "./$types";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
 
@@ -231,7 +231,7 @@
         <div class="mb-3 text-sm">
           {#if selectedVariant.stock > 0}
             <div class="flex items-center gap-2">
-              <CheckCircle class="h-4 w-4 text-green-600" />
+              <CheckIcon class="h-4 w-4 text-green-600" />
               <span class="text-green-600">In stock</span>
             </div>
           {:else}
@@ -242,12 +242,7 @@
 
       <!-- Add to Cart -->
       {#if selectedVariant && selectedVariant.stock > 0}
-        <Button
-          type="button"
-          size="xl"
-          onclick={handleAddToCart}
-          class="flex-1 py-3"
-        >
+        <Button type="button" size="xl" onclick={handleAddToCart} class="flex-1 py-3">
           Add to Cart
         </Button>
       {/if}
