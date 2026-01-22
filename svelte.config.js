@@ -7,7 +7,7 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			runtime: "bun-1.x",
+			runtime: "bun1.x",
 			regions: ["fra1"]
 		}),
 		experimental: {
