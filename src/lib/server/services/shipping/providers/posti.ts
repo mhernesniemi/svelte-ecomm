@@ -4,6 +4,7 @@
  */
 import type { ShippingProvider, ShippingRate, ShipmentInfo, ShipmentStatus } from "../types.js";
 import type { OrderWithRelations } from "$lib/types.js";
+import { estimateOrderWeight, mapPostiStatus, generateTrackingNumber } from "../shipping-utils.js";
 
 export class PostiProvider implements ShippingProvider {
 	code = "posti_standard";
@@ -14,7 +15,7 @@ export class PostiProvider implements ShippingProvider {
 	 */
 	async getRates(order: OrderWithRelations): Promise<ShippingRate[]> {
 		// Calculate order weight (simplified - in real app, sum variant weights)
-		const estimatedWeight = this.estimateOrderWeight(order);
+		const estimatedWeight = estimateOrderWeight(order.lines);
 
 		// In production, call Posti API:
 		// const response = await fetch('https://api.posti.fi/shipping/rates', {
@@ -79,7 +80,7 @@ export class PostiProvider implements ShippingProvider {
 		// const data = await response.json();
 
 		// Mock response
-		const trackingNumber = `POSTI${order.id.toString().padStart(10, "0")}`;
+		const trackingNumber = generateTrackingNumber("posti", order.id);
 		return {
 			trackingNumber,
 			labelUrl: `https://posti.fi/labels/${trackingNumber}`,
@@ -100,27 +101,9 @@ export class PostiProvider implements ShippingProvider {
 		//   headers: { 'Authorization': `Bearer ${process.env.POSTI_API_KEY}` }
 		// });
 		// const data = await response.json();
-		// return this.mapPostiStatusToShipmentStatus(data.status);
+		// return mapPostiStatus(data.status);
 
 		// Mock response
 		return "in_transit";
-	}
-
-	private estimateOrderWeight(order: OrderWithRelations): number {
-		// Simplified weight estimation (in grams)
-		// In production, sum actual variant weights
-		return order.lines.reduce((total, line) => total + line.quantity * 500, 0);
-	}
-
-	private mapPostiStatusToShipmentStatus(postiStatus: string): ShipmentStatus {
-		const statusMap: Record<string, ShipmentStatus> = {
-			created: "pending",
-			dispatched: "shipped",
-			in_transit: "in_transit",
-			out_for_delivery: "in_transit",
-			delivered: "delivered",
-			error: "error"
-		};
-		return statusMap[postiStatus] || "pending";
 	}
 }

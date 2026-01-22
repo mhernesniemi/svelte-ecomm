@@ -6,6 +6,7 @@ import { eq, and, desc, sql, gte, lte, or, isNull } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { promotions } from "../db/schema.js";
 import type { Promotion, CreatePromotionInput, PaginatedResult } from "$lib/types.js";
+import { calculateDiscount } from "./promotion-utils.js";
 
 export class PromotionService {
 	/**
@@ -204,12 +205,7 @@ export class PromotionService {
 	 * Calculate discount amount for a promotion
 	 */
 	calculateDiscount(promotion: Promotion, orderAmount: number): number {
-		if (promotion.discountType === "percentage") {
-			return Math.round(orderAmount * (promotion.discountValue / 100));
-		}
-
-		// Fixed amount - don't exceed order amount
-		return Math.min(promotion.discountValue, orderAmount);
+		return calculateDiscount(promotion, orderAmount);
 	}
 }
 

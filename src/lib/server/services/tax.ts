@@ -10,12 +10,14 @@
 import { eq } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { taxRates, customers } from "../db/schema.js";
+import {
+	calculateTax,
+	calculateTaxExemptPrice,
+	calculateLineTax,
+	type TaxCalculation
+} from "./tax-utils.js";
 
-export interface TaxCalculation {
-	gross: number; // VAT-inclusive price (in cents)
-	net: number; // Price excluding VAT (in cents)
-	tax: number; // Tax amount (in cents)
-}
+export type { TaxCalculation };
 
 export interface TaxRateInfo {
 	code: string;
@@ -67,85 +69,28 @@ export class TaxService {
 
 	/**
 	 * Calculate tax breakdown from a gross price
-	 *
-	 * Formula:
-	 * - net = gross / (1 + taxRate)
-	 * - tax = gross - net
-	 *
-	 * @param grossPrice - VAT-inclusive price in cents
-	 * @param taxRate - Tax rate as decimal (0.24 for 24%)
 	 */
 	calculateTax(grossPrice: number, taxRate: number): TaxCalculation {
-		if (taxRate === 0) {
-			return { gross: grossPrice, net: grossPrice, tax: 0 };
-		}
-
-		const divisor = 1 + taxRate;
-		const net = Math.round(grossPrice / divisor);
-		const tax = grossPrice - net;
-
-		return { gross: grossPrice, net, tax };
+		return calculateTax(grossPrice, taxRate);
 	}
 
 	/**
 	 * Calculate tax-exempt price (for B2B customers)
-	 * Returns the net price when customer is exempt from VAT
-	 *
-	 * @param grossPrice - VAT-inclusive price in cents
-	 * @param taxRate - Tax rate as decimal (0.24 for 24%)
 	 */
 	calculateTaxExemptPrice(grossPrice: number, taxRate: number): number {
-		if (taxRate === 0) {
-			return grossPrice;
-		}
-
-		return Math.round(grossPrice / (1 + taxRate));
+		return calculateTaxExemptPrice(grossPrice, taxRate);
 	}
 
 	/**
 	 * Calculate tax for a line item
-	 *
-	 * @param grossUnitPrice - VAT-inclusive unit price in cents
-	 * @param quantity - Number of items
-	 * @param taxRate - Tax rate as decimal
-	 * @param isTaxExempt - Whether customer is tax-exempt (B2B)
 	 */
 	calculateLineTax(
 		grossUnitPrice: number,
 		quantity: number,
 		taxRate: number,
 		isTaxExempt: boolean = false
-	): {
-		unitPriceGross: number;
-		unitPriceNet: number;
-		lineTotalGross: number;
-		lineTotalNet: number;
-		taxAmount: number;
-	} {
-		if (isTaxExempt || taxRate === 0) {
-			const netPrice = this.calculateTaxExemptPrice(grossUnitPrice, taxRate);
-			const lineTotal = netPrice * quantity;
-			return {
-				unitPriceGross: grossUnitPrice,
-				unitPriceNet: netPrice,
-				lineTotalGross: lineTotal,
-				lineTotalNet: lineTotal,
-				taxAmount: 0
-			};
-		}
-
-		const unitTax = this.calculateTax(grossUnitPrice, taxRate);
-		const lineTotalGross = grossUnitPrice * quantity;
-		const lineTotalNet = unitTax.net * quantity;
-		const taxAmount = lineTotalGross - lineTotalNet;
-
-		return {
-			unitPriceGross: grossUnitPrice,
-			unitPriceNet: unitTax.net,
-			lineTotalGross,
-			lineTotalNet,
-			taxAmount
-		};
+	) {
+		return calculateLineTax(grossUnitPrice, quantity, taxRate, isTaxExempt);
 	}
 
 	/**

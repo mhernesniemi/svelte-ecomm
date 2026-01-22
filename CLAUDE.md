@@ -17,6 +17,7 @@ This is a **full-stack e-commerce platform** built with:
 ## Important to note
 
 - This project uses Svelte 5, so look at the Svelte 5 documentation for the best practices. Avoid using outdated Svelte 4 specific code.
+- Add tests where needed when adding a new feature or modifying existing code.
 
 ## Tools
 

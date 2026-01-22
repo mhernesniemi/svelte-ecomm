@@ -34,21 +34,12 @@ import type {
 import { nanoid } from "nanoid";
 import { reservationService } from "./reservations.js";
 import { taxService } from "./tax.js";
+import { STATE_TRANSITIONS, isValidTransition } from "./order-utils.js";
 
 // Generate a secure cart token for guest users
 function generateCartToken(): string {
 	return nanoid(32);
 }
-
-// Valid state transitions
-const STATE_TRANSITIONS: Record<OrderState, OrderState[]> = {
-	created: ["payment_pending", "cancelled"],
-	payment_pending: ["paid", "cancelled"],
-	paid: ["shipped", "cancelled"],
-	shipped: ["delivered"],
-	delivered: [],
-	cancelled: []
-};
 
 export class OrderService {
 	/**
@@ -546,9 +537,8 @@ export class OrderService {
 		if (!order) throw new Error("Order not found");
 
 		const currentState = order.state;
-		const allowedTransitions = STATE_TRANSITIONS[currentState];
 
-		if (!allowedTransitions.includes(newState)) {
+		if (!isValidTransition(currentState, newState)) {
 			throw new Error(`Cannot transition from ${currentState} to ${newState}`);
 		}
 
