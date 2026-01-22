@@ -58,7 +58,7 @@
                   <input type="hidden" name="state" value={state} />
                   <button
                     type="submit"
-                    class="rounded border px-3 py-1 text-sm capitalize hover:bg-gray-50"
+                    class="rounded border border-gray-200 px-3 py-1 text-sm capitalize hover:bg-gray-50"
                   >
                     Mark as {state.replace("_", " ")}
                   </button>
@@ -71,10 +71,10 @@
 
       <!-- Line Items -->
       <div class="rounded-lg bg-white shadow">
-        <div class="border-b px-6 py-4">
+        <div class="border-b border-gray-200 px-6 py-4">
           <h2 class="font-semibold">Items</h2>
         </div>
-        <div class="divide-y">
+        <div class="divide-y divide-gray-200">
           {#each data.order.lines as line}
             <div class="flex items-center justify-between px-6 py-4">
               <div>
@@ -115,7 +115,7 @@
               <dd>-{(data.order.discount / 100).toFixed(2)} EUR</dd>
             </div>
           {/if}
-          <div class="flex justify-between border-t pt-2 font-bold">
+          <div class="flex justify-between border-t border-gray-200 pt-2 font-bold">
             <dt>Total</dt>
             <dd>{(data.order.total / 100).toFixed(2)} {data.order.currencyCode}</dd>
           </div>
@@ -177,7 +177,7 @@
             <form method="POST" action="?/trackShipment" class="mt-4">
               <button
                 type="submit"
-                class="w-full rounded border px-3 py-2 text-sm hover:bg-gray-50"
+                class="w-full rounded border border-gray-200 px-3 py-2 text-sm hover:bg-gray-50"
               >
                 Refresh Tracking Status
               </button>

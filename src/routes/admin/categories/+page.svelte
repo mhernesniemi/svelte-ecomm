@@ -90,7 +90,7 @@
           <button
             type="button"
             onclick={() => (showCreate = false)}
-            class="rounded-lg border px-4 py-2"
+            class="rounded-lg border border-gray-200 px-4 py-2"
           >
             Cancel
           </button>
@@ -120,7 +120,7 @@
     </div>
   {:else}
     <div class="rounded-lg bg-white shadow">
-      <div class="divide-y">
+      <div class="divide-y divide-gray-200">
         {#snippet categoryNode(node: (typeof data.tree)[0], depth: number)}
           <div class="px-6 py-3" style="padding-left: {24 + depth * 24}px">
             {#if editingId === node.id}
@@ -141,17 +141,17 @@
                   type="text"
                   name="slug"
                   value={node.slug}
-                  class="rounded border px-2 py-1 text-sm"
+                  class="rounded border border-gray-200 px-2 py-1 text-sm"
                   placeholder="Slug"
                 />
                 <input
                   type="text"
                   name="name_en"
                   value={getName(node.translations)}
-                  class="rounded border px-2 py-1 text-sm"
+                  class="rounded border border-gray-200 px-2 py-1 text-sm"
                   placeholder="Name"
                 />
-                <select name="parent_id" class="rounded border px-2 py-1 text-sm">
+                <select name="parent_id" class="rounded border border-gray-200 px-2 py-1 text-sm">
                   <option value="">None (Root)</option>
                   {#each data.categories.filter((c) => c.id !== node.id) as category}
                     <option value={category.id} selected={category.id === node.parentId}>

@@ -188,7 +188,7 @@
       <!-- Product Form -->
       <form method="POST" action="?/update" use:enhance class="rounded-lg bg-white shadow">
         <!-- Language Tabs -->
-        <div class="border-b">
+        <div class="border-b border-gray-200">
           <div class="flex">
             <button
               type="button"
@@ -303,7 +303,7 @@
           </div>
 
           <!-- Common Fields -->
-          <div class="grid grid-cols-3 gap-4 border-t pt-6">
+          <div class="grid grid-cols-3 gap-4 border-t border-gray-200 pt-6">
             <label class="block">
               <span class="text-sm font-medium text-gray-700">Product Type</span>
               <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
@@ -346,7 +346,7 @@
         </div>
 
         <!-- Actions -->
-        <div class="flex justify-between border-t bg-gray-50 px-6 py-4">
+        <div class="flex justify-between border-t border-gray-200 bg-gray-50 px-6 py-4">
           <Button
             type="button"
             variant="ghost"
@@ -361,7 +361,7 @@
 
       <!-- Variants Section -->
       <div class="rounded-lg bg-white shadow">
-        <div class="flex items-center justify-between border-b px-6 py-4">
+        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
           <button
             type="button"
@@ -397,7 +397,7 @@
                 }
               };
             }}
-            class="border-b bg-gray-50 p-6"
+            class="border-b border-gray-200 bg-gray-50 p-6"
           >
             {#if isEditing && variant}
               <input type="hidden" name="variantId" value={variant.id} />
@@ -464,7 +464,7 @@
               <button
                 type="button"
                 onclick={() => (editingVariant = null)}
-                class="rounded border px-3 py-1 text-sm"
+                class="rounded border border-gray-200 px-3 py-1 text-sm"
               >
                 Cancel
               </button>
@@ -604,7 +604,7 @@
     <div class="w-80 shrink-0 space-y-6">
       <!-- Images Section -->
       <div class="rounded-lg bg-white shadow">
-        <div class="border-b px-4 py-3">
+        <div class="border-b border-gray-200 px-4 py-3">
           <h2 class="font-semibold">Images</h2>
         </div>
 
@@ -624,7 +624,7 @@
                   <img
                     src="{asset.source}?tr=w-150,h-150,fo-auto"
                     alt={asset.name}
-                    class="h-24 w-full rounded border object-cover {data.product.featuredAssetId ===
+                    class="h-24 w-full rounded border border-gray-200 object-cover {data.product.featuredAssetId ===
                     asset.id
                       ? 'ring-2 ring-blue-500'
                       : ''}"
@@ -684,7 +684,7 @@
 
       <!-- Facet Values Section -->
       <div class="rounded-lg bg-white shadow">
-        <div class="border-b px-4 py-3">
+        <div class="border-b border-gray-200 px-4 py-3">
           <h2 class="font-semibold">Facet Values</h2>
         </div>
 
@@ -744,7 +744,7 @@
 
       <!-- Categories Section -->
       <div class="rounded-lg bg-white shadow">
-        <div class="border-b px-4 py-3">
+        <div class="border-b border-gray-200 px-4 py-3">
           <h2 class="font-semibold">Categories</h2>
         </div>
 

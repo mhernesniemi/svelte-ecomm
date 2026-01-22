@@ -71,7 +71,7 @@
           <button
             type="button"
             onclick={() => (showCreateFacet = false)}
-            class="rounded-lg border px-4 py-2"
+            class="rounded-lg border border-gray-200 px-4 py-2"
           >
             Cancel
           </button>
@@ -103,7 +103,7 @@
     <div class="space-y-6">
       {#each data.facets as facet}
         <div class="rounded-lg bg-white shadow">
-          <div class="flex items-center justify-between border-b px-6 py-4">
+          <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
             <div>
               <h2 class="font-semibold">{getTranslation(facet.translations)}</h2>
               <p class="text-sm text-gray-500">Code: {facet.code}</p>
@@ -113,7 +113,7 @@
                 type="button"
                 onclick={() =>
                   (addingValueToFacet = addingValueToFacet === facet.id ? null : facet.id)}
-                class="rounded border px-3 py-1 text-sm hover:bg-gray-50"
+                class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
               >
                 Add Value
               </button>
@@ -128,7 +128,7 @@
 
           <!-- Add Value Form -->
           {#if addingValueToFacet === facet.id}
-            <div class="border-b bg-gray-50 px-6 py-4">
+            <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
               <form
                 method="POST"
                 action="?/createValue"

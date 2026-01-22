@@ -46,7 +46,7 @@
 
   <form method="POST" use:enhance class="rounded-lg bg-white shadow">
     <!-- Language Tabs -->
-    <div class="border-b">
+    <div class="border-b border-gray-200">
       <div class="flex">
         <button
           type="button"
@@ -163,7 +163,7 @@
       </div>
 
       <!-- Common Fields -->
-      <div class="space-y-4 border-t pt-6">
+      <div class="space-y-4 border-t border-gray-200 pt-6">
         <label class="block">
           <span class="text-sm font-medium text-gray-700">Product Type</span>
           <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
@@ -198,7 +198,7 @@
     </div>
 
     <!-- Actions -->
-    <div class="flex justify-end gap-3 border-t bg-gray-50 px-6 py-4">
+    <div class="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
       <a
         href="/admin/products"
         class="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"

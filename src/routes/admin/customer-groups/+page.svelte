@@ -73,7 +73,7 @@
           <button
             type="button"
             onclick={() => (showCreateForm = false)}
-            class="rounded-lg border px-4 py-2"
+            class="rounded-lg border border-gray-200 px-4 py-2"
           >
             Cancel
           </button>
@@ -105,7 +105,7 @@
     <div class="space-y-6">
       {#each data.groups as group}
         <div class="rounded-lg bg-white shadow">
-          <div class="flex items-center justify-between border-b px-6 py-4">
+          <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
             <div>
               <h2 class="font-semibold">{group.name}</h2>
               <p class="text-sm text-gray-500">
@@ -119,7 +119,7 @@
               <button
                 type="button"
                 onclick={() => (expandedGroupId = expandedGroupId === group.id ? null : group.id)}
-                class="rounded border px-3 py-1 text-sm hover:bg-gray-50"
+                class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
               >
                 {expandedGroupId === group.id ? "Hide" : "Manage"} Customers
               </button>
@@ -134,7 +134,7 @@
 
           <!-- Expanded Customer Management -->
           {#if expandedGroupId === group.id}
-            <div class="border-b bg-gray-50 px-6 py-4">
+            <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
               <h3 class="mb-3 text-sm font-medium text-gray-700">Add Customer to Group</h3>
               {#if getCustomersNotInGroup(group.id).length === 0}
                 <p class="text-sm text-gray-500">All customers are already in this group</p>

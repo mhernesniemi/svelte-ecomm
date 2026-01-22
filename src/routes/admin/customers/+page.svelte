@@ -74,7 +74,7 @@
         {#if data.currentPage > 1}
           <a
             href="?page={data.currentPage - 1}"
-            class="rounded border px-3 py-1 text-sm hover:bg-gray-100"
+            class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-100"
           >
             Previous
           </a>
@@ -82,7 +82,7 @@
         {#if data.pagination.hasMore}
           <a
             href="?page={data.currentPage + 1}"
-            class="rounded border px-3 py-1 text-sm hover:bg-gray-100"
+            class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-100"
           >
             Next
           </a>

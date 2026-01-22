@@ -120,7 +120,7 @@
           <button
             type="button"
             onclick={() => (showCreateForm = false)}
-            class="rounded-lg border px-4 py-2"
+            class="rounded-lg border border-gray-200 px-4 py-2"
           >
             Cancel
           </button>
