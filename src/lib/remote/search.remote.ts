@@ -1,22 +1,32 @@
-import { json } from "@sveltejs/kit";
+/**
+ * Search Remote Functions
+ */
+import { command } from "$app/server";
 import { productService } from "$lib/server/services/index.js";
-import type { RequestHandler } from "./$types";
 
-export const GET: RequestHandler = async ({ url }) => {
-	const query = url.searchParams.get("q")?.trim() || "";
+export interface SearchResult {
+	id: number;
+	name: string;
+	slug: string;
+	price: number;
+	image: string | null;
+}
 
-	if (query.length < 2) {
-		return json([]);
+/**
+ * Search products by query string
+ */
+export const searchProducts = command("unchecked", async (query: string): Promise<SearchResult[]> => {
+	if (!query || query.trim().length < 2) {
+		return [];
 	}
 
 	const result = await productService.list({
-		search: query,
+		search: query.trim(),
 		limit: 8,
 		visibility: "public"
 	});
 
-	// Return minimal data for search results
-	const items = result.items.map((product) => {
+	return result.items.map((product) => {
 		const translation = product.translations.find((t) => t.languageCode === "en");
 		const defaultVariant = product.variants[0];
 
@@ -28,6 +38,4 @@ export const GET: RequestHandler = async ({ url }) => {
 			image: product.featuredAsset?.source || null
 		};
 	});
-
-	return json(items);
-};
+});

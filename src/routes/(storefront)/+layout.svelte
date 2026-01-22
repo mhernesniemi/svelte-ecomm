@@ -3,6 +3,7 @@
   import { invalidateAll, goto, onNavigate } from "$app/navigation";
   import { browser } from "$app/environment";
   import { throttle, formatPrice } from "$lib/utils";
+  import { searchProducts, type SearchResult } from "$lib/remote/search.remote.js";
   import CartSheet from "$lib/components/storefront/CartSheet.svelte";
   import type { LayoutData } from "./$types";
   import Loader2 from "@lucide/svelte/icons/loader-2";
@@ -39,25 +40,12 @@
   const cartItemCount = $derived(data.cartItemCount);
 
   // Search state
-  type SearchResult = {
-    id: number;
-    name: string;
-    slug: string;
-    price: number;
-    image: string | null;
-  };
-
   let searchQuery = $state("");
   let searchResults = $state<SearchResult[]>([]);
   let isSearching = $state(false);
   let showResults = $state(false);
-  let abortController: AbortController | null = null;
 
   async function performSearch(query: string) {
-    // Cancel previous request
-    abortController?.abort();
-    abortController = new AbortController();
-
     if (query.length < 2) {
       searchResults = [];
       isSearching = false;
@@ -67,14 +55,9 @@
     isSearching = true;
 
     try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`, {
-        signal: abortController.signal
-      });
-      searchResults = await res.json();
+      searchResults = await searchProducts(query);
     } catch (e) {
-      if ((e as Error).name !== "AbortError") {
-        console.error("Search error:", e);
-      }
+      console.error("Search error:", e);
     } finally {
       isSearching = false;
     }
