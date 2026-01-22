@@ -9,6 +9,7 @@
     SheetTitle,
     SheetFooter
   } from "$lib/components/storefront/ui/sheet";
+  import { buttonVariants } from "$lib/components/storefront/ui/button";
   import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
   import Minus from "@lucide/svelte/icons/minus";
   import Plus from "@lucide/svelte/icons/plus";
@@ -199,11 +200,11 @@
             {/if}
           </div>
 
-          <div class="mb-4">
+          <div class="mb-8">
             <a
               href="/checkout"
               onclick={() => cartStore.close()}
-              class="flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              class={buttonVariants({ size: "xl" }) + " w-full"}
             >
               Proceed to Checkout
             </a>
