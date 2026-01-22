@@ -20,10 +20,13 @@
 
 <div>
   <!-- Hero Section -->
-  <section class="bg-gray-100 py-20">
+  <section class="bg-gray-100 pt-16 pb-20">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex items-center gap-20">
         <div>
+          <a href="/" class="mb-6 inline-block bg-[#f7d0dd] text-xl font-bold text-gray-900"
+            >"Hoikka"</a
+          >
           <h1 class="mb-4 text-4xl font-bold md:text-5xl">Opinionated Commerce</h1>
           <p class="mb-10 text-lg leading-[1.75] text-gray-600">
             Lightweight but powerful e-commerce gear, built with <span

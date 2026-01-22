@@ -1,6 +1,7 @@
 <script lang="ts">
   import { SignedIn, SignedOut, UserButton, SignInButton, useClerkContext } from "svelte-clerk";
   import { invalidateAll, goto, onNavigate } from "$app/navigation";
+  import { page } from "$app/stores";
   import { browser } from "$app/environment";
   import { throttle, formatPrice } from "$lib/utils";
   import { searchProducts, type SearchResult } from "$lib/remote/search.remote.js";
@@ -90,7 +91,8 @@
 </script>
 
 <div class="min-h-screen bg-white">
-  <!-- Header -->
+  <!-- Header (hidden on front page) -->
+  {#if $page.url.pathname !== "/"}
   <header>
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="flex h-16 items-center justify-between">
@@ -182,6 +184,7 @@
       </div>
     </div>
   </header>
+  {/if}
 
   <!-- Main Content -->
   <main>
