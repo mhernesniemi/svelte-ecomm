@@ -62,19 +62,4 @@
     </div>
   </div>
 
-  <!-- Quick Actions -->
-  <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-    <a
-      href="/admin/products/new"
-      class="rounded-lg bg-blue-600 p-4 text-center text-white transition-colors hover:bg-blue-700"
-    >
-      Add New Product
-    </a>
-    <a
-      href="/admin/promotions"
-      class="rounded-lg bg-gray-600 p-4 text-center text-white transition-colors hover:bg-gray-700"
-    >
-      Manage Promotions
-    </a>
-  </div>
 </div>
