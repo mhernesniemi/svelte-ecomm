@@ -5,22 +5,35 @@
 import { db } from "$lib/server/db/index.js";
 import { users, userSessions } from "$lib/server/db/schema.js";
 import { eq, and, gt, lt } from "drizzle-orm";
-import { randomBytes } from "crypto";
+import { randomBytes, scrypt, timingSafeEqual } from "crypto";
+import { promisify } from "util";
 
+const scryptAsync = promisify(scrypt);
 const SESSION_DURATION_DAYS = 7;
+const SALT_LENGTH = 32;
+const KEY_LENGTH = 64;
 
 /**
- * Hash a password using Bun's built-in bcrypt implementation
+ * Hash a password using Node's scrypt
  */
 async function hashPassword(password: string): Promise<string> {
-	return Bun.password.hash(password);
+	const salt = randomBytes(SALT_LENGTH).toString("hex");
+	const derivedKey = (await scryptAsync(password, salt, KEY_LENGTH)) as Buffer;
+	return `${salt}:${derivedKey.toString("hex")}`;
 }
 
 /**
- * Verify a password against a hash using Bun's built-in verification
+ * Verify a password against a hash
  */
 async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
-	return Bun.password.verify(password, storedHash);
+	const [salt, hash] = storedHash.split(":");
+	if (!salt || !hash) return false;
+
+	const derivedKey = (await scryptAsync(password, salt, KEY_LENGTH)) as Buffer;
+	const storedKey = Buffer.from(hash, "hex");
+
+	if (derivedKey.length !== storedKey.length) return false;
+	return timingSafeEqual(derivedKey, storedKey);
 }
 
 /**
