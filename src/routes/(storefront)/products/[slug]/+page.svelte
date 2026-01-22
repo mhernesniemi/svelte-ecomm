@@ -4,6 +4,7 @@
   import { toggleWishlist } from "$lib/remote/wishlist.remote";
   import { invalidateAll } from "$app/navigation";
   import { cartSheet } from "$lib/stores/cart.svelte";
+  import { formatPrice } from "$lib/utils";
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
@@ -172,7 +173,7 @@
 
       {#if selectedVariant}
         <div class="mb-8 text-xl font-semibold">
-          {(selectedVariant.price / 100).toFixed(2)} EUR
+          {formatPrice(selectedVariant.price)}
         </div>
       {/if}
 

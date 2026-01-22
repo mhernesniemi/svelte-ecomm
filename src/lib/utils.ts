@@ -43,3 +43,79 @@ export function throttle<T extends (...args: Parameters<T>) => void>(
 		}
 	};
 }
+
+// ============================================================================
+// CURRENCY UTILITIES
+// ============================================================================
+
+/** Base currency for the system */
+export const BASE_CURRENCY = "EUR";
+
+/** Supported currencies with their locale and symbol info */
+const CURRENCY_CONFIG: Record<string, { locale: string; symbol: string; symbolPosition: "before" | "after" }> = {
+	EUR: { locale: "fi-FI", symbol: "€", symbolPosition: "after" },
+	USD: { locale: "en-US", symbol: "$", symbolPosition: "before" },
+	GBP: { locale: "en-GB", symbol: "£", symbolPosition: "before" },
+	SEK: { locale: "sv-SE", symbol: "kr", symbolPosition: "after" },
+	NOK: { locale: "nb-NO", symbol: "kr", symbolPosition: "after" },
+	DKK: { locale: "da-DK", symbol: "kr", symbolPosition: "after" }
+};
+
+/**
+ * Format a price in minor units (cents) to a display string
+ *
+ * @param cents - Amount in minor units (e.g., 2999 for 29.99)
+ * @param currencyCode - ISO 4217 currency code (default: EUR)
+ * @returns Formatted price string (e.g., "29.99 €" or "$29.99")
+ */
+export function formatPrice(cents: number, currencyCode: string = BASE_CURRENCY): string {
+	const amount = cents / 100;
+	const config = CURRENCY_CONFIG[currencyCode];
+
+	if (config) {
+		// Use Intl.NumberFormat for proper locale-aware formatting
+		return new Intl.NumberFormat(config.locale, {
+			style: "currency",
+			currency: currencyCode
+		}).format(amount);
+	}
+
+	// Fallback for unsupported currencies
+	return `${amount.toFixed(2)} ${currencyCode}`;
+}
+
+/**
+ * Format a price without currency symbol (just the number)
+ *
+ * @param cents - Amount in minor units
+ * @param currencyCode - ISO 4217 currency code for locale
+ * @returns Formatted number string (e.g., "29.99")
+ */
+export function formatPriceNumber(cents: number, currencyCode: string = BASE_CURRENCY): string {
+	const amount = cents / 100;
+	const config = CURRENCY_CONFIG[currencyCode];
+	const locale = config?.locale ?? "en-US";
+
+	return new Intl.NumberFormat(locale, {
+		minimumFractionDigits: 2,
+		maximumFractionDigits: 2
+	}).format(amount);
+}
+
+/**
+ * Convert price from base currency (EUR) to target currency
+ *
+ * @param centsInBaseCurrency - Amount in EUR cents
+ * @param exchangeRate - Exchange rate from EUR to target currency
+ * @returns Amount in target currency cents
+ */
+export function convertPrice(centsInBaseCurrency: number, exchangeRate: number): number {
+	return Math.round(centsInBaseCurrency * exchangeRate);
+}
+
+/**
+ * Get currency symbol for a currency code
+ */
+export function getCurrencySymbol(currencyCode: string): string {
+	return CURRENCY_CONFIG[currencyCode]?.symbol ?? currencyCode;
+}

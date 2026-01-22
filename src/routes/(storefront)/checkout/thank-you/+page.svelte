@@ -1,12 +1,9 @@
 <script lang="ts">
   import type { PageData } from "./$types.js";
   import Check from "@lucide/svelte/icons/check";
+  import { formatPrice } from "$lib/utils.js";
 
   let { data }: { data: PageData } = $props();
-
-  function formatPrice(cents: number): string {
-    return (cents / 100).toFixed(2);
-  }
 </script>
 
 <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
@@ -33,7 +30,7 @@
             {/if}
             <p class="text-sm text-gray-500">Quantity: {line.quantity}</p>
           </div>
-          <p class="font-medium">{formatPrice(line.lineTotal)} EUR</p>
+          <p class="font-medium">{formatPrice(line.lineTotal)}</p>
         </div>
       {/each}
     </div>
@@ -41,26 +38,26 @@
     <div class="space-y-2 border-t pt-4">
       <div class="flex justify-between text-sm">
         <span class="text-gray-600">Subtotal</span>
-        <span class="font-medium">{formatPrice(data.order.subtotal)} EUR</span>
+        <span class="font-medium">{formatPrice(data.order.subtotal)}</span>
       </div>
 
       {#if data.order.discount > 0}
         <div class="flex justify-between text-sm">
           <span class="text-gray-600">Discount</span>
           <span class="font-medium text-green-600">
-            -{formatPrice(data.order.discount)} EUR
+            -{formatPrice(data.order.discount)}
           </span>
         </div>
       {/if}
 
       <div class="flex justify-between text-sm">
         <span class="text-gray-600">Shipping</span>
-        <span class="font-medium">{formatPrice(data.order.shipping)} EUR</span>
+        <span class="font-medium">{formatPrice(data.order.shipping)}</span>
       </div>
 
       <div class="flex justify-between border-t pt-2 text-lg font-bold">
         <span>Total</span>
-        <span>{formatPrice(data.order.total)} EUR</span>
+        <span>{formatPrice(data.order.total)}</span>
       </div>
     </div>
   </div>

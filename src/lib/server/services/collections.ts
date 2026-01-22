@@ -656,6 +656,7 @@ export class CollectionService {
 			id: number;
 			type: "physical" | "digital";
 			visibility: "public" | "private" | "hidden";
+			taxCode: string;
 			featuredAssetId: number | null;
 			deletedAt: Date | null;
 			createdAt: Date;

@@ -4,6 +4,7 @@
   import { Input } from "$lib/components/storefront/ui/input";
   import { Label } from "$lib/components/storefront/ui/label";
   import { Alert } from "$lib/components/storefront/ui/alert";
+  import { formatPrice } from "$lib/utils.js";
   import type { PageData } from "./$types.js";
 
   let { data, form }: { data: PageData; form: any } = $props();
@@ -75,10 +76,6 @@
     fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
     email: data.customerEmail ?? data.cart?.customerEmail ?? ""
   });
-
-  function formatPrice(cents: number): string {
-    return (cents / 100).toFixed(2);
-  }
 
   function selectShippingRate(rate: (typeof data.shippingRates)[0]) {
     selectedShippingRate = rate;
@@ -409,7 +406,7 @@
                             : ""}
                         </p>
                       {/if}
-                      <p class="mt-1 font-semibold">{formatPrice(selectedRate?.price ?? 0)} EUR</p>
+                      <p class="mt-1 font-semibold">{formatPrice(selectedRate?.price ?? 0)}</p>
                     </div>
                     <button
                       type="button"
@@ -457,7 +454,7 @@
                               </p>
                             {/if}
                           </div>
-                          <p class="ml-4 font-semibold">{formatPrice(rate.price)} EUR</p>
+                          <p class="ml-4 font-semibold">{formatPrice(rate.price)}</p>
                         </div>
                       </div>
                     </label>
@@ -602,7 +599,7 @@
                   {/if}
                   <p class="text-xs text-gray-500">Qty: {line.quantity}</p>
                 </div>
-                <p class="font-medium">{formatPrice(line.lineTotal)} EUR</p>
+                <p class="font-medium">{formatPrice(line.lineTotal)}</p>
               </div>
             {/each}
           </div>
@@ -610,14 +607,14 @@
           <div class="space-y-2 border-t pt-4">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600">Subtotal</span>
-              <span class="font-medium">{formatPrice(currentCart.subtotal)} EUR</span>
+              <span class="font-medium">{formatPrice(currentCart.subtotal)}</span>
             </div>
 
             {#if currentCart.discount > 0}
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Discount</span>
                 <span class="font-medium text-green-600">
-                  -{formatPrice(currentCart.discount)} EUR
+                  -{formatPrice(currentCart.discount)}
                 </span>
               </div>
             {/if}
@@ -625,14 +622,32 @@
             {#if !isDigitalOnly}
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Shipping</span>
-                <span class="font-medium">{formatPrice(currentCart.shipping)} EUR</span>
+                <span class="font-medium">{formatPrice(currentCart.shipping)}</span>
+              </div>
+            {/if}
+
+            {#if currentCart.taxTotal > 0}
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">VAT (included)</span>
+                <span class="font-medium">{formatPrice(currentCart.taxTotal)}</span>
+              </div>
+            {:else if currentCart.isTaxExempt}
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">VAT</span>
+                <span class="font-medium text-green-600">Tax exempt (B2B)</span>
               </div>
             {/if}
 
             <div class="flex justify-between border-t pt-2 text-lg font-bold">
               <span>Total</span>
-              <span>{formatPrice(currentCart.total)} EUR</span>
+              <span>{formatPrice(currentCart.total)}</span>
             </div>
+
+            {#if currentCart.isTaxExempt}
+              <p class="text-xs text-gray-500">
+                Net amount: {formatPrice(currentCart.totalNet)} (VAT 0%)
+              </p>
+            {/if}
           </div>
 
           {#if currentPaymentInfo}

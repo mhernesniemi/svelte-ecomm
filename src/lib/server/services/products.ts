@@ -152,7 +152,8 @@ export class ProductService {
 			.insert(products)
 			.values({
 				type: input.type ?? "physical",
-				visibility: input.visibility ?? "public"
+				visibility: input.visibility ?? "public",
+				taxCode: input.taxCode ?? "standard"
 			})
 			.returning();
 
@@ -183,9 +184,11 @@ export class ProductService {
 		const updates: {
 			type?: "physical" | "digital";
 			visibility?: "public" | "private" | "hidden";
+			taxCode?: string;
 		} = {};
 		if (input.type !== undefined) updates.type = input.type;
 		if (input.visibility !== undefined) updates.visibility = input.visibility;
+		if (input.taxCode !== undefined) updates.taxCode = input.taxCode;
 
 		if (Object.keys(updates).length > 0) {
 			await db.update(products).set(updates).where(eq(products.id, id));

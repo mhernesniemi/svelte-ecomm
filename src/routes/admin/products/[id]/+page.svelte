@@ -303,7 +303,7 @@
           </div>
 
           <!-- Common Fields -->
-          <div class="grid grid-cols-2 gap-4 border-t pt-6">
+          <div class="grid grid-cols-3 gap-4 border-t pt-6">
             <label class="block">
               <span class="text-sm font-medium text-gray-700">Product Type</span>
               <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
@@ -329,6 +329,17 @@
                 <option value="hidden" selected={data.product.visibility === "hidden"}
                   >Hidden</option
                 >
+              </select>
+            </label>
+
+            <label class="block">
+              <span class="text-sm font-medium text-gray-700">Tax Rate</span>
+              <select name="taxCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                {#each data.taxRates as rate}
+                  <option value={rate.code} selected={data.product.taxCode === rate.code}>
+                    {rate.name} ({(rate.rate * 100).toFixed(0)}%)
+                  </option>
+                {/each}
               </select>
             </label>
           </div>

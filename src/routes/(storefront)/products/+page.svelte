@@ -2,6 +2,7 @@
   import { page } from "$app/stores";
   import { Input } from "$lib/components/storefront/ui/input";
   import { Button } from "$lib/components/storefront/ui/button";
+  import { formatPrice } from "$lib/utils";
   import type { PageData } from "./$types";
   import Check from "@lucide/svelte/icons/check";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -155,7 +156,7 @@
                 </h3>
                 {#if getLowestPrice(product) !== null}
                   <p class="mt-1 text-gray-600">
-                    From {(getLowestPrice(product)! / 100).toFixed(2)} EUR
+                    From {formatPrice(getLowestPrice(product)!)}
                   </p>
                 {/if}
               </div>

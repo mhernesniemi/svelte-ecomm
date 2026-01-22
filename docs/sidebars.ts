@@ -27,6 +27,8 @@ const sidebars: SidebarsConfig = {
 				"features/collections",
 				"features/payments",
 				"features/shipping",
+				"features/tax",
+				"features/currency",
 				"features/assets"
 			]
 		},

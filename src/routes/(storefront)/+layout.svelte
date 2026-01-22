@@ -1,7 +1,7 @@
 <script lang="ts">
   import { SignedIn, SignedOut, UserButton, SignInButton, useClerkContext } from "svelte-clerk";
   import { invalidateAll, goto, onNavigate } from "$app/navigation";
-  import { throttle } from "$lib/utils";
+  import { throttle, formatPrice } from "$lib/utils";
   import CartSheet from "$lib/components/storefront/CartSheet.svelte";
   import type { LayoutData } from "./$types";
   import Loader2 from "@lucide/svelte/icons/loader-2";
@@ -92,9 +92,6 @@
     goto(`/products/${slug}`);
   }
 
-  function formatPrice(cents: number): string {
-    return (cents / 100).toFixed(2) + " €";
-  }
 </script>
 
 <div class="min-h-screen bg-white">

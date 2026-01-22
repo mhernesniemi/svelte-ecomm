@@ -18,6 +18,17 @@ import {
 } from "drizzle-orm/pg-core";
 
 // ============================================================================
+// TAX RATES
+// ============================================================================
+
+export const taxRates = pgTable("tax_rates", {
+	code: varchar("code", { length: 20 }).primaryKey(),
+	rate: numeric("rate", { precision: 5, scale: 4 }).notNull(), // 0.24 for 24%
+	name: varchar("name", { length: 100 }).notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull()
+});
+
+// ============================================================================
 // PRODUCTS
 // ============================================================================
 
@@ -35,6 +46,7 @@ export const products = pgTable(
 		})
 			.default("public")
 			.notNull(),
+		taxCode: varchar("tax_code", { length: 20 }).default("standard").notNull(),
 		featuredAssetId: integer("featured_asset_id"),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -343,6 +355,7 @@ export const customers = pgTable(
 		firstName: varchar("first_name", { length: 100 }).notNull(),
 		lastName: varchar("last_name", { length: 100 }).notNull(),
 		phone: varchar("phone", { length: 50 }),
+		vatId: varchar("vat_id", { length: 50 }), // B2B VAT ID for tax exemption
 		isAdmin: boolean("is_admin").default(false).notNull(),
 		b2bStatus: text("b2b_status", {
 			enum: ["retail", "pending", "approved", "rejected"]
@@ -411,7 +424,12 @@ export const orders = pgTable(
 		shipping: integer("shipping").default(0).notNull(),
 		discount: integer("discount").default(0).notNull(),
 		total: integer("total").default(0).notNull(),
-		currencyCode: varchar("currency_code", { length: 10 }).default("EUR").notNull(),
+		// Tax fields
+		taxTotal: integer("tax_total").default(0).notNull(),
+		totalNet: integer("total_net").default(0).notNull(), // total minus tax
+		isTaxExempt: boolean("is_tax_exempt").default(false).notNull(),
+		currencyCode: varchar("currency_code", { length: 3 }).default("EUR").notNull(),
+		exchangeRate: numeric("exchange_rate", { precision: 10, scale: 6 }).default("1").notNull(), // Rate from base currency (EUR) at order time
 		// Shipping address snapshot
 		shippingFullName: varchar("shipping_full_name", { length: 255 }),
 		shippingStreetLine1: varchar("shipping_street_line_1", { length: 255 }),
@@ -449,9 +467,15 @@ export const orderLines = pgTable(
 			.references(() => productVariants.id)
 			.notNull(),
 		quantity: integer("quantity").notNull(),
-		// Price snapshot at time of order (in cents)
+		// Price snapshot at time of order (in cents) - unitPrice and lineTotal are gross (VAT-inclusive)
 		unitPrice: integer("unit_price").notNull(),
 		lineTotal: integer("line_total").notNull(),
+		// Tax fields
+		taxCode: varchar("tax_code", { length: 20 }).default("standard").notNull(),
+		taxRate: numeric("tax_rate", { precision: 5, scale: 4 }).default("0.24").notNull(), // 0.24 for 24%
+		taxAmount: integer("tax_amount").default(0).notNull(),
+		unitPriceNet: integer("unit_price_net").default(0).notNull(),
+		lineTotalNet: integer("line_total_net").default(0).notNull(),
 		// Product info snapshot
 		productName: varchar("product_name", { length: 255 }).notNull(),
 		variantName: varchar("variant_name", { length: 255 }),

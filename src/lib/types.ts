@@ -31,7 +31,8 @@ import type {
 	wishlists,
 	wishlistItems,
 	reviews,
-	stockReservations
+	stockReservations,
+	taxRates
 } from "$lib/server/db/schema.js";
 
 // ============================================================================
@@ -203,6 +204,16 @@ export type StockReservation = InferSelectModel<typeof stockReservations>;
 export type NewStockReservation = InferInsertModel<typeof stockReservations>;
 
 // ============================================================================
+// TAX RATE TYPES
+// ============================================================================
+
+export type TaxRate = InferSelectModel<typeof taxRates>;
+export type NewTaxRate = InferInsertModel<typeof taxRates>;
+
+/** Tax code - common codes */
+export type TaxCode = "standard" | "food" | "books" | "zero";
+
+// ============================================================================
 // PROMOTION TYPES
 // ============================================================================
 
@@ -351,6 +362,7 @@ export interface PaginatedResult<T> {
 export interface CreateProductInput {
 	type?: ProductType;
 	visibility?: ProductVisibility;
+	taxCode?: string;
 	translations: {
 		languageCode: string;
 		name: string;
@@ -362,6 +374,7 @@ export interface CreateProductInput {
 export interface UpdateProductInput {
 	type?: ProductType;
 	visibility?: ProductVisibility;
+	taxCode?: string;
 	translations?: {
 		languageCode: string;
 		name?: string;

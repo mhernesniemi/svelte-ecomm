@@ -20,7 +20,8 @@ import {
 	promotions,
 	orderShipping,
 	products,
-	assets
+	assets,
+	customers
 } from "../db/schema.js";
 import type {
 	Order,
@@ -32,6 +33,7 @@ import type {
 } from "$lib/types.js";
 import { nanoid } from "nanoid";
 import { reservationService } from "./reservations.js";
+import { taxService } from "./tax.js";
 
 // Generate a secure cart token for guest users
 function generateCartToken(): string {
@@ -297,6 +299,12 @@ export class OrderService {
 			);
 		}
 
+		// Get product with taxCode
+		const [product] = await db
+			.select()
+			.from(products)
+			.where(eq(products.id, variant.productId));
+
 		// Get product name for snapshot
 		const [productTrans] = await db
 			.select()
@@ -311,15 +319,30 @@ export class OrderService {
 			.where(eq(productVariantTranslations.variantId, variant.id))
 			.limit(1);
 
+		// Get tax rate for this product
+		const taxCode = product?.taxCode ?? "standard";
+		const taxRate = await taxService.getTaxRate(taxCode);
+		const isTaxExempt = await taxService.isCustomerTaxExempt(order.customerId);
+
 		// Update existing line or create new one
 		if (existingLine) {
-			// Update quantity
+			// Update quantity and recalculate tax
 			const newQuantity = existingLine.quantity + input.quantity;
+			const lineTax = taxService.calculateLineTax(
+				variant.price,
+				newQuantity,
+				taxRate,
+				isTaxExempt
+			);
+
 			const [updated] = await db
 				.update(orderLines)
 				.set({
 					quantity: newQuantity,
-					lineTotal: variant.price * newQuantity
+					lineTotal: lineTax.lineTotalGross,
+					unitPriceNet: lineTax.unitPriceNet,
+					lineTotalNet: lineTax.lineTotalNet,
+					taxAmount: lineTax.taxAmount
 				})
 				.where(eq(orderLines.id, existingLine.id))
 				.returning();
@@ -331,7 +354,15 @@ export class OrderService {
 			return updated;
 		}
 
-		// Create new line
+		// Calculate tax for new line
+		const lineTax = taxService.calculateLineTax(
+			variant.price,
+			input.quantity,
+			taxRate,
+			isTaxExempt
+		);
+
+		// Create new line with tax info
 		const [line] = await db
 			.insert(orderLines)
 			.values({
@@ -339,7 +370,12 @@ export class OrderService {
 				variantId: input.variantId,
 				quantity: input.quantity,
 				unitPrice: variant.price,
-				lineTotal: variant.price * input.quantity,
+				lineTotal: lineTax.lineTotalGross,
+				taxCode,
+				taxRate: taxRate.toString(),
+				taxAmount: lineTax.taxAmount,
+				unitPriceNet: lineTax.unitPriceNet,
+				lineTotalNet: lineTax.lineTotalNet,
 				productName: productTrans?.name ?? "Unknown Product",
 				variantName: variantTrans?.name ?? null,
 				sku: variant.sku
@@ -384,11 +420,18 @@ export class OrderService {
 			throw new Error(`Only ${availableStock} items available`);
 		}
 
+		// Recalculate tax for new quantity
+		const taxRate = parseFloat(line.taxRate);
+		const isTaxExempt = await taxService.isCustomerTaxExempt(order.customerId);
+		const lineTax = taxService.calculateLineTax(line.unitPrice, quantity, taxRate, isTaxExempt);
+
 		const [updated] = await db
 			.update(orderLines)
 			.set({
 				quantity,
-				lineTotal: line.unitPrice * quantity
+				lineTotal: lineTax.lineTotalGross,
+				lineTotalNet: lineTax.lineTotalNet,
+				taxAmount: lineTax.taxAmount
 			})
 			.where(eq(orderLines.id, lineId))
 			.returning();
@@ -697,6 +740,8 @@ export class OrderService {
 		const lines = await db.select().from(orderLines).where(eq(orderLines.orderId, orderId));
 
 		const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
+		const taxTotal = lines.reduce((sum, line) => sum + line.taxAmount, 0);
+		const subtotalNet = lines.reduce((sum, line) => sum + line.lineTotalNet, 0);
 
 		// Get applied discounts
 		const appliedPromotions = await db
@@ -714,11 +759,25 @@ export class OrderService {
 			.limit(1);
 		const shipping = shippingRecord?.price ?? 0;
 
+		// Get order to check tax exemption status
+		const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
+		const isTaxExempt = order ? await taxService.isCustomerTaxExempt(order.customerId) : false;
+
 		const total = Math.max(0, subtotal - discount + shipping);
+		// For tax-exempt orders, totalNet equals total (no tax). Otherwise subtract the tax.
+		const totalNet = isTaxExempt ? total : Math.max(0, subtotalNet - discount + shipping);
 
 		await db
 			.update(orders)
-			.set({ subtotal, discount, shipping, total })
+			.set({
+				subtotal,
+				discount,
+				shipping,
+				total,
+				taxTotal: isTaxExempt ? 0 : taxTotal,
+				totalNet,
+				isTaxExempt
+			})
 			.where(eq(orders.id, orderId));
 	}
 

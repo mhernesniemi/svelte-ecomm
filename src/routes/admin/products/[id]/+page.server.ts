@@ -2,6 +2,7 @@ import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { assetService } from "$lib/server/services/assets.js";
 import { categoryService } from "$lib/server/services/categories.js";
+import { taxService } from "$lib/server/services/tax.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -18,17 +19,19 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Product not found");
 	}
 
-	const [facets, categoryTree, productCategories] = await Promise.all([
+	const [facets, categoryTree, productCategories, taxRates] = await Promise.all([
 		facetService.list("en"),
 		categoryService.getTree(),
-		categoryService.getProductCategories(id)
+		categoryService.getProductCategories(id),
+		taxService.getAllTaxRates()
 	]);
 
 	return {
 		product,
 		facets,
 		categoryTree,
-		productCategories
+		productCategories,
+		taxRates
 	};
 };
 
@@ -45,6 +48,7 @@ export const actions: Actions = {
 		const descriptionFi = formData.get("description_fi") as string;
 		const type = formData.get("type") as "physical" | "digital";
 		const visibility = formData.get("visibility") as "public" | "private" | "hidden";
+		const taxCode = formData.get("taxCode") as string;
 
 		if (!nameEn || !slugEn) {
 			return fail(400, { error: "English name and slug are required" });
@@ -54,6 +58,7 @@ export const actions: Actions = {
 			await productService.update(id, {
 				type,
 				visibility,
+				taxCode: taxCode || "standard",
 				translations: [
 					{
 						languageCode: "en",
