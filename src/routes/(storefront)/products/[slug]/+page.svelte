@@ -24,7 +24,6 @@
 
   let selectedVariantId = $state<number | null>(null);
   let quantity = $state(1);
-  let isAddingToCart = $state(false);
   let isTogglingWishlist = $state(false);
   let wishlistOverride = $state<boolean | null>(null);
   let message = $state<{ type: "success" | "error"; text: string } | null>(null);
@@ -72,7 +71,6 @@
 
   async function handleAddToCart() {
     if (!selectedVariantId) return;
-    isAddingToCart = true;
     message = null;
 
     // Open cart immediately with loading state
@@ -85,7 +83,6 @@
     } catch {
       message = { type: "error", text: "Failed to add item to cart" };
     } finally {
-      isAddingToCart = false;
       cartStore.setLoading(false);
     }
   }
@@ -249,10 +246,9 @@
           type="button"
           size="xl"
           onclick={handleAddToCart}
-          disabled={isAddingToCart}
           class="flex-1 py-3"
         >
-          {isAddingToCart ? "Adding..." : "Add to Cart"}
+          Add to Cart
         </Button>
       {/if}
     </div>
