@@ -124,45 +124,45 @@
         {#if data.orders.length === 0}
           <p class="text-sm text-gray-500">No orders yet</p>
         {:else}
-          <Table class="border-0 shadow-none rounded-none">
-              <TableHeader>
-                <TableRow class="hover:bg-transparent">
-                  <TableHead class="px-4 py-3 text-sm">Order</TableHead>
-                  <TableHead class="px-4 py-3 text-sm">Date</TableHead>
-                  <TableHead class="px-4 py-3 text-sm">Status</TableHead>
-                  <TableHead class="px-4 py-3 text-right text-sm">Total</TableHead>
+          <Table class="rounded-none border-0 shadow-none">
+            <TableHeader>
+              <TableRow class="hover:bg-transparent">
+                <TableHead class="px-4 py-3 text-sm">Order</TableHead>
+                <TableHead class="px-4 py-3 text-sm">Date</TableHead>
+                <TableHead class="px-4 py-3 text-sm">Status</TableHead>
+                <TableHead class="px-4 py-3 text-right text-sm">Total</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {#each data.orders as order}
+                <TableRow>
+                  <TableCell class="px-4 py-3 text-sm">
+                    <a
+                      href="/admin/orders/{order.id}"
+                      class="font-medium text-blue-600 hover:text-blue-800"
+                    >
+                      #{order.code}
+                    </a>
+                  </TableCell>
+                  <TableCell class="px-4 py-3 text-sm text-gray-500">
+                    {formatDate(order.createdAt)}
+                  </TableCell>
+                  <TableCell class="px-4 py-3 text-sm">
+                    <span
+                      class="rounded-full px-2 py-0.5 text-xs font-medium {getStateColor(
+                        order.state
+                      )}"
+                    >
+                      {order.state}
+                    </span>
+                  </TableCell>
+                  <TableCell class="px-4 py-3 text-right text-sm font-medium">
+                    {formatPrice(order.total)} EUR
+                  </TableCell>
                 </TableRow>
-              </TableHeader>
-              <TableBody>
-                {#each data.orders as order}
-                  <TableRow>
-                    <TableCell class="px-4 py-3 text-sm">
-                      <a
-                        href="/admin/orders/{order.id}"
-                        class="font-medium text-blue-600 hover:text-blue-800"
-                      >
-                        #{order.code}
-                      </a>
-                    </TableCell>
-                    <TableCell class="px-4 py-3 text-sm text-gray-500">
-                      {formatDate(order.createdAt)}
-                    </TableCell>
-                    <TableCell class="px-4 py-3 text-sm">
-                      <span
-                        class="rounded-full px-2 py-0.5 text-xs font-medium {getStateColor(
-                          order.state
-                        )}"
-                      >
-                        {order.state}
-                      </span>
-                    </TableCell>
-                    <TableCell class="px-4 py-3 text-right text-sm font-medium">
-                      {formatPrice(order.total)} EUR
-                    </TableCell>
-                  </TableRow>
-                {/each}
-              </TableBody>
-            </Table>
+              {/each}
+            </TableBody>
+          </Table>
         {/if}
       </div>
     </div>

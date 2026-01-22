@@ -33,7 +33,10 @@ export class ReservationService {
 			.select({ reserved: sum(stockReservations.quantity) })
 			.from(stockReservations)
 			.where(
-				and(eq(stockReservations.variantId, variantId), gt(stockReservations.expiresAt, new Date()))
+				and(
+					eq(stockReservations.variantId, variantId),
+					gt(stockReservations.expiresAt, new Date())
+				)
 			);
 
 		const reserved = Number(result?.reserved ?? 0);

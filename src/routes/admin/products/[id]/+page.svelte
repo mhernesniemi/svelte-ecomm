@@ -469,7 +469,7 @@
         {/if}
 
         <!-- Variants Table -->
-        <Table class="border-0 shadow-none rounded-none">
+        <Table class="rounded-none border-0 shadow-none">
           <TableHeader>
             <TableRow class="hover:bg-transparent">
               <TableHead>SKU</TableHead>

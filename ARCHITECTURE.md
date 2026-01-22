@@ -48,6 +48,7 @@ export const orderLines = pgTable("order_lines", { ... });
 ### 2. Services (`src/lib/server/services/`)
 
 Business logic layer. Each service is a **singleton class** that:
+
 - Encapsulates all operations for a domain (orders, products, etc.)
 - Handles database queries
 - Enforces business rules
@@ -67,6 +68,7 @@ export const orderService = new OrderService();
 SvelteKit routes handle HTTP requests. Two patterns are used:
 
 **Form Actions** - For form submissions with progressive enhancement:
+
 ```typescript
 // +page.server.ts
 export const actions = {
@@ -79,6 +81,7 @@ export const actions = {
 ```
 
 **Remote Functions** - For RPC-style calls without page reload:
+
 ```typescript
 // src/lib/remote/cart.remote.ts
 export const addToCart = command("unchecked", async (input) => {
@@ -90,6 +93,7 @@ export const addToCart = command("unchecked", async (input) => {
 ### 4. Components (`src/lib/components/`)
 
 Reusable Svelte components. Split into:
+
 - `storefront/` - Customer-facing UI
 - `admin/` - Admin dashboard UI
 - `ui/` - Base components (shadcn/svelte)
@@ -265,6 +269,7 @@ export const orderService = new OrderService();
 ```
 
 This ensures:
+
 - Single database connection pool usage
 - Easy to import anywhere: `import { orderService } from "$lib/server/services/orders.js"`
 - Testable (can mock the export)
@@ -280,11 +285,12 @@ products (id, type, visibility, ...)
 ```
 
 Query pattern:
+
 ```typescript
 const product = await db.query.products.findFirst({
-  with: { translations: true }
+	with: { translations: true }
 });
-const name = product.translations.find(t => t.languageCode === "en")?.name;
+const name = product.translations.find((t) => t.languageCode === "en")?.name;
 ```
 
 ### Guest Carts (Cookie-based)
@@ -322,15 +328,15 @@ class MockProvider implements PaymentProvider { ... }
 
 ## File Naming Conventions
 
-| Pattern | Purpose |
-|---------|---------|
-| `*.svelte` | Svelte components |
-| `*.svelte.ts` | TypeScript with Svelte runes ($state, $derived) |
-| `+page.svelte` | Route page component |
-| `+page.server.ts` | Route server-side load/actions |
-| `+layout.svelte` | Shared layout component |
-| `*.remote.ts` | RPC functions (command()) |
-| `index.ts` | Barrel exports |
+| Pattern           | Purpose                                         |
+| ----------------- | ----------------------------------------------- |
+| `*.svelte`        | Svelte components                               |
+| `*.svelte.ts`     | TypeScript with Svelte runes ($state, $derived) |
+| `+page.svelte`    | Route page component                            |
+| `+page.server.ts` | Route server-side load/actions                  |
+| `+layout.svelte`  | Shared layout component                         |
+| `*.remote.ts`     | RPC functions (command())                       |
+| `index.ts`        | Barrel exports                                  |
 
 ---
 
