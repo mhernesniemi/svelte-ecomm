@@ -5,38 +5,22 @@
 import { db } from "$lib/server/db/index.js";
 import { users, userSessions } from "$lib/server/db/schema.js";
 import { eq, and, gt, lt } from "drizzle-orm";
-import { randomBytes, scrypt, timingSafeEqual } from "crypto";
+import { randomBytes } from "crypto";
 
 const SESSION_DURATION_DAYS = 7;
-const SCRYPT_KEYLEN = 64;
 
 /**
- * Hash a password using scrypt (memory-hard, resistant to brute force)
+ * Hash a password using Bun's built-in bcrypt implementation
  */
 async function hashPassword(password: string): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const salt = randomBytes(16).toString("hex");
-		scrypt(password, salt, SCRYPT_KEYLEN, (err, derivedKey) => {
-			if (err) reject(err);
-			resolve(`${salt}:${derivedKey.toString("hex")}`);
-		});
-	});
+	return Bun.password.hash(password);
 }
 
 /**
- * Verify a password against a hash using timing-safe comparison
+ * Verify a password against a hash using Bun's built-in verification
  */
 async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
-	const [salt, hash] = storedHash.split(":");
-	if (!salt || !hash) return false;
-
-	return new Promise((resolve, reject) => {
-		scrypt(password, salt, SCRYPT_KEYLEN, (err, derivedKey) => {
-			if (err) reject(err);
-			const storedBuffer = Buffer.from(hash, "hex");
-			resolve(timingSafeEqual(derivedKey, storedBuffer));
-		});
-	});
+	return Bun.password.verify(password, storedHash);
 }
 
 /**

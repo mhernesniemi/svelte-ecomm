@@ -6,7 +6,6 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { eq } from "drizzle-orm";
 import { users } from "../src/lib/server/db/schema.js";
-import { randomBytes, scrypt } from "crypto";
 
 // Load DATABASE_URL from .env
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -18,16 +17,8 @@ if (!DATABASE_URL) {
 const client = postgres(DATABASE_URL);
 const db = drizzle(client);
 
-const SCRYPT_KEYLEN = 64;
-
 async function hashPassword(password: string): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const salt = randomBytes(16).toString("hex");
-		scrypt(password, salt, SCRYPT_KEYLEN, (err, derivedKey) => {
-			if (err) reject(err);
-			resolve(`${salt}:${derivedKey.toString("hex")}`);
-		});
-	});
+	return Bun.password.hash(password);
 }
 
 const prompt = (question: string): Promise<string> => {
