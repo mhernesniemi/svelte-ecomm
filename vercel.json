@@ -1,4 +1,9 @@
 {
+	"functions": {
+		"api/**/*.ts": {
+			"regions": ["fra1"]
+		}
+	},
 	"crons": [
 		{
 			"path": "/api/cron/jobs",
