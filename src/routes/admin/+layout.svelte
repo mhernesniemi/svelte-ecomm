@@ -96,10 +96,10 @@
           <p class="text-gray-400">{data.adminUser.email}</p>
         </div>
         <div class="flex items-center justify-between">
-          <a href="/" class="text-sm text-gray-400 hover:text-white">Storefront</a>
           <form method="POST" action="/admin/logout" use:enhance>
             <button type="submit" class="text-sm text-gray-400 hover:text-white">Logout</button>
           </form>
+          <a href="/" class="text-sm text-gray-400 hover:text-white">Storefront</a>
         </div>
       {/if}
     </div>
