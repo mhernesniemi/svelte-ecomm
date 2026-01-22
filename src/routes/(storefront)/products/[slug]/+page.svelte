@@ -120,6 +120,14 @@
   }
 </script>
 
+<svelte:head>
+  <title>{enTrans?.name ?? "Product"} | Hoikka</title>
+  <meta name="description" content={enTrans?.description?.slice(0, 160) ?? "View product details and add to cart."} />
+  {#if product.featuredAsset}
+    <meta property="og:image" content={product.featuredAsset.source} />
+  {/if}
+</svelte:head>
+
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
   <nav class="mb-6">
     <a href="/products" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"

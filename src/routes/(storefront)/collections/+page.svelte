@@ -17,7 +17,8 @@
 </script>
 
 <svelte:head>
-  <title>Collections</title>
+  <title>Collections | Hoikka</title>
+  <meta name="description" content="Browse our curated collections of products." />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

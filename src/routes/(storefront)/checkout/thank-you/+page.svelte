@@ -6,6 +6,11 @@
   let { data }: { data: PageData } = $props();
 </script>
 
+<svelte:head>
+  <title>Order Confirmed | Hoikka</title>
+  <meta name="robots" content="noindex" />
+</svelte:head>
+
 <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
   <div class="mb-8 text-center">
     <div class="mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100">

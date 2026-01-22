@@ -40,6 +40,11 @@
   }
 </script>
 
+<svelte:head>
+  <title>Wishlist | Hoikka</title>
+  <meta name="robots" content="noindex" />
+</svelte:head>
+
 <div class="mx-auto max-w-4xl px-4 py-8">
   <div class="mb-8 flex items-center justify-between">
     <h1 class="text-3xl font-bold">Wishlist</h1>

@@ -9,6 +9,8 @@
 
   let { data }: { data: PageData } = $props();
 
+  const pageTitle = $derived(data.search ? `Search: ${data.search} | Hoikka` : "Products | Hoikka");
+
   function getProductName(product: (typeof data.products)[0]): string {
     return product.translations.find((t) => t.languageCode === "en")?.name ?? "Untitled";
   }
@@ -60,6 +62,11 @@
 
   const hasActiveFilters = $derived(Object.keys(data.activeFilters).length > 0);
 </script>
+
+<svelte:head>
+  <title>{pageTitle}</title>
+  <meta name="description" content="Browse our collection of products. Filter by category, brand, and more." />
+</svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
   <h1 class="mb-8 text-2xl font-bold">Products</h1>

@@ -18,6 +18,11 @@
   }
 </script>
 
+<svelte:head>
+  <title>Hoikka - Opinionated Commerce for SvelteKit</title>
+  <meta name="description" content="Lightweight but powerful e-commerce platform built with SvelteKit. 100% customizable and owned by you." />
+</svelte:head>
+
 <div>
   <!-- Hero Section -->
   <section class="bg-gray-100 pt-10 pb-20">
