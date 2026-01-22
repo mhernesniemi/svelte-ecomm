@@ -2,7 +2,7 @@
 	"name": "sveltecomm",
 	"version": "0.0.1",
 	"scripts": {
-		"dev": "vite dev",
+		"dev": "bun --bun vite dev",
 		"build": "vitest run && vite build && bun run prepack",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
