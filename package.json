@@ -80,6 +80,7 @@
 		"bits-ui": "^2.15.4",
 		"clsx": "^2.1.1",
 		"nanoid": "^5.1.6",
+		"resend": "^6.8.0",
 		"svelte-clerk": "^0.20.3",
 		"tailwind-merge": "^3.4.0",
 		"tailwind-variants": "^3.2.2",
