@@ -42,9 +42,10 @@ product_variant_translations
 orders
 ├── id, code (unique order number)
 ├── customerId (nullable for guests)
-├── state: pending | confirmed | shipped | delivered | cancelled
-├── subtotal, tax, shipping, total
-├── shippingAddress, billingAddress (jsonb)
+├── state: created | payment_pending | paid | shipped | delivered | cancelled
+├── subtotal, taxTotal, shipping, discount, total
+├── currencyCode, exchangeRate
+├── shippingFullName, shippingStreetLine1, shippingCity, etc.
 
 order_lines
 ├── id, orderId, variantId

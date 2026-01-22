@@ -9,17 +9,18 @@ Orders track customer purchases through their lifecycle.
 ## Order States
 
 ```
-pending → confirmed → shipped → delivered
-                   ↘ cancelled
+created → payment_pending → paid → shipped → delivered
+                              ↘ cancelled
 ```
 
-| State       | Description               |
-| ----------- | ------------------------- |
-| `pending`   | Created, awaiting payment |
-| `confirmed` | Payment received          |
-| `shipped`   | Shipped to customer       |
-| `delivered` | Received by customer      |
-| `cancelled` | Order cancelled           |
+| State             | Description               |
+| ----------------- | ------------------------- |
+| `created`         | Cart converted to order   |
+| `payment_pending` | Awaiting payment          |
+| `paid`            | Payment received          |
+| `shipped`         | Shipped to customer       |
+| `delivered`       | Received by customer      |
+| `cancelled`       | Order cancelled           |
 
 ## Creating Orders
 
@@ -43,17 +44,12 @@ const order = await orderService.createFromCart(cartId, {
 ## State Transitions
 
 ```typescript
-// After successful payment
-await orderService.confirm(orderId);
-
-// When shipped
-await orderService.ship(orderId, "TRACK123456");
-
-// When delivered
-await orderService.deliver(orderId);
-
-// Cancel with reason
-await orderService.cancel(orderId, "Customer requested cancellation");
+// Transition to next state
+await orderService.transition(orderId, 'payment_pending');
+await orderService.transition(orderId, 'paid');
+await orderService.transition(orderId, 'shipped');
+await orderService.transition(orderId, 'delivered');
+await orderService.transition(orderId, 'cancelled');
 ```
 
 ## Order Lines
