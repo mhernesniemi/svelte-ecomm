@@ -10,7 +10,6 @@
     SheetFooter
   } from "$lib/components/storefront/ui/sheet";
   import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
-  import Loader2 from "@lucide/svelte/icons/loader-2";
   import Minus from "@lucide/svelte/icons/minus";
   import Plus from "@lucide/svelte/icons/plus";
   import Trash2 from "@lucide/svelte/icons/trash-2";
@@ -83,9 +82,24 @@
 
     <div class="flex-1 overflow-y-auto py-4">
       {#if isLoading}
-        <div class="flex flex-col items-center justify-center py-16 text-center">
-          <Loader2 class="h-10 w-10 animate-spin text-gray-400" />
-          <p class="mt-4 text-sm text-gray-500">Loading cart...</p>
+        <div class="divide-y divide-gray-200">
+          {#each [1, 2] as _}
+            <div class="flex gap-3 p-3">
+              <div class="h-20 w-20 shrink-0 animate-pulse rounded-md bg-gray-200"></div>
+              <div class="flex min-w-0 flex-1 flex-col">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="space-y-2">
+                    <div class="h-4 w-32 animate-pulse rounded bg-gray-200"></div>
+                    <div class="h-3 w-20 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                </div>
+                <div class="mt-auto flex items-center justify-between pt-2">
+                  <div class="h-7 w-20 animate-pulse rounded bg-gray-200"></div>
+                  <div class="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                </div>
+              </div>
+            </div>
+          {/each}
         </div>
       {:else if lines.length === 0}
         <div class="flex flex-col items-center justify-center py-16 text-center">
