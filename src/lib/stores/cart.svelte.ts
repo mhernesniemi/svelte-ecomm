@@ -1,35 +1,81 @@
 /**
- * Cart UI State (Client-side only)
+ * Cart Store (Client-side only)
  *
  * This file uses the `.svelte.ts` extension to enable Svelte 5 runes ($state).
  * Regular `.ts` files cannot use runes - you'll get "rune_outside_svelte" error.
  *
- * Why this pattern?
- * - CartSheet component needs to be opened from multiple places (product page, wishlist)
- * - We can't pass props up through the component tree (CartSheet is in the layout)
- * - This shared state allows any component to open/close the cart sheet
+ * This store manages:
+ * - Cart sheet UI state (open/close)
+ * - Cart data with optimistic updates for instant UI feedback
  *
  * Usage:
- *   import { cartSheet } from "$lib/stores/cart.svelte";
- *   cartSheet.open();  // Opens the cart sheet
- *   cartSheet.close(); // Closes it
+ *   import { cartStore } from "$lib/stores/cart.svelte";
+ *   cartStore.open();  // Opens the cart sheet
+ *   cartStore.close(); // Closes it
+ *   cartStore.updateLineQuantity(lineId, 2); // Optimistic quantity update
  *
- * Note: This is CLIENT-SIDE state. Don't try to call cartSheet.open() from server code.
+ * Note: This is CLIENT-SIDE state. Don't try to call from server code.
  */
 
-let cartSheetOpen = $state(false);
+import type { OrderWithRelations } from '$lib/types';
 
-export const cartSheet = {
+let isOpen = $state(false);
+let isLoading = $state(false);
+let cart = $state<OrderWithRelations | null>(null);
+
+export const cartStore = {
+	// UI state
 	get isOpen() {
-		return cartSheetOpen;
+		return isOpen;
+	},
+	get isLoading() {
+		return isLoading;
 	},
 	open() {
-		cartSheetOpen = true;
+		isOpen = true;
 	},
 	close() {
-		cartSheetOpen = false;
+		isOpen = false;
 	},
 	toggle() {
-		cartSheetOpen = !cartSheetOpen;
+		isOpen = !isOpen;
+	},
+	setLoading(loading: boolean) {
+		isLoading = loading;
+	},
+
+	// Cart data
+	get cart() {
+		return cart;
+	},
+	get itemCount() {
+		return cart?.lines.reduce((sum, l) => sum + l.quantity, 0) ?? 0;
+	},
+
+	// Sync from server (called by layout)
+	sync(serverCart: OrderWithRelations | null) {
+		cart = serverCart;
+	},
+
+	// Optimistic updates
+	updateLineQuantity(lineId: number, quantity: number) {
+		if (!cart) return;
+		let newLines;
+		if (quantity <= 0) {
+			newLines = cart.lines.filter((l) => l.id !== lineId);
+		} else {
+			newLines = cart.lines.map((l) =>
+				l.id === lineId ? { ...l, quantity, lineTotal: l.unitPrice * quantity } : l
+			);
+		}
+		const newSubtotal = newLines.reduce((sum, l) => sum + l.lineTotal, 0);
+		cart = { ...cart, lines: newLines, subtotal: newSubtotal };
+	},
+
+	removeLine(lineId: number) {
+		if (!cart) return;
+		const newLines = cart.lines.filter((l) => l.id !== lineId);
+		const newSubtotal = newLines.reduce((sum, l) => sum + l.lineTotal, 0);
+		cart = { ...cart, lines: newLines, subtotal: newSubtotal };
 	}
 };

@@ -3,7 +3,8 @@
   import { addToCart } from "$lib/remote/cart.remote";
   import { toggleWishlist } from "$lib/remote/wishlist.remote";
   import { invalidateAll } from "$app/navigation";
-  import { cartSheet } from "$lib/stores/cart.svelte";
+  import { cartStore } from "$lib/stores/cart.svelte";
+  import { wishlistStore } from "$lib/stores/wishlist.svelte";
   import { formatPrice } from "$lib/utils";
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
@@ -73,28 +74,47 @@
     if (!selectedVariantId) return;
     isAddingToCart = true;
     message = null;
+
+    // Open cart immediately with loading state
+    cartStore.setLoading(true);
+    cartStore.open();
+
     try {
       await addToCart({ variantId: selectedVariantId, quantity });
-      cartSheet.open();
-      invalidateAll(); // Don't await - refresh data in background
+      await invalidateAll();
     } catch {
       message = { type: "error", text: "Failed to add item to cart" };
     } finally {
       isAddingToCart = false;
+      cartStore.setLoading(false);
     }
   }
 
   async function handleToggleWishlist() {
     isTogglingWishlist = true;
+
+    // Optimistic update
+    const willBeAdded = !isWishlisted;
+    wishlistOverride = willBeAdded;
+    if (willBeAdded) {
+      wishlistStore.increment();
+    } else {
+      wishlistStore.decrement();
+    }
+
     try {
-      const result = await toggleWishlist({
+      await toggleWishlist({
         productId: product.id,
         variantId: selectedVariantId ?? undefined
       });
-      wishlistOverride = result.added;
-      // Invalidate to update header wishlist count
-      await invalidateAll();
     } catch {
+      // Revert optimistic update on error
+      wishlistOverride = !willBeAdded;
+      if (willBeAdded) {
+        wishlistStore.decrement();
+      } else {
+        wishlistStore.increment();
+      }
       message = { type: "error", text: "Failed to update wishlist" };
       setTimeout(() => (message = null), 3000);
     } finally {

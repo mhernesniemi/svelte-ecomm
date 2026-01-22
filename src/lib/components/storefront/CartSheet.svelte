@@ -1,7 +1,7 @@
 <script lang="ts">
   import { invalidateAll } from "$app/navigation";
   import { updateCartLineQuantity, removeCartLine } from "$lib/remote/cart.remote";
-  import { cartSheet } from "$lib/stores/cart.svelte";
+  import { cartStore } from "$lib/stores/cart.svelte";
   import {
     Sheet,
     SheetContent,
@@ -10,19 +10,16 @@
     SheetFooter
   } from "$lib/components/storefront/ui/sheet";
   import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
+  import Loader2 from "@lucide/svelte/icons/loader-2";
   import Minus from "@lucide/svelte/icons/minus";
   import Plus from "@lucide/svelte/icons/plus";
   import Trash2 from "@lucide/svelte/icons/trash-2";
-  import type { OrderWithRelations } from "$lib/types";
 
-  let {
-    cart,
-    itemCount
-  }: {
-    cart: OrderWithRelations | null;
-    itemCount: number;
-  } = $props();
-
+  // Read cart data from store (enables optimistic updates)
+  // Use getter functions for proper reactivity across modules
+  const cart = $derived.by(() => cartStore.cart);
+  const itemCount = $derived.by(() => cartStore.itemCount);
+  const isLoading = $derived.by(() => cartStore.isLoading);
   const lines = $derived(cart?.lines ?? []);
   const subtotal = $derived(cart?.subtotal ?? 0);
   const discount = $derived(cart?.discount ?? 0);
@@ -32,23 +29,40 @@
   }
 
   async function updateQuantity(lineId: number, newQuantity: number) {
-    await updateCartLineQuantity({ lineId, quantity: newQuantity });
-    await invalidateAll();
+    // Optimistic: update store immediately
+    cartStore.updateLineQuantity(lineId, newQuantity);
+
+    // Server sync
+    try {
+      await updateCartLineQuantity({ lineId, quantity: newQuantity });
+      // Success - store already has correct state, no need to invalidate
+    } catch {
+      // On error, refetch to restore correct state
+      invalidateAll();
+    }
   }
 
   async function removeLine(lineId: number) {
-    await removeCartLine({ lineId });
-    await invalidateAll();
+    // Optimistic: remove from store immediately
+    cartStore.removeLine(lineId);
+
+    // Server sync
+    try {
+      await removeCartLine({ lineId });
+    } catch {
+      // On error, refetch to restore correct state
+      invalidateAll();
+    }
   }
 </script>
 
 <Sheet
-  open={cartSheet.isOpen}
-  onOpenChange={(open) => (open ? cartSheet.open() : cartSheet.close())}
+  open={cartStore.isOpen}
+  onOpenChange={(open) => (open ? cartStore.open() : cartStore.close())}
 >
   <button
     type="button"
-    onclick={() => cartSheet.open()}
+    onclick={() => cartStore.open()}
     class="relative text-gray-600 hover:text-gray-900"
     aria-label="Shopping cart"
   >
@@ -68,7 +82,12 @@
     </SheetHeader>
 
     <div class="flex-1 overflow-y-auto py-4">
-      {#if lines.length === 0}
+      {#if isLoading}
+        <div class="flex flex-col items-center justify-center py-16 text-center">
+          <Loader2 class="h-10 w-10 animate-spin text-gray-400" />
+          <p class="mt-4 text-sm text-gray-500">Loading cart...</p>
+        </div>
+      {:else if lines.length === 0}
         <div class="flex flex-col items-center justify-center py-16 text-center">
           <div class="mb-4 rounded-full bg-gray-100 p-4">
             <ShoppingCart class="h-10 w-10 text-gray-400" />
@@ -76,7 +95,7 @@
           <p class="mb-1 font-medium text-gray-900">Your cart is empty</p>
           <p class="mb-6 text-sm text-gray-500">Add some items to get started</p>
           <button
-            onclick={() => cartSheet.close()}
+            onclick={() => cartStore.close()}
             class="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-6 text-sm font-medium text-white hover:bg-blue-700"
           >
             Continue Shopping
@@ -169,7 +188,7 @@
           <div class="mb-4">
             <a
               href="/checkout"
-              onclick={() => cartSheet.close()}
+              onclick={() => cartStore.close()}
               class="flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
               Proceed to Checkout

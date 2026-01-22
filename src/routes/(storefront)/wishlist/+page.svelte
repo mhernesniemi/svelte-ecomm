@@ -2,7 +2,7 @@
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
-  import { cartSheet } from "$lib/stores/cart.svelte";
+  import { cartStore } from "$lib/stores/cart.svelte";
   import type { PageData, ActionData } from "./$types";
   import Heart from "@lucide/svelte/icons/heart";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -132,12 +132,13 @@
                     action="?/addToCart"
                     use:enhance={() => {
                       addingId = variantId;
-                      return async ({ update, result }) => {
-                        if (result.type === "success") {
-                          cartSheet.open();
-                        }
+                      // Open cart immediately with loading state
+                      cartStore.setLoading(true);
+                      cartStore.open();
+                      return async ({ update }) => {
+                        await update();
                         addingId = null;
-                        update(); // Don't await - refresh data in background
+                        cartStore.setLoading(false);
                       };
                     }}
                   >

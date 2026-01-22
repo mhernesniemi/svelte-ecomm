@@ -5,6 +5,8 @@
   import { throttle, formatPrice } from "$lib/utils";
   import { searchProducts, type SearchResult } from "$lib/remote/search.remote.js";
   import CartSheet from "$lib/components/storefront/CartSheet.svelte";
+  import { cartStore } from "$lib/stores/cart.svelte";
+  import { wishlistStore } from "$lib/stores/wishlist.svelte";
   import type { LayoutData } from "./$types";
   import Loader2 from "@lucide/svelte/icons/loader-2";
   import Heart from "@lucide/svelte/icons/heart";
@@ -35,9 +37,16 @@
     previousUserId = currentUserId;
   });
 
-  const wishlistCount = $derived(data.wishlistCount);
-  const cart = $derived(data.cart);
-  const cartItemCount = $derived(data.cartItemCount);
+  // Sync server data to stores for optimistic updates
+  $effect(() => {
+    cartStore.sync(data.cart);
+  });
+
+  $effect(() => {
+    wishlistStore.sync(data.wishlistCount);
+  });
+
+  const wishlistCount = $derived.by(() => wishlistStore.count);
 
   // Search state
   let searchQuery = $state("");
@@ -151,7 +160,7 @@
             </a>
           {/if}
 
-          <CartSheet {cart} itemCount={cartItemCount} />
+          <CartSheet />
 
           <!-- Auth UI -->
           <SignedIn>
