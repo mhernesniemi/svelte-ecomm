@@ -89,7 +89,7 @@
       {/each}
     </nav>
 
-    <div class="absolute right-0 bottom-0 left-0 border-t border-gray-800 p-4">
+    <div class="absolute right-0 bottom-0 left-0 border-t border-gray-800 bg-gray-900 p-4">
       {#if data.adminUser}
         <div class="mb-3 text-sm">
           <p class="font-medium text-white">{data.adminUser.name}</p>

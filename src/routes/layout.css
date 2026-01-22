@@ -3,6 +3,15 @@
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 
+/* Cursor pointer for all clickable elements */
+button,
+[role="button"],
+[onclick],
+label[for],
+summary {
+	cursor: pointer;
+}
+
 /* Global focus styles */
 *:focus-visible {
 	@apply ring-2 ring-blue-500 ring-offset-2 outline-none;
