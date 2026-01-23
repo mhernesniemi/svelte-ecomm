@@ -124,8 +124,7 @@
 
           <div class="flex flex-1 flex-col rounded-lg border border-gray-300 bg-white p-6">
             <p class="mb-6 text-sm text-gray-600">
-              Log in to explore the admin dashboard. The credentials that have been filled in for
-              you.
+              Log in to explore the admin dashboard. The credentials have been filled in for you.
             </p>
 
             {#if form?.error}
