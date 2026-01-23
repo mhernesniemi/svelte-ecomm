@@ -38,10 +38,9 @@
           >
           <h1 class="mb-4 text-4xl font-bold md:text-5xl">Opinionated Commerce</h1>
           <p class="mb-10 text-lg leading-[1.75] text-gray-600">
-            Lightweight but powerful <span class="font-semibold text-gray-900">DX-first</span>
-            ecommerce gear, built with SvelteKit.<br />
-            It is truly <span class="font-semibold text-gray-900">100% customizable</span> and owned by
-            you!
+            Lightweight but powerful ecommerce gear, designed for developers.<br />
+            It's 100% customizable and owned by you.
+            <span class="text-gray-900 italic">Built with SvelteKit.</span>
           </p>
           <div class="flex items-center gap-4">
             <img src="/kuvitus2.png" alt="Svelte" class="h-20 w-20" />
