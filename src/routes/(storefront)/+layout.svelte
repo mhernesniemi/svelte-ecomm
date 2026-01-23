@@ -3,7 +3,7 @@
   import { invalidateAll, goto, onNavigate } from "$app/navigation";
   import { page } from "$app/stores";
   import { browser } from "$app/environment";
-  import { throttle, formatPrice } from "$lib/utils";
+  import { throttle, formatPrice, cn } from "$lib/utils";
   import { searchProducts, type SearchResult } from "$lib/remote/search.remote.js";
   import CartSheet from "$lib/components/storefront/CartSheet.svelte";
   import { cartStore } from "$lib/stores/cart.svelte";
@@ -11,6 +11,8 @@
   import type { LayoutData } from "./$types";
   import Loader2 from "@lucide/svelte/icons/loader-2";
   import Heart from "@lucide/svelte/icons/heart";
+  import Dot from "@lucide/svelte/icons/dot";
+  import UserIcon from "@lucide/svelte/icons/user";
 
   // Enable view transitions for navigation
   onNavigate((navigation) => {
@@ -144,41 +146,35 @@
           </div>
 
           <nav class="flex items-center gap-6">
-            <a href="/products" class="text-gray-600 hover:text-gray-900">Products</a>
-
-            {#if wishlistCount > 0}
-              <a
-                href="/wishlist"
-                class="relative text-gray-600 hover:text-gray-900"
-                aria-label="Wishlist"
+            <a
+              href="/wishlist"
+              class={cn(
+                "group relative text-gray-600 transition-opacity hover:text-gray-900",
+                wishlistCount > 0 ? "opacity-100" : "pointer-events-none opacity-0"
+              )}
+              aria-label="Wishlist"
+            >
+              <Heart class="h-6 w-6" />
+              <span
+                class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-500 text-xs text-white group-hover:bg-red-500"
               >
-                <Heart class="h-6 w-6" />
-                <span
-                  class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
-                >
-                  {wishlistCount}
-                </span>
-              </a>
-            {/if}
-
-            <CartSheet />
+                {wishlistCount}
+              </span>
+            </a>
 
             <!-- Auth UI -->
             <SignedIn>
-              <a href="/account" class="text-sm text-gray-600 hover:text-gray-900">Account</a>
-              <UserButton />
+              <a href="/account" class="text-sm text-gray-600 hover:text-gray-900"
+                ><UserIcon class="h-6 w-6" /></a
+              >
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
                 <button class="text-sm text-gray-600 hover:text-gray-900">Sign in</button>
               </SignInButton>
-              <a
-                href="/sign-up"
-                class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
-              >
-                Sign up
-              </a>
             </SignedOut>
+
+            <CartSheet />
           </nav>
         </div>
       </div>
@@ -195,7 +191,13 @@
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
         <p class="text-sm text-gray-500">Hoikka - Opinionated Commerce for SvelteKit</p>
-        <a href="/admin" class="text-sm text-gray-500 hover:text-gray-900">Admin</a>
+        <div class="flex items-center gap-2">
+          <a href="/privacy-policy" class="text-sm text-gray-500 hover:text-gray-900"
+            >Privacy Policy</a
+          >
+          <Dot class="h-4 w-4 text-gray-500" />
+          <a href="/admin" class="text-sm text-gray-500 hover:text-gray-900">Admin</a>
+        </div>
       </div>
     </div>
   </footer>

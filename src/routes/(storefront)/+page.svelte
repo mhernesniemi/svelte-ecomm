@@ -119,7 +119,7 @@
 
         <!-- Demo Admin UI Login -->
         <div class="ml-12 flex flex-col">
-          <h2 class="mb-8 text-xl font-bold">Demo Admin UI</h2>
+          <h2 class="mb-8 text-xl font-bold">Admin UI Demo</h2>
 
           <div class="flex flex-1 flex-col rounded-lg border border-gray-300 bg-white p-6">
             <p class="mb-6 text-sm text-gray-600">
