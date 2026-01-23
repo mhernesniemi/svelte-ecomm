@@ -109,6 +109,8 @@ export class OrderService {
 			cartToken: newCartToken ?? undefined
 		});
 
+		console.log("[cart] created", { orderId: newOrder.id, customerId: customerId ?? null, isGuest: !customerId });
+
 		return {
 			order: await this.loadOrderRelations(newOrder),
 			cartToken: newCartToken,
@@ -179,6 +181,8 @@ export class OrderService {
 			// Delete the guest cart
 			await db.delete(orders).where(eq(orders.id, guestCart.id));
 
+			console.log("[cart] merged", { guestCartId: guestCart.id, targetCartId: existingCart.id, customerId, itemsMerged: guestLines.length });
+
 			return existingCart;
 		} else {
 			// Transfer ownership of guest cart to customer
@@ -190,6 +194,8 @@ export class OrderService {
 				})
 				.where(eq(orders.id, guestCart.id))
 				.returning();
+
+			console.log("[cart] transferred", { orderId: guestCart.id, customerId });
 
 			return updated;
 		}
@@ -376,6 +382,8 @@ export class OrderService {
 		// Create reservation for the new line
 		await reservationService.reserve(input.variantId, orderId, line.id, input.quantity);
 
+		console.log("[cart] item_added", { orderId, variantId: input.variantId, quantity: input.quantity, unitPrice: variant.price });
+
 		await this.recalculateTotals(orderId);
 		return line;
 	}
@@ -508,6 +516,8 @@ export class OrderService {
 			})
 			.onConflictDoNothing();
 
+		console.log("[order] promotion_applied", { orderId, promotionId: promotion.id, code, discountAmount });
+
 		await this.recalculateTotals(orderId);
 
 		return { success: true, message: `Discount of ${discountAmount / 100} applied` };
@@ -539,8 +549,11 @@ export class OrderService {
 		const currentState = order.state;
 
 		if (!isValidTransition(currentState, newState)) {
+			console.warn("[order] invalid_transition", { orderId, from: currentState, to: newState });
 			throw new Error(`Cannot transition from ${currentState} to ${newState}`);
 		}
+
+		console.log("[order] state_transition", { orderId, from: currentState, to: newState, total: order.total });
 
 		const updateData: Partial<Order> = {
 			state: newState
@@ -590,6 +603,8 @@ export class OrderService {
 					.where(eq(productVariants.id, line.variantId));
 			}
 
+			console.log("[inventory] stock_deducted", { orderId, lineCount: order.lines.length });
+
 			// Release reservations since stock has been permanently deducted
 			await reservationService.releaseForOrder(orderId);
 		}
@@ -604,9 +619,12 @@ export class OrderService {
 						.set({ stock: sql`${productVariants.stock} + ${line.quantity}` })
 						.where(eq(productVariants.id, line.variantId));
 				}
+				console.log("[inventory] stock_restored", { orderId, lineCount: order.lines.length });
 			}
 			// Release any remaining reservations
 			await reservationService.releaseForOrder(orderId);
+
+			console.log("[order] cancelled", { orderId, previousState: currentState, total: order.total });
 		}
 
 		return updated;

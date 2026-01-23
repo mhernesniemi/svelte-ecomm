@@ -44,6 +44,13 @@ export const load: PageServerLoad = async ({ locals }) => {
 		};
 	}
 
+	console.log("[checkout] started", {
+		orderId: cart.id,
+		total: cart.total,
+		itemCount: cart.lines?.length ?? 0,
+		customerId: locals.customer?.id ?? null
+	});
+
 	// Check if cart contains only digital products
 	const isDigitalOnly = await isCartDigitalOnly(cart.id);
 
@@ -189,6 +196,8 @@ export const actions: Actions = {
 			country
 		});
 
+		console.log("[checkout] shipping_address_set", { orderId: cart.id, country, postalCode });
+
 		// Reload cart to get updated shipping rates
 		const updatedCart = await orderService.getActiveCart({
 			customerId: locals.customer?.id,
@@ -273,6 +282,8 @@ export const actions: Actions = {
 			rateId,
 			parseInt(price)
 		);
+
+		console.log("[checkout] shipping_method_set", { orderId: cart.id, methodId, rateId, price: parseInt(price) });
 
 		// Recalculate totals with new shipping cost
 		await orderService.updateTotals(cart.id);
@@ -359,6 +370,13 @@ export const actions: Actions = {
 				const result = await paymentService.createPayment(order, parseInt(paymentMethodId));
 				payment = result.payment;
 				paymentInfo = result.paymentInfo;
+
+				console.log("[checkout] payment_created", {
+					orderId: cart.id,
+					paymentId: payment.id,
+					amount: payment.amount,
+					method: payment.method
+				});
 			}
 
 			return {
@@ -367,6 +385,7 @@ export const actions: Actions = {
 				paymentInfo
 			};
 		} catch (error) {
+			console.error("[checkout] payment_failed", { orderId: cart.id, error: (error as Error).message });
 			return fail(400, { error: (error as Error).message });
 		}
 	},
@@ -454,6 +473,13 @@ export const actions: Actions = {
 			if (isPaymentSuccessful(paymentStatus)) {
 				await orderService.transitionState(cart.id, "paid");
 
+				console.log("[order] completed", {
+					orderId: cart.id,
+					total: cart.total,
+					customerId: locals.customer?.id ?? null,
+					isDigitalOnly
+				});
+
 				const order = await orderService.getById(cart.id);
 				if (order) {
 					// Create shipment only for physical products
@@ -494,6 +520,7 @@ export const actions: Actions = {
 			if (error && typeof error === "object" && "status" in error && error.status === 303) {
 				throw error; // Re-throw redirect
 			}
+			console.error("[order] completion_failed", { orderId: cart.id, error: (error as Error).message });
 			return fail(400, { error: (error as Error).message });
 		}
 	}

@@ -4,7 +4,7 @@
  */
 import { withClerkHandler } from "svelte-clerk/server";
 import { sequence } from "@sveltejs/kit/hooks";
-import type { Handle } from "@sveltejs/kit";
+import type { Handle, HandleServerError } from "@sveltejs/kit";
 import { db } from "$lib/server/db/index.js";
 import { customers } from "$lib/server/db/schema.js";
 import { eq } from "drizzle-orm";
@@ -192,3 +192,22 @@ export const handle = sequence(
 	paymentInit,
 	adminAuth
 );
+
+// Handle uncaught server errors
+export const handleError: HandleServerError = async ({ error, event, status, message }) => {
+	const errorId = crypto.randomUUID();
+
+	console.error("[error]", {
+		id: errorId,
+		status,
+		message,
+		url: event.url.pathname,
+		method: event.request.method,
+		error: error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : error
+	});
+
+	return {
+		message: "An unexpected error occurred",
+		errorId
+	};
+};

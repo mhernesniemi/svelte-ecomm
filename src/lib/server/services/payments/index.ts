@@ -90,6 +90,8 @@ export class PaymentService {
 			})
 			.returning();
 
+		console.log("[payment] created", { paymentId: payment.id, orderId: order.id, amount: order.total, method: method.code });
+
 		return { payment, paymentInfo };
 	}
 
@@ -148,9 +150,11 @@ export class PaymentService {
 				})
 				.where(eq(payments.id, paymentId));
 
+			console.log("[payment] confirmed", { paymentId, orderId: payment.orderId, status, amount: payment.amount });
+
 			return status;
 		} catch (error) {
-			console.error("Error confirming payment:", error);
+			console.error("[payment] confirmation_failed", { paymentId, orderId: payment.orderId, error: (error as Error).message });
 			throw error;
 		}
 	}
@@ -202,9 +206,11 @@ export class PaymentService {
 				})
 				.where(eq(payments.id, paymentId));
 
+			console.log("[payment] refunded", { paymentId, orderId: payment.orderId, refundAmount, originalAmount: payment.amount });
+
 			return refundInfo;
 		} catch (error) {
-			console.error("Error refunding payment:", error);
+			console.error("[payment] refund_failed", { paymentId, orderId: payment.orderId, error: (error as Error).message });
 			throw error;
 		}
 	}
