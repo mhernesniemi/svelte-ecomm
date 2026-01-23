@@ -31,7 +31,7 @@
   <!-- Hero Section -->
   <section class="bg-gray-100 pt-10 pb-20">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex items-center gap-20">
+      <div class="flex items-center gap-16">
         <div>
           <a href="/" class="mb-6 inline-block bg-[#f7d0dd] text-xl font-bold text-gray-900"
             >"Hoikka"</a
