@@ -20,7 +20,7 @@
 </script>
 
 <svelte:head>
-  <title>Hoikka - Opinionated Commerce for SvelteKit</title>
+  <title>Hoikka - DX-first ecommerce platform</title>
   <meta
     name="description"
     content="Lightweight but powerful DX-first ecommerce platform built with SvelteKit. 100% customizable and owned by you."
