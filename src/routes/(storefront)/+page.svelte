@@ -142,8 +142,8 @@
                   type="email"
                   id="email"
                   name="email"
-                  required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                  disabled
+                  class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
                   placeholder="admin@example.com"
                 />
               </div>
@@ -156,8 +156,8 @@
                   type="password"
                   id="password"
                   name="password"
-                  required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none"
+                  disabled
+                  class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
                   placeholder="Enter password"
                 />
               </div>
