@@ -143,7 +143,7 @@
                   id="email"
                   name="email"
                   disabled
-                  class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
+                  class="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
                   placeholder="admin@example.com"
                 />
               </div>
@@ -157,7 +157,7 @@
                   id="password"
                   name="password"
                   disabled
-                  class="w-full rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
+                  class="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
                   placeholder="Enter password"
                 />
               </div>
