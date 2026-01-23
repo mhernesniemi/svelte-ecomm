@@ -37,11 +37,6 @@ export class DigitalDeliveryService {
 			return { sent: 0, errors: ["Order not found"] };
 		}
 
-		// Use email from order snapshot
-		if (!order.customerEmail) {
-			return { sent: 0, errors: ["No customer email on order"] };
-		}
-
 		// Load order lines with variants and products
 		const lines = await db
 			.select({
@@ -53,6 +48,17 @@ export class DigitalDeliveryService {
 			.innerJoin(productVariants, eq(orderLines.variantId, productVariants.id))
 			.innerJoin(products, eq(productVariants.productId, products.id))
 			.where(eq(orderLines.orderId, orderId));
+
+		// Check if order has any digital products
+		const digitalProducts = lines.filter(({ product }) => product.type === "digital");
+		if (digitalProducts.length === 0) {
+			return { sent: 0, errors: [] };
+		}
+
+		// Only require email if there are digital products to deliver
+		if (!order.customerEmail) {
+			return { sent: 0, errors: [`No customer email on order ${orderId}`] };
+		}
 
 		// Process each digital product
 		for (const { product } of lines) {
