@@ -37,7 +37,7 @@
       {#each data.collections as collection}
         {@const trans = getTranslation(collection.translations, "en")}
         <a
-          href="/collections/{trans?.slug}"
+          href="/collections/{collection.id}/{trans?.slug}"
           class="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
         >
           {#if collection.featuredAsset}

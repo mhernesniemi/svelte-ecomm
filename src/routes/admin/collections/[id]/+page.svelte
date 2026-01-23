@@ -121,7 +121,7 @@
       </span>
       {#if slugEn}
         <a
-          href="/collections/{slugEn}"
+          href="/collections/{data.collection.id}/{slugEn}"
           target="_blank"
           class="text-sm text-gray-500 hover:text-gray-700"
         >
