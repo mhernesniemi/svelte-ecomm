@@ -164,7 +164,7 @@
                 type="submit"
                 class="mt-4 w-full rounded-lg border bg-white px-4 py-2 font-semibold text-gray-900 transition-colors hover:bg-[#f7d0dd]/50"
               >
-                Log in
+                Log in to Admin
               </button>
             </form>
           </div>
