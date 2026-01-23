@@ -191,7 +191,7 @@
   </main>
 
   <!-- Footer -->
-  <footer class="mt-auto">
+  <footer class="mt-auto border-t border-gray-300">
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
         <p class="text-sm text-gray-500">Hoikka - Opinionated Commerce for SvelteKit</p>
