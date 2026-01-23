@@ -80,7 +80,7 @@
         {@const trans = getProductTranslation(product.translations, "en")}
         {@const lowestPrice = getLowestPrice(product.variants)}
         <a
-          href="/products/{trans?.slug}"
+          href="/products/{product.id}/{trans?.slug}"
           class="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
         >
           {#if product.featuredAsset}

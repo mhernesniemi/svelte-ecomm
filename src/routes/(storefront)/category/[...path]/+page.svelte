@@ -105,7 +105,7 @@
       {#each data.products as product}
         {#if product}
           <a
-            href="/products/{getProductSlug(product)}"
+            href="/products/{product.id}/{getProductSlug(product)}"
             class="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
           >
             <div

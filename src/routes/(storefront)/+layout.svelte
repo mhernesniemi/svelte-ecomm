@@ -81,11 +81,11 @@
     }
   });
 
-  function handleResultClick(slug: string) {
+  function handleResultClick(id: number, slug: string) {
     searchQuery = "";
     searchResults = [];
     showResults = false;
-    goto(`/products/${slug}`);
+    goto(`/products/${id}/${slug}`);
   }
 
 </script>
@@ -123,7 +123,7 @@
                 {#each searchResults as result}
                   <button
                     type="button"
-                    onclick={() => handleResultClick(result.slug)}
+                    onclick={() => handleResultClick(result.id, result.slug)}
                     class="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left last:border-b-0 hover:bg-gray-50"
                   >
                     {#if result.image}

@@ -163,7 +163,7 @@
       <h1 class="text-2xl font-bold">Edit Product</h1>
       {#if enTrans?.slug}
         <a
-          href="/products/{enTrans.slug}"
+          href="/products/{data.product.id}/{enTrans.slug}"
           target="_blank"
           class="text-sm text-gray-500 hover:text-gray-700"
         >

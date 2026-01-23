@@ -38,6 +38,10 @@
   function getImage(item: (typeof items)[0]): string | null {
     return item.product.featuredAsset?.source ?? item.product.assets[0]?.source ?? null;
   }
+
+  function getProductId(item: (typeof items)[0]): number {
+    return item.product.id;
+  }
 </script>
 
 <svelte:head>
@@ -78,13 +82,14 @@
       {#each items as item}
         {@const name = getName(item)}
         {@const slug = getSlug(item)}
+        {@const productId = getProductId(item)}
         {@const price = getPrice(item)}
         {@const stock = getStock(item)}
         {@const variantId = getVariantId(item)}
         {@const image = getImage(item)}
 
         <div class="flex gap-4 rounded-lg border p-4">
-          <a href="/products/{slug}" class="flex-shrink-0">
+          <a href="/products/{productId}/{slug}" class="flex-shrink-0">
             {#if image}
               <img
                 src="{image}?tr=w-120,h-120,fo-auto"
@@ -100,7 +105,7 @@
 
           <div class="flex flex-1 flex-col">
             <div class="flex items-start justify-between">
-              <a href="/products/{slug}" class="font-medium hover:text-blue-600">{name}</a>
+              <a href="/products/{productId}/{slug}" class="font-medium hover:text-blue-600">{name}</a>
               <span class="text-lg font-semibold">{(price / 100).toFixed(2)} EUR</span>
             </div>
 

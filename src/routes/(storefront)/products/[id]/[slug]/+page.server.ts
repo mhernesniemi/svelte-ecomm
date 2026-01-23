@@ -1,11 +1,17 @@
 import { productService } from "$lib/server/services/products.js";
 import { wishlistService } from "$lib/server/services/wishlist.js";
 import { reviewService } from "$lib/server/services/reviews.js";
-import { error, fail } from "@sveltejs/kit";
+import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-	const product = await productService.getBySlug(params.slug, "en");
+	const id = Number(params.id);
+
+	if (isNaN(id)) {
+		throw error(404, "Product not found");
+	}
+
+	const product = await productService.getById(id, "en");
 
 	if (!product || product.visibility === "hidden") {
 		throw error(404, "Product not found");
@@ -14,6 +20,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	// Private products require approved B2B status
 	if (product.visibility === "private" && locals.customer?.b2bStatus !== "approved") {
 		throw error(404, "Product not found");
+	}
+
+	// Redirect if slug doesn't match (for SEO and correct URLs)
+	const correctSlug = product.translations.find((t) => t.languageCode === "en")?.slug;
+	if (correctSlug && params.slug !== correctSlug) {
+		throw redirect(301, `/products/${id}/${correctSlug}`);
 	}
 
 	const [isWishlisted, rating, reviewsResult, customerReview] = await Promise.all([
@@ -46,7 +58,12 @@ export const actions: Actions = {
 			return fail(401, { reviewError: "You must be logged in to submit a review" });
 		}
 
-		const product = await productService.getBySlug(params.slug, "en");
+		const id = Number(params.id);
+		if (isNaN(id)) {
+			return fail(404, { reviewError: "Product not found" });
+		}
+
+		const product = await productService.getById(id, "en");
 		if (!product) {
 			return fail(404, { reviewError: "Product not found" });
 		}

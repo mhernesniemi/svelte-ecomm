@@ -141,7 +141,7 @@
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {#each data.products as product}
             <a
-              href="/products/{getProductSlug(product)}"
+              href="/products/{product.id}/{getProductSlug(product)}"
               class="group overflow-hidden rounded-lg border border-gray-300 bg-white transition-shadow hover:shadow-lg"
             >
               <div
