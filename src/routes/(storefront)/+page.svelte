@@ -123,7 +123,10 @@
           <h2 class="mb-8 text-xl font-bold">Demo Admin UI</h2>
 
           <div class="flex flex-1 flex-col rounded-lg border border-gray-300 bg-white p-6">
-            <p class="mb-6 text-sm text-gray-600">Log in to explore the admin dashboard.</p>
+            <p class="mb-6 text-sm text-gray-600">
+              Log in to explore the admin dashboard. Use the credentials that have been filled in
+              for you.
+            </p>
 
             {#if form?.error}
               <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
