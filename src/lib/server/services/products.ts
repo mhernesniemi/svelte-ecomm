@@ -221,10 +221,12 @@ export class ProductService {
 	}
 
 	/**
-	 * Soft delete a product
+	 * Soft delete a product and clean up translations
 	 */
 	async delete(id: number): Promise<boolean> {
-		const result = await db
+		await db.delete(productTranslations).where(eq(productTranslations.productId, id));
+
+		await db
 			.update(products)
 			.set({ deletedAt: new Date() })
 			.where(eq(products.id, id));
