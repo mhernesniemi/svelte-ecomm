@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { SignOutButton } from "svelte-clerk";
   import type { PageData, ActionData } from "./$types";
   import MapPin from "@lucide/svelte/icons/map-pin";
 
@@ -40,6 +41,9 @@
         >
           Addresses
         </a>
+        <SignOutButton class="block w-full rounded-lg px-4 py-2 text-left text-gray-600 hover:bg-gray-50">
+          Sign out
+        </SignOutButton>
       </nav>
     </aside>
 
@@ -460,11 +464,11 @@
                     {/if}
                   </div>
 
-                  <div class="mt-4 flex gap-3">
+                  <div class="mt-4 flex gap-2">
                     <button
                       type="button"
                       onclick={() => (editingAddressId = address.id)}
-                      class="text-sm font-medium text-blue-600 hover:text-blue-800"
+                      class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
                       Edit
                     </button>
@@ -473,7 +477,7 @@
                         <input type="hidden" name="addressId" value={address.id} />
                         <button
                           type="submit"
-                          class="text-sm font-medium text-gray-600 hover:text-gray-800"
+                          class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                         >
                           Set as default
                         </button>
@@ -488,7 +492,7 @@
                             e.preventDefault();
                           }
                         }}
-                        class="text-sm font-medium text-red-600 hover:text-red-800"
+                        class="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                       >
                         Delete
                       </button>

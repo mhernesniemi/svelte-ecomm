@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { UserProfile } from "svelte-clerk";
-  import type { PageData } from "./$types";
+  import { enhance } from "$app/forms";
+  import { SignOutButton } from "svelte-clerk";
+  import type { PageData, ActionData } from "./$types";
 
-  let { data }: { data: PageData } = $props();
+  let { data, form }: { data: PageData; form: ActionData } = $props();
 </script>
 
 <svelte:head>
@@ -32,6 +33,9 @@
         >
           Addresses
         </a>
+        <SignOutButton class="block w-full rounded-lg px-4 py-2 text-left text-gray-600 hover:bg-gray-50">
+          Sign out
+        </SignOutButton>
       </nav>
     </aside>
 
@@ -39,7 +43,98 @@
     <main class="md:col-span-3">
       <div class="rounded-lg bg-white p-6 shadow">
         <h2 class="mb-4 text-lg font-semibold">Profile Settings</h2>
-        <UserProfile routing="path" path="/account" />
+
+        {#if form?.error}
+          <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+            {form.error}
+          </div>
+        {/if}
+
+        {#if form?.success}
+          <div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-600">
+            Profile updated successfully
+          </div>
+        {/if}
+
+        {#if data.customer}
+          <form
+            method="POST"
+            action="?/updateProfile"
+            use:enhance={() => {
+              return async ({ update }) => {
+                await update({ reset: false });
+              };
+            }}
+            class="space-y-4"
+          >
+            <div>
+              <label for="email" class="mb-1 block text-sm font-medium text-gray-700">
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={data.customer.email}
+                disabled
+                class="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
+              />
+              <p class="mt-1 text-xs text-gray-500">Email cannot be changed</p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label for="firstName" class="mb-1 block text-sm font-medium text-gray-700">
+                  First Name
+                </label>
+                <input
+                  type="text"
+                  id="firstName"
+                  name="firstName"
+                  value={data.customer.firstName}
+                  required
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+              </div>
+              <div>
+                <label for="lastName" class="mb-1 block text-sm font-medium text-gray-700">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  name="lastName"
+                  value={data.customer.lastName}
+                  required
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label for="phone" class="mb-1 block text-sm font-medium text-gray-700">
+                Phone (optional)
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={data.customer.phone ?? ""}
+                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+              />
+            </div>
+
+            <div class="pt-2">
+              <button
+                type="submit"
+                class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
+        {:else}
+          <p class="text-gray-500">Unable to load profile data.</p>
+        {/if}
       </div>
     </main>
   </div>

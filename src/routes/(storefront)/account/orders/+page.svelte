@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { SignOutButton } from "svelte-clerk";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -61,6 +62,9 @@
         >
           Addresses
         </a>
+        <SignOutButton class="block w-full rounded-lg px-4 py-2 text-left text-gray-600 hover:bg-gray-50">
+          Sign out
+        </SignOutButton>
       </nav>
     </aside>
 
