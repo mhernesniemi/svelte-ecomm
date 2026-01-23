@@ -22,7 +22,7 @@
   <title>Hoikka - Opinionated Commerce for SvelteKit</title>
   <meta
     name="description"
-    content="Lightweight but powerful DX-first e-commerce platform built with SvelteKit. 100% customizable and owned by you."
+    content="Lightweight but powerful DX-first ecommerce platform built with SvelteKit. 100% customizable and owned by you."
   />
 </svelte:head>
 
@@ -37,7 +37,7 @@
           >
           <h1 class="mb-4 text-4xl font-bold md:text-5xl">Opinionated Commerce</h1>
           <p class="mb-10 text-lg leading-[1.75] text-gray-600">
-            Lightweight but powerful e-commerce gear, built with <span
+            Lightweight but powerful DX-first e-commerce gear, built with <span
               class="font-semibold text-gray-900">SvelteKit</span
             >.<br />
             It is truly <span class="font-semibold text-gray-900">100% customizable</span> and owned by
