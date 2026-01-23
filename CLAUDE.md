@@ -26,7 +26,7 @@ This is a **full-stack e-commerce platform** built with:
 ## UI Guidelines
 
 - Use shadcn/svelte for UI components where they provide value and install a new shadcn/svelte component if it's not available.
-- No dark theme
+- Prefer to use existing UI components if possible, for example `<Button>` instead of `<button>`.
 - Use global focus styles for all interactive elements
 
 ## Key Structure

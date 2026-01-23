@@ -1,6 +1,5 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { SignOutButton } from "svelte-clerk";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -11,131 +10,98 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-  <div class="mb-8">
-    <h1 class="text-2xl font-bold">My Account</h1>
-    <p class="mt-1 text-gray-600">Manage your account settings and view your orders</p>
-  </div>
+<div>
+  <h2 class="mb-4 text-lg font-semibold">Profile Settings</h2>
 
-  <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
-    <!-- Sidebar -->
-    <aside class="md:col-span-1">
-      <nav class="space-y-2">
-        <a href="/account" class="block rounded-lg bg-blue-50 px-4 py-2 font-medium text-blue-600">
-          Profile
-        </a>
-        <a href="/account/orders" class="block rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-50">
-          Order History
-        </a>
-        <a
-          href="/account/addresses"
-          class="block rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-50"
-        >
-          Addresses
-        </a>
-        <SignOutButton class="block w-full rounded-lg px-4 py-2 text-left text-gray-600 hover:bg-gray-50">
-          Sign out
-        </SignOutButton>
-      </nav>
-    </aside>
+  {#if form?.error}
+    <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
+      {form.error}
+    </div>
+  {/if}
 
-    <!-- Main Content -->
-    <main class="md:col-span-3">
-      <div class="rounded-lg bg-white p-6 shadow">
-        <h2 class="mb-4 text-lg font-semibold">Profile Settings</h2>
+  {#if form?.success}
+    <div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-600">
+      Profile updated successfully
+    </div>
+  {/if}
 
-        {#if form?.error}
-          <div class="mb-4 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-            {form.error}
-          </div>
-        {/if}
-
-        {#if form?.success}
-          <div class="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-600">
-            Profile updated successfully
-          </div>
-        {/if}
-
-        {#if data.customer}
-          <form
-            method="POST"
-            action="?/updateProfile"
-            use:enhance={() => {
-              return async ({ update }) => {
-                await update({ reset: false });
-              };
-            }}
-            class="space-y-4"
-          >
-            <div>
-              <label for="email" class="mb-1 block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={data.customer.email}
-                disabled
-                class="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
-              />
-              <p class="mt-1 text-xs text-gray-500">Email cannot be changed</p>
-            </div>
-
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label for="firstName" class="mb-1 block text-sm font-medium text-gray-700">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  id="firstName"
-                  name="firstName"
-                  value={data.customer.firstName}
-                  required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                />
-              </div>
-              <div>
-                <label for="lastName" class="mb-1 block text-sm font-medium text-gray-700">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  id="lastName"
-                  name="lastName"
-                  value={data.customer.lastName}
-                  required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label for="phone" class="mb-1 block text-sm font-medium text-gray-700">
-                Phone (optional)
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                name="phone"
-                value={data.customer.phone ?? ""}
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
-              />
-            </div>
-
-            <div class="pt-2">
-              <button
-                type="submit"
-                class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                Save Changes
-              </button>
-            </div>
-          </form>
-        {:else}
-          <p class="text-gray-500">Unable to load profile data.</p>
-        {/if}
+  {#if data.customer}
+    <form
+      method="POST"
+      action="?/updateProfile"
+      use:enhance={() => {
+        return async ({ update }) => {
+          await update({ reset: false });
+        };
+      }}
+      class="space-y-4"
+    >
+      <div>
+        <label for="email" class="mb-1 block text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          value={data.customer.email}
+          disabled
+          class="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
+        />
+        <p class="mt-1 text-xs text-gray-500">Email cannot be changed</p>
       </div>
-    </main>
-  </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label for="firstName" class="mb-1 block text-sm font-medium text-gray-700">
+            First Name
+          </label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={data.customer.firstName}
+            required
+            class="w-full rounded-lg border border-gray-300 px-3 py-2"
+          />
+        </div>
+        <div>
+          <label for="lastName" class="mb-1 block text-sm font-medium text-gray-700">
+            Last Name
+          </label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={data.customer.lastName}
+            required
+            class="w-full rounded-lg border border-gray-300 px-3 py-2"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label for="phone" class="mb-1 block text-sm font-medium text-gray-700">
+          Phone (optional)
+        </label>
+        <input
+          type="tel"
+          id="phone"
+          name="phone"
+          value={data.customer.phone ?? ""}
+          class="w-full rounded-lg border border-gray-300 px-3 py-2"
+        />
+      </div>
+
+      <div class="pt-2">
+        <button
+          type="submit"
+          class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+        >
+          Save Changes
+        </button>
+      </div>
+    </form>
+  {:else}
+    <p class="text-gray-500">Unable to load profile data.</p>
+  {/if}
 </div>
