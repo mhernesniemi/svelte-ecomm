@@ -40,12 +40,18 @@ describe("calculateDiscount", () => {
 		});
 
 		it("does not exceed order amount", () => {
-			const promotion = createPromotion({ discountType: "fixed_amount", discountValue: 5000 });
+			const promotion = createPromotion({
+				discountType: "fixed_amount",
+				discountValue: 5000
+			});
 			expect(calculateDiscount(promotion, 3000)).toBe(3000);
 		});
 
 		it("equals order amount when discount matches exactly", () => {
-			const promotion = createPromotion({ discountType: "fixed_amount", discountValue: 1000 });
+			const promotion = createPromotion({
+				discountType: "fixed_amount",
+				discountValue: 1000
+			});
 			expect(calculateDiscount(promotion, 1000)).toBe(1000);
 		});
 	});

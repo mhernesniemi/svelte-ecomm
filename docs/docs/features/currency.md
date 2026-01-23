@@ -19,11 +19,11 @@ All prices are stored in cents (minor units) to avoid floating-point errors:
 
 ```typescript
 // Product variant price
-variant.price = 2999;  // 29.99 EUR
+variant.price = 2999; // 29.99 EUR
 
 // Order totals
-order.subtotal = 5998;  // 59.98 EUR
-order.total = 6498;     // 64.98 EUR
+order.subtotal = 5998; // 59.98 EUR
+order.total = 6498; // 64.98 EUR
 ```
 
 ## Formatting Prices
@@ -31,54 +31,54 @@ order.total = 6498;     // 64.98 EUR
 Use the shared `formatPrice` helper for consistent display:
 
 ```typescript
-import { formatPrice } from '$lib/utils';
+import { formatPrice } from "$lib/utils";
 
 // Format with currency symbol
-formatPrice(2999);           // "29,99 €" (default EUR)
-formatPrice(2999, 'EUR');    // "29,99 €"
-formatPrice(2999, 'USD');    // "$29.99"
-formatPrice(2999, 'GBP');    // "£29.99"
-formatPrice(2999, 'SEK');    // "29,99 kr"
+formatPrice(2999); // "29,99 €" (default EUR)
+formatPrice(2999, "EUR"); // "29,99 €"
+formatPrice(2999, "USD"); // "$29.99"
+formatPrice(2999, "GBP"); // "£29.99"
+formatPrice(2999, "SEK"); // "29,99 kr"
 ```
 
 ### Available Functions
 
 ```typescript
 import {
-  formatPrice,
-  formatPriceNumber,
-  convertPrice,
-  getCurrencySymbol,
-  BASE_CURRENCY
-} from '$lib/utils';
+	formatPrice,
+	formatPriceNumber,
+	convertPrice,
+	getCurrencySymbol,
+	BASE_CURRENCY
+} from "$lib/utils";
 
 // Format with currency symbol
-formatPrice(2999, 'EUR');  // "29,99 €"
+formatPrice(2999, "EUR"); // "29,99 €"
 
 // Format number only (no symbol)
-formatPriceNumber(2999, 'EUR');  // "29,99"
+formatPriceNumber(2999, "EUR"); // "29,99"
 
 // Convert from base currency
-convertPrice(2999, 1.08);  // 3239 (EUR to USD at 1.08 rate)
+convertPrice(2999, 1.08); // 3239 (EUR to USD at 1.08 rate)
 
 // Get currency symbol
-getCurrencySymbol('EUR');  // "€"
-getCurrencySymbol('USD');  // "$"
+getCurrencySymbol("EUR"); // "€"
+getCurrencySymbol("USD"); // "$"
 
 // Base currency constant
-BASE_CURRENCY;  // "EUR"
+BASE_CURRENCY; // "EUR"
 ```
 
 ## Supported Currencies
 
-| Code | Symbol | Locale | Example |
-|------|--------|--------|---------|
-| EUR | € | fi-FI | 29,99 € |
-| USD | $ | en-US | $29.99 |
-| GBP | £ | en-GB | £29.99 |
-| SEK | kr | sv-SE | 29,99 kr |
-| NOK | kr | nb-NO | 29,99 kr |
-| DKK | kr | da-DK | 29,99 kr |
+| Code | Symbol | Locale | Example  |
+| ---- | ------ | ------ | -------- |
+| EUR  | €      | fi-FI  | 29,99 €  |
+| USD  | $      | en-US  | $29.99   |
+| GBP  | £      | en-GB  | £29.99   |
+| SEK  | kr     | sv-SE  | 29,99 kr |
+| NOK  | kr     | nb-NO  | 29,99 kr |
+| DKK  | kr     | da-DK  | 29,99 kr |
 
 ## Order Currency Fields
 
@@ -86,10 +86,10 @@ Orders store currency information for historical accuracy:
 
 ```typescript
 order = {
-  currencyCode: 'EUR',      // ISO 4217 currency code
-  exchangeRate: '1.000000', // Rate from EUR at order time
-  subtotal: 5998,           // Always in order's currency
-  total: 6498
+	currencyCode: "EUR", // ISO 4217 currency code
+	exchangeRate: "1.000000", // Rate from EUR at order time
+	subtotal: 5998, // Always in order's currency
+	total: 6498
 };
 ```
 
@@ -123,7 +123,7 @@ CREATE TABLE orders (
 
 ```svelte
 <script>
-  import { formatPrice } from '$lib/utils';
+	import { formatPrice } from "$lib/utils";
 </script>
 
 <!-- Product price -->
@@ -136,12 +136,12 @@ CREATE TABLE orders (
 ### Server-Side
 
 ```typescript
-import { formatPrice, convertPrice } from '$lib/utils';
+import { formatPrice, convertPrice } from "$lib/utils";
 
 // Calculate price in target currency
 const eurPrice = 2999;
 const exchangeRate = 1.08;
-const usdPrice = convertPrice(eurPrice, exchangeRate);  // 3239
+const usdPrice = convertPrice(eurPrice, exchangeRate); // 3239
 ```
 
 ## Adding Multi-Currency Support
@@ -152,16 +152,13 @@ The codebase is ready for multi-currency. To enable:
 
 ```typescript
 // src/lib/server/services/currency.ts
-export async function getExchangeRate(
-  from: string,
-  to: string
-): Promise<number> {
-  if (from === to) return 1;
+export async function getExchangeRate(from: string, to: string): Promise<number> {
+	if (from === to) return 1;
 
-  // Fetch from API (e.g., exchangerate-api.com)
-  const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${from}`);
-  const data = await response.json();
-  return data.rates[to];
+	// Fetch from API (e.g., exchangerate-api.com)
+	const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${from}`);
+	const data = await response.json();
+	return data.rates[to];
 }
 ```
 
@@ -169,12 +166,12 @@ export async function getExchangeRate(
 
 ```typescript
 // In order service
-const exchangeRate = await getExchangeRate('EUR', customerCurrency);
+const exchangeRate = await getExchangeRate("EUR", customerCurrency);
 
 await db.insert(orders).values({
-  currencyCode: customerCurrency,
-  exchangeRate: exchangeRate.toString(),
-  // ... totals converted to customer currency
+	currencyCode: customerCurrency,
+	exchangeRate: exchangeRate.toString()
+	// ... totals converted to customer currency
 });
 ```
 
@@ -183,9 +180,9 @@ await db.insert(orders).values({
 ```svelte
 <!-- Currency selector component -->
 <select bind:value={selectedCurrency}>
-  <option value="EUR">EUR (€)</option>
-  <option value="USD">USD ($)</option>
-  <option value="GBP">GBP (£)</option>
+	<option value="EUR">EUR (€)</option>
+	<option value="USD">USD ($)</option>
+	<option value="GBP">GBP (£)</option>
 </select>
 ```
 
@@ -193,11 +190,11 @@ await db.insert(orders).values({
 
 ```svelte
 <script>
-  import { formatPrice, convertPrice } from '$lib/utils';
+	import { formatPrice, convertPrice } from "$lib/utils";
 
-  let { price, baseCurrency, targetCurrency, exchangeRate } = $props();
+	let { price, baseCurrency, targetCurrency, exchangeRate } = $props();
 
-  const displayPrice = convertPrice(price, exchangeRate);
+	const displayPrice = convertPrice(price, exchangeRate);
 </script>
 
 <span>{formatPrice(displayPrice, targetCurrency)}</span>

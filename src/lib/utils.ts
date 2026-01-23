@@ -52,7 +52,10 @@ export function throttle<T extends (...args: Parameters<T>) => void>(
 export const BASE_CURRENCY = "EUR";
 
 /** Supported currencies with their locale and symbol info */
-const CURRENCY_CONFIG: Record<string, { locale: string; symbol: string; symbolPosition: "before" | "after" }> = {
+const CURRENCY_CONFIG: Record<
+	string,
+	{ locale: string; symbol: string; symbolPosition: "before" | "after" }
+> = {
 	EUR: { locale: "fi-FI", symbol: "€", symbolPosition: "after" },
 	USD: { locale: "en-US", symbol: "$", symbolPosition: "before" },
 	GBP: { locale: "en-GB", symbol: "£", symbolPosition: "before" },

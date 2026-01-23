@@ -87,112 +87,111 @@
     showResults = false;
     goto(`/products/${id}/${slug}`);
   }
-
 </script>
 
-<div class="min-h-screen bg-white">
+<div class="flex min-h-screen flex-col bg-white">
   <!-- Header (hidden on front page) -->
   {#if $page.url.pathname !== "/"}
-  <header>
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div class="flex h-16 items-center justify-between">
-        <a href="/" class="bg-[#f7d0dd] text-xl font-bold text-gray-900">"Hoikka"</a>
+    <header>
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 items-center justify-between">
+          <a href="/" class="bg-[#f7d0dd] text-xl font-bold text-gray-900">"Hoikka"</a>
 
-        <!-- Search Bar -->
-        <div class="relative mx-4 max-w-md flex-1">
-          <input
-            type="text"
-            bind:value={searchQuery}
-            onfocus={() => (showResults = true)}
-            onblur={() => setTimeout(() => (showResults = false), 200)}
-            placeholder="Search products..."
-            class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm"
-          />
-          {#if isSearching}
-            <div class="absolute top-1/2 right-3 -translate-y-1/2">
-              <Loader2 class="h-4 w-4 animate-spin text-gray-400" />
-            </div>
-          {/if}
+          <!-- Search Bar -->
+          <div class="relative mx-4 max-w-md flex-1">
+            <input
+              type="text"
+              bind:value={searchQuery}
+              onfocus={() => (showResults = true)}
+              onblur={() => setTimeout(() => (showResults = false), 200)}
+              placeholder="Search products..."
+              class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm"
+            />
+            {#if isSearching}
+              <div class="absolute top-1/2 right-3 -translate-y-1/2">
+                <Loader2 class="h-4 w-4 animate-spin text-gray-400" />
+              </div>
+            {/if}
 
-          <!-- Search Results Dropdown -->
-          {#if showResults && searchQuery.length >= 2}
-            <div
-              class="absolute top-full right-0 left-0 z-50 mt-1 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
-            >
-              {#if searchResults.length > 0}
-                {#each searchResults as result}
-                  <button
-                    type="button"
-                    onclick={() => handleResultClick(result.id, result.slug)}
-                    class="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left last:border-b-0 hover:bg-gray-50"
-                  >
-                    {#if result.image}
-                      <img src={result.image} alt="" class="h-10 w-10 rounded object-cover" />
-                    {:else}
-                      <div class="h-10 w-10 rounded bg-gray-100"></div>
-                    {/if}
-                    <div class="min-w-0 flex-1">
-                      <p class="truncate text-sm font-medium text-gray-900">{result.name}</p>
-                      <p class="text-sm text-gray-500">{formatPrice(result.price)}</p>
-                    </div>
-                  </button>
-                {/each}
-              {:else if !isSearching}
-                <div class="px-4 py-3 text-sm text-gray-500">No products found</div>
-              {/if}
-            </div>
-          {/if}
-        </div>
-
-        <nav class="flex items-center gap-6">
-          <a href="/products" class="text-gray-600 hover:text-gray-900">Products</a>
-
-          {#if wishlistCount > 0}
-            <a
-              href="/wishlist"
-              class="relative text-gray-600 hover:text-gray-900"
-              aria-label="Wishlist"
-            >
-              <Heart class="h-6 w-6" />
-              <span
-                class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+            <!-- Search Results Dropdown -->
+            {#if showResults && searchQuery.length >= 2}
+              <div
+                class="absolute top-full right-0 left-0 z-50 mt-1 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
               >
-                {wishlistCount}
-              </span>
-            </a>
-          {/if}
+                {#if searchResults.length > 0}
+                  {#each searchResults as result}
+                    <button
+                      type="button"
+                      onclick={() => handleResultClick(result.id, result.slug)}
+                      class="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left last:border-b-0 hover:bg-gray-50"
+                    >
+                      {#if result.image}
+                        <img src={result.image} alt="" class="h-10 w-10 rounded object-cover" />
+                      {:else}
+                        <div class="h-10 w-10 rounded bg-gray-100"></div>
+                      {/if}
+                      <div class="min-w-0 flex-1">
+                        <p class="truncate text-sm font-medium text-gray-900">{result.name}</p>
+                        <p class="text-sm text-gray-500">{formatPrice(result.price)}</p>
+                      </div>
+                    </button>
+                  {/each}
+                {:else if !isSearching}
+                  <div class="px-4 py-3 text-sm text-gray-500">No products found</div>
+                {/if}
+              </div>
+            {/if}
+          </div>
 
-          <CartSheet />
+          <nav class="flex items-center gap-6">
+            <a href="/products" class="text-gray-600 hover:text-gray-900">Products</a>
 
-          <!-- Auth UI -->
-          <SignedIn>
-            <a href="/account" class="text-sm text-gray-600 hover:text-gray-900">Account</a>
-            <UserButton />
-          </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <button class="text-sm text-gray-600 hover:text-gray-900">Sign in</button>
-            </SignInButton>
-            <a
-              href="/sign-up"
-              class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
-            >
-              Sign up
-            </a>
-          </SignedOut>
-        </nav>
+            {#if wishlistCount > 0}
+              <a
+                href="/wishlist"
+                class="relative text-gray-600 hover:text-gray-900"
+                aria-label="Wishlist"
+              >
+                <Heart class="h-6 w-6" />
+                <span
+                  class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+                >
+                  {wishlistCount}
+                </span>
+              </a>
+            {/if}
+
+            <CartSheet />
+
+            <!-- Auth UI -->
+            <SignedIn>
+              <a href="/account" class="text-sm text-gray-600 hover:text-gray-900">Account</a>
+              <UserButton />
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <button class="text-sm text-gray-600 hover:text-gray-900">Sign in</button>
+              </SignInButton>
+              <a
+                href="/sign-up"
+                class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+              >
+                Sign up
+              </a>
+            </SignedOut>
+          </nav>
+        </div>
       </div>
-    </div>
-  </header>
+    </header>
   {/if}
 
   <!-- Main Content -->
-  <main>
+  <main class="flex-1">
     {@render children()}
   </main>
 
   <!-- Footer -->
-  <footer class="mt-auto border-t">
+  <footer class="mt-auto">
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
         <p class="text-sm text-gray-500">Hoikka - Opinionated Commerce for SvelteKit</p>

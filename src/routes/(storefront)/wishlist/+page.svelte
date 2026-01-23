@@ -105,7 +105,9 @@
 
           <div class="flex flex-1 flex-col">
             <div class="flex items-start justify-between">
-              <a href="/products/{productId}/{slug}" class="font-medium hover:text-blue-600">{name}</a>
+              <a href="/products/{productId}/{slug}" class="font-medium hover:text-blue-600"
+                >{name}</a
+              >
               <span class="text-lg font-semibold">{(price / 100).toFixed(2)} EUR</span>
             </div>
 

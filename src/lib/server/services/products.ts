@@ -226,10 +226,7 @@ export class ProductService {
 	async delete(id: number): Promise<boolean> {
 		await db.delete(productTranslations).where(eq(productTranslations.productId, id));
 
-		await db
-			.update(products)
-			.set({ deletedAt: new Date() })
-			.where(eq(products.id, id));
+		await db.update(products).set({ deletedAt: new Date() }).where(eq(products.id, id));
 
 		return true;
 	}

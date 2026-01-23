@@ -283,7 +283,12 @@ export const actions: Actions = {
 			parseInt(price)
 		);
 
-		console.log("[checkout] shipping_method_set", { orderId: cart.id, methodId, rateId, price: parseInt(price) });
+		console.log("[checkout] shipping_method_set", {
+			orderId: cart.id,
+			methodId,
+			rateId,
+			price: parseInt(price)
+		});
 
 		// Recalculate totals with new shipping cost
 		await orderService.updateTotals(cart.id);
@@ -385,7 +390,10 @@ export const actions: Actions = {
 				paymentInfo
 			};
 		} catch (error) {
-			console.error("[checkout] payment_failed", { orderId: cart.id, error: (error as Error).message });
+			console.error("[checkout] payment_failed", {
+				orderId: cart.id,
+				error: (error as Error).message
+			});
 			return fail(400, { error: (error as Error).message });
 		}
 	},
@@ -520,7 +528,10 @@ export const actions: Actions = {
 			if (error && typeof error === "object" && "status" in error && error.status === 303) {
 				throw error; // Re-throw redirect
 			}
-			console.error("[order] completion_failed", { orderId: cart.id, error: (error as Error).message });
+			console.error("[order] completion_failed", {
+				orderId: cart.id,
+				error: (error as Error).message
+			});
 			return fail(400, { error: (error as Error).message });
 		}
 	}

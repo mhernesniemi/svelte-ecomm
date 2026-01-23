@@ -17,7 +17,7 @@
  * Note: This is CLIENT-SIDE state. Don't try to call from server code.
  */
 
-import type { OrderWithRelations } from '$lib/types';
+import type { OrderWithRelations } from "$lib/types";
 
 let isOpen = $state(false);
 let isLoading = $state(false);

@@ -203,7 +203,10 @@ export const handleError: HandleServerError = async ({ error, event, status, mes
 		message,
 		url: event.url.pathname,
 		method: event.request.method,
-		error: error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : error
+		error:
+			error instanceof Error
+				? { name: error.name, message: error.message, stack: error.stack }
+				: error
 	});
 
 	return {

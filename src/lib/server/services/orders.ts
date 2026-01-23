@@ -109,7 +109,11 @@ export class OrderService {
 			cartToken: newCartToken ?? undefined
 		});
 
-		console.log("[cart] created", { orderId: newOrder.id, customerId: customerId ?? null, isGuest: !customerId });
+		console.log("[cart] created", {
+			orderId: newOrder.id,
+			customerId: customerId ?? null,
+			isGuest: !customerId
+		});
 
 		return {
 			order: await this.loadOrderRelations(newOrder),
@@ -181,7 +185,12 @@ export class OrderService {
 			// Delete the guest cart
 			await db.delete(orders).where(eq(orders.id, guestCart.id));
 
-			console.log("[cart] merged", { guestCartId: guestCart.id, targetCartId: existingCart.id, customerId, itemsMerged: guestLines.length });
+			console.log("[cart] merged", {
+				guestCartId: guestCart.id,
+				targetCartId: existingCart.id,
+				customerId,
+				itemsMerged: guestLines.length
+			});
 
 			return existingCart;
 		} else {
@@ -382,7 +391,12 @@ export class OrderService {
 		// Create reservation for the new line
 		await reservationService.reserve(input.variantId, orderId, line.id, input.quantity);
 
-		console.log("[cart] item_added", { orderId, variantId: input.variantId, quantity: input.quantity, unitPrice: variant.price });
+		console.log("[cart] item_added", {
+			orderId,
+			variantId: input.variantId,
+			quantity: input.quantity,
+			unitPrice: variant.price
+		});
 
 		await this.recalculateTotals(orderId);
 		return line;
@@ -516,7 +530,12 @@ export class OrderService {
 			})
 			.onConflictDoNothing();
 
-		console.log("[order] promotion_applied", { orderId, promotionId: promotion.id, code, discountAmount });
+		console.log("[order] promotion_applied", {
+			orderId,
+			promotionId: promotion.id,
+			code,
+			discountAmount
+		});
 
 		await this.recalculateTotals(orderId);
 
@@ -549,11 +568,20 @@ export class OrderService {
 		const currentState = order.state;
 
 		if (!isValidTransition(currentState, newState)) {
-			console.warn("[order] invalid_transition", { orderId, from: currentState, to: newState });
+			console.warn("[order] invalid_transition", {
+				orderId,
+				from: currentState,
+				to: newState
+			});
 			throw new Error(`Cannot transition from ${currentState} to ${newState}`);
 		}
 
-		console.log("[order] state_transition", { orderId, from: currentState, to: newState, total: order.total });
+		console.log("[order] state_transition", {
+			orderId,
+			from: currentState,
+			to: newState,
+			total: order.total
+		});
 
 		const updateData: Partial<Order> = {
 			state: newState
@@ -619,12 +647,19 @@ export class OrderService {
 						.set({ stock: sql`${productVariants.stock} + ${line.quantity}` })
 						.where(eq(productVariants.id, line.variantId));
 				}
-				console.log("[inventory] stock_restored", { orderId, lineCount: order.lines.length });
+				console.log("[inventory] stock_restored", {
+					orderId,
+					lineCount: order.lines.length
+				});
 			}
 			// Release any remaining reservations
 			await reservationService.releaseForOrder(orderId);
 
-			console.log("[order] cancelled", { orderId, previousState: currentState, total: order.total });
+			console.log("[order] cancelled", {
+				orderId,
+				previousState: currentState,
+				total: order.total
+			});
 		}
 
 		return updated;

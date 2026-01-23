@@ -13,14 +13,14 @@ created → payment_pending → paid → shipped → delivered
                               ↘ cancelled
 ```
 
-| State             | Description               |
-| ----------------- | ------------------------- |
-| `created`         | Cart converted to order   |
-| `payment_pending` | Awaiting payment          |
-| `paid`            | Payment received          |
-| `shipped`         | Shipped to customer       |
-| `delivered`       | Received by customer      |
-| `cancelled`       | Order cancelled           |
+| State             | Description             |
+| ----------------- | ----------------------- |
+| `created`         | Cart converted to order |
+| `payment_pending` | Awaiting payment        |
+| `paid`            | Payment received        |
+| `shipped`         | Shipped to customer     |
+| `delivered`       | Received by customer    |
+| `cancelled`       | Order cancelled         |
 
 ## Creating Orders
 
@@ -45,11 +45,11 @@ const order = await orderService.createFromCart(cartId, {
 
 ```typescript
 // Transition to next state
-await orderService.transition(orderId, 'payment_pending');
-await orderService.transition(orderId, 'paid');
-await orderService.transition(orderId, 'shipped');
-await orderService.transition(orderId, 'delivered');
-await orderService.transition(orderId, 'cancelled');
+await orderService.transition(orderId, "payment_pending");
+await orderService.transition(orderId, "paid");
+await orderService.transition(orderId, "shipped");
+await orderService.transition(orderId, "delivered");
+await orderService.transition(orderId, "cancelled");
 ```
 
 ## Order Lines

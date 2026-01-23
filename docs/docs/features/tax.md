@@ -16,12 +16,12 @@ Hoikka uses a **gross pricing strategy** where all prices include VAT. This foll
 
 Finnish VAT rates are supported:
 
-| Code       | Rate | Description           |
-| ---------- | ---- | --------------------- |
+| Code       | Rate | Description             |
+| ---------- | ---- | ----------------------- |
 | `standard` | 24%  | Default (most products) |
-| `food`     | 14%  | Food items            |
-| `books`    | 10%  | Books, newspapers     |
-| `zero`     | 0%   | Exports, exempt       |
+| `food`     | 14%  | Food items              |
+| `books`    | 10%  | Books, newspapers       |
+| `zero`     | 0%   | Exports, exempt         |
 
 ## Product Tax Code
 
@@ -30,14 +30,14 @@ Each product has a `taxCode` field:
 ```typescript
 // Default is 'standard' (24%)
 const product = {
-  id: 123,
-  taxCode: 'standard',  // or 'food', 'books', 'zero'
-  // ...
+	id: 123,
+	taxCode: "standard" // or 'food', 'books', 'zero'
+	// ...
 };
 
 // Update product tax code
 await productService.update(productId, {
-  taxCode: 'food'  // 14% VAT
+	taxCode: "food" // 14% VAT
 });
 ```
 
@@ -46,7 +46,7 @@ await productService.update(productId, {
 Tax is back-calculated from the gross price:
 
 ```typescript
-import { taxService } from '$lib/server/services/tax.js';
+import { taxService } from "$lib/server/services/tax.js";
 
 // Calculate tax breakdown
 const result = taxService.calculateTax(2480, 0.24);
@@ -63,11 +63,11 @@ Orders track tax information:
 
 ```typescript
 order = {
-  subtotal: 4960,      // Gross subtotal (VAT-inclusive)
-  taxTotal: 960,       // Total VAT amount
-  totalNet: 4000,      // Subtotal minus VAT
-  isTaxExempt: false,  // B2B exemption flag
-  total: 5960          // Final total
+	subtotal: 4960, // Gross subtotal (VAT-inclusive)
+	taxTotal: 960, // Total VAT amount
+	totalNet: 4000, // Subtotal minus VAT
+	isTaxExempt: false, // B2B exemption flag
+	total: 5960 // Final total
 };
 ```
 
@@ -77,13 +77,13 @@ Each order line stores tax details:
 
 ```typescript
 orderLine = {
-  unitPrice: 2480,      // Gross unit price
-  unitPriceNet: 2000,   // Net unit price
-  lineTotal: 4960,      // Gross line total
-  lineTotalNet: 4000,   // Net line total
-  taxCode: 'standard',
-  taxRate: '0.24',
-  taxAmount: 960
+	unitPrice: 2480, // Gross unit price
+	unitPriceNet: 2000, // Net unit price
+	lineTotal: 4960, // Gross line total
+	lineTotalNet: 4000, // Net line total
+	taxCode: "standard",
+	taxRate: "0.24",
+	taxAmount: 960
 };
 ```
 
@@ -140,10 +140,10 @@ Net amount: 45.00 EUR (VAT 0%)
 ## Tax Service API
 
 ```typescript
-import { taxService } from '$lib/server/services/tax.js';
+import { taxService } from "$lib/server/services/tax.js";
 
 // Get rate for a tax code
-const rate = await taxService.getTaxRate('standard');  // 0.24
+const rate = await taxService.getTaxRate("standard"); // 0.24
 
 // Get all available rates
 const rates = await taxService.getAllTaxRates();
@@ -153,12 +153,7 @@ const rates = await taxService.getAllTaxRates();
 const { gross, net, tax } = taxService.calculateTax(2480, 0.24);
 
 // Calculate line item tax
-const lineTax = taxService.calculateLineTax(
-  grossUnitPrice,
-  quantity,
-  taxRate,
-  isTaxExempt
-);
+const lineTax = taxService.calculateLineTax(grossUnitPrice, quantity, taxRate, isTaxExempt);
 
 // Check customer exemption
 const exempt = await taxService.isCustomerTaxExempt(customerId);

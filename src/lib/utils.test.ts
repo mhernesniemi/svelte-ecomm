@@ -1,11 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import {
-	formatPrice,
-	formatPriceNumber,
-	convertPrice,
-	getCurrencySymbol,
-	throttle
-} from "./utils";
+import { formatPrice, formatPriceNumber, convertPrice, getCurrencySymbol, throttle } from "./utils";
 
 describe("formatPrice", () => {
 	it("formats EUR price with Finnish locale", () => {

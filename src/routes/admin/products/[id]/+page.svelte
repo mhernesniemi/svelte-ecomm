@@ -624,8 +624,8 @@
                   <img
                     src="{asset.source}?tr=w-150,h-150,fo-auto"
                     alt={asset.name}
-                    class="h-24 w-full rounded border border-gray-200 object-cover {data.product.featuredAssetId ===
-                    asset.id
+                    class="h-24 w-full rounded border border-gray-200 object-cover {data.product
+                      .featuredAssetId === asset.id
                       ? 'ring-2 ring-blue-500'
                       : ''}"
                   />

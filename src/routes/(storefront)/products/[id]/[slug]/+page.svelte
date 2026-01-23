@@ -122,7 +122,10 @@
 
 <svelte:head>
   <title>{enTrans?.name ?? "Product"} | Hoikka</title>
-  <meta name="description" content={enTrans?.description?.slice(0, 160) ?? "View product details and add to cart."} />
+  <meta
+    name="description"
+    content={enTrans?.description?.slice(0, 160) ?? "View product details and add to cart."}
+  />
   {#if product.featuredAsset}
     <meta property="og:image" content={product.featuredAsset.source} />
   {/if}
