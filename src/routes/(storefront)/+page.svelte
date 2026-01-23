@@ -38,7 +38,7 @@
           >
           <h1 class="mb-4 text-4xl font-bold md:text-5xl">Opinionated Commerce</h1>
           <p class="mb-10 text-lg leading-[1.75] text-gray-600">
-            Lightweight but powerful ecommerce gear, designed for developers.<br />
+            Lightweight but powerful e-commerce gear, designed for developers.<br />
             It's 100% customizable and owned by you.
             <span class="text-gray-900 italic">Built with SvelteKit.</span>
           </p>
