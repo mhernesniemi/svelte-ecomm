@@ -65,7 +65,10 @@
 
 <svelte:head>
   <title>{pageTitle}</title>
-  <meta name="description" content="Browse our collection of products. Filter by category, brand, and more." />
+  <meta
+    name="description"
+    content="Browse our collection of products. Filter by category, brand, and more."
+  />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -139,7 +142,7 @@
           {#each data.products as product}
             <a
               href="/products/{getProductSlug(product)}"
-              class="group overflow-hidden rounded-lg border bg-white transition-shadow hover:shadow-lg"
+              class="group overflow-hidden rounded-lg border border-gray-300 bg-white transition-shadow hover:shadow-lg"
             >
               <div
                 class="relative aspect-square bg-gray-100"
