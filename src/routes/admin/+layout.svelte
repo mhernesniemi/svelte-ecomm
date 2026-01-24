@@ -12,8 +12,7 @@
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
   import Users from "@lucide/svelte/icons/users";
-  import UsersRound from "@lucide/svelte/icons/users-round";
-  import Star from "@lucide/svelte/icons/star";
+    import Star from "@lucide/svelte/icons/star";
   import Tag from "@lucide/svelte/icons/tag";
 
   let { children, data }: { children: any; data: LayoutData } = $props();
@@ -32,7 +31,6 @@
     { href: "/admin/collections", label: "Collections", icon: "folder" },
     { href: "/admin/orders", label: "Orders", icon: "shopping-cart" },
     { href: "/admin/customers", label: "Customers", icon: "users" },
-    { href: "/admin/customer-groups", label: "Customer Groups", icon: "user-group" },
     { href: "/admin/reviews", label: "Reviews", icon: "star" },
     { href: "/admin/promotions", label: "Promotions", icon: "tag" }
   ];
@@ -80,8 +78,6 @@
               <Tag class="h-5 w-5" />
             {:else if item.icon === "folder"}
               <FolderOpen class="h-5 w-5" />
-            {:else if item.icon === "user-group"}
-              <UsersRound class="h-5 w-5" />
             {:else if item.icon === "star"}
               <Star class="h-5 w-5" />
             {/if}
