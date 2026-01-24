@@ -2,6 +2,14 @@ import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { categoryService } from "$lib/server/services/categories.js";
 import { productService } from "$lib/server/services/products.js";
+import { BYPASS_TOKEN } from "$env/static/private";
+
+export const config = {
+	isr: {
+		expiration: 60,
+		bypassToken: BYPASS_TOKEN
+	}
+};
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const pathSegments = params.path.split("/").filter(Boolean);

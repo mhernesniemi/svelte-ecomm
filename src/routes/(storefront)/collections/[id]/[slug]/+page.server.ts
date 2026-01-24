@@ -1,6 +1,14 @@
 import type { PageServerLoad } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { error, redirect } from "@sveltejs/kit";
+import { BYPASS_TOKEN } from "$env/static/private";
+
+export const config = {
+	isr: {
+		expiration: 60,
+		bypassToken: BYPASS_TOKEN
+	}
+};
 
 export const load: PageServerLoad = async ({ params, url }) => {
 	const id = Number(params.id);

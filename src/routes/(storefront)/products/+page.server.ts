@@ -1,7 +1,15 @@
 import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
+import { BYPASS_TOKEN } from "$env/static/private";
 import type { PageServerLoad } from "./$types";
 import type { FacetCount, FacetWithValues } from "$lib/types.js";
+
+export const config = {
+	isr: {
+		expiration: 60,
+		bypassToken: BYPASS_TOKEN
+	}
+};
 
 export const load: PageServerLoad = async ({ url }) => {
 	const search = url.searchParams.get("q") ?? undefined;

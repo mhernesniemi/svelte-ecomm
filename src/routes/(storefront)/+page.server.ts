@@ -2,7 +2,15 @@ import { productService } from "$lib/server/services/products.js";
 import { fail, redirect } from "@sveltejs/kit";
 import { dev } from "$app/environment";
 import { authService } from "$lib/server/services/auth.js";
+import { BYPASS_TOKEN } from "$env/static/private";
 import type { PageServerLoad, Actions } from "./$types";
+
+export const config = {
+	isr: {
+		expiration: 60,
+		bypassToken: BYPASS_TOKEN
+	}
+};
 
 const ADMIN_SESSION_COOKIE = "admin_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
