@@ -1,9 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { onMount } from "svelte";
   import { addToCart } from "$lib/remote/cart.remote";
   import { toggleWishlist } from "$lib/remote/wishlist.remote";
-  import { getVariantStock } from "$lib/remote/stock.remote";
   import { invalidateAll } from "$app/navigation";
   import { cartStore } from "$lib/stores/cart.svelte";
   import { wishlistStore } from "$lib/stores/wishlist.svelte";
@@ -16,7 +14,6 @@
   import ImageIcon from "@lucide/svelte/icons/image";
   import Heart from "@lucide/svelte/icons/heart";
   import CheckIcon from "@lucide/svelte/icons/check";
-  import Loader2 from "@lucide/svelte/icons/loader-2";
   import type { PageData, ActionData } from "./$types";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
 
@@ -32,39 +29,8 @@
   let message = $state<{ type: "success" | "error"; text: string } | null>(null);
   let selectedImageIndex = $state(0);
 
-  // Stock fetching state - bypasses ISR cache for real-time availability
-  let stockMap = $state<Map<number, number>>(new Map());
-  let stockLoading = $state(true);
-
   // Use override if set (after toggle), otherwise use server data
   const isWishlisted = $derived(wishlistOverride ?? data.isWishlisted);
-
-  // Get current stock from dynamic fetch, fallback to server-rendered data
-  const currentStock = $derived.by(() => {
-    const selected = product.variants.find((v) => v.id === selectedVariantId);
-    if (!selected) return 0;
-    if (stockMap.has(selected.id)) {
-      return stockMap.get(selected.id)!;
-    }
-    return selected.stock;
-  });
-
-  // Fetch real-time stock on mount
-  onMount(async () => {
-    const variantIds = product.variants.map((v) => v.id);
-    try {
-      const stockData = await getVariantStock(variantIds);
-      const newMap = new Map<number, number>();
-      for (const { variantId, stock } of stockData) {
-        newMap.set(variantId, stock);
-      }
-      stockMap = newMap;
-    } catch {
-      // On error, fall back to server-rendered stock data
-    } finally {
-      stockLoading = false;
-    }
-  });
 
   const images = $derived(
     product.assets.length > 0
@@ -274,12 +240,7 @@
       <!-- Stock Status -->
       {#if selectedVariant}
         <div class="mb-3 text-sm">
-          {#if stockLoading}
-            <div class="flex items-center gap-2 text-gray-500">
-              <Loader2 class="h-4 w-4 animate-spin" />
-              <span>Checking availability...</span>
-            </div>
-          {:else if currentStock > 0}
+          {#if selectedVariant.stock > 0}
             <div class="flex items-center gap-2">
               <CheckIcon class="h-4 w-4 text-green-600" />
               <span class="text-green-600">In stock</span>
@@ -291,21 +252,9 @@
       {/if}
 
       <!-- Add to Cart -->
-      {#if selectedVariant}
-        <Button
-          type="button"
-          size="xl"
-          onclick={handleAddToCart}
-          disabled={stockLoading || currentStock === 0}
-          class="flex-1 py-3"
-        >
-          {#if stockLoading}
-            Checking availability...
-          {:else if currentStock === 0}
-            Out of Stock
-          {:else}
-            Add to Cart
-          {/if}
+      {#if selectedVariant && selectedVariant.stock > 0}
+        <Button type="button" size="xl" onclick={handleAddToCart} class="flex-1 py-3">
+          Add to Cart
         </Button>
       {/if}
     </div>
