@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Card } from "$lib/components/admin/ui/card";
   import type { PageData } from "./$types";
   import Tag from "@lucide/svelte/icons/tag";
 
@@ -27,7 +28,7 @@
 
   <!-- Create Facet Form -->
   {#if showCreateFacet}
-    <div class="mb-6 rounded-lg bg-white p-6 shadow">
+    <Card class="mb-6 p-6">
       <h2 class="mb-4 font-semibold">Create New Facet</h2>
       <form
         method="POST"
@@ -70,7 +71,7 @@
           <Button type="submit">Create Facet</Button>
         </div>
       </form>
-    </div>
+    </Card>
   {/if}
 
   <!-- Facets List -->
@@ -88,7 +89,7 @@
   {:else}
     <div class="space-y-6">
       {#each data.facets as facet}
-        <div class="rounded-lg bg-white shadow">
+        <Card>
           <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
             <div>
               <h2 class="font-semibold">{getTranslation(facet.translations)}</h2>
@@ -175,7 +176,7 @@
               </div>
             {/if}
           </div>
-        </div>
+        </Card>
       {/each}
     </div>
   {/if}

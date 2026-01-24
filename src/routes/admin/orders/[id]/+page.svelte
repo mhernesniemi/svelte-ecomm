@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Button } from "$lib/components/admin/ui/button";
+  import { Card } from "$lib/components/admin/ui/card";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -38,7 +39,7 @@
     <!-- Order Details -->
     <div class="space-y-6 lg:col-span-2">
       <!-- Status -->
-      <div class="rounded-lg bg-white p-6 shadow">
+      <Card class="p-6">
         <h2 class="mb-4 font-semibold">Order Status</h2>
         <div class="flex items-center gap-4">
           <span
@@ -65,10 +66,10 @@
             </div>
           {/if}
         </div>
-      </div>
+      </Card>
 
       <!-- Line Items -->
-      <div class="rounded-lg bg-white shadow">
+      <Card>
         <div class="border-b border-gray-200 px-6 py-4">
           <h2 class="font-semibold">Items</h2>
         </div>
@@ -91,12 +92,12 @@
             </div>
           {/each}
         </div>
-      </div>
+      </Card>
     </div>
 
     <!-- Order Summary -->
     <div class="space-y-6">
-      <div class="rounded-lg bg-white p-6 shadow">
+      <Card class="p-6">
         <h2 class="mb-4 font-semibold">Summary</h2>
         <dl class="space-y-2">
           <div class="flex justify-between">
@@ -118,10 +119,10 @@
             <dd>{(data.order.total / 100).toFixed(2)} {data.order.currencyCode}</dd>
           </div>
         </dl>
-      </div>
+      </Card>
 
       {#if data.order.shippingFullName}
-        <div class="rounded-lg bg-white p-6 shadow">
+        <Card class="p-6">
           <h2 class="mb-4 font-semibold">Shipping Address</h2>
           <address class="text-sm text-gray-600 not-italic">
             <p class="font-medium text-gray-900">{data.order.shippingFullName}</p>
@@ -132,11 +133,11 @@
             <p>{data.order.shippingPostalCode} {data.order.shippingCity}</p>
             <p>{data.order.shippingCountry}</p>
           </address>
-        </div>
+        </Card>
       {/if}
 
       {#if data.orderShipping && data.shippingMethod}
-        <div class="rounded-lg bg-white p-6 shadow">
+        <Card class="p-6">
           <h2 class="mb-4 font-semibold">Shipping Information</h2>
           <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
@@ -187,11 +188,11 @@
               </Button>
             </form>
           {/if}
-        </div>
+        </Card>
       {/if}
 
       {#if data.payment && data.paymentMethod}
-        <div class="rounded-lg bg-white p-6 shadow">
+        <Card class="p-6">
           <h2 class="mb-4 font-semibold">Payment Information</h2>
           <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
@@ -248,10 +249,10 @@
               </Button>
             </form>
           {/if}
-        </div>
+        </Card>
       {/if}
 
-      <div class="rounded-lg bg-white p-6 shadow">
+      <Card class="p-6">
         <h2 class="mb-4 font-semibold">Details</h2>
         <dl class="space-y-2 text-sm">
           <div class="flex justify-between">
@@ -269,7 +270,7 @@
             </div>
           {/if}
         </dl>
-      </div>
+      </Card>
     </div>
   </div>
 </div>

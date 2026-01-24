@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Card } from "$lib/components/admin/ui/card";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -157,7 +158,7 @@
     }}
     class="space-y-6"
   >
-    <div class="overflow-hidden rounded-lg bg-white shadow">
+    <Card class="overflow-hidden">
       <div class="p-6">
         <h2 class="mb-4 text-lg font-medium text-gray-900">Basic Information</h2>
 
@@ -314,11 +315,11 @@
           </Button>
         </div>
       </div>
-    </div>
+    </Card>
   </form>
 
   <!-- Collection Filters -->
-  <div class="overflow-hidden rounded-lg bg-white shadow">
+  <Card class="overflow-hidden">
     <div class="p-6">
       <h2 class="mb-4 text-lg font-medium text-gray-900">Collection Filters</h2>
       <p class="mb-4 text-sm text-gray-600">
@@ -567,11 +568,11 @@
         </div>
       </form>
     </div>
-  </div>
+  </Card>
 
   <!-- Preview -->
   {#if data.preview.length > 0}
-    <div class="overflow-hidden rounded-lg bg-white shadow">
+    <Card class="overflow-hidden">
       <div class="p-6">
         <h2 class="mb-4 text-lg font-medium text-gray-900">
           Preview ({data.productCount} products)
@@ -598,7 +599,7 @@
           {/each}
         </div>
       </div>
-    </div>
+    </Card>
   {/if}
 
   <!-- Delete -->

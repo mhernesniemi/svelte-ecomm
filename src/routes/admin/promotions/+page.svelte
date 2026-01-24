@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Card } from "$lib/components/admin/ui/card";
   import {
     Table,
     TableHeader,
@@ -34,7 +35,7 @@
 
   <!-- Create Form -->
   {#if showCreateForm}
-    <div class="mb-6 rounded-lg bg-white p-6 shadow">
+    <Card class="mb-6 p-6">
       <h2 class="mb-4 font-semibold">Create Promotion</h2>
       <form
         method="POST"
@@ -120,7 +121,7 @@
           <Button type="submit">Create Promotion</Button>
         </div>
       </form>
-    </div>
+    </Card>
   {/if}
 
   {#if data.promotions.length === 0}

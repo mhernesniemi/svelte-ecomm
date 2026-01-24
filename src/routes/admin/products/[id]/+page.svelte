@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Card } from "$lib/components/admin/ui/card";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
   import { Alert } from "$lib/components/admin/ui/alert";
@@ -359,7 +360,7 @@
       </form>
 
       <!-- Variants Section -->
-      <div class="rounded-lg bg-white shadow">
+      <Card>
         <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
           <Button
@@ -595,12 +596,12 @@
           </TableBody>
         </Table>
       </div>
-    </div>
+    </Card>
 
     <!-- Sidebar (Right) -->
     <div class="w-80 shrink-0 space-y-6">
       <!-- Images Section -->
-      <div class="rounded-lg bg-white shadow">
+      <Card>
         <div class="border-b border-gray-200 px-4 py-3">
           <h2 class="font-semibold">Images</h2>
         </div>
@@ -671,10 +672,10 @@
             >
           </label>
         </div>
-      </div>
+      </Card>
 
       <!-- Facet Values Section -->
-      <div class="rounded-lg bg-white shadow">
+      <Card>
         <div class="border-b border-gray-200 px-4 py-3">
           <h2 class="font-semibold">Facet Values</h2>
         </div>
@@ -728,10 +729,10 @@
             </Button>
           {/if}
         </form>
-      </div>
+      </Card>
 
       <!-- Categories Section -->
-      <div class="rounded-lg bg-white shadow">
+      <Card>
         <div class="border-b border-gray-200 px-4 py-3">
           <h2 class="font-semibold">Categories</h2>
         </div>
@@ -821,7 +822,7 @@
             </Button>
           {/if}
         </form>
-      </div>
+      </Card>
     </div>
   </div>
 
