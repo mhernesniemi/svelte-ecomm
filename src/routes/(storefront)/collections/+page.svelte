@@ -38,35 +38,22 @@
         {@const trans = getTranslation(collection.translations, "en")}
         <a
           href="/collections/{collection.id}/{trans?.slug}"
-          class="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+          class="group rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
         >
-          {#if collection.featuredAsset}
-            <div class="aspect-video overflow-hidden">
-              <img
-                src="{collection.featuredAsset.source}?tr=w-600,h-400,fo-auto"
-                alt={trans?.name ?? "Collection"}
-                class="h-full w-full object-cover transition-transform group-hover:scale-105"
-              />
+          <div class="flex items-center gap-3">
+            <FolderOpen class="h-8 w-8 text-gray-400" />
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
+                {trans?.name ?? "Untitled"}
+              </h2>
+              <p class="text-sm text-gray-500">
+                {collection.productCount} products
+              </p>
             </div>
-          {:else}
-            <div
-              class="flex aspect-video items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
-            >
-              <FolderOpen class="h-16 w-16 text-gray-400" />
-            </div>
-          {/if}
-
-          <div class="p-4">
-            <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
-              {trans?.name ?? "Untitled"}
-            </h2>
-            {#if trans?.description}
-              <p class="mt-1 line-clamp-2 text-sm text-gray-600">{trans.description}</p>
-            {/if}
-            <p class="mt-2 text-sm text-gray-500">
-              {collection.productCount} products
-            </p>
           </div>
+          {#if trans?.description}
+            <p class="mt-3 line-clamp-2 text-sm text-gray-600">{trans.description}</p>
+          {/if}
         </a>
       {/each}
     </div>

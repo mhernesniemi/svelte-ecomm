@@ -70,7 +70,7 @@
         <div class="flex items-start gap-4">
           {#if line.imageUrl}
             <img
-              src={line.imageUrl}
+              src="{line.imageUrl}?tr=w-100,h-100,fo-auto"
               alt={line.productName}
               class="h-16 w-16 rounded-lg object-cover"
             />

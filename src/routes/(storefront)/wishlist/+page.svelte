@@ -94,12 +94,12 @@
           <a href="/products/{productId}/{slug}" class="flex-shrink-0">
             {#if image}
               <img
-                src="{image}?tr=w-120,h-120,fo-auto"
+                src="{image}?tr=w-100,h-100,fo-auto"
                 alt={name}
-                class="h-24 w-24 rounded-lg object-cover"
+                class="h-20 w-20 rounded-lg object-cover"
               />
             {:else}
-              <div class="flex h-24 w-24 items-center justify-center rounded-lg bg-gray-100">
+              <div class="flex h-20 w-20 items-center justify-center rounded-lg bg-gray-100">
                 <ImageIcon class="h-8 w-8 text-gray-400" />
               </div>
             {/if}

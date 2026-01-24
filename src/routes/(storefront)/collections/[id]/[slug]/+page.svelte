@@ -48,16 +48,6 @@
       </a>
     </nav>
 
-    {#if data.collection.featuredAsset}
-      <div class="mb-6 overflow-hidden rounded-lg">
-        <img
-          src="{data.collection.featuredAsset.source}?tr=w-1200,h-400,fo-auto"
-          alt={collectionTrans?.name ?? "Collection"}
-          class="h-48 w-full object-cover sm:h-64"
-        />
-      </div>
-    {/if}
-
     <h1 class="text-3xl font-bold text-gray-900">{collectionTrans?.name ?? "Collection"}</h1>
     {#if collectionTrans?.description}
       <p class="mt-2 text-lg text-gray-600">{collectionTrans.description}</p>

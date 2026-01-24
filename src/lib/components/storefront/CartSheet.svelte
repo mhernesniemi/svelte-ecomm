@@ -63,7 +63,7 @@
   <button
     type="button"
     onclick={() => cartStore.open()}
-    class="relative text-gray-600 hover:text-gray-900"
+    class="relative"
     aria-label="Shopping cart"
   >
     <ShoppingCart class="h-6 w-6" />
@@ -109,9 +109,7 @@
           </div>
           <p class="mb-1 font-medium text-gray-900">Your cart is empty</p>
           <p class="mb-6 text-sm text-gray-500">Add some items to get started</p>
-          <Button onclick={() => cartStore.close()}>
-            Continue Shopping
-          </Button>
+          <Button onclick={() => cartStore.close()}>Continue Shopping</Button>
         </div>
       {:else}
         <div class="divide-y divide-gray-200">
@@ -120,7 +118,7 @@
               <div class="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-gray-100">
                 {#if line.imageUrl}
                   <img
-                    src={line.imageUrl}
+                    src="{line.imageUrl}?tr=w-100,h-100,fo-auto"
                     alt={line.productName}
                     class="h-full w-full object-cover"
                   />

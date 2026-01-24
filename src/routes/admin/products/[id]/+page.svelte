@@ -619,7 +619,7 @@
               {#each data.product.assets as asset}
                 <div class="group relative">
                   <img
-                    src="{asset.source}?tr=w-150,h-150,fo-auto"
+                    src="{asset.source}?tr=w-100,h-100,fo-auto"
                     alt={asset.name}
                     class="h-24 w-full rounded border border-gray-200 object-cover {data.product
                       .featuredAssetId === asset.id

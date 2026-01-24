@@ -165,9 +165,7 @@
 
             <!-- Auth UI -->
             <SignedIn>
-              <a href="/account" class="text-sm text-gray-600 hover:text-gray-900"
-                ><UserIcon class="h-6 w-6" /></a
-              >
+              <a href="/account"><UserIcon class="h-6 w-6" /></a>
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">

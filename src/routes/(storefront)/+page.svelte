@@ -92,7 +92,7 @@
                   >
                     {#if product.featuredAsset}
                       <img
-                        src={product.featuredAsset.preview ?? product.featuredAsset.source}
+                        src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto"
                         alt={getProductName(product)}
                         class="h-full w-full object-cover"
                       />
@@ -162,9 +162,7 @@
                 />
               </div>
 
-              <Button type="submit" variant="secondary" class="mt-4 w-full">
-                Log in
-              </Button>
+              <Button type="submit" class="mt-4 w-full">Log in</Button>
             </form>
           </div>
         </div>

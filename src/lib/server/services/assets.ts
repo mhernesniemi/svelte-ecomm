@@ -68,14 +68,45 @@ class AssetService {
 				type: "image",
 				mimeType: "image/jpeg", // ImageKit handles conversion
 				source: input.url,
-				preview: input.url + "?tr=w-200,h-200",
+				preview: input.url + "?tr=w-100,h-100,fo-auto",
 				width: input.width ?? 0,
 				height: input.height ?? 0,
 				fileSize: input.fileSize ?? 0
 			})
 			.returning();
 
+		// Pre-warm cache for common transformations
+		this.warmCache(input.url);
+
 		return asset;
+	}
+
+	/**
+	 * Pre-warm ImageKit cache by requesting common transformations
+	 * Runs in background - doesn't block the upload response
+	 *
+	 * Sizes used across the site:
+	 * - 100x100: thumbnails (cart, orders, wishlist, product page, admin)
+	 * - 400x400: product grid listings (products, category, collections, front page)
+	 * - 600x600: product detail main image
+	 */
+	private warmCache(baseUrl: string) {
+		const transformations = [
+			"tr=w-100,h-100,fo-auto",
+			"tr=w-400,h-400,fo-auto",
+			"tr=w-600,h-600,fo-auto"
+		];
+
+		Promise.all(
+			transformations.map((tr) =>
+				fetch(`${baseUrl}?${tr}`)
+					.then((res) => res.ok)
+					.catch(() => false)
+			)
+		).then((results) => {
+			const success = results.filter(Boolean).length;
+			console.log(`[ImageKit] Cache warmed for ${baseUrl}: ${success}/${transformations.length}`);
+		});
 	}
 
 	/**
