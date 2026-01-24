@@ -100,7 +100,15 @@
   const fiTrans = getTranslation("fi");
 
   async function handleImagesSelected(
-    files: { url: string; name: string; fileId: string; width: number; height: number; size: number; alt: string }[]
+    files: {
+      url: string;
+      name: string;
+      fileId: string;
+      width: number;
+      height: number;
+      size: number;
+      alt: string;
+    }[]
   ) {
     isSavingImages = true;
     imageError = null;
@@ -560,9 +568,7 @@
                           {/each}
                         </div>
                         <div class="mt-4">
-                          <Button type="submit" size="sm">
-                            Save Variant Facets
-                          </Button>
+                          <Button type="submit" size="sm">Save Variant Facets</Button>
                         </div>
                       </form>
                     </TableCell>
@@ -622,7 +628,12 @@
                       size="sm"
                       variant="secondary"
                       class="h-7 w-7 p-0"
-                      onclick={() => (editingImageAlt = { id: asset.id, alt: asset.alt || "", isFeatured: data.product.featuredAssetId === asset.id })}
+                      onclick={() =>
+                        (editingImageAlt = {
+                          id: asset.id,
+                          alt: asset.alt || "",
+                          isFeatured: data.product.featuredAssetId === asset.id
+                        })}
                     >
                       <Pencil class="h-3.5 w-3.5" />
                     </Button>
@@ -698,9 +709,7 @@
                 </div>
               {/each}
             </div>
-            <Button type="submit" class="mt-4 w-full">
-              Save Facets
-            </Button>
+            <Button type="submit" class="mt-4 w-full">Save Facets</Button>
           {/if}
         </form>
       </div>
@@ -787,9 +796,7 @@
               </div>
             {/if}
 
-            <Button type="submit" class="mt-4 w-full">
-              Save Categories
-            </Button>
+            <Button type="submit" class="mt-4 w-full">Save Categories</Button>
           {/if}
         </form>
       </div>
@@ -836,9 +843,9 @@
         <div class="space-y-4 py-2">
           {#if editingAsset}
             <img
-              src="{editingAsset.source}?tr=w-200,h-200,fo-auto"
+              src="{editingAsset.source}?tr=w-400,h-400,fo-auto"
               alt={currentEditingImage.alt || editingAsset.name}
-              class="mx-auto h-32 w-32 rounded-lg object-cover"
+              class="mx-auto max-h-96 rounded-lg object-contain"
             />
           {/if}
 
