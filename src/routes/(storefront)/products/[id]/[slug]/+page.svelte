@@ -132,10 +132,15 @@
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-  <nav class="mb-6">
+  <nav class="mb-6 flex items-center justify-between">
     <a href="/products" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
       ><ArrowLeft class="h-4 w-4" /> Back to Products</a
     >
+    {#if data.isAdmin}
+      <a href="/admin/products/{product.id}">
+        <Button variant="outline" size="sm">Edit</Button>
+      </a>
+    {/if}
   </nav>
 
   <div class="grid grid-cols-1 md:grid-cols-2">

@@ -48,7 +48,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		reviews: reviewsResult.items,
 		reviewsPagination: reviewsResult.pagination,
 		customerReview,
-		customerId: locals.customer?.id ?? null
+		customerId: locals.customer?.id ?? null,
+		isAdmin: !!locals.adminUser
 	};
 };
 

@@ -54,9 +54,7 @@
     <h1 class="text-3xl font-bold">Wishlist</h1>
     {#if items.length > 0}
       <form method="POST" action="?/clear" use:enhance>
-        <button type="submit" class="text-sm text-red-600 hover:text-red-700">
-          Clear all
-        </button>
+        <button type="submit" class="text-sm text-red-600 hover:text-red-700"> Clear all </button>
       </form>
     {/if}
   </div>
@@ -90,8 +88,8 @@
         {@const variantId = getVariantId(item)}
         {@const image = getImage(item)}
 
-        <div class="flex gap-4 rounded-lg border p-4">
-          <a href="/products/{productId}/{slug}" class="flex-shrink-0">
+        <div class="flex gap-4 rounded-lg border border-gray-300 p-4">
+          <a href="/products/{productId}/{slug}" class="shrink-0">
             {#if image}
               <img
                 src="{image}?tr=w-100,h-100,fo-auto"
