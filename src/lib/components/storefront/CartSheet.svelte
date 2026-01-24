@@ -9,7 +9,7 @@
     SheetTitle,
     SheetFooter
   } from "$lib/components/storefront/ui/sheet";
-  import { buttonVariants } from "$lib/components/storefront/ui/button";
+  import { Button, buttonVariants } from "$lib/components/storefront/ui/button";
   import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
   import Minus from "@lucide/svelte/icons/minus";
   import Plus from "@lucide/svelte/icons/plus";
@@ -109,12 +109,9 @@
           </div>
           <p class="mb-1 font-medium text-gray-900">Your cart is empty</p>
           <p class="mb-6 text-sm text-gray-500">Add some items to get started</p>
-          <button
-            onclick={() => cartStore.close()}
-            class="inline-flex h-10 items-center justify-center rounded-lg bg-blue-600 px-6 text-sm font-medium text-white hover:bg-blue-700"
-          >
+          <Button onclick={() => cartStore.close()}>
             Continue Shopping
-          </button>
+          </Button>
         </div>
       {:else}
         <div class="divide-y divide-gray-200">

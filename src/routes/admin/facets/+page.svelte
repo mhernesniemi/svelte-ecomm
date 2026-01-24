@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/admin/ui/button";
   import type { PageData } from "./$types";
   import Tag from "@lucide/svelte/icons/tag";
 
@@ -19,13 +20,9 @@
       <h1 class="text-2xl font-bold text-gray-900">Facets</h1>
       <p class="mt-1 text-sm text-gray-600">Manage product attributes for filtering</p>
     </div>
-    <button
-      type="button"
-      onclick={() => (showCreateFacet = !showCreateFacet)}
-      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-    >
+    <Button type="button" onclick={() => (showCreateFacet = !showCreateFacet)}>
       Add Facet
-    </button>
+    </Button>
   </div>
 
   <!-- Create Facet Form -->
@@ -44,8 +41,7 @@
       >
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
           <div>
-            <label for="facet_code" class="mb-1 block text-sm font-medium text-gray-700">Code</label
-            >
+            <label for="facet_code" class="mb-1 block text-sm font-medium text-gray-700">Code</label>
             <input
               type="text"
               id="facet_code"
@@ -68,16 +64,10 @@
           </div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button
-            type="button"
-            onclick={() => (showCreateFacet = false)}
-            class="rounded-lg border border-gray-200 px-4 py-2"
-          >
+          <Button type="button" variant="outline" onclick={() => (showCreateFacet = false)}>
             Cancel
-          </button>
-          <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white">
-            Create Facet
-          </button>
+          </Button>
+          <Button type="submit">Create Facet</Button>
         </div>
       </form>
     </div>
@@ -90,13 +80,9 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No facets</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new facet.</p>
       <div class="mt-6">
-        <button
-          type="button"
-          onclick={() => (showCreateFacet = true)}
-          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Button type="button" onclick={() => (showCreateFacet = true)}>
           Add Facet
-        </button>
+        </Button>
       </div>
     </div>
   {:else}
@@ -109,17 +95,18 @@
               <p class="text-sm text-gray-500">Code: {facet.code}</p>
             </div>
             <div class="flex gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onclick={() =>
                   (addingValueToFacet = addingValueToFacet === facet.id ? null : facet.id)}
-                class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
               >
                 Add Value
-              </button>
+              </Button>
               <form method="POST" action="?/delete" use:enhance>
                 <input type="hidden" name="id" value={facet.id} />
-                <button type="submit" class="px-3 py-1 text-sm text-red-600 hover:text-red-800">
+                <button type="submit" class="text-sm text-red-600 hover:text-red-800">
                   Delete
                 </button>
               </form>
@@ -167,9 +154,7 @@
                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                     />
                   </div>
-                  <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white">
-                    Add
-                  </button>
+                  <Button type="submit" size="sm">Add</Button>
                 </div>
               </form>
             </div>

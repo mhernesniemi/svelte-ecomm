@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/storefront/ui/button";
   import type { PageData, ActionData } from "./$types";
   import MapPin from "@lucide/svelte/icons/map-pin";
 
@@ -25,13 +26,9 @@
       <p class="text-sm text-gray-600">Manage your shipping addresses</p>
     </div>
     {#if !showAddForm && !editingAddressId}
-      <button
-        type="button"
-        onclick={() => (showAddForm = true)}
-        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-      >
+      <Button type="button" onclick={() => (showAddForm = true)}>
         Add Address
-      </button>
+      </Button>
     {/if}
   </div>
 
@@ -185,19 +182,10 @@
         </div>
 
         <div class="flex justify-end gap-3">
-          <button
-            type="button"
-            onclick={() => (showAddForm = false)}
-            class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-          >
+          <Button type="button" variant="outline" onclick={() => (showAddForm = false)}>
             Cancel
-          </button>
-          <button
-            type="submit"
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
-            Save Address
-          </button>
+          </Button>
+          <Button type="submit">Save Address</Button>
         </div>
       </form>
     </div>
@@ -365,19 +353,10 @@
           </div>
 
           <div class="flex justify-end gap-3">
-            <button
-              type="button"
-              onclick={() => (editingAddressId = null)}
-              class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-            >
+            <Button type="button" variant="outline" onclick={() => (editingAddressId = null)}>
               Cancel
-            </button>
-            <button
-              type="submit"
-              class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              Update Address
-            </button>
+            </Button>
+            <Button type="submit">Update Address</Button>
           </div>
         </form>
       </div>
@@ -392,13 +371,9 @@
         <h3 class="mt-2 text-sm font-medium text-gray-900">No saved addresses</h3>
         <p class="mt-1 text-sm text-gray-500">Add an address to speed up checkout.</p>
         <div class="mt-4">
-          <button
-            type="button"
-            onclick={() => (showAddForm = true)}
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-          >
+          <Button type="button" onclick={() => (showAddForm = true)}>
             Add Address
-          </button>
+          </Button>
         </div>
       </div>
     {:else}
@@ -434,37 +409,36 @@
             </div>
 
             <div class="mt-4 flex gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onclick={() => (editingAddressId = address.id)}
-                class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Edit
-              </button>
+              </Button>
               {#if !address.isDefault}
                 <form method="POST" action="?/setDefault" use:enhance class="inline">
                   <input type="hidden" name="addressId" value={address.id} />
-                  <button
-                    type="submit"
-                    class="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
+                  <Button type="submit" variant="outline" size="sm">
                     Set as default
-                  </button>
+                  </Button>
                 </form>
               {/if}
               <form method="POST" action="?/delete" use:enhance class="inline">
                 <input type="hidden" name="addressId" value={address.id} />
-                <button
+                <Button
                   type="submit"
+                  variant="destructive-outline"
+                  size="sm"
                   onclick={(e) => {
                     if (!confirm("Are you sure you want to delete this address?")) {
                       e.preventDefault();
                     }
                   }}
-                  class="rounded-lg border border-red-300 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                 >
                   Delete
-                </button>
+                </Button>
               </form>
             </div>
           </div>

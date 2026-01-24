@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
+  import { buttonVariants } from "$lib/components/admin/ui/button";
   import {
     Table,
     TableHeader,
@@ -26,10 +26,7 @@
       <h1 class="text-2xl font-bold text-gray-900">Collections</h1>
       <p class="mt-1 text-sm text-gray-600">Manage product collections with dynamic filters</p>
     </div>
-    <a
-      href="/admin/collections/new"
-      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-    >
+    <a href="/admin/collections/new" class={buttonVariants()}>
       Create Collection
     </a>
   </div>
@@ -40,10 +37,7 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No collections</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new collection.</p>
       <div class="mt-6">
-        <a
-          href="/admin/collections/new"
-          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <a href="/admin/collections/new" class={buttonVariants()}>
           Create Collection
         </a>
       </div>
@@ -108,38 +102,12 @@
               {new Date(collection.createdAt).toLocaleDateString()}
             </TableCell>
             <TableCell class="text-right text-sm font-medium whitespace-nowrap">
-              <div class="flex justify-end gap-2">
-                <a
-                  href="/admin/collections/{collection.id}"
-                  class="text-blue-600 hover:text-blue-900"
-                >
-                  Edit
-                </a>
-                <form
-                  method="POST"
-                  action="?/delete"
-                  use:enhance={() => {
-                    return async ({ result, update }) => {
-                      if (result.type === "success") {
-                        await update();
-                      }
-                    };
-                  }}
-                >
-                  <input type="hidden" name="id" value={collection.id} />
-                  <button
-                    type="submit"
-                    class="text-red-600 hover:text-red-900"
-                    onclick={(e) => {
-                      if (!confirm("Are you sure you want to delete this collection?")) {
-                        e.preventDefault();
-                      }
-                    }}
-                  >
-                    Delete
-                  </button>
-                </form>
-              </div>
+              <a
+                href="/admin/collections/{collection.id}"
+                class="text-blue-600 hover:text-blue-900"
+              >
+                Edit
+              </a>
             </TableCell>
           </TableRow>
         {/each}

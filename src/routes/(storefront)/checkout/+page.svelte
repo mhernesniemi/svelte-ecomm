@@ -185,11 +185,12 @@
                 {#each savedAddresses as address}
                   <form method="POST" action="?/useSavedAddress" use:enhance>
                     <input type="hidden" name="addressId" value={address.id} />
-                    <button
+                    <Button
                       type="submit"
-                      class="w-full rounded-lg border border-gray-300 p-4 text-left transition-colors hover:border-blue-500 hover:bg-blue-50"
+                      variant="outline"
+                      class="h-auto w-full justify-start p-4 text-left hover:border-blue-500 hover:bg-blue-50"
                     >
-                      <div class="flex items-start justify-between">
+                      <div class="flex w-full items-start justify-between">
                         <div>
                           {#if address.fullName}
                             <p class="font-medium">{address.fullName}</p>
@@ -209,15 +210,15 @@
                           </span>
                         {/if}
                       </div>
-                    </button>
+                    </Button>
                   </form>
                 {/each}
               </div>
 
               <button
                 type="button"
+                class="text-sm text-blue-600 hover:underline"
                 onclick={() => (preferManualEntry = true)}
-                class="text-sm text-blue-600 hover:text-blue-800"
               >
                 + Use a different address
               </button>
@@ -238,6 +239,7 @@
                   </div>
                   <button
                     type="button"
+                    class="text-sm text-blue-600 hover:underline"
                     onclick={() => {
                       // Pre-fill form with current values
                       addressFormData = {
@@ -249,7 +251,6 @@
                       };
                       isEditingAddress = true;
                     }}
-                    class="text-sm font-medium text-blue-600 hover:text-blue-800"
                   >
                     Edit
                   </button>
@@ -376,8 +377,8 @@
               {#if savedAddresses.length > 0 && !cartHasAddress && !isEditingAddress}
                 <button
                   type="button"
-                  onclick={() => (preferManualEntry = false)}
                   class="mt-4 text-sm text-gray-600 hover:text-gray-800"
+                  onclick={() => (preferManualEntry = false)}
                 >
                   &larr; Use a saved address
                 </button>
@@ -415,11 +416,11 @@
                     </div>
                     <button
                       type="button"
+                      class="text-sm text-blue-600 hover:underline"
                       onclick={() => {
                         selectedShippingRate = selectedRate ?? null;
                         isEditingShipping = true;
                       }}
-                      class="text-sm font-medium text-blue-600 hover:text-blue-800"
                     >
                       Edit
                     </button>

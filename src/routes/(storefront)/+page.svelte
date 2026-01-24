@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PageData, ActionData } from "./$types";
+  import { Button } from "$lib/components/storefront/ui/button";
   import ImageIcon from "@lucide/svelte/icons/image";
   import { enhance } from "$app/forms";
 
@@ -161,12 +162,9 @@
                 />
               </div>
 
-              <button
-                type="submit"
-                class="mt-4 w-full rounded-lg border bg-white px-4 py-2 font-semibold text-gray-900 transition-colors hover:bg-[#f7d0dd]/50"
-              >
+              <Button type="submit" variant="secondary" class="mt-4 w-full">
                 Log in
-              </button>
+              </Button>
             </form>
           </div>
         </div>

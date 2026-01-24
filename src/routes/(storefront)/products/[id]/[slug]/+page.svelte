@@ -190,9 +190,9 @@
           type="button"
           onclick={handleToggleWishlist}
           disabled={isTogglingWishlist}
-          class="rounded-full p-2 transition-colors {isWishlisted
+          class="rounded-full p-2 transition-colors disabled:opacity-50 {isWishlisted
             ? 'text-red-500 hover:text-red-600'
-            : 'text-gray-400 hover:text-red-500'} disabled:opacity-50"
+            : 'text-gray-400 hover:text-red-500'}"
           aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart class="h-6 w-6" fill={isWishlisted ? "currentColor" : "none"} />

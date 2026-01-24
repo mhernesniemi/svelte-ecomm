@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -199,15 +200,10 @@
 
     <!-- Actions -->
     <div class="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
-      <a
-        href="/admin/products"
-        class="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
-      >
+      <a href="/admin/products" class={buttonVariants({ variant: "outline" })}>
         Cancel
       </a>
-      <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
-        Create Product
-      </button>
+      <Button type="submit">Create Product</Button>
     </div>
   </form>
 </div>

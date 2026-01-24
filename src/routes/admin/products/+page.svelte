@@ -1,5 +1,6 @@
 <script lang="ts">
   import { Badge } from "$lib/components/admin/ui/badge";
+  import { buttonVariants } from "$lib/components/admin/ui/button";
   import {
     Table,
     TableHeader,
@@ -26,10 +27,7 @@
       <h1 class="text-2xl font-bold text-gray-900">Products</h1>
       <p class="mt-1 text-sm text-gray-600">Manage your product catalog</p>
     </div>
-    <a
-      href="/admin/products/new"
-      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-    >
+    <a href="/admin/products/new" class={buttonVariants()}>
       Add Product
     </a>
   </div>
@@ -40,10 +38,7 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No products</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new product.</p>
       <div class="mt-6">
-        <a
-          href="/admin/products/new"
-          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <a href="/admin/products/new" class={buttonVariants()}>
           Add Product
         </a>
       </div>
@@ -124,18 +119,12 @@
         </div>
         <div class="flex gap-2">
           {#if data.currentPage > 1}
-            <a
-              href="?page={data.currentPage - 1}"
-              class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-100"
-            >
+            <a href="?page={data.currentPage - 1}" class={buttonVariants({ variant: "outline", size: "sm" })}>
               Previous
             </a>
           {/if}
           {#if data.pagination.hasMore}
-            <a
-              href="?page={data.currentPage + 1}"
-              class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-100"
-            >
+            <a href="?page={data.currentPage + 1}" class={buttonVariants({ variant: "outline", size: "sm" })}>
               Next
             </a>
           {/if}

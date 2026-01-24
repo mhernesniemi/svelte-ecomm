@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/storefront/ui/button";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -93,12 +94,7 @@
       </div>
 
       <div class="pt-2">
-        <button
-          type="submit"
-          class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
-          Save Changes
-        </button>
+        <Button type="submit">Save Changes</Button>
       </div>
     </form>
   {:else}

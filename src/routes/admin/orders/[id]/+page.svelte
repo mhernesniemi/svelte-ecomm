@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { Button } from "$lib/components/admin/ui/button";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -56,12 +57,9 @@
               {#each nextStates as state}
                 <form method="POST" action="?/transition" class="inline">
                   <input type="hidden" name="state" value={state} />
-                  <button
-                    type="submit"
-                    class="rounded border border-gray-200 px-3 py-1 text-sm capitalize hover:bg-gray-50"
-                  >
+                  <Button type="submit" variant="outline" size="sm" class="capitalize">
                     Mark as {state.replace("_", " ")}
-                  </button>
+                  </Button>
                 </form>
               {/each}
             </div>
@@ -175,24 +173,18 @@
 
           {#if data.orderShipping.trackingNumber}
             <form method="POST" action="?/trackShipment" class="mt-4">
-              <button
-                type="submit"
-                class="w-full rounded border border-gray-200 px-3 py-2 text-sm hover:bg-gray-50"
-              >
+              <Button type="submit" variant="outline" class="w-full">
                 Refresh Tracking Status
-              </button>
+              </Button>
             </form>
           {/if}
 
           {#if data.order.state === "paid" && data.orderShipping.status === "pending"}
             <form method="POST" action="?/updateShippingStatus" class="mt-4">
               <input type="hidden" name="status" value="shipped" />
-              <button
-                type="submit"
-                class="w-full rounded bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
-              >
+              <Button type="submit" class="w-full">
                 Mark as Shipped
-              </button>
+              </Button>
             </form>
           {/if}
         </div>
@@ -243,23 +235,17 @@
 
           {#if data.payment.state === "pending" || data.payment.state === "authorized"}
             <form method="POST" action="?/confirmPayment" class="mt-4">
-              <button
-                type="submit"
-                class="w-full rounded bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
-              >
+              <Button type="submit" class="w-full">
                 Confirm Payment Status
-              </button>
+              </Button>
             </form>
           {/if}
 
           {#if data.payment.state === "settled" && data.payment.transactionId}
             <form method="POST" action="?/refundPayment" class="mt-4">
-              <button
-                type="submit"
-                class="w-full rounded bg-yellow-600 px-3 py-2 text-sm text-white hover:bg-yellow-700"
-              >
+              <Button type="submit" variant="secondary" class="w-full bg-yellow-600 text-white hover:bg-yellow-700">
                 Refund Payment
-              </button>
+              </Button>
             </form>
           {/if}
         </div>

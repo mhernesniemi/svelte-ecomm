@@ -6,6 +6,7 @@
   import { throttle, formatPrice, cn } from "$lib/utils";
   import { searchProducts, type SearchResult } from "$lib/remote/search.remote.js";
   import CartSheet from "$lib/components/storefront/CartSheet.svelte";
+  import { buttonVariants } from "$lib/components/storefront/ui/button";
   import { cartStore } from "$lib/stores/cart.svelte";
   import { wishlistStore } from "$lib/stores/wishlist.svelte";
   import type { LayoutData } from "./$types";
@@ -170,7 +171,7 @@
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
-                <button class="text-sm text-gray-600 hover:text-gray-900">Sign in</button>
+                <button type="button" class="text-sm text-gray-600 hover:text-gray-900">Sign in</button>
               </SignInButton>
             </SignedOut>
 

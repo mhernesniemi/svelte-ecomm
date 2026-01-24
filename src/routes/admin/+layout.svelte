@@ -2,6 +2,7 @@
   import "./admin.css";
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/admin/ui/button";
   import type { LayoutData } from "./$types";
   import Home from "@lucide/svelte/icons/home";
   import Package from "@lucide/svelte/icons/package";

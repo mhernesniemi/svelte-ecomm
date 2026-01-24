@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/admin/ui/button";
   import type { ActionData } from "./$types";
 
   let { form }: { form: ActionData } = $props();
@@ -53,13 +54,13 @@
           />
         </div>
 
-        <button
+        <Button
           type="submit"
           disabled={isLoading}
-          class="w-full rounded-lg bg-gray-900 px-4 py-2 font-medium text-white transition-colors hover:bg-gray-800 disabled:opacity-50"
+          class="w-full bg-gray-900 hover:bg-gray-800"
         >
           {isLoading ? "Signing in..." : "Sign in"}
-        </button>
+        </Button>
       </form>
     </div>
   </div>

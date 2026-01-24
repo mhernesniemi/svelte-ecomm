@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
+  import { Button } from "$lib/components/admin/ui/button";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -308,13 +309,9 @@
         </div>
 
         <div class="mt-6 flex justify-end">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-          >
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : "Save Changes"}
-          </button>
+          </Button>
         </div>
       </div>
     </div>
@@ -355,7 +352,7 @@
                 <input type="hidden" name="filterId" value={filter.id} />
                 <button
                   type="submit"
-                  class="text-red-600 hover:text-red-800"
+                  class="rounded p-1 text-red-600 hover:bg-red-50 hover:text-red-800"
                   aria-label="Remove filter"
                 >
                   <X class="h-5 w-5" />
@@ -558,16 +555,15 @@
         {/if}
 
         <div class="flex justify-end">
-          <button
+          <Button
             type="submit"
             disabled={!newFilterField ||
               (newFilterField === "facet" && selectedFacetValues.length === 0) ||
               (newFilterField === "product" && selectedProducts.length === 0) ||
               (newFilterField !== "facet" && newFilterField !== "product" && !newFilterValue)}
-            class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             Add Filter
-          </button>
+          </Button>
         </div>
       </form>
     </div>
@@ -621,17 +617,17 @@
           };
         }}
       >
-        <button
+        <Button
           type="submit"
+          variant="destructive-outline"
           onclick={(e) => {
             if (!confirm("Are you sure you want to delete this collection?")) {
               e.preventDefault();
             }
           }}
-          class="rounded-lg border border-red-600 bg-white px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
         >
           Delete Collection
-        </button>
+        </Button>
       </form>
     </div>
   </div>

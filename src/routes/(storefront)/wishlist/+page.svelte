@@ -54,7 +54,9 @@
     <h1 class="text-3xl font-bold">Wishlist</h1>
     {#if items.length > 0}
       <form method="POST" action="?/clear" use:enhance>
-        <button type="submit" class="text-sm text-red-600 hover:underline">Clear all</button>
+        <button type="submit" class="text-sm text-red-600 hover:text-red-700">
+          Clear all
+        </button>
       </form>
     {/if}
   </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Info from "@lucide/svelte/icons/info";
 
@@ -239,19 +240,12 @@
     </div>
 
     <div class="flex justify-end gap-3">
-      <a
-        href="/admin/collections"
-        class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-      >
+      <a href="/admin/collections" class={buttonVariants({ variant: "outline" })}>
         Cancel
       </a>
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : "Create Collection"}
-      </button>
+      </Button>
     </div>
   </form>
 </div>

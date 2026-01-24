@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/admin/ui/button";
   import type { PageData } from "./$types";
   import UsersRound from "@lucide/svelte/icons/users-round";
 
@@ -21,13 +22,9 @@
       <h1 class="text-2xl font-bold text-gray-900">Customer Groups</h1>
       <p class="mt-1 text-sm text-gray-600">Manage B2B customer groups for pricing</p>
     </div>
-    <button
-      type="button"
-      onclick={() => (showCreateForm = !showCreateForm)}
-      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-    >
+    <Button type="button" onclick={() => (showCreateForm = !showCreateForm)}>
       Add Group
-    </button>
+    </Button>
   </div>
 
   <!-- Create Form -->
@@ -70,16 +67,10 @@
           </div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button
-            type="button"
-            onclick={() => (showCreateForm = false)}
-            class="rounded-lg border border-gray-200 px-4 py-2"
-          >
+          <Button type="button" variant="outline" onclick={() => (showCreateForm = false)}>
             Cancel
-          </button>
-          <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white">
-            Create Group
-          </button>
+          </Button>
+          <Button type="submit">Create Group</Button>
         </div>
       </form>
     </div>
@@ -92,13 +83,9 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No customer groups</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new customer group.</p>
       <div class="mt-6">
-        <button
-          type="button"
-          onclick={() => (showCreateForm = true)}
-          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Button type="button" onclick={() => (showCreateForm = true)}>
           Add Group
-        </button>
+        </Button>
       </div>
     </div>
   {:else}
@@ -116,16 +103,17 @@
               </p>
             </div>
             <div class="flex gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onclick={() => (expandedGroupId = expandedGroupId === group.id ? null : group.id)}
-                class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-50"
               >
                 {expandedGroupId === group.id ? "Hide" : "Manage"} Customers
-              </button>
+              </Button>
               <form method="POST" action="?/delete" use:enhance>
                 <input type="hidden" name="id" value={group.id} />
-                <button type="submit" class="px-3 py-1 text-sm text-red-600 hover:text-red-800">
+                <button type="submit" class="text-sm text-red-600 hover:text-red-800">
                   Delete
                 </button>
               </form>
@@ -155,9 +143,7 @@
                       {/each}
                     </select>
                   </div>
-                  <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white">
-                    Add
-                  </button>
+                  <Button type="submit" size="sm">Add</Button>
                 </form>
               {/if}
             </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/admin/ui/button";
   import {
     Table,
     TableHeader,
@@ -26,13 +27,9 @@
       <h1 class="text-2xl font-bold text-gray-900">Promotions</h1>
       <p class="mt-1 text-sm text-gray-600">Manage discount codes and promotions</p>
     </div>
-    <button
-      type="button"
-      onclick={() => (showCreateForm = !showCreateForm)}
-      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-    >
+    <Button type="button" onclick={() => (showCreateForm = !showCreateForm)}>
       Add Promotion
-    </button>
+    </Button>
   </div>
 
   <!-- Create Form -->
@@ -117,16 +114,10 @@
           </div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button
-            type="button"
-            onclick={() => (showCreateForm = false)}
-            class="rounded-lg border border-gray-200 px-4 py-2"
-          >
+          <Button type="button" variant="outline" onclick={() => (showCreateForm = false)}>
             Cancel
-          </button>
-          <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white">
-            Create Promotion
-          </button>
+          </Button>
+          <Button type="submit">Create Promotion</Button>
         </div>
       </form>
     </div>
@@ -138,13 +129,9 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No promotions</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new promotion.</p>
       <div class="mt-6">
-        <button
-          type="button"
-          onclick={() => (showCreateForm = true)}
-          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Button type="button" onclick={() => (showCreateForm = true)}>
           Add Promotion
-        </button>
+        </Button>
       </div>
     </div>
   {:else}
@@ -191,13 +178,15 @@
               <form method="POST" action="?/toggle" use:enhance class="inline">
                 <input type="hidden" name="id" value={promo.id} />
                 <input type="hidden" name="enabled" value={!promo.enabled} />
-                <button type="submit" class="mr-3 text-blue-600 hover:text-blue-800">
+                <button type="submit" class="mr-3 text-blue-600 hover:underline">
                   {promo.enabled ? "Disable" : "Enable"}
                 </button>
               </form>
               <form method="POST" action="?/delete" use:enhance class="inline">
                 <input type="hidden" name="id" value={promo.id} />
-                <button type="submit" class="text-red-600 hover:text-red-800"> Delete </button>
+                <button type="submit" class="text-red-600 hover:text-red-800">
+                  Delete
+                </button>
               </form>
             </TableCell>
           </TableRow>

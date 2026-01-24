@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { Button } from "$lib/components/admin/ui/button";
   import type { PageData } from "./$types";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
@@ -24,13 +25,9 @@
       <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
       <p class="mt-1 text-sm text-gray-600">Organize products in a hierarchical navigation tree</p>
     </div>
-    <button
-      type="button"
-      onclick={() => (showCreate = !showCreate)}
-      class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-    >
+    <Button type="button" onclick={() => (showCreate = !showCreate)}>
       Add Category
-    </button>
+    </Button>
   </div>
 
   <!-- Create Category Form -->
@@ -87,16 +84,10 @@
           </div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
-          <button
-            type="button"
-            onclick={() => (showCreate = false)}
-            class="rounded-lg border border-gray-200 px-4 py-2"
-          >
+          <Button type="button" variant="outline" onclick={() => (showCreate = false)}>
             Cancel
-          </button>
-          <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white">
-            Create Category
-          </button>
+          </Button>
+          <Button type="submit">Create Category</Button>
         </div>
       </form>
     </div>
@@ -109,13 +100,9 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No categories</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a root category.</p>
       <div class="mt-6">
-        <button
-          type="button"
-          onclick={() => (showCreate = true)}
-          class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <Button type="button" onclick={() => (showCreate = true)}>
           Add Category
-        </button>
+        </Button>
       </div>
     </div>
   {:else}
@@ -159,12 +146,11 @@
                     </option>
                   {/each}
                 </select>
-                <button type="submit" class="text-sm text-blue-600 hover:text-blue-800">Save</button
-                >
+                <button type="submit" class="text-sm text-blue-600 hover:underline">Save</button>
                 <button
                   type="button"
+                  class="text-sm text-gray-600 hover:text-gray-900"
                   onclick={() => (editingId = null)}
-                  class="text-sm text-gray-500 hover:text-gray-700"
                 >
                   Cancel
                 </button>
@@ -184,16 +170,16 @@
                 <div class="flex gap-2">
                   <button
                     type="button"
-                    onclick={() => (editingId = node.id)}
                     class="text-sm text-gray-600 hover:text-gray-900"
+                    onclick={() => (editingId = node.id)}
                   >
                     Edit
                   </button>
                   <form method="POST" action="?/delete" use:enhance>
                     <input type="hidden" name="id" value={node.id} />
-                    <button type="submit" class="text-sm text-red-600 hover:text-red-800"
-                      >Delete</button
-                    >
+                    <button type="submit" class="text-sm text-red-600 hover:text-red-800">
+                      Delete
+                    </button>
                   </form>
                 </div>
               </div>

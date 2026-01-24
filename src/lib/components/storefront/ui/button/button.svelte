@@ -6,9 +6,10 @@
     variants: {
       variant: {
         default: "border bg-[#f7d0dd]/50 hover:bg-[#f7d0dd]/60",
-        destructive: "bg-red-600 text-white hover:bg-red-700",
+        secondary: "border bg-gray-100 hover:bg-gray-200/60",
         outline: "border border-gray-300 bg-white text-gray-900 hover:bg-gray-50",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
+        destructive: "bg-red-600 text-white hover:bg-red-700",
+        "destructive-outline": "border border-red-300 text-red-600 hover:bg-red-50",
         ghost: "text-gray-900 hover:bg-gray-100",
         link: "text-blue-600 underline-offset-4 hover:underline"
       },

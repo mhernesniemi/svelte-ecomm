@@ -347,14 +347,13 @@
 
         <!-- Actions -->
         <div class="flex justify-between border-t border-gray-200 bg-gray-50 px-6 py-4">
-          <Button
+          <button
             type="button"
-            variant="ghost"
             onclick={() => (showDeleteConfirm = true)}
-            class="text-red-600 hover:text-red-800"
+            class="text-sm text-red-600 hover:text-red-800"
           >
             Delete Product
-          </Button>
+          </button>
           <Button type="submit">Save Changes</Button>
         </div>
       </form>
@@ -363,13 +362,13 @@
       <div class="rounded-lg bg-white shadow">
         <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
-          <button
+          <Button
             type="button"
+            size="sm"
             onclick={() => (editingVariant = editingVariant === "new" ? null : "new")}
-            class="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700"
           >
             Add Variant
-          </button>
+          </Button>
         </div>
 
         {#if form?.variantSuccess}
@@ -461,16 +460,17 @@
               </div>
             </div>
             <div class="mt-4 flex justify-end gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onclick={() => (editingVariant = null)}
-                class="rounded border border-gray-200 px-3 py-1 text-sm"
               >
                 Cancel
-              </button>
-              <button type="submit" class="rounded bg-blue-600 px-3 py-1 text-sm text-white">
+              </Button>
+              <Button type="submit" size="sm">
                 {isEditing ? "Save Changes" : "Add Variant"}
-              </button>
+              </Button>
             </div>
           </form>
         {/if}
@@ -523,17 +523,17 @@
                   <TableCell class="space-x-3 text-right text-sm">
                     <button
                       type="button"
+                      class="text-blue-600 hover:underline"
                       onclick={() => (editingVariant = editingVariant === variant ? null : variant)}
-                      class="text-blue-600 hover:text-blue-800"
                     >
                       Edit
                     </button>
                     <button
                       type="button"
+                      class="text-gray-600 hover:text-gray-900"
                       onclick={() =>
                         (editingVariantFacets =
                           editingVariantFacets === variant.id ? null : variant.id)}
-                      class="text-gray-600 hover:text-gray-800"
                     >
                       {editingVariantFacets === variant.id ? "Cancel" : "Facets"}
                     </button>
@@ -582,12 +582,9 @@
                           {/each}
                         </div>
                         <div class="mt-4">
-                          <button
-                            type="submit"
-                            class="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
-                          >
+                          <Button type="submit" size="sm">
                             Save Variant Facets
-                          </button>
+                          </Button>
                         </div>
                       </form>
                     </TableCell>
@@ -635,22 +632,16 @@
                     {#if data.product.featuredAssetId !== asset.id}
                       <form method="POST" action="?/setFeaturedImage" use:enhance>
                         <input type="hidden" name="assetId" value={asset.id} />
-                        <button
-                          type="submit"
-                          class="rounded bg-blue-600 px-1.5 py-0.5 text-xs text-white hover:bg-blue-700"
-                        >
+                        <Button type="submit" size="sm" class="h-auto px-1.5 py-0.5 text-xs">
                           Featured
-                        </button>
+                        </Button>
                       </form>
                     {/if}
                     <form method="POST" action="?/removeImage" use:enhance>
                       <input type="hidden" name="assetId" value={asset.id} />
-                      <button
-                        type="submit"
-                        class="rounded bg-red-600 px-1.5 py-0.5 text-xs text-white hover:bg-red-700"
-                      >
+                      <Button type="submit" variant="destructive" size="sm" class="h-auto px-1.5 py-0.5 text-xs">
                         Remove
-                      </button>
+                      </Button>
                     </form>
                   </div>
                   {#if data.product.featuredAssetId === asset.id}
@@ -732,12 +723,9 @@
                 </div>
               {/each}
             </div>
-            <button
-              type="submit"
-              class="mt-4 w-full rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
-            >
+            <Button type="submit" class="mt-4 w-full">
               Save Facets
-            </button>
+            </Button>
           {/if}
         </form>
       </div>
@@ -828,12 +816,9 @@
               </div>
             {/if}
 
-            <button
-              type="submit"
-              class="mt-4 w-full rounded-lg bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
-            >
+            <Button type="submit" class="mt-4 w-full">
               Save Categories
-            </button>
+            </Button>
           {/if}
         </form>
       </div>
