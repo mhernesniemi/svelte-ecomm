@@ -1,5 +1,4 @@
 <script lang="ts">
-  import * as Card from "$lib/components/admin/ui/card";
   import { Badge } from "$lib/components/admin/ui/badge";
   import type { PageData } from "./$types";
 
@@ -11,18 +10,18 @@
 
   <!-- Stats Grid -->
   <div class="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-    <Card.Root class="p-6">
+    <div class="rounded-lg bg-white p-6 shadow">
       <h3 class="text-sm font-medium text-gray-500">Total Products</h3>
       <p class="text-3xl font-bold text-gray-900">{data.stats.totalProducts}</p>
-    </Card.Root>
-    <Card.Root class="p-6">
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
       <h3 class="text-sm font-medium text-gray-500">Total Orders</h3>
       <p class="text-3xl font-bold text-gray-900">{data.stats.totalOrders}</p>
-    </Card.Root>
-    <Card.Root class="p-6">
+    </div>
+    <div class="rounded-lg bg-white p-6 shadow">
       <h3 class="text-sm font-medium text-gray-500">Total Customers</h3>
       <p class="text-3xl font-bold text-gray-900">{data.stats.totalCustomers}</p>
-    </Card.Root>
+    </div>
   </div>
 
   <!-- Recent Orders -->
