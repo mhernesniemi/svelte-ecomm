@@ -18,20 +18,31 @@
   let activeTab = $state<"en" | "fi">("en");
   let isSubmitting = $state(false);
 
-  // Form values from collection data
-  function getTranslation(lang: string) {
-    return data.collection.translations.find((t) => t.languageCode === lang);
-  }
+  // Form values - reset when collection changes
+  let code = $state("");
+  let nameEn = $state("");
+  let nameFi = $state("");
+  let slugEn = $state("");
+  let slugFi = $state("");
+  let descriptionEn = $state("");
+  let descriptionFi = $state("");
+  let enabled = $state(true);
+  let isPrivate = $state(false);
 
-  let code = $state(data.collection.code);
-  let nameEn = $state(getTranslation("en")?.name ?? "");
-  let nameFi = $state(getTranslation("fi")?.name ?? "");
-  let slugEn = $state(getTranslation("en")?.slug ?? "");
-  let slugFi = $state(getTranslation("fi")?.slug ?? "");
-  let descriptionEn = $state(getTranslation("en")?.description ?? "");
-  let descriptionFi = $state(getTranslation("fi")?.description ?? "");
-  let enabled = $state(data.collection.enabled);
-  let isPrivate = $state(data.collection.isPrivate);
+  // Initialize/reset form values when collection data changes
+  $effect(() => {
+    const enTrans = data.collection.translations.find((t) => t.languageCode === "en");
+    const fiTrans = data.collection.translations.find((t) => t.languageCode === "fi");
+    code = data.collection.code;
+    nameEn = enTrans?.name ?? "";
+    nameFi = fiTrans?.name ?? "";
+    slugEn = enTrans?.slug ?? "";
+    slugFi = fiTrans?.slug ?? "";
+    descriptionEn = enTrans?.description ?? "";
+    descriptionFi = fiTrans?.description ?? "";
+    enabled = data.collection.enabled;
+    isPrivate = data.collection.isPrivate;
+  });
 
   // Filter builder state
   let newFilterField = $state<string>("");

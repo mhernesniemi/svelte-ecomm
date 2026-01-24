@@ -40,11 +40,25 @@
 
   // Form data for physical products (shipping address)
   let addressFormData = $state({
-    fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
-    streetLine1: data.cart?.shippingStreetLine1 ?? "",
-    city: data.cart?.shippingCity ?? "",
-    postalCode: data.cart?.shippingPostalCode ?? "",
-    country: data.cart?.shippingCountry ?? "FI"
+    fullName: "",
+    streetLine1: "",
+    city: "",
+    postalCode: "",
+    country: "FI"
+  });
+
+  // Initialize address form from data on mount
+  $effect(() => {
+    // Only set if not already filled by user
+    if (!addressFormData.fullName && !addressFormData.streetLine1) {
+      addressFormData = {
+        fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
+        streetLine1: data.cart?.shippingStreetLine1 ?? "",
+        city: data.cart?.shippingCity ?? "",
+        postalCode: data.cart?.shippingPostalCode ?? "",
+        country: data.cart?.shippingCountry ?? "FI"
+      };
+    }
   });
 
   // Saved addresses
@@ -73,8 +87,18 @@
 
   // Form data for digital products (contact info)
   let contactFormData = $state({
-    fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
-    email: data.customerEmail ?? data.cart?.customerEmail ?? ""
+    fullName: "",
+    email: ""
+  });
+
+  // Initialize contact form from data on mount
+  $effect(() => {
+    if (!contactFormData.fullName && !contactFormData.email) {
+      contactFormData = {
+        fullName: data.customerFullName ?? data.cart?.shippingFullName ?? "",
+        email: data.customerEmail ?? data.cart?.customerEmail ?? ""
+      };
+    }
   });
 
   function selectShippingRate(rate: (typeof data.shippingRates)[0]) {

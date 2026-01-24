@@ -16,13 +16,24 @@
   let isSubmitting = $state(false);
 
   // Form values
-  let code = $state(form?.code ?? "");
-  let nameEn = $state(form?.nameEn ?? "");
-  let nameFi = $state(form?.nameFi ?? "");
-  let slugEn = $state(form?.slugEn ?? "");
-  let slugFi = $state(form?.slugFi ?? "");
-  let descriptionEn = $state(form?.descriptionEn ?? "");
-  let descriptionFi = $state(form?.descriptionFi ?? "");
+  let code = $state("");
+  let nameEn = $state("");
+  let nameFi = $state("");
+  let slugEn = $state("");
+  let slugFi = $state("");
+  let descriptionEn = $state("");
+  let descriptionFi = $state("");
+
+  // Restore values from form after failed submission
+  $effect(() => {
+    if (form?.code) code = form.code;
+    if (form?.nameEn) nameEn = form.nameEn;
+    if (form?.nameFi) nameFi = form.nameFi;
+    if (form?.slugEn) slugEn = form.slugEn;
+    if (form?.slugFi) slugFi = form.slugFi;
+    if (form?.descriptionEn) descriptionEn = form.descriptionEn;
+    if (form?.descriptionFi) descriptionFi = form.descriptionFi;
+  });
 
   function slugify(text: string): string {
     return text
@@ -32,15 +43,17 @@
   }
 
   // Auto-generate slug from name
+  let autoSlug = $state(true);
   $effect(() => {
-    if (nameEn && !slugEn) {
+    if (autoSlug && nameEn) {
       slugEn = slugify(nameEn);
     }
   });
 
   // Auto-generate code from name
+  let autoCode = $state(true);
   $effect(() => {
-    if (nameEn && !code) {
+    if (autoCode && nameEn) {
       code = slugify(nameEn);
     }
   });

@@ -49,34 +49,39 @@
   let isSavingProduct = $state(false);
   let editingImageAlt = $state<{ id: number; alt: string; isFeatured: boolean } | null>(null);
 
-  // Selected facet values (bind:group handles reactivity)
-  let selectedProductFacets = $state(data.product.facetValues.map((fv) => fv.id));
-  let variantFacets: Record<number, number[]> = $state(
-    Object.fromEntries(data.product.variants.map((v) => [v.id, v.facetValues.map((fv) => fv.id)]))
-  );
-
-  // Selected categories
-  let selectedCategories = $state(data.productCategories.map((c) => c.id));
+  // Selected facet values and categories - reset when product changes
+  let selectedProductFacets = $state<number[]>([]);
+  let variantFacets = $state<Record<number, number[]>>({});
+  let selectedCategories = $state<number[]>([]);
   let categoryComboboxOpen = $state(false);
-
-  // Facet values combobox
   let facetComboboxOpen = $state(false);
 
-  // Flatten facet values for combobox display
+  // Initialize selections when product data changes
+  $effect(() => {
+    selectedProductFacets = data.product.facetValues.map((fv) => fv.id);
+    variantFacets = Object.fromEntries(
+      data.product.variants.map((v) => [v.id, v.facetValues.map((fv) => fv.id)])
+    );
+    selectedCategories = data.productCategories.map((c) => c.id);
+  });
+
+  // Flatten facet values for combobox display (derived from data)
   type FlatFacetValue = {
     id: number;
     name: string;
     facetName: string;
   };
 
-  const flatFacetValues: FlatFacetValue[] = data.facets.flatMap((facet) => {
-    const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
-    return facet.values.map((value) => ({
-      id: value.id,
-      name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
-      facetName
-    }));
-  });
+  const flatFacetValues: FlatFacetValue[] = $derived(
+    data.facets.flatMap((facet) => {
+      const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+      return facet.values.map((value) => ({
+        id: value.id,
+        name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
+        facetName
+      }));
+    })
+  );
 
   function getSelectedFacetValueObjects() {
     return flatFacetValues.filter((fv) => selectedProductFacets.includes(fv.id));
@@ -119,7 +124,7 @@
     ]);
   }
 
-  const flatCategories = flattenTree(data.categoryTree);
+  const flatCategories = $derived(flattenTree(data.categoryTree));
 
   // Get selected category objects for display
   function getSelectedCategoryObjects() {

@@ -147,7 +147,10 @@ class AuthService {
 	 * Clean up expired sessions
 	 */
 	async cleanupExpiredSessions(): Promise<number> {
-		const result = await db.delete(userSessions).where(lt(userSessions.expiresAt, new Date()));
+		const result = await db
+			.delete(userSessions)
+			.where(lt(userSessions.expiresAt, new Date()))
+			.returning({ id: userSessions.id });
 		return result.length;
 	}
 }

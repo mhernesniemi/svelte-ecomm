@@ -149,9 +149,9 @@ async function fetchNextJob(queue: string): Promise<typeof jobs.$inferSelect | n
 		RETURNING *
 	`);
 
-	if (result.length === 0) return null;
+	if (result.rows.length === 0) return null;
 
-	const row = result[0];
+	const row = result.rows[0];
 	return {
 		id: row.id,
 		queue: row.queue,
@@ -380,7 +380,7 @@ export async function getQueueStats(queue = "default"): Promise<QueueStats> {
 
 	const stats: QueueStats = { pending: 0, processing: 0, completed: 0, failed: 0 };
 
-	for (const row of result) {
+	for (const row of result.rows) {
 		if (row.status in stats) {
 			stats[row.status as keyof QueueStats] = row.count;
 		}
