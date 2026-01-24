@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/storefront/ui/button";
   import ImageIcon from "@lucide/svelte/icons/image";
   import { enhance } from "$app/forms";
+  import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -70,7 +71,14 @@
       <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
         <!-- Demo Store Products -->
         <div>
-          <h2 class="mb-8 text-xl font-bold">Demo Store Products</h2>
+          <div class="mb-8 flex items-baseline justify-between">
+            <h2 class="text-xl font-bold">Demo Store Products</h2>
+            <a
+              href="/products"
+              class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+              >View all <ArrowRightIcon class="h-4 w-4" /></a
+            >
+          </div>
 
           {#if data.featuredProducts.length === 0}
             <div class="py-12 text-center text-gray-500">
