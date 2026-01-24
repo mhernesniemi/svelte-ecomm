@@ -1,7 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
-  import { Card } from "$lib/components/admin/ui/card";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Info from "@lucide/svelte/icons/info";
 
@@ -70,7 +69,7 @@
     }}
     class="space-y-6"
   >
-    <Card class="overflow-hidden">
+    <div class="overflow-hidden rounded-lg bg-white shadow">
       <div class="p-6">
         <h2 class="mb-4 text-lg font-medium text-gray-900">Basic Information</h2>
 
@@ -225,7 +224,7 @@
           </div>
         </div>
       </div>
-    </Card>
+    </div>
 
     <div class="rounded-lg bg-blue-50 p-4">
       <div class="flex items-start gap-3">

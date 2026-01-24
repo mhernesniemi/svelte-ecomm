@@ -1,7 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
-  import { Card } from "$lib/components/admin/ui/card";
   import type { PageData } from "./$types";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
@@ -33,7 +32,7 @@
 
   <!-- Create Category Form -->
   {#if showCreate}
-    <Card class="mb-6 p-6">
+    <div class="mb-6 rounded-lg bg-white p-6 shadow">
       <h2 class="mb-4 font-semibold">Create New Category</h2>
       <form
         method="POST"
@@ -91,7 +90,7 @@
           <Button type="submit">Create Category</Button>
         </div>
       </form>
-    </Card>
+    </div>
   {/if}
 
   <!-- Categories Tree -->
@@ -107,7 +106,7 @@
       </div>
     </div>
   {:else}
-    <Card>
+    <div class="rounded-lg bg-white shadow">
       <div class="divide-y divide-gray-200">
         {#snippet categoryNode(node: (typeof data.tree)[0], depth: number)}
           <div class="px-6 py-3" style="padding-left: {24 + depth * 24}px">
@@ -195,6 +194,6 @@
           {@render categoryNode(rootNode, 0)}
         {/each}
       </div>
-    </Card>
+    </div>
   {/if}
 </div>

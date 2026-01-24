@@ -1,7 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
-  import { Card } from "$lib/components/admin/ui/card";
   import type { PageData } from "./$types";
   import UsersRound from "@lucide/svelte/icons/users-round";
 
@@ -30,7 +29,7 @@
 
   <!-- Create Form -->
   {#if showCreateForm}
-    <Card class="mb-6 p-6">
+    <div class="mb-6 rounded-lg bg-white p-6 shadow">
       <h2 class="mb-4 font-semibold">Create New Group</h2>
       <form
         method="POST"
@@ -74,7 +73,7 @@
           <Button type="submit">Create Group</Button>
         </div>
       </form>
-    </Card>
+    </div>
   {/if}
 
   <!-- Groups List -->
@@ -92,7 +91,7 @@
   {:else}
     <div class="space-y-6">
       {#each data.groups as group}
-        <Card>
+        <div class="rounded-lg bg-white shadow">
           <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
             <div>
               <h2 class="font-semibold">{group.name}</h2>
@@ -175,7 +174,7 @@
               {/if}
             </div>
           {/if}
-        </Card>
+        </div>
       {/each}
     </div>
   {/if}

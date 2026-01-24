@@ -26,7 +26,7 @@
   </div>
 
   <!-- Recent Orders -->
-  <Card.Root>
+  <div class="rounded-lg bg-white shadow">
     <div class="border-b border-gray-200 px-6 py-4">
       <h2 class="text-lg font-semibold">Recent Orders</h2>
     </div>
@@ -60,5 +60,5 @@
         {/each}
       {/if}
     </div>
-  </Card.Root>
+  </div>
 </div>
