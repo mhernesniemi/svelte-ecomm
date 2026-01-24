@@ -266,6 +266,8 @@ export const assets = pgTable("assets", {
 	fileSize: integer("file_size").default(0),
 	source: varchar("source", { length: 500 }).notNull(), // File path or URL
 	preview: varchar("preview", { length: 500 }), // Thumbnail path
+	alt: text("alt"), // Alt text for accessibility
+	imagekitFileId: varchar("imagekit_file_id", { length: 100 }), // ImageKit file ID for syncing
 	createdAt: timestamp("created_at").defaultNow().notNull()
 });
 

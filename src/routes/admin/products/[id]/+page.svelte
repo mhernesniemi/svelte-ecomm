@@ -21,6 +21,8 @@
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import X from "@lucide/svelte/icons/x";
   import Plus from "@lucide/svelte/icons/plus";
+  import Pencil from "@lucide/svelte/icons/pencil";
+  import Trash2 from "@lucide/svelte/icons/trash-2";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -32,6 +34,7 @@
   let editingVariantFacets = $state<number | null>(null);
   let isSavingImages = $state(false);
   let imageError = $state<string | null>(null);
+  let editingImageAlt = $state<{ id: number; alt: string; isFeatured: boolean } | null>(null);
 
   // Selected facet values (bind:group handles reactivity)
   let selectedProductFacets = $state(data.product.facetValues.map((fv) => fv.id));
@@ -97,7 +100,7 @@
   const fiTrans = getTranslation("fi");
 
   async function handleImagesSelected(
-    files: { url: string; name: string; fileId: string; width: number; height: number; size: number }[]
+    files: { url: string; name: string; fileId: string; width: number; height: number; size: number; alt: string }[]
   ) {
     isSavingImages = true;
     imageError = null;
@@ -111,6 +114,7 @@
         saveForm.append("width", file.width.toString());
         saveForm.append("height", file.height.toString());
         saveForm.append("fileSize", file.size.toString());
+        saveForm.append("alt", file.alt);
 
         await fetch(`?/addImage`, {
           method: "POST",
@@ -604,7 +608,7 @@
                 <div class="group relative">
                   <img
                     src="{asset.source}?tr=w-100,h-100,fo-auto"
-                    alt={asset.name}
+                    alt={asset.alt || asset.name}
                     class="h-24 w-full rounded border border-gray-200 object-cover {data.product
                       .featuredAssetId === asset.id
                       ? 'ring-2 ring-blue-500'
@@ -613,18 +617,19 @@
                   <div
                     class="absolute inset-0 flex items-center justify-center gap-1 rounded bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
                   >
-                    {#if data.product.featuredAssetId !== asset.id}
-                      <form method="POST" action="?/setFeaturedImage" use:enhance>
-                        <input type="hidden" name="assetId" value={asset.id} />
-                        <Button type="submit" size="sm" class="h-auto px-1.5 py-0.5 text-xs">
-                          Featured
-                        </Button>
-                      </form>
-                    {/if}
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      class="h-7 w-7 p-0"
+                      onclick={() => (editingImageAlt = { id: asset.id, alt: asset.alt || "", isFeatured: data.product.featuredAssetId === asset.id })}
+                    >
+                      <Pencil class="h-3.5 w-3.5" />
+                    </Button>
                     <form method="POST" action="?/removeImage" use:enhance>
                       <input type="hidden" name="assetId" value={asset.id} />
-                      <Button type="submit" variant="destructive" size="sm" class="h-auto px-1.5 py-0.5 text-xs">
-                        Remove
+                      <Button type="submit" variant="destructive" size="sm" class="h-7 w-7 p-0">
+                        <Trash2 class="h-3.5 w-3.5" />
                       </Button>
                     </form>
                   </div>
@@ -815,4 +820,77 @@
     onClose={() => (showImagePicker = false)}
     onSelect={handleImagesSelected}
   />
+
+  <!-- Edit Image Dialog -->
+  <Dialog.Root
+    open={editingImageAlt !== null}
+    onOpenChange={(open) => !open && (editingImageAlt = null)}
+  >
+    <Dialog.Content class="max-w-md">
+      <Dialog.Header>
+        <Dialog.Title>Edit Image</Dialog.Title>
+      </Dialog.Header>
+      {#if editingImageAlt}
+        {@const currentEditingImage = editingImageAlt}
+        {@const editingAsset = data.product.assets.find((a) => a.id === currentEditingImage.id)}
+        <div class="space-y-4 py-2">
+          {#if editingAsset}
+            <img
+              src="{editingAsset.source}?tr=w-200,h-200,fo-auto"
+              alt={currentEditingImage.alt || editingAsset.name}
+              class="mx-auto h-32 w-32 rounded-lg object-cover"
+            />
+          {/if}
+
+          <form
+            method="POST"
+            action="?/updateImageAlt"
+            use:enhance={() => {
+              return async ({ result, update }) => {
+                await update();
+                if (result.type === "success") {
+                  editingImageAlt = null;
+                }
+              };
+            }}
+          >
+            <input type="hidden" name="assetId" value={currentEditingImage.id} />
+            <div class="space-y-4">
+              <div>
+                <Label for="alt-text">Alt text</Label>
+                <Input
+                  id="alt-text"
+                  name="alt"
+                  value={currentEditingImage.alt}
+                  placeholder="Describe this image..."
+                  class="mt-1"
+                />
+                <p class="mt-1 text-xs text-gray-500">
+                  Describes the image for screen readers and search engines.
+                </p>
+              </div>
+
+              <label class="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  name="setFeatured"
+                  value="true"
+                  checked={currentEditingImage.isFeatured}
+                  disabled={currentEditingImage.isFeatured}
+                  class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <span class="text-sm text-gray-700">Featured image</span>
+              </label>
+            </div>
+            <Dialog.Footer class="mt-4">
+              <Button type="button" variant="outline" onclick={() => (editingImageAlt = null)}>
+                Cancel
+              </Button>
+              <Button type="submit">Save</Button>
+            </Dialog.Footer>
+          </form>
+        </div>
+      {/if}
+    </Dialog.Content>
+  </Dialog.Root>
 </div>

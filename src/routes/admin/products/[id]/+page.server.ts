@@ -226,6 +226,7 @@ export const actions: Actions = {
 		const width = Number(formData.get("width")) || 0;
 		const height = Number(formData.get("height")) || 0;
 		const fileSize = Number(formData.get("fileSize")) || 0;
+		const alt = formData.get("alt") as string;
 
 		if (!url || !name) {
 			return fail(400, { imageError: "Image data is required" });
@@ -234,6 +235,12 @@ export const actions: Actions = {
 		try {
 			const asset = await assetService.create({ name, url, fileId, width, height, fileSize });
 			await assetService.addToProduct(productId, asset.id);
+
+			// Update alt text if provided
+			if (alt) {
+				await assetService.updateAlt(asset.id, alt);
+			}
+
 			return { imageSuccess: true };
 		} catch (e) {
 			return fail(500, { imageError: "Failed to add image" });
@@ -288,6 +295,30 @@ export const actions: Actions = {
 			return { categorySuccess: true };
 		} catch (e) {
 			return fail(500, { categoryError: "Failed to update categories" });
+		}
+	},
+
+	updateImageAlt: async ({ params, request }) => {
+		const productId = Number(params.id);
+		const formData = await request.formData();
+		const assetId = Number(formData.get("assetId"));
+		const alt = formData.get("alt") as string;
+		const setFeatured = formData.get("setFeatured") === "true";
+
+		if (isNaN(assetId)) {
+			return fail(400, { imageError: "Invalid asset ID" });
+		}
+
+		try {
+			await assetService.updateAlt(assetId, alt || "");
+
+			if (setFeatured) {
+				await assetService.setFeaturedAsset(productId, assetId);
+			}
+
+			return { altUpdated: true };
+		} catch (e) {
+			return fail(500, { imageError: "Failed to update image" });
 		}
 	}
 };
