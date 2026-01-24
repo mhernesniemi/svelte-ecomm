@@ -2,15 +2,7 @@ import { productService } from "$lib/server/services/products.js";
 import { wishlistService } from "$lib/server/services/wishlist.js";
 import { reviewService } from "$lib/server/services/reviews.js";
 import { error, fail, redirect } from "@sveltejs/kit";
-import { BYPASS_TOKEN } from "$env/static/private";
 import type { PageServerLoad, Actions } from "./$types";
-
-export const config = {
-	isr: {
-		expiration: false,
-		bypassToken: BYPASS_TOKEN
-	}
-};
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const id = Number(params.id);

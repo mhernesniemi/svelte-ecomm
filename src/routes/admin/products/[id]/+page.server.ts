@@ -3,18 +3,8 @@ import { facetService } from "$lib/server/services/facets.js";
 import { assetService } from "$lib/server/services/assets.js";
 import { categoryService } from "$lib/server/services/categories.js";
 import { taxService } from "$lib/server/services/tax.js";
-import {
-	revalidateProduct,
-	revalidateListingPages
-} from "$lib/server/services/revalidation.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
-
-/** Get the English slug for a product, used for revalidation */
-async function getProductSlug(productId: number): Promise<string | null> {
-	const product = await productService.getById(productId, "en");
-	return product?.translations.find((t) => t.languageCode === "en")?.slug ?? null;
-}
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);
@@ -85,9 +75,6 @@ export const actions: Actions = {
 				]
 			});
 
-			// Revalidate product page and listing pages
-			await Promise.all([revalidateProduct(id, slugEn), revalidateListingPages()]);
-
 			return { success: true };
 		} catch (e) {
 			return fail(500, { error: "Failed to update product" });
@@ -97,16 +84,7 @@ export const actions: Actions = {
 	delete: async ({ params }) => {
 		const id = Number(params.id);
 
-		// Get slug before deletion for revalidation
-		const slug = await getProductSlug(id);
-
 		await productService.delete(id);
-
-		// Revalidate listing pages and product page (product removed)
-		await revalidateListingPages();
-		if (slug) {
-			await revalidateProduct(id, slug);
-		}
 
 		throw redirect(303, "/admin/products");
 	},
@@ -139,20 +117,13 @@ export const actions: Actions = {
 				}
 			}
 
-			// Revalidate product page and listing pages (facets affect filtering)
-			const slug = await getProductSlug(productId);
-			if (slug) {
-				await Promise.all([revalidateProduct(productId, slug), revalidateListingPages()]);
-			}
-
 			return { facetSuccess: true };
 		} catch (e) {
 			return fail(500, { error: "Failed to update facet values" });
 		}
 	},
 
-	updateVariantFacetValues: async ({ params, request }) => {
-		const productId = Number(params.id);
+	updateVariantFacetValues: async ({ request }) => {
 		const formData = await request.formData();
 		const variantId = Number(formData.get("variantId"));
 		const facetValueIds = formData.getAll("facetValueIds").map(Number);
@@ -184,12 +155,6 @@ export const actions: Actions = {
 				}
 			}
 
-			// Revalidate product page (variant facets changed)
-			const slug = await getProductSlug(productId);
-			if (slug) {
-				await revalidateProduct(productId, slug);
-			}
-
 			return { variantFacetSuccess: true };
 		} catch (e) {
 			return fail(500, { error: "Failed to update variant facet values" });
@@ -218,21 +183,14 @@ export const actions: Actions = {
 				translations: nameEn ? [{ languageCode: "en", name: nameEn }] : []
 			});
 
-			// Revalidate product page and listing pages (new variant may affect price display)
-			const slug = await getProductSlug(productId);
-			if (slug) {
-				await Promise.all([revalidateProduct(productId, slug), revalidateListingPages()]);
-			}
-
 			return { variantSuccess: true };
 		} catch (e) {
 			return fail(500, { variantError: "Failed to create variant" });
 		}
 	},
 
-	updateVariant: async ({ params, request }) => {
+	updateVariant: async ({ request }) => {
 		const formData = await request.formData();
-		const productId = Number(params.id);
 
 		const variantId = Number(formData.get("variantId"));
 		const sku = formData.get("sku") as string;
@@ -251,12 +209,6 @@ export const actions: Actions = {
 				stock,
 				translations: [{ languageCode: "en", name: nameEn || undefined }]
 			});
-
-			// Revalidate product page (stock changed)
-			const slug = await getProductSlug(productId);
-			if (slug) {
-				await revalidateProduct(productId, slug);
-			}
 
 			return { variantSuccess: true };
 		} catch (e) {
@@ -282,13 +234,6 @@ export const actions: Actions = {
 		try {
 			const asset = await assetService.create({ name, url, fileId, width, height, fileSize });
 			await assetService.addToProduct(productId, asset.id);
-
-			// Revalidate product page
-			const slug = await getProductSlug(productId);
-			if (slug) {
-				await revalidateProduct(productId, slug);
-			}
-
 			return { imageSuccess: true };
 		} catch (e) {
 			return fail(500, { imageError: "Failed to add image" });
@@ -307,13 +252,6 @@ export const actions: Actions = {
 		try {
 			await assetService.removeFromProduct(productId, assetId);
 			await assetService.delete(assetId);
-
-			// Revalidate product page
-			const slug = await getProductSlug(productId);
-			if (slug) {
-				await revalidateProduct(productId, slug);
-			}
-
 			return { imageRemoved: true };
 		} catch (e) {
 			return fail(500, { imageError: "Failed to remove image" });
@@ -331,13 +269,6 @@ export const actions: Actions = {
 
 		try {
 			await assetService.setFeaturedAsset(productId, assetId);
-
-			// Revalidate product page and listing pages (featured image affects listings)
-			const slug = await getProductSlug(productId);
-			if (slug) {
-				await Promise.all([revalidateProduct(productId, slug), revalidateListingPages()]);
-			}
-
 			return { featuredSet: true };
 		} catch (e) {
 			return fail(500, { imageError: "Failed to set featured image" });
@@ -354,13 +285,6 @@ export const actions: Actions = {
 
 		try {
 			await categoryService.setProductCategories(productId, categoryIds);
-
-			// Revalidate product page and listing pages (category pages affected)
-			const slug = await getProductSlug(productId);
-			if (slug) {
-				await Promise.all([revalidateProduct(productId, slug), revalidateListingPages()]);
-			}
-
 			return { categorySuccess: true };
 		} catch (e) {
 			return fail(500, { categoryError: "Failed to update categories" });

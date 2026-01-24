@@ -1,6 +1,5 @@
 import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
-import { revalidateListingPages } from "$lib/server/services/revalidation.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -66,9 +65,6 @@ export const actions: Actions = {
 						: [])
 				]
 			});
-
-			// Revalidate listing pages (new product added)
-			await revalidateListingPages();
 
 			throw redirect(303, `/admin/products/${product.id}`);
 		} catch (error) {
