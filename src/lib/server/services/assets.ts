@@ -84,7 +84,6 @@ class AssetService {
 
 	/**
 	 * Update asset alt text
-	 * Also syncs to ImageKit's custom metadata if configured
 	 */
 	async updateAlt(assetId: number, alt: string) {
 		const [asset] = await db
@@ -93,33 +92,7 @@ class AssetService {
 			.where(eq(assets.id, assetId))
 			.returning();
 
-		// Sync alt text to ImageKit as custom metadata
-		if (asset?.imagekitFileId) {
-			this.syncAltToImageKit(asset.imagekitFileId, alt).catch(() => {
-				// Silent fail - local DB is the source of truth
-			});
-		}
-
 		return asset;
-	}
-
-	/**
-	 * Sync alt text to ImageKit's custom metadata
-	 */
-	private async syncAltToImageKit(fileId: string, alt: string) {
-		const privateKey = env.IMAGEKIT_PRIVATE_KEY;
-		if (!privateKey) return;
-
-		await fetch(`https://api.imagekit.io/v1/files/${fileId}/details`, {
-			method: "PATCH",
-			headers: {
-				Authorization: `Basic ${Buffer.from(privateKey + ":").toString("base64")}`,
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				customMetadata: { alt }
-			})
-		});
 	}
 
 	/**
