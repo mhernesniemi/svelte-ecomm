@@ -91,18 +91,12 @@
     </nav>
 
     <div class="absolute right-0 bottom-0 left-0 border-t border-gray-800 bg-gray-900 p-4">
-      {#if data.adminUser}
-        <div class="mb-3 text-sm">
-          <p class="font-medium text-white">{data.adminUser.name}</p>
-          <p class="text-gray-400">{data.adminUser.email}</p>
-        </div>
-        <div class="flex items-center justify-between">
-          <form method="POST" action="/admin/logout" use:enhance>
-            <button type="submit" class="text-sm text-gray-400 hover:text-white">Logout</button>
-          </form>
-          <a href="/" class="text-sm text-gray-400 hover:text-white">Storefront</a>
-        </div>
-      {/if}
+      <div class="flex items-center justify-between">
+        <form method="POST" action="/admin/logout" use:enhance>
+          <button type="submit" class="text-sm text-gray-400 hover:text-white">Logout</button>
+        </form>
+        <a href="/" class="text-sm text-gray-400 hover:text-white">Storefront</a>
+      </div>
     </div>
   </aside>
 
