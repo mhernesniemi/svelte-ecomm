@@ -178,27 +178,29 @@
 
 <div>
   <div class="mb-6">
-    <a href="/admin/products" class="text-sm text-blue-600 hover:underline"
-      >&larr; Back to Products</a
-    >
+    <div class="mb-4 flex items-center justify-between">
+      <a href="/admin/products" class="text-sm text-blue-600 hover:underline"
+        >&larr; Back to Products</a
+      >
+      {#if enTrans?.slug}
+        <a
+          href="/products/{data.product.id}/{enTrans.slug}"
+          target="_blank"
+          class="text-sm text-gray-500 hover:text-gray-700"
+        >
+          View in store &rarr;
+        </a>
+      {/if}
+    </div>
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">Edit Product</h1>
-      <div class="flex items-center gap-3">
-        {#if enTrans?.slug}
-          <a
-            href="/products/{data.product.id}/{enTrans.slug}"
-            target="_blank"
-            class="text-sm text-gray-500 hover:text-gray-700"
-          >
-            View in store &rarr;
-          </a>
-        {/if}
+      <div class="flex items-center gap-6">
         <button
           type="button"
           onclick={() => (showDeleteConfirm = true)}
           class="text-sm text-red-600 hover:text-red-800"
         >
-          Delete
+          Delete Product
         </button>
         <Button type="submit" form="product-form" disabled={isSavingProduct}>
           {isSavingProduct ? "Saving..." : "Save Changes"}
