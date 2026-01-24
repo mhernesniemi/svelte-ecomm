@@ -16,19 +16,22 @@
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
+  import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
   import Check from "@lucide/svelte/icons/check";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import X from "@lucide/svelte/icons/x";
+  import Plus from "@lucide/svelte/icons/plus";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
   let activeTab = $state<"en" | "fi">("en");
   let showDeleteConfirm = $state(false);
+  let showImagePicker = $state(false);
   let editingVariant = $state<(typeof data.product.variants)[number] | "new" | null>(null);
   let editingVariantFacets = $state<number | null>(null);
-  let isUploading = $state(false);
-  let uploadError = $state<string | null>(null);
+  let isSavingImages = $state(false);
+  let imageError = $state<string | null>(null);
 
   // Selected facet values (bind:group handles reactivity)
   let selectedProductFacets = $state(data.product.facetValues.map((fv) => fv.id));
@@ -93,49 +96,21 @@
   const enTrans = getTranslation("en");
   const fiTrans = getTranslation("fi");
 
-  async function handleImageUpload(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const files = input.files;
-    if (!files || files.length === 0) return;
-
-    isUploading = true;
-    uploadError = null;
+  async function handleImagesSelected(
+    files: { url: string; name: string; fileId: string; width: number; height: number; size: number }[]
+  ) {
+    isSavingImages = true;
+    imageError = null;
 
     try {
-      // Get auth params from server
-      const authResponse = await fetch("/api/assets/auth");
-      const auth = await authResponse.json();
-
-      // Upload each file to ImageKit
       for (const file of files) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("publicKey", auth.publicKey);
-        formData.append("signature", auth.signature);
-        formData.append("expire", auth.expire.toString());
-        formData.append("token", auth.token);
-        formData.append("fileName", file.name);
-        formData.append("folder", `/products/${data.product.id}`);
-
-        const uploadResponse = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
-          method: "POST",
-          body: formData
-        });
-
-        if (!uploadResponse.ok) {
-          throw new Error("Upload failed");
-        }
-
-        const result = await uploadResponse.json();
-
-        // Save to database via form action
         const saveForm = new FormData();
-        saveForm.append("url", result.url);
-        saveForm.append("name", result.name);
-        saveForm.append("fileId", result.fileId);
-        saveForm.append("width", result.width?.toString() ?? "0");
-        saveForm.append("height", result.height?.toString() ?? "0");
-        saveForm.append("fileSize", result.size?.toString() ?? "0");
+        saveForm.append("url", file.url);
+        saveForm.append("name", file.name);
+        saveForm.append("fileId", file.fileId);
+        saveForm.append("width", file.width.toString());
+        saveForm.append("height", file.height.toString());
+        saveForm.append("fileSize", file.size.toString());
 
         await fetch(`?/addImage`, {
           method: "POST",
@@ -146,10 +121,9 @@
       // Reload page to show new images
       window.location.reload();
     } catch (e) {
-      uploadError = e instanceof Error ? e.message : "Upload failed";
+      imageError = e instanceof Error ? e.message : "Failed to save images";
     } finally {
-      isUploading = false;
-      input.value = "";
+      isSavingImages = false;
     }
   }
 </script>
@@ -601,21 +575,31 @@
     <div class="w-80 shrink-0 space-y-6">
       <!-- Images Section -->
       <div class="rounded-lg bg-white shadow">
-        <div class="border-b border-gray-200 px-4 py-3">
+        <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
           <h2 class="font-semibold">Images</h2>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onclick={() => (showImagePicker = true)}
+            disabled={isSavingImages}
+          >
+            <Plus class="mr-1 h-4 w-4" />
+            Add
+          </Button>
         </div>
 
         {#if form?.imageError}
           <Alert variant="destructive" class="mx-4 mt-3">{form.imageError}</Alert>
         {/if}
 
-        {#if uploadError}
-          <Alert variant="destructive" class="mx-4 mt-3">{uploadError}</Alert>
+        {#if imageError}
+          <Alert variant="destructive" class="mx-4 mt-3">{imageError}</Alert>
         {/if}
 
         <div class="p-4">
           {#if data.product.assets.length > 0}
-            <div class="mb-4 grid grid-cols-2 gap-2">
+            <div class="grid grid-cols-2 gap-2">
               {#each data.product.assets as asset}
                 <div class="group relative">
                   <img
@@ -653,23 +637,9 @@
                 </div>
               {/each}
             </div>
+          {:else}
+            <p class="py-4 text-center text-sm text-gray-500">No images yet</p>
           {/if}
-
-          <label
-            class="flex cursor-pointer items-center justify-center rounded-lg border-2 border-dashed border-gray-300 py-4 text-center hover:border-blue-500 hover:bg-gray-50"
-          >
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              class="hidden"
-              onchange={handleImageUpload}
-              disabled={isUploading}
-            />
-            <span class="text-sm text-gray-600"
-              >{isUploading ? "Uploading..." : "Upload images"}</span
-            >
-          </label>
         </div>
       </div>
 
@@ -750,18 +720,14 @@
           {:else}
             <!-- Combobox -->
             <Popover.Root bind:open={categoryComboboxOpen}>
-              <Popover.Trigger class="w-full">
-                <button
-                  type="button"
-                  role="combobox"
-                  aria-expanded={categoryComboboxOpen}
-                  aria-controls="category-listbox"
-                  aria-haspopup="listbox"
-                  class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
-                >
-                  <span class="text-gray-500">Select categories...</span>
-                  <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </button>
+              <Popover.Trigger
+                class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                aria-expanded={categoryComboboxOpen}
+                aria-controls="category-listbox"
+                aria-haspopup="listbox"
+              >
+                <span class="text-gray-500">Select categories...</span>
+                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Popover.Trigger>
               <Popover.Content class="w-72 p-0" align="start">
                 <Command.Root>
@@ -842,4 +808,11 @@
       </Dialog.Footer>
     </Dialog.Content>
   </Dialog.Root>
+
+  <!-- Image Picker Dialog -->
+  <ImagePicker
+    bind:open={showImagePicker}
+    onClose={() => (showImagePicker = false)}
+    onSelect={handleImagesSelected}
+  />
 </div>

@@ -179,6 +179,47 @@ class AssetService {
 	async delete(assetId: number) {
 		await db.delete(assets).where(eq(assets.id, assetId));
 	}
+
+	/**
+	 * List files from ImageKit folder
+	 */
+	async listFromImageKit(folder: string = "/products"): Promise<ImageKitFile[]> {
+		const privateKey = env.IMAGEKIT_PRIVATE_KEY;
+		if (!privateKey) {
+			throw new Error("IMAGEKIT_PRIVATE_KEY not configured");
+		}
+
+		const params = new URLSearchParams({
+			path: folder,
+			type: "file",
+			limit: "100",
+			sort: "DESC_CREATED"
+		});
+
+		const response = await fetch(`https://api.imagekit.io/v1/files?${params}`, {
+			headers: {
+				Authorization: `Basic ${Buffer.from(privateKey + ":").toString("base64")}`
+			}
+		});
+
+		if (!response.ok) {
+			throw new Error("Failed to list ImageKit files");
+		}
+
+		return response.json();
+	}
+}
+
+export interface ImageKitFile {
+	fileId: string;
+	name: string;
+	url: string;
+	thumbnail: string;
+	width: number;
+	height: number;
+	size: number;
+	filePath: string;
+	fileType: string;
 }
 
 export const assetService = new AssetService();
