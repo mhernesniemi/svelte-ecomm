@@ -15,6 +15,10 @@
 
 <svelte:head>
   <title>Categories | Hoikka</title>
+  <meta name="description" content="Browse products by category. Find exactly what you're looking for." />
+  <meta property="og:title" content="Categories | Hoikka" />
+  <meta property="og:description" content="Browse products by category. Find exactly what you're looking for." />
+  <meta property="og:type" content="website" />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

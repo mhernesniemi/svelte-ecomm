@@ -126,9 +126,42 @@
     name="description"
     content={enTrans?.description?.slice(0, 160) ?? "View product details and add to cart."}
   />
+  <meta property="og:title" content={enTrans?.name ?? "Product"} />
+  <meta property="og:description" content={enTrans?.description?.slice(0, 160) ?? ""} />
+  <meta property="og:type" content="product" />
   {#if product.featuredAsset}
     <meta property="og:image" content={product.featuredAsset.source} />
   {/if}
+
+  <!-- JSON-LD Structured Data -->
+  {@html `<script type="application/ld+json">${JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: enTrans?.name,
+    description: enTrans?.description,
+    image: product.featuredAsset?.source,
+    sku: product.variants[0]?.sku,
+    offers: {
+      "@type": "AggregateOffer",
+      priceCurrency: "EUR",
+      lowPrice: (Math.min(...product.variants.map((v) => v.price)) / 100).toFixed(2),
+      highPrice: (Math.max(...product.variants.map((v) => v.price)) / 100).toFixed(2),
+      offerCount: product.variants.length,
+      availability:
+        product.variants.some((v) => v.stock > 0)
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock"
+    },
+    ...(data.rating.count > 0
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: data.rating.average.toFixed(1),
+            reviewCount: data.rating.count
+          }
+        }
+      : {})
+  })}</script>`}
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

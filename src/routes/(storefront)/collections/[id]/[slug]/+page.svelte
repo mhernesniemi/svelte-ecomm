@@ -4,23 +4,25 @@
 
   let { data } = $props();
 
-  function getTranslation(
-    translations: {
-      languageCode: string;
-      name: string;
-      slug?: string;
-      description?: string | null;
-    }[],
-    lang: string
-  ) {
-    return translations.find((t) => t.languageCode === lang) ?? translations[0];
+  type CollectionTranslation = {
+    languageCode: string;
+    name: string;
+    slug?: string;
+    description?: string | null;
+  };
+
+  type ProductTranslation = {
+    languageCode: string;
+    name: string;
+    slug: string;
+  };
+
+  function getTranslation(translations: CollectionTranslation[], lang: string) {
+    return translations.find((t: CollectionTranslation) => t.languageCode === lang) ?? translations[0];
   }
 
-  function getProductTranslation(
-    translations: { languageCode: string; name: string; slug: string }[],
-    lang: string
-  ) {
-    return translations.find((t) => t.languageCode === lang) ?? translations[0];
+  function getProductTranslation(translations: ProductTranslation[], lang: string) {
+    return translations.find((t: ProductTranslation) => t.languageCode === lang) ?? translations[0];
   }
 
   function getLowestPrice(variants: { price: number }[]): number {
@@ -36,7 +38,17 @@
 </script>
 
 <svelte:head>
-  <title>{collectionTrans?.name ?? "Collection"}</title>
+  <title>{collectionTrans?.name ?? "Collection"} | Hoikka</title>
+  <meta
+    name="description"
+    content={collectionTrans?.description?.slice(0, 160) ?? `Browse our ${collectionTrans?.name} collection.`}
+  />
+  <meta property="og:title" content="{collectionTrans?.name ?? 'Collection'} | Hoikka" />
+  <meta
+    property="og:description"
+    content={collectionTrans?.description?.slice(0, 160) ?? `Browse our ${collectionTrans?.name} collection.`}
+  />
+  <meta property="og:type" content="website" />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
