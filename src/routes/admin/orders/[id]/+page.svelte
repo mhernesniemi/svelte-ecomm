@@ -1,8 +1,15 @@
 <script lang="ts">
+  import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  // Show toast notifications based on form results
+  $effect(() => {
+    if (form?.success) toast.success("Order updated successfully");
+    if (form?.error) toast.error(form.error);
+  });
 
   const transitions: Record<string, string[]> = {
     created: ["payment_pending", "cancelled"],
@@ -16,23 +23,13 @@
   const nextStates = $derived(transitions[data.order.state] ?? []);
 </script>
 
+<svelte:head><title>Order Details | Admin</title></svelte:head>
+
 <div>
   <div class="mb-8">
     <a href="/admin/orders" class="text-sm text-blue-600 hover:underline">&larr; Back to Orders</a>
     <h1 class="mt-2 text-2xl font-bold">Order {data.order.code}</h1>
   </div>
-
-  {#if form?.success}
-    <div class="mb-6 rounded border border-green-200 bg-green-50 px-4 py-3 text-green-700">
-      Order updated successfully
-    </div>
-  {/if}
-
-  {#if form?.error}
-    <div class="mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-      {form.error}
-    </div>
-  {/if}
 
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
     <!-- Order Details -->

@@ -39,6 +39,8 @@
   }
 </script>
 
+<svelte:head><title>Customer Details | Admin</title></svelte:head>
+
 <div>
   <div class="mb-8">
     <a href="/admin/customers" class="text-sm text-blue-600 hover:underline"

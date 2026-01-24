@@ -47,6 +47,8 @@
   }
 </script>
 
+<svelte:head><title>Reviews | Admin</title></svelte:head>
+
 <div>
   <div class="mb-8 flex items-center justify-between">
     <h1 class="text-2xl font-bold">Reviews</h1>

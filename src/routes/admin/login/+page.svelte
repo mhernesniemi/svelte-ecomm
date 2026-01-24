@@ -7,6 +7,8 @@
   let isLoading = $state(false);
 </script>
 
+<svelte:head><title>Login | Admin</title></svelte:head>
+
 <div class="flex min-h-screen items-center justify-center bg-gray-900 font-sans">
   <div class="w-full max-w-sm">
     <div class="rounded-lg bg-white p-8 shadow-lg">

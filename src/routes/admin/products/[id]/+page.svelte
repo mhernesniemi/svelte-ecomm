@@ -1,9 +1,9 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
-  import { Alert } from "$lib/components/admin/ui/alert";
   import { Badge } from "$lib/components/admin/ui/badge";
   import {
     Table,
@@ -27,6 +27,19 @@
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
+  // Show toast notifications based on form results
+  $effect(() => {
+    if (form?.success) toast.success("Product updated successfully");
+    if (form?.error) toast.error(form.error);
+    if (form?.variantSuccess) toast.success("Variant saved successfully");
+    if (form?.variantError) toast.error(form.variantError);
+    if (form?.variantFacetSuccess) toast.success("Variant facet values updated");
+    if (form?.imageError) toast.error(form.imageError);
+    if (form?.imageRemoved) toast.success("Image removed");
+    if (form?.featuredSet) toast.success("Featured image updated");
+    if (form?.altUpdated) toast.success("Image updated");
+  });
+
   let activeTab = $state<"en" | "fi">("en");
   let showDeleteConfirm = $state(false);
   let showImagePicker = $state(false);
@@ -34,7 +47,6 @@
   let editingVariantFacets = $state<number | null>(null);
   let isSavingImages = $state(false);
   let isSavingProduct = $state(false);
-  let imageError = $state<string | null>(null);
   let editingImageAlt = $state<{ id: number; alt: string; isFeatured: boolean } | null>(null);
 
   // Selected facet values (bind:group handles reactivity)
@@ -147,7 +159,6 @@
     }[]
   ) {
     isSavingImages = true;
-    imageError = null;
 
     try {
       for (const file of files) {
@@ -169,12 +180,14 @@
       // Reload page to show new images
       window.location.reload();
     } catch (e) {
-      imageError = e instanceof Error ? e.message : "Failed to save images";
+      toast.error(e instanceof Error ? e.message : "Failed to save images");
     } finally {
       isSavingImages = false;
     }
   }
 </script>
+
+<svelte:head><title>Edit Product | Admin</title></svelte:head>
 
 <div>
   <div class="mb-6">
@@ -209,14 +222,6 @@
     </div>
   </div>
 
-  {#if form?.success}
-    <Alert variant="success" class="mb-6">Product updated successfully</Alert>
-  {/if}
-
-  {#if form?.error}
-    <Alert variant="destructive" class="mb-6">{form.error}</Alert>
-  {/if}
-
   <!-- Two Column Layout -->
   <div class="flex gap-6">
     <!-- Main Content (Left) -->
@@ -229,7 +234,7 @@
         use:enhance={() => {
           isSavingProduct = true;
           return async ({ update }) => {
-            await update();
+            await update({ reset: false });
             isSavingProduct = false;
           };
         }}
@@ -407,14 +412,6 @@
           </Button>
         </div>
 
-        {#if form?.variantSuccess}
-          <Alert variant="success" class="mx-6 mt-4">Variant saved successfully</Alert>
-        {/if}
-
-        {#if form?.variantError}
-          <Alert variant="destructive" class="mx-6 mt-4">{form.variantError}</Alert>
-        {/if}
-
         <!-- Add/Edit Variant Form -->
         {#if editingVariant}
           {@const isEditing = editingVariant !== "new"}
@@ -509,10 +506,6 @@
               </Button>
             </div>
           </form>
-        {/if}
-
-        {#if form?.variantFacetSuccess}
-          <Alert variant="success" class="mx-6 mt-4">Variant facet values updated</Alert>
         {/if}
 
         <!-- Variants Table -->
@@ -648,14 +641,6 @@
             Add
           </Button>
         </div>
-
-        {#if form?.imageError}
-          <Alert variant="destructive" class="mx-4 mt-3">{form.imageError}</Alert>
-        {/if}
-
-        {#if imageError}
-          <Alert variant="destructive" class="mx-4 mt-3">{imageError}</Alert>
-        {/if}
 
         <div class="p-4">
           {#if data.product.assets.length > 0}

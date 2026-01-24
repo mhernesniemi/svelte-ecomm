@@ -1,9 +1,15 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  // Show toast notifications based on form results
+  $effect(() => {
+    if (form?.error) toast.error(form.error);
+  });
 
   let activeTab = $state<"en" | "fi">("en");
 
@@ -31,6 +37,8 @@
   });
 </script>
 
+<svelte:head><title>New Product | Admin</title></svelte:head>
+
 <div>
   <div class="mb-8">
     <a href="/admin/products" class="text-sm text-blue-600 hover:underline"
@@ -39,13 +47,15 @@
     <h1 class="mt-2 text-2xl font-bold">Create Product</h1>
   </div>
 
-  {#if form?.error}
-    <div class="mb-6 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-      {form.error}
-    </div>
-  {/if}
-
-  <form method="POST" use:enhance class="rounded-lg bg-white shadow">
+  <form
+    method="POST"
+    use:enhance={() => {
+      return async ({ update }) => {
+        await update({ reset: false });
+      };
+    }}
+    class="rounded-lg bg-white shadow"
+  >
     <!-- Language Tabs -->
     <div class="border-b border-gray-200">
       <div class="flex">

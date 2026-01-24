@@ -1,12 +1,19 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
+  import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
 
   let { data, form } = $props();
+
+  // Show toast notifications based on form results
+  $effect(() => {
+    if (form?.success) toast.success(form.message || "Collection updated");
+    if (form?.error) toast.error(form.error);
+  });
 
   let activeTab = $state<"en" | "fi">("en");
   let isSubmitting = $state(false);
@@ -104,6 +111,8 @@
   }
 </script>
 
+<svelte:head><title>Edit Collection | Admin</title></svelte:head>
+
 <div class="space-y-6">
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-4">
@@ -132,27 +141,15 @@
     </div>
   </div>
 
-  {#if form?.error}
-    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-      {form.error}
-    </div>
-  {/if}
-
-  {#if form?.success}
-    <div class="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-600">
-      {form.message}
-    </div>
-  {/if}
-
   <!-- Basic Info Form -->
   <form
     method="POST"
     action="?/update"
     use:enhance={() => {
       isSubmitting = true;
-      return async ({ result, update }) => {
+      return async ({ update }) => {
         isSubmitting = false;
-        await update();
+        await update({ reset: false });
       };
     }}
     class="space-y-6"

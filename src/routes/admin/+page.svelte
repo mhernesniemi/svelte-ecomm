@@ -5,6 +5,8 @@
   let { data }: { data: PageData } = $props();
 </script>
 
+<svelte:head><title>Dashboard | Admin</title></svelte:head>
+
 <div>
   <h1 class="mb-8 text-2xl font-bold">Dashboard</h1>
 

@@ -30,6 +30,8 @@
   }
 </script>
 
+<svelte:head><title>Orders | Admin</title></svelte:head>
+
 <div>
   <h1 class="mb-8 text-2xl font-bold">Orders</h1>
 

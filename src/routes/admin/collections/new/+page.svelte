@@ -1,10 +1,16 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Info from "@lucide/svelte/icons/info";
 
   let { data, form } = $props();
+
+  // Show toast notifications based on form results
+  $effect(() => {
+    if (form?.error) toast.error(form.error);
+  });
 
   let activeTab = $state<"en" | "fi">("en");
   let isSubmitting = $state(false);
@@ -40,6 +46,8 @@
   });
 </script>
 
+<svelte:head><title>New Collection | Admin</title></svelte:head>
+
 <div class="space-y-6">
   <div class="flex items-center gap-4">
     <a
@@ -52,19 +60,13 @@
     <h1 class="text-2xl font-bold text-gray-900">Create Collection</h1>
   </div>
 
-  {#if form?.error}
-    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-600">
-      {form.error}
-    </div>
-  {/if}
-
   <form
     method="POST"
     use:enhance={() => {
       isSubmitting = true;
-      return async ({ result, update }) => {
+      return async ({ update }) => {
         isSubmitting = false;
-        await update();
+        await update({ reset: false });
       };
     }}
     class="space-y-6"
