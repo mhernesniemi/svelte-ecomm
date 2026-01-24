@@ -50,11 +50,16 @@ export const actions: Actions = {
 		const visibility = formData.get("visibility") as "public" | "private" | "hidden";
 		const taxCode = formData.get("taxCode") as string;
 
+		// Facet values and categories
+		const facetValueIds = formData.getAll("facetValueIds").map(Number).filter((id) => !isNaN(id));
+		const categoryIds = formData.getAll("categoryIds").map(Number).filter((id) => !isNaN(id));
+
 		if (!nameEn || !slugEn) {
 			return fail(400, { error: "English name and slug are required" });
 		}
 
 		try {
+			// Update product
 			await productService.update(id, {
 				type,
 				visibility,
@@ -74,6 +79,25 @@ export const actions: Actions = {
 					}
 				]
 			});
+
+			// Update facet values
+			const product = await productService.getById(id, "en");
+			if (product) {
+				const currentFacetIds = product.facetValues.map((fv) => fv.id);
+				for (const fvId of currentFacetIds) {
+					if (!facetValueIds.includes(fvId)) {
+						await productService.removeFacetValue(id, fvId);
+					}
+				}
+				for (const fvId of facetValueIds) {
+					if (!currentFacetIds.includes(fvId)) {
+						await productService.addFacetValue(id, fvId);
+					}
+				}
+			}
+
+			// Update categories
+			await categoryService.setProductCategories(id, categoryIds);
 
 			return { success: true };
 		} catch (e) {

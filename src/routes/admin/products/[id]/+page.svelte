@@ -33,6 +33,7 @@
   let editingVariant = $state<(typeof data.product.variants)[number] | "new" | null>(null);
   let editingVariantFacets = $state<number | null>(null);
   let isSavingImages = $state(false);
+  let isSavingProduct = $state(false);
   let imageError = $state<string | null>(null);
   let editingImageAlt = $state<{ id: number; alt: string; isFeatured: boolean } | null>(null);
 
@@ -45,6 +46,41 @@
   // Selected categories
   let selectedCategories = $state(data.productCategories.map((c) => c.id));
   let categoryComboboxOpen = $state(false);
+
+  // Facet values combobox
+  let facetComboboxOpen = $state(false);
+
+  // Flatten facet values for combobox display
+  type FlatFacetValue = {
+    id: number;
+    name: string;
+    facetName: string;
+  };
+
+  const flatFacetValues: FlatFacetValue[] = data.facets.flatMap((facet) => {
+    const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+    return facet.values.map((value) => ({
+      id: value.id,
+      name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
+      facetName
+    }));
+  });
+
+  function getSelectedFacetValueObjects() {
+    return flatFacetValues.filter((fv) => selectedProductFacets.includes(fv.id));
+  }
+
+  function toggleFacetValue(id: number) {
+    if (selectedProductFacets.includes(id)) {
+      selectedProductFacets = selectedProductFacets.filter((fv) => fv !== id);
+    } else {
+      selectedProductFacets = [...selectedProductFacets, id];
+    }
+  }
+
+  function removeFacetValue(id: number) {
+    selectedProductFacets = selectedProductFacets.filter((fv) => fv !== id);
+  }
 
   // Helper to get translated name
   function getCategoryName(translations: { languageCode: string; name: string }[]): string {
@@ -147,15 +183,27 @@
     >
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">Edit Product</h1>
-      {#if enTrans?.slug}
-        <a
-          href="/products/{data.product.id}/{enTrans.slug}"
-          target="_blank"
-          class="text-sm text-gray-500 hover:text-gray-700"
+      <div class="flex items-center gap-3">
+        {#if enTrans?.slug}
+          <a
+            href="/products/{data.product.id}/{enTrans.slug}"
+            target="_blank"
+            class="text-sm text-gray-500 hover:text-gray-700"
+          >
+            View in store &rarr;
+          </a>
+        {/if}
+        <button
+          type="button"
+          onclick={() => (showDeleteConfirm = true)}
+          class="text-sm text-red-600 hover:text-red-800"
         >
-          View in store &rarr;
-        </a>
-      {/if}
+          Delete
+        </button>
+        <Button type="submit" form="product-form" disabled={isSavingProduct}>
+          {isSavingProduct ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
     </div>
   </div>
 
@@ -172,7 +220,19 @@
     <!-- Main Content (Left) -->
     <div class="flex-1 space-y-6">
       <!-- Product Form -->
-      <form method="POST" action="?/update" use:enhance class="rounded-lg bg-white shadow">
+      <form
+        id="product-form"
+        method="POST"
+        action="?/update"
+        use:enhance={() => {
+          isSavingProduct = true;
+          return async ({ update }) => {
+            await update();
+            isSavingProduct = false;
+          };
+        }}
+        class="rounded-lg bg-white shadow"
+      >
         <!-- Language Tabs -->
         <div class="border-b border-gray-200">
           <div class="flex">
@@ -289,7 +349,7 @@
           </div>
 
           <!-- Common Fields -->
-          <div class="grid grid-cols-3 gap-4 border-t border-gray-200 pt-6">
+          <div class="grid grid-cols-3 gap-4">
             <label class="block">
               <span class="text-sm font-medium text-gray-700">Product Type</span>
               <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
@@ -329,18 +389,6 @@
               </select>
             </label>
           </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="flex justify-between border-t border-gray-200 bg-gray-50 px-6 py-4">
-          <button
-            type="button"
-            onclick={() => (showDeleteConfirm = true)}
-            class="text-sm text-red-600 hover:text-red-800"
-          >
-            Delete Product
-          </button>
-          <Button type="submit">Save Changes</Button>
         </div>
       </form>
 
@@ -665,53 +713,81 @@
           <h2 class="font-semibold">Facet Values</h2>
         </div>
 
-        {#if form?.facetSuccess}
-          <Alert variant="success" class="mx-4 mt-3">Facet values updated</Alert>
-        {/if}
-
-        <form method="POST" action="?/updateFacetValues" use:enhance class="p-4">
+        <div class="p-4">
           {#if data.facets.length === 0}
             <p class="text-sm text-gray-500">No facets defined.</p>
           {:else}
-            <div class="space-y-4">
-              {#each data.facets as facet}
-                {@const facetName =
-                  facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code}
-                <div>
-                  <p class="mb-1.5 text-sm font-medium text-gray-700">{facetName}</p>
-                  {#if facet.values.length === 0}
-                    <p class="text-xs text-gray-400">No values</p>
-                  {:else}
-                    <div class="flex flex-wrap gap-1.5">
-                      {#each facet.values as value}
-                        {@const valueName =
-                          value.translations.find((t) => t.languageCode === "en")?.name ??
-                          value.code}
-                        <label
-                          class="cursor-pointer rounded-full px-2 py-1 text-xs transition-colors {selectedProductFacets.includes(
-                            value.id
-                          )
-                            ? 'border border-blue-300 bg-blue-100 text-blue-800'
-                            : 'border border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                        >
-                          <input
-                            type="checkbox"
-                            name="facetValueIds"
-                            value={value.id}
-                            bind:group={selectedProductFacets}
-                            class="sr-only"
-                          />
-                          {valueName}
-                        </label>
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-              {/each}
-            </div>
-            <Button type="submit" class="mt-4 w-full">Save Facets</Button>
+            <!-- Combobox -->
+            <Popover.Root bind:open={facetComboboxOpen}>
+              <Popover.Trigger
+                class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                aria-expanded={facetComboboxOpen}
+                aria-controls="facet-listbox"
+                aria-haspopup="listbox"
+              >
+                <span class="text-gray-500">Select facet values...</span>
+                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Popover.Trigger>
+              <Popover.Content class="w-72 p-0" align="start">
+                <Command.Root>
+                  <Command.Input placeholder="Search facet values..." />
+                  <Command.List id="facet-listbox" class="max-h-64">
+                    <Command.Empty>No facet value found.</Command.Empty>
+                    {#each data.facets as facet}
+                      {@const facetName =
+                        facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code}
+                      {#if facet.values.length > 0}
+                        <Command.Group heading={facetName}>
+                          {#each facet.values as value}
+                            {@const valueName =
+                              value.translations.find((t) => t.languageCode === "en")?.name ??
+                              value.code}
+                            <Command.Item
+                              value="{facetName} {valueName}"
+                              onSelect={() => toggleFacetValue(value.id)}
+                              class="cursor-pointer"
+                            >
+                              <div class="flex w-full items-center gap-2">
+                                <div class="flex h-4 w-4 items-center justify-center">
+                                  {#if selectedProductFacets.includes(value.id)}
+                                    <Check class="h-4 w-4" />
+                                  {/if}
+                                </div>
+                                <span>{valueName}</span>
+                              </div>
+                            </Command.Item>
+                          {/each}
+                        </Command.Group>
+                      {/if}
+                    {/each}
+                  </Command.List>
+                </Command.Root>
+              </Popover.Content>
+            </Popover.Root>
+
+            <!-- Selected facet values -->
+            {#if selectedProductFacets.length > 0}
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                {#each getSelectedFacetValueObjects() as fv}
+                  <span
+                    class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800"
+                  >
+                    {fv.facetName}: {fv.name}
+                    <button
+                      type="button"
+                      onclick={() => removeFacetValue(fv.id)}
+                      class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200"
+                      aria-label="Remove {fv.name}"
+                    >
+                      <X class="h-3 w-3" />
+                    </button>
+                  </span>
+                  <input form="product-form" type="hidden" name="facetValueIds" value={fv.id} />
+                {/each}
+              </div>
+            {/if}
           {/if}
-        </form>
+        </div>
       </div>
 
       <!-- Categories Section -->
@@ -720,15 +796,7 @@
           <h2 class="font-semibold">Categories</h2>
         </div>
 
-        {#if form?.categorySuccess}
-          <Alert variant="success" class="mx-4 mt-3">Categories updated</Alert>
-        {/if}
-
-        {#if form?.categoryError}
-          <Alert variant="destructive" class="mx-4 mt-3">{form.categoryError}</Alert>
-        {/if}
-
-        <form method="POST" action="?/updateCategories" use:enhance class="p-4">
+        <div class="p-4">
           {#if data.categoryTree.length === 0}
             <p class="text-sm text-gray-500">No categories defined.</p>
           {:else}
@@ -791,14 +859,12 @@
                       <X class="h-3 w-3" />
                     </button>
                   </span>
-                  <input type="hidden" name="categoryIds" value={category.id} />
+                  <input form="product-form" type="hidden" name="categoryIds" value={category.id} />
                 {/each}
               </div>
             {/if}
-
-            <Button type="submit" class="mt-4 w-full">Save Categories</Button>
           {/if}
-        </form>
+        </div>
       </div>
     </div>
   </div>
