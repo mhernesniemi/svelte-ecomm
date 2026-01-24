@@ -36,10 +36,8 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="rounded-lg bg-white shadow">
-  <div class="border-b p-6">
-    <h2 class="text-lg font-semibold">Order History</h2>
-  </div>
+<div>
+  <h2 class="mb-4 text-lg font-semibold">Order History</h2>
 
   {#if data.orders.length === 0}
     <div class="p-6 text-center text-gray-500">
@@ -51,15 +49,13 @@
   {:else}
     <div class="divide-y">
       {#each data.orders as order}
-        <div class="p-6">
+        <div class="rounded-lg border border-gray-200 p-6">
           <div class="mb-4 flex items-center justify-between">
             <div>
               <p class="font-medium">Order #{order.code}</p>
               <p class="text-sm text-gray-500">{formatDate(order.createdAt)}</p>
             </div>
-            <span
-              class="rounded-full px-3 py-1 text-sm font-medium {getStateColor(order.state)}"
-            >
+            <span class="rounded-full px-3 py-1 text-sm font-medium {getStateColor(order.state)}">
               {order.state}
             </span>
           </div>
@@ -68,10 +64,7 @@
             <p class="text-gray-600">
               Total: <span class="font-medium text-gray-900">${formatPrice(order.total)}</span>
             </p>
-            <a
-              href="/account/orders/{order.id}"
-              class="text-sm text-blue-600 hover:underline"
-            >
+            <a href="/account/orders/{order.id}" class="text-sm text-blue-600 hover:underline">
               View details
             </a>
           </div>

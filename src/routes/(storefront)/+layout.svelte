@@ -171,7 +171,7 @@
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal">
-                <button type="button" class="text-sm text-gray-600 hover:text-gray-900">Sign in</button>
+                <UserIcon class="h-6 w-6" />
               </SignInButton>
             </SignedOut>
 

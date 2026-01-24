@@ -40,7 +40,7 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="rounded-lg bg-white shadow">
+<div>
   <!-- Header -->
   <div class="border-b p-6">
     <a
@@ -56,9 +56,7 @@
         <h2 class="text-lg font-semibold">Order #{data.order.code}</h2>
         <p class="text-sm text-gray-500">{formatDate(data.order.createdAt)}</p>
       </div>
-      <span
-        class="rounded-full px-3 py-1 text-sm font-medium {getStateColor(data.order.state)}"
-      >
+      <span class="rounded-full px-3 py-1 text-sm font-medium {getStateColor(data.order.state)}">
         {data.order.state}
       </span>
     </div>
@@ -111,7 +109,9 @@
       {#if data.order.discount > 0}
         <div class="flex justify-between text-sm">
           <span class="text-gray-600">Discount</span>
-          <span class="text-green-600">-{formatPrice(data.order.discount)} {data.order.currencyCode}</span>
+          <span class="text-green-600"
+            >-{formatPrice(data.order.discount)} {data.order.currencyCode}</span
+          >
         </div>
       {/if}
       {#if data.order.taxTotal > 0}

@@ -26,9 +26,7 @@
       <p class="text-sm text-gray-600">Manage your shipping addresses</p>
     </div>
     {#if !showAddForm && !editingAddressId}
-      <Button type="button" onclick={() => (showAddForm = true)}>
-        Add Address
-      </Button>
+      <Button type="button" onclick={() => (showAddForm = true)}>Add Address</Button>
     {/if}
   </div>
 
@@ -176,9 +174,7 @@
             name="isDefault"
             class="h-4 w-4 rounded border-gray-300 text-blue-600"
           />
-          <label for="isDefault" class="text-sm text-gray-700">
-            Set as default address
-          </label>
+          <label for="isDefault" class="text-sm text-gray-700"> Set as default address </label>
         </div>
 
         <div class="flex justify-end gap-3">
@@ -240,10 +236,7 @@
           </div>
 
           <div>
-            <label
-              for="edit_streetLine1"
-              class="mb-1 block text-sm font-medium text-gray-700"
-            >
+            <label for="edit_streetLine1" class="mb-1 block text-sm font-medium text-gray-700">
               Street Address <span class="text-red-500">*</span>
             </label>
             <input
@@ -257,10 +250,7 @@
           </div>
 
           <div>
-            <label
-              for="edit_streetLine2"
-              class="mb-1 block text-sm font-medium text-gray-700"
-            >
+            <label for="edit_streetLine2" class="mb-1 block text-sm font-medium text-gray-700">
               Apartment, suite, etc. (optional)
             </label>
             <input
@@ -287,10 +277,7 @@
               />
             </div>
             <div>
-              <label
-                for="edit_postalCode"
-                class="mb-1 block text-sm font-medium text-gray-700"
-              >
+              <label for="edit_postalCode" class="mb-1 block text-sm font-medium text-gray-700">
                 Postal Code <span class="text-red-500">*</span>
               </label>
               <input
@@ -324,10 +311,7 @@
           </div>
 
           <div>
-            <label
-              for="edit_phoneNumber"
-              class="mb-1 block text-sm font-medium text-gray-700"
-            >
+            <label for="edit_phoneNumber" class="mb-1 block text-sm font-medium text-gray-700">
               Phone Number (optional)
             </label>
             <input
@@ -371,13 +355,11 @@
         <h3 class="mt-2 text-sm font-medium text-gray-900">No saved addresses</h3>
         <p class="mt-1 text-sm text-gray-500">Add an address to speed up checkout.</p>
         <div class="mt-4">
-          <Button type="button" onclick={() => (showAddForm = true)}>
-            Add Address
-          </Button>
+          <Button type="button" onclick={() => (showAddForm = true)}>Add Address</Button>
         </div>
       </div>
     {:else}
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="flex flex-col gap-4">
         {#each data.addresses as address}
           <div class="relative rounded-lg border border-gray-200 bg-white p-4">
             {#if address.isDefault}
@@ -420,9 +402,7 @@
               {#if !address.isDefault}
                 <form method="POST" action="?/setDefault" use:enhance class="inline">
                   <input type="hidden" name="addressId" value={address.id} />
-                  <Button type="submit" variant="outline" size="sm">
-                    Set as default
-                  </Button>
+                  <Button type="submit" variant="outline" size="sm">Set as default</Button>
                 </form>
               {/if}
               <form method="POST" action="?/delete" use:enhance class="inline">
