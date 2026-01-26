@@ -27,3 +27,9 @@ vite.config.ts.timestamp-*
 claude/settings.local.json
 .claude/settings.local.json
 
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
