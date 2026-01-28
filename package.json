@@ -3,7 +3,8 @@
 	"version": "0.0.1",
 	"scripts": {
 		"dev": "bun --bun vite dev",
-		"build": "vitest run && vite build && bun run prepack",
+		"build": "vitest run && bun run build:docs && vite build && bun run prepack",
+		"build:docs": "cd docs && npm ci && npm run build && rm -rf ../static/docs && mv build ../static/docs",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "svelte-kit sync && svelte-package && publint",

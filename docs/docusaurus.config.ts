@@ -7,8 +7,8 @@ const config: Config = {
 	tagline: "Lightweight e-commerce for SvelteKit",
 	favicon: "img/favicon.ico",
 
-	url: "https://hoikka.dev",
-	baseUrl: "/",
+	url: "https://hoikka-dev.vercel.app",
+	baseUrl: "/docs/",
 
 	organizationName: "hoikka",
 	projectName: "hoikka",
@@ -62,11 +62,11 @@ const config: Config = {
 					items: [
 						{
 							label: "Getting Started",
-							to: "/getting-started"
+							to: "/getting-started/installation"
 						},
 						{
 							label: "Architecture",
-							to: "/architecture"
+							to: "/core/architecture"
 						}
 					]
 				}
