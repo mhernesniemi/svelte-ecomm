@@ -9,7 +9,7 @@ sidebar_position: 1
 
 ## Philosophy: Code Over Configuration
 
-Hoikka takes a different approach from traditional e-commerce platforms:
+Hoikka follows the principles outlined in the [Rails Doctrine](https://rubyonrails.org/doctrine)—adapted for the modern TypeScript ecosystem.
 
 | Traditional Platforms     | Hoikka                      |
 | ------------------------- | --------------------------- |
@@ -17,8 +17,6 @@ Hoikka takes a different approach from traditional e-commerce platforms:
 | Admin panels hiding logic | Logic in your codebase      |
 | Plugin systems and hooks  | Just edit the code          |
 | External dependencies     | PostgreSQL-native solutions |
-
-**Your code, your rules.** No black boxes, no framework abstractions to learn.
 
 ## Tech Stack
 
