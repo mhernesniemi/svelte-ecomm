@@ -150,7 +150,7 @@
                   type="email"
                   id="email"
                   name="email"
-                  disabled
+                  readonly
                   value="admin@example.com"
                   class="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
                 />
@@ -164,7 +164,7 @@
                   type="text"
                   id="password"
                   name="password"
-                  disabled
+                  readonly
                   value="admin538"
                   class="w-full cursor-not-allowed rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 text-gray-500"
                 />
