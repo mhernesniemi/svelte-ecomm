@@ -38,6 +38,11 @@ const config: Config = {
 	],
 
 	themeConfig: {
+		colorMode: {
+			defaultMode: "dark",
+			disableSwitch: true,
+			respectPrefersColorScheme: false
+		},
 		navbar: {
 			title: "Hoikka",
 			items: [
@@ -74,7 +79,7 @@ const config: Config = {
 			copyright: `Copyright © ${new Date().getFullYear()} Hoikka.`
 		},
 		prism: {
-			theme: prismThemes.github,
+			theme: prismThemes.dracula,
 			darkTheme: prismThemes.dracula,
 			additionalLanguages: ["bash", "typescript"]
 		}

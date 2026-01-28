@@ -47,7 +47,7 @@
           <div class="flex items-center gap-4">
             <img src="/kuvitus2.png" alt="Svelte" class="h-20 w-20" />
             <a
-              href="/products"
+              href="/docs"
               class="h inline-block rounded-lg border bg-white px-8 py-3 font-semibold text-gray-900 transition-colors hover:bg-[#f7d0dd]/50"
             >
               Get Started: Docs
