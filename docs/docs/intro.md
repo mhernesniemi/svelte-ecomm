@@ -5,11 +5,11 @@ sidebar_position: 1
 
 # Introduction
 
-**Hoikka** is a lightweight e-commerce platform for SvelteKit that is 100% customizable and owned by you.
-
-## Philosophy: Code Over Configuration
+**Hoikka** is a full-stack e-commerce platform built with SvelteKit. It includes both the storefront and admin panel, sharing types and business logic in a single codebase—ready to deploy serverless on Vercel.
 
 Hoikka follows the principles outlined in the [Rails Doctrine](https://rubyonrails.org/doctrine)—adapted for the modern TypeScript ecosystem.
+
+## Philosophy: Code Over Configuration
 
 | Traditional Platforms     | Hoikka                      |
 | ------------------------- | --------------------------- |
@@ -25,11 +25,14 @@ Hoikka follows the principles outlined in the [Rails Doctrine](https://rubyonrai
 - **Auth:** Clerk
 - **Payments:** Stripe (provider pattern)
 - **Shipping:** Posti, Matkahuolto (provider pattern)
+- **Images:** ImageKit
 - **Styling:** TailwindCSS 4
 - **Runtime:** Bun
+- **Deployment:** Vercel (serverless)
 
 ## Key Features
 
+- **Full-stack monolith** - Storefront, admin panel, and API in one codebase
 - **Service-oriented architecture** - Clean separation of business logic
 - **Provider pattern** - Easily swap payment and shipping providers
 - **Multi-language support** - Built-in translation tables
