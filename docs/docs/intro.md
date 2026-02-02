@@ -28,6 +28,7 @@ Hoikka follows the principles outlined in the [Rails Doctrine](https://rubyonrai
 - **Guest checkout** - Cookie-based cart tokens
 - **PostgreSQL job queue** - No Redis needed
 - **Transactional events** - Reliable event-driven integrations
+- **AI-agent friendly** - Simple, readable codebase optimized for AI-assisted development
 
 ## Quick Start
 

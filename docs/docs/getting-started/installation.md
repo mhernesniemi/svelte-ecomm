@@ -8,8 +8,8 @@ sidebar_position: 1
 
 - [Bun](https://bun.sh) runtime (v1.0+)
 - PostgreSQL 15+
-- Clerk account (for authentication)
 - ImageKit account (for image hosting)
+- Clerk account (optional - for customer authentication)
 - Stripe account (optional - for payments)
 
 ## Setup
