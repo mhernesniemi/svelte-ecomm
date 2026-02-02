@@ -9,8 +9,6 @@
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
-  import Minus from "@lucide/svelte/icons/minus";
-  import Plus from "@lucide/svelte/icons/plus";
   import ImageIcon from "@lucide/svelte/icons/image";
   import Heart from "@lucide/svelte/icons/heart";
   import CheckIcon from "@lucide/svelte/icons/check";
@@ -124,7 +122,8 @@
   <title>{enTrans?.name ?? "Product"} | Hoikka</title>
   <meta
     name="description"
-    content={stripHtml(enTrans?.description)?.slice(0, 160) || "View product details and add to cart."}
+    content={stripHtml(enTrans?.description)?.slice(0, 160) ||
+      "View product details and add to cart."}
   />
   <meta property="og:title" content={enTrans?.name ?? "Product"} />
   <meta property="og:description" content={stripHtml(enTrans?.description)?.slice(0, 160) ?? ""} />
@@ -147,10 +146,9 @@
       lowPrice: (Math.min(...product.variants.map((v) => v.price)) / 100).toFixed(2),
       highPrice: (Math.max(...product.variants.map((v) => v.price)) / 100).toFixed(2),
       offerCount: product.variants.length,
-      availability:
-        product.variants.some((v) => v.stock > 0)
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock"
+      availability: product.variants.some((v) => v.stock > 0)
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock"
     },
     ...(data.rating.count > 0
       ? {
@@ -244,7 +242,7 @@
       {/if}
 
       {#if enTrans?.description}
-        <div class="prose prose-gray mb-12 max-w-none">
+        <div class="prose mb-12 max-w-none prose-gray">
           {@html enTrans.description}
         </div>
       {/if}
