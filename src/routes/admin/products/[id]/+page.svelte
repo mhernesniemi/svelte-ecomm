@@ -41,7 +41,6 @@
     if (form?.altUpdated) toast.success("Image updated");
   });
 
-  let activeTab = $state<"en" | "fi">("en");
   let showDeleteConfirm = $state(false);
   let showImagePicker = $state(false);
   let editingVariant = $state<(typeof data.product.variants)[number] | "new" | null>(null);
@@ -146,12 +145,10 @@
     selectedCategories = selectedCategories.filter((c) => c !== id);
   }
 
-  function getTranslation(lang: string) {
-    return data.product.translations.find((t) => t.languageCode === lang);
-  }
-
-  const enTrans = getTranslation("en");
-  const fiTrans = getTranslation("fi");
+  // Get the primary translation (English)
+  const translation = $derived(
+    data.product.translations.find((t) => t.languageCode === "en") ?? data.product.translations[0]
+  );
 
   async function handleImagesSelected(
     files: {
@@ -201,9 +198,9 @@
       <a href="/admin/products" class="text-sm text-blue-600 hover:underline"
         >&larr; Back to Products</a
       >
-      {#if enTrans?.slug}
+      {#if translation?.slug}
         <a
-          href="/products/{data.product.id}/{enTrans.slug}"
+          href="/products/{data.product.id}/{translation.slug}"
           target="_blank"
           class="text-sm text-gray-500 hover:text-gray-700"
         >
@@ -246,114 +243,45 @@
         }}
         class="rounded-lg bg-white shadow"
       >
-        <!-- Language Tabs -->
-        <div class="border-b border-gray-200">
-          <div class="flex">
-            <button
-              type="button"
-              onclick={() => (activeTab = "en")}
-              class="px-6 py-3 text-sm font-medium {activeTab === 'en'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'}"
-            >
-              English
-            </button>
-            <button
-              type="button"
-              onclick={() => (activeTab = "fi")}
-              class="px-6 py-3 text-sm font-medium {activeTab === 'fi'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'}"
-            >
-              Finnish
-            </button>
-          </div>
-        </div>
-
         <div class="space-y-6 p-6">
-          <!-- English Fields -->
-          <div class={activeTab === "en" ? "" : "hidden"}>
-            <div class="space-y-4">
-              <div>
-                <label for="name_en" class="mb-1 block text-sm font-medium text-gray-700">
-                  Name <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name_en"
-                  name="name_en"
-                  value={enTrans?.name ?? ""}
-                  required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label for="slug_en" class="mb-1 block text-sm font-medium text-gray-700">
-                  Slug <span class="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="slug_en"
-                  name="slug_en"
-                  value={enTrans?.slug ?? ""}
-                  required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label for="description_en" class="mb-1 block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <RichTextEditor
-                  name="description_en"
-                  content={enTrans?.description ?? ""}
-                  placeholder="Write product description..."
-                />
-              </div>
+          <div class="space-y-4">
+            <div>
+              <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+                Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={translation?.name ?? ""}
+                required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+              />
             </div>
-          </div>
 
-          <!-- Finnish Fields -->
-          <div class={activeTab === "fi" ? "" : "hidden"}>
-            <div class="space-y-4">
-              <div>
-                <label for="name_fi" class="mb-1 block text-sm font-medium text-gray-700"
-                  >Name</label
-                >
-                <input
-                  type="text"
-                  id="name_fi"
-                  name="name_fi"
-                  value={fiTrans?.name ?? ""}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                />
-              </div>
+            <div>
+              <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+                Slug <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="slug"
+                name="slug"
+                value={translation?.slug ?? ""}
+                required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+              />
+            </div>
 
-              <div>
-                <label for="slug_fi" class="mb-1 block text-sm font-medium text-gray-700"
-                  >Slug</label
-                >
-                <input
-                  type="text"
-                  id="slug_fi"
-                  name="slug_fi"
-                  value={fiTrans?.slug ?? ""}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                />
-              </div>
-
-              <div>
-                <label for="description_fi" class="mb-1 block text-sm font-medium text-gray-700">
-                  Description
-                </label>
-                <RichTextEditor
-                  name="description_fi"
-                  content={fiTrans?.description ?? ""}
-                  placeholder="Kirjoita tuotekuvaus..."
-                />
-              </div>
+            <div>
+              <label for="description" class="mb-1 block text-sm font-medium text-gray-700">
+                Description
+              </label>
+              <RichTextEditor
+                name="description"
+                content={translation?.description ?? ""}
+                placeholder="Write product description..."
+              />
             </div>
           </div>
 
@@ -482,13 +410,13 @@
                 />
               </div>
               <div>
-                <label for="variant_name_en" class="mb-1 block text-sm font-medium text-gray-700"
-                  >Name (EN)</label
+                <label for="variant_name" class="mb-1 block text-sm font-medium text-gray-700"
+                  >Name</label
                 >
                 <input
                   type="text"
-                  id="variant_name_en"
-                  name="variant_name_en"
+                  id="variant_name"
+                  name="variant_name"
                   value={variantNameEn}
                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
                 />

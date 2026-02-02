@@ -40,12 +40,9 @@ export const actions: Actions = {
 		const id = Number(params.id);
 		const formData = await request.formData();
 
-		const nameEn = formData.get("name_en") as string;
-		const nameFi = formData.get("name_fi") as string;
-		const slugEn = formData.get("slug_en") as string;
-		const slugFi = formData.get("slug_fi") as string;
-		const descriptionEn = formData.get("description_en") as string;
-		const descriptionFi = formData.get("description_fi") as string;
+		const name = formData.get("name") as string;
+		const slug = formData.get("slug") as string;
+		const description = formData.get("description") as string;
 		const type = formData.get("type") as "physical" | "digital";
 		const visibility = formData.get("visibility") as "public" | "private" | "hidden";
 		const taxCode = formData.get("taxCode") as string;
@@ -54,8 +51,8 @@ export const actions: Actions = {
 		const facetValueIds = formData.getAll("facetValueIds").map(Number).filter((id) => !isNaN(id));
 		const categoryIds = formData.getAll("categoryIds").map(Number).filter((id) => !isNaN(id));
 
-		if (!nameEn || !slugEn) {
-			return fail(400, { error: "English name and slug are required" });
+		if (!name || !slug) {
+			return fail(400, { error: "Name and slug are required" });
 		}
 
 		try {
@@ -67,15 +64,9 @@ export const actions: Actions = {
 				translations: [
 					{
 						languageCode: "en",
-						name: nameEn,
-						slug: slugEn,
-						description: descriptionEn || undefined
-					},
-					{
-						languageCode: "fi",
-						name: nameFi || nameEn,
-						slug: slugFi || slugEn,
-						description: descriptionFi || undefined
+						name,
+						slug,
+						description: description || undefined
 					}
 				]
 			});
@@ -192,7 +183,7 @@ export const actions: Actions = {
 		const sku = formData.get("sku") as string;
 		const price = Number(formData.get("price")) * 100; // Convert to cents
 		const stock = Number(formData.get("stock")) || 0;
-		const nameEn = formData.get("variant_name_en") as string;
+		const name = formData.get("variant_name") as string;
 
 		if (!sku || isNaN(price)) {
 			return fail(400, { variantError: "SKU and price are required" });
@@ -204,7 +195,7 @@ export const actions: Actions = {
 				sku,
 				price,
 				stock,
-				translations: nameEn ? [{ languageCode: "en", name: nameEn }] : []
+				translations: name ? [{ languageCode: "en", name }] : []
 			});
 
 			return { variantSuccess: true };
@@ -220,7 +211,7 @@ export const actions: Actions = {
 		const sku = formData.get("sku") as string;
 		const price = Number(formData.get("price")) * 100; // Convert to cents
 		const stock = Number(formData.get("stock")) || 0;
-		const nameEn = formData.get("variant_name_en") as string;
+		const name = formData.get("variant_name") as string;
 
 		if (!variantId || !sku || isNaN(price)) {
 			return fail(400, { variantError: "Variant ID, SKU and price are required" });
@@ -231,7 +222,7 @@ export const actions: Actions = {
 				sku,
 				price,
 				stock,
-				translations: [{ languageCode: "en", name: nameEn || undefined }]
+				translations: [{ languageCode: "en", name: name || undefined }]
 			});
 
 			return { variantSuccess: true };

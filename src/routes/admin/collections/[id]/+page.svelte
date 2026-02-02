@@ -16,31 +16,25 @@
     if (form?.error) toast.error(form.error);
   });
 
-  let activeTab = $state<"en" | "fi">("en");
   let isSubmitting = $state(false);
 
   // Form values - reset when collection changes
   let code = $state("");
-  let nameEn = $state("");
-  let nameFi = $state("");
-  let slugEn = $state("");
-  let slugFi = $state("");
-  let descriptionEn = $state("");
-  let descriptionFi = $state("");
+  let name = $state("");
+  let slug = $state("");
+  let description = $state("");
   let enabled = $state(true);
   let isPrivate = $state(false);
 
   // Initialize/reset form values when collection data changes
   $effect(() => {
-    const enTrans = data.collection.translations.find((t) => t.languageCode === "en");
-    const fiTrans = data.collection.translations.find((t) => t.languageCode === "fi");
+    const trans =
+      data.collection.translations.find((t) => t.languageCode === "en") ??
+      data.collection.translations[0];
     code = data.collection.code;
-    nameEn = enTrans?.name ?? "";
-    nameFi = fiTrans?.name ?? "";
-    slugEn = enTrans?.slug ?? "";
-    slugFi = fiTrans?.slug ?? "";
-    descriptionEn = enTrans?.description ?? "";
-    descriptionFi = fiTrans?.description ?? "";
+    name = trans?.name ?? "";
+    slug = trans?.slug ?? "";
+    description = trans?.description ?? "";
     enabled = data.collection.enabled;
     isPrivate = data.collection.isPrivate;
   });
@@ -141,9 +135,9 @@
       <span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
         {data.productCount} products
       </span>
-      {#if slugEn}
+      {#if slug}
         <a
-          href="/collections/{data.collection.id}/{slugEn}"
+          href="/collections/{data.collection.id}/{slug}"
           target="_blank"
           class="text-sm text-gray-500 hover:text-gray-700"
         >
@@ -184,108 +178,45 @@
           />
         </div>
 
-        <div class="mb-4">
-          <div class="flex border-b border-gray-200">
-            <button
-              type="button"
-              class="px-4 py-2 text-sm font-medium {activeTab === 'en'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'}"
-              onclick={() => (activeTab = "en")}
-            >
-              English
-            </button>
-            <button
-              type="button"
-              class="px-4 py-2 text-sm font-medium {activeTab === 'fi'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'}"
-              onclick={() => (activeTab = "fi")}
-            >
-              Finnish
-            </button>
+        <div class="space-y-4">
+          <div>
+            <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+              Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              bind:value={name}
+              required
+              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+            />
+          </div>
+          <div>
+            <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+              Slug <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="slug"
+              name="slug"
+              bind:value={slug}
+              required
+              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+            />
+          </div>
+          <div>
+            <label for="description" class="mb-1 block text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <RichTextEditor
+              name="description"
+              content={description}
+              placeholder="Write collection description..."
+              onchange={(html) => (description = html)}
+            />
           </div>
         </div>
-
-        {#if activeTab === "en"}
-          <div class="space-y-4">
-            <div>
-              <label for="name_en" class="mb-1 block text-sm font-medium text-gray-700">
-                Name (EN) <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="name_en"
-                name="name_en"
-                bind:value={nameEn}
-                required
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              />
-            </div>
-            <div>
-              <label for="slug_en" class="mb-1 block text-sm font-medium text-gray-700">
-                Slug (EN) <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="slug_en"
-                name="slug_en"
-                bind:value={slugEn}
-                required
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              />
-            </div>
-            <div>
-              <label for="description_en" class="mb-1 block text-sm font-medium text-gray-700">
-                Description (EN)
-              </label>
-              <RichTextEditor
-                name="description_en"
-                content={descriptionEn}
-                placeholder="Write collection description..."
-                onchange={(html) => (descriptionEn = html)}
-              />
-            </div>
-          </div>
-        {:else}
-          <div class="space-y-4">
-            <div>
-              <label for="name_fi" class="mb-1 block text-sm font-medium text-gray-700">
-                Name (FI)
-              </label>
-              <input
-                type="text"
-                id="name_fi"
-                name="name_fi"
-                bind:value={nameFi}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              />
-            </div>
-            <div>
-              <label for="slug_fi" class="mb-1 block text-sm font-medium text-gray-700">
-                Slug (FI)
-              </label>
-              <input
-                type="text"
-                id="slug_fi"
-                name="slug_fi"
-                bind:value={slugFi}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              />
-            </div>
-            <div>
-              <label for="description_fi" class="mb-1 block text-sm font-medium text-gray-700">
-                Description (FI)
-              </label>
-              <RichTextEditor
-                name="description_fi"
-                content={descriptionFi}
-                placeholder="Kirjoita kokoelman kuvaus..."
-                onchange={(html) => (descriptionFi = html)}
-              />
-            </div>
-          </div>
-        {/if}
 
         <div class="mt-6 space-y-4">
           <div class="flex items-center gap-2">

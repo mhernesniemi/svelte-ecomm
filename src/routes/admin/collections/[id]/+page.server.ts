@@ -51,17 +51,14 @@ export const actions: Actions = {
 		const data = await request.formData();
 
 		const code = data.get("code") as string;
-		const nameEn = data.get("name_en") as string;
-		const nameFi = data.get("name_fi") as string;
-		const slugEn = data.get("slug_en") as string;
-		const slugFi = data.get("slug_fi") as string;
-		const descriptionEn = data.get("description_en") as string;
-		const descriptionFi = data.get("description_fi") as string;
+		const name = data.get("name") as string;
+		const slug = data.get("slug") as string;
+		const description = data.get("description") as string;
 		const enabled = data.get("enabled") === "on";
 		const isPrivate = data.get("is_private") === "on";
 
-		if (!code || !nameEn || !slugEn) {
-			return fail(400, { error: "Code, name (EN), and slug (EN) are required" });
+		if (!code || !name || !slug) {
+			return fail(400, { error: "Code, name, and slug are required" });
 		}
 
 		try {
@@ -72,15 +69,9 @@ export const actions: Actions = {
 				translations: [
 					{
 						languageCode: "en",
-						name: nameEn,
-						slug: slugify(slugEn),
-						description: descriptionEn || undefined
-					},
-					{
-						languageCode: "fi",
-						name: nameFi || nameEn,
-						slug: slugify(slugFi || slugEn),
-						description: descriptionFi || descriptionEn || undefined
+						name,
+						slug: slugify(slug),
+						description: description || undefined
 					}
 				]
 			});

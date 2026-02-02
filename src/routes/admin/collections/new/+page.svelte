@@ -13,27 +13,20 @@
     if (form?.error) toast.error(form.error);
   });
 
-  let activeTab = $state<"en" | "fi">("en");
   let isSubmitting = $state(false);
 
   // Form values
   let code = $state("");
-  let nameEn = $state("");
-  let nameFi = $state("");
-  let slugEn = $state("");
-  let slugFi = $state("");
-  let descriptionEn = $state("");
-  let descriptionFi = $state("");
+  let name = $state("");
+  let slug = $state("");
+  let description = $state("");
 
   // Restore values from form after failed submission
   $effect(() => {
     if (form?.code) code = form.code;
-    if (form?.nameEn) nameEn = form.nameEn;
-    if (form?.nameFi) nameFi = form.nameFi;
-    if (form?.slugEn) slugEn = form.slugEn;
-    if (form?.slugFi) slugFi = form.slugFi;
-    if (form?.descriptionEn) descriptionEn = form.descriptionEn;
-    if (form?.descriptionFi) descriptionFi = form.descriptionFi;
+    if (form?.name) name = form.name;
+    if (form?.slug) slug = form.slug;
+    if (form?.description) description = form.description;
   });
 
   function slugify(text: string): string {
@@ -46,16 +39,16 @@
   // Auto-generate slug from name
   let autoSlug = $state(true);
   $effect(() => {
-    if (autoSlug && nameEn) {
-      slugEn = slugify(nameEn);
+    if (autoSlug && name) {
+      slug = slugify(name);
     }
   });
 
   // Auto-generate code from name
   let autoCode = $state(true);
   $effect(() => {
-    if (autoCode && nameEn) {
-      code = slugify(nameEn);
+    if (autoCode && name) {
+      code = slugify(name);
     }
   });
 </script>
@@ -89,126 +82,63 @@
       <div class="p-6">
         <h2 class="mb-4 text-lg font-medium text-gray-900">Basic Information</h2>
 
-        <div class="mb-4">
-          <label for="code" class="mb-1 block text-sm font-medium text-gray-700">
-            Code <span class="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="code"
-            name="code"
-            bind:value={code}
-            required
-            class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-            placeholder="e.g., summer-sale"
-          />
-          <p class="mt-1 text-xs text-gray-500">Unique identifier for this collection</p>
-        </div>
+        <div class="space-y-4">
+          <div>
+            <label for="code" class="mb-1 block text-sm font-medium text-gray-700">
+              Code <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="code"
+              name="code"
+              bind:value={code}
+              required
+              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+              placeholder="e.g., summer-sale"
+            />
+            <p class="mt-1 text-xs text-gray-500">Unique identifier for this collection</p>
+          </div>
 
-        <div class="mb-4">
-          <div class="flex border-b border-gray-200">
-            <button
-              type="button"
-              class="px-4 py-2 text-sm font-medium {activeTab === 'en'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'}"
-              onclick={() => (activeTab = "en")}
-            >
-              English
-            </button>
-            <button
-              type="button"
-              class="px-4 py-2 text-sm font-medium {activeTab === 'fi'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500 hover:text-gray-700'}"
-              onclick={() => (activeTab = "fi")}
-            >
-              Finnish
-            </button>
+          <div>
+            <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+              Name <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              bind:value={name}
+              required
+              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+            />
+          </div>
+
+          <div>
+            <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+              Slug <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="slug"
+              name="slug"
+              bind:value={slug}
+              required
+              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+            />
+          </div>
+
+          <div>
+            <label for="description" class="mb-1 block text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <RichTextEditor
+              name="description"
+              content={description}
+              placeholder="Write collection description..."
+              onchange={(html) => (description = html)}
+            />
           </div>
         </div>
-
-        {#if activeTab === "en"}
-          <div class="space-y-4">
-            <div>
-              <label for="name_en" class="mb-1 block text-sm font-medium text-gray-700">
-                Name (EN) <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="name_en"
-                name="name_en"
-                bind:value={nameEn}
-                required
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              />
-            </div>
-            <div>
-              <label for="slug_en" class="mb-1 block text-sm font-medium text-gray-700">
-                Slug (EN) <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="slug_en"
-                name="slug_en"
-                bind:value={slugEn}
-                required
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              />
-            </div>
-            <div>
-              <label for="description_en" class="mb-1 block text-sm font-medium text-gray-700">
-                Description (EN)
-              </label>
-              <RichTextEditor
-                name="description_en"
-                content={descriptionEn}
-                placeholder="Write collection description..."
-                onchange={(html) => (descriptionEn = html)}
-              />
-            </div>
-          </div>
-        {:else}
-          <div class="space-y-4">
-            <div>
-              <label for="name_fi" class="mb-1 block text-sm font-medium text-gray-700">
-                Name (FI)
-              </label>
-              <input
-                type="text"
-                id="name_fi"
-                name="name_fi"
-                bind:value={nameFi}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-                placeholder="Leave empty to use English"
-              />
-            </div>
-            <div>
-              <label for="slug_fi" class="mb-1 block text-sm font-medium text-gray-700">
-                Slug (FI)
-              </label>
-              <input
-                type="text"
-                id="slug_fi"
-                name="slug_fi"
-                bind:value={slugFi}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-                placeholder="Leave empty to use English"
-              />
-            </div>
-            <div>
-              <label for="description_fi" class="mb-1 block text-sm font-medium text-gray-700">
-                Description (FI)
-              </label>
-              <RichTextEditor
-                name="description_fi"
-                content={descriptionFi}
-                placeholder="Kirjoita kokoelman kuvaus..."
-                onchange={(html) => (descriptionFi = html)}
-              />
-            </div>
-          </div>
-        {/if}
 
         <div class="mt-6 space-y-4">
           <div class="flex items-center gap-2">

@@ -12,8 +12,6 @@
     if (form?.error) toast.error(form.error);
   });
 
-  let activeTab = $state<"en" | "fi">("en");
-
   function generateSlug(name: string): string {
     return name
       .toLowerCase()
@@ -21,19 +19,19 @@
       .replace(/(^-|-$)/g, "");
   }
 
-  let nameEn = $state("");
-  let slugEn = $state("");
-  let autoSlugEn = $state(true);
+  let name = $state("");
+  let slug = $state("");
+  let autoSlug = $state(true);
 
   // Initialize from form values if present (after form submission with errors)
   $effect(() => {
-    if (form?.values?.nameEn) nameEn = form.values.nameEn;
-    if (form?.values?.slugEn) slugEn = form.values.slugEn;
+    if (form?.values?.name) name = form.values.name;
+    if (form?.values?.slug) slug = form.values.slug;
   });
 
   $effect(() => {
-    if (autoSlugEn && nameEn) {
-      slugEn = generateSlug(nameEn);
+    if (autoSlug && name) {
+      slug = generateSlug(name);
     }
   });
 </script>
@@ -57,116 +55,51 @@
     }}
     class="rounded-lg bg-white shadow"
   >
-    <!-- Language Tabs -->
-    <div class="border-b border-gray-200">
-      <div class="flex">
-        <button
-          type="button"
-          onclick={() => (activeTab = "en")}
-          class="px-6 py-3 text-sm font-medium {activeTab === 'en'
-            ? 'border-b-2 border-blue-500 text-blue-600'
-            : 'text-gray-500 hover:text-gray-700'}"
-        >
-          English
-        </button>
-        <button
-          type="button"
-          onclick={() => (activeTab = "fi")}
-          class="px-6 py-3 text-sm font-medium {activeTab === 'fi'
-            ? 'border-b-2 border-blue-500 text-blue-600'
-            : 'text-gray-500 hover:text-gray-700'}"
-        >
-          Finnish
-        </button>
-      </div>
-    </div>
-
     <div class="space-y-6 p-6">
-      <!-- English Fields -->
-      <div class={activeTab === "en" ? "" : "hidden"}>
-        <div class="space-y-4">
-          <div>
-            <label for="name_en" class="mb-1 block text-sm font-medium text-gray-700">
-              Name <span class="text-red-500">*</span>
-            </label>
+      <div class="space-y-4">
+        <div>
+          <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+            Name <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            bind:value={name}
+            required
+            class="w-full rounded-lg border border-gray-300 px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+            Slug <span class="text-red-500">*</span>
+          </label>
+          <div class="flex gap-2">
             <input
               type="text"
-              id="name_en"
-              name="name_en"
-              bind:value={nameEn}
+              id="slug"
+              name="slug"
+              bind:value={slug}
               required
-              class="w-full rounded-lg border border-gray-300 px-3 py-2"
+              class="flex-1 rounded-lg border border-gray-300 px-3 py-2"
             />
-          </div>
-
-          <div>
-            <label for="slug_en" class="mb-1 block text-sm font-medium text-gray-700">
-              Slug <span class="text-red-500">*</span>
+            <label class="flex items-center gap-2 text-sm text-gray-500">
+              <input type="checkbox" bind:checked={autoSlug} class="rounded border-gray-300" />
+              Auto
             </label>
-            <div class="flex gap-2">
-              <input
-                type="text"
-                id="slug_en"
-                name="slug_en"
-                bind:value={slugEn}
-                required
-                class="flex-1 rounded-lg border border-gray-300 px-3 py-2"
-              />
-              <label class="flex items-center gap-2 text-sm text-gray-500">
-                <input type="checkbox" bind:checked={autoSlugEn} class="rounded border-gray-300" />
-                Auto
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label for="description_en" class="mb-1 block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <RichTextEditor
-              name="description_en"
-              content={form?.values?.descriptionEn ?? ""}
-              placeholder="Write product description..."
-            />
           </div>
         </div>
-      </div>
 
-      <!-- Finnish Fields -->
-      <div class={activeTab === "fi" ? "" : "hidden"}>
-        <div class="space-y-4">
-          <div>
-            <label for="name_fi" class="mb-1 block text-sm font-medium text-gray-700"> Name </label>
-            <input
-              type="text"
-              id="name_fi"
-              name="name_fi"
-              value={form?.values?.nameFi ?? ""}
-              class="w-full rounded-lg border border-gray-300 px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label for="slug_fi" class="mb-1 block text-sm font-medium text-gray-700"> Slug </label>
-            <input
-              type="text"
-              id="slug_fi"
-              name="slug_fi"
-              value={form?.values?.slugFi ?? ""}
-              class="w-full rounded-lg border border-gray-300 px-3 py-2"
-            />
-          </div>
-
-          <div>
-            <label for="description_fi" class="mb-1 block text-sm font-medium text-gray-700">
-              Description
-            </label>
-            <RichTextEditor
-              name="description_fi"
-              content={form?.values?.descriptionFi ?? ""}
-              placeholder="Kirjoita tuotekuvaus..."
-            />
-          </div>
+        <div>
+          <label for="description" class="mb-1 block text-sm font-medium text-gray-700">
+            Description
+          </label>
+          <RichTextEditor
+            name="description"
+            content={form?.values?.description ?? ""}
+            placeholder="Write product description..."
+          />
         </div>
       </div>
 

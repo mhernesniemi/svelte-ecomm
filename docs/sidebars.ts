@@ -15,7 +15,7 @@ const sidebars: SidebarsConfig = {
 		{
 			type: "category",
 			label: "Core Concepts",
-			items: ["core/architecture", "core/database", "core/services", "core/providers"]
+			items: ["core/architecture", "core/database", "core/services", "core/providers", "core/localization"]
 		},
 		{
 			type: "category",

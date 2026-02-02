@@ -15,27 +15,21 @@ export const actions: Actions = {
 	default: async ({ request }) => {
 		const formData = await request.formData();
 
-		const nameEn = formData.get("name_en") as string;
-		const nameFi = formData.get("name_fi") as string;
-		const slugEn = formData.get("slug_en") as string;
-		const slugFi = formData.get("slug_fi") as string;
-		const descriptionEn = formData.get("description_en") as string;
-		const descriptionFi = formData.get("description_fi") as string;
+		const name = formData.get("name") as string;
+		const slug = formData.get("slug") as string;
+		const description = formData.get("description") as string;
 		const type = (formData.get("type") as "physical" | "digital") || "physical";
 		const visibility =
 			(formData.get("visibility") as "public" | "private" | "hidden") || "public";
 
 		// Validation
-		if (!nameEn || !slugEn) {
+		if (!name || !slug) {
 			return fail(400, {
-				error: "English name and slug are required",
+				error: "Name and slug are required",
 				values: {
-					nameEn,
-					nameFi,
-					slugEn,
-					slugFi,
-					descriptionEn,
-					descriptionFi,
+					name,
+					slug,
+					description,
 					type,
 					visibility
 				}
@@ -49,20 +43,10 @@ export const actions: Actions = {
 				translations: [
 					{
 						languageCode: "en",
-						name: nameEn,
-						slug: slugEn,
-						description: descriptionEn || undefined
-					},
-					...(nameFi || slugFi
-						? [
-								{
-									languageCode: "fi",
-									name: nameFi || nameEn,
-									slug: slugFi || slugEn,
-									description: descriptionFi || undefined
-								}
-							]
-						: [])
+						name,
+						slug,
+						description: description || undefined
+					}
 				]
 			});
 
@@ -72,12 +56,9 @@ export const actions: Actions = {
 			return fail(500, {
 				error: "Failed to create product",
 				values: {
-					nameEn,
-					nameFi,
-					slugEn,
-					slugFi,
-					descriptionEn,
-					descriptionFi,
+					name,
+					slug,
+					description,
 					type,
 					visibility
 				}
