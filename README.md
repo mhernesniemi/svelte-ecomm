@@ -22,8 +22,10 @@ Hoikka takes a different approach from traditional e-commerce platforms:
 - **Auth:** Clerk
 - **Payments:** Stripe (provider pattern)
 - **Shipping:** Posti, Matkahuolto (provider pattern)
+- **Images:** ImageKit
 - **Styling:** TailwindCSS 4
 - **Runtime:** Bun
+- **Deployment:** Vercel (serverless)
 
 ## Getting Started
 
