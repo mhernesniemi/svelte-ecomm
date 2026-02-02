@@ -17,6 +17,7 @@
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
+  import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import Check from "@lucide/svelte/icons/check";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import X from "@lucide/svelte/icons/x";
@@ -305,13 +306,11 @@
                 <label for="description_en" class="mb-1 block text-sm font-medium text-gray-700">
                   Description
                 </label>
-                <textarea
-                  id="description_en"
+                <RichTextEditor
                   name="description_en"
-                  rows="4"
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                  >{enTrans?.description ?? ""}</textarea
-                >
+                  content={enTrans?.description ?? ""}
+                  placeholder="Write product description..."
+                />
               </div>
             </div>
           </div>
@@ -349,13 +348,11 @@
                 <label for="description_fi" class="mb-1 block text-sm font-medium text-gray-700">
                   Description
                 </label>
-                <textarea
-                  id="description_fi"
+                <RichTextEditor
                   name="description_fi"
-                  rows="4"
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
-                  >{fiTrans?.description ?? ""}</textarea
-                >
+                  content={fiTrans?.description ?? ""}
+                  placeholder="Kirjoita tuotekuvaus..."
+                />
               </div>
             </div>
           </div>

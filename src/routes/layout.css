@@ -26,3 +26,8 @@ button:focus-visible,
 [role="menuitem"]:focus-visible {
 	@apply ring-offset-0;
 }
+
+/* Fix Tiptap list item paragraph wrapping */
+.prose li > p {
+	margin: 0;
+}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import Package from "@lucide/svelte/icons/package";
   import ImageIcon from "@lucide/svelte/icons/image";
+  import { stripHtml } from "$lib/utils";
 
   let { data } = $props();
 
@@ -41,12 +42,12 @@
   <title>{collectionTrans?.name ?? "Collection"} | Hoikka</title>
   <meta
     name="description"
-    content={collectionTrans?.description?.slice(0, 160) ?? `Browse our ${collectionTrans?.name} collection.`}
+    content={stripHtml(collectionTrans?.description)?.slice(0, 160) || `Browse our ${collectionTrans?.name} collection.`}
   />
   <meta property="og:title" content="{collectionTrans?.name ?? 'Collection'} | Hoikka" />
   <meta
     property="og:description"
-    content={collectionTrans?.description?.slice(0, 160) ?? `Browse our ${collectionTrans?.name} collection.`}
+    content={stripHtml(collectionTrans?.description)?.slice(0, 160) || `Browse our ${collectionTrans?.name} collection.`}
   />
   <meta property="og:type" content="website" />
 </svelte:head>
@@ -62,7 +63,9 @@
 
     <h1 class="text-3xl font-bold text-gray-900">{collectionTrans?.name ?? "Collection"}</h1>
     {#if collectionTrans?.description}
-      <p class="mt-2 text-lg text-gray-600">{collectionTrans.description}</p>
+      <div class="prose prose-gray prose-lg mt-2 max-w-none">
+        {@html collectionTrans.description}
+      </div>
     {/if}
     <p class="mt-2 text-sm text-gray-500">{data.pagination.total} products</p>
   </div>

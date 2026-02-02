@@ -3,6 +3,7 @@
   import { invalidateAll } from "$app/navigation";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -238,13 +239,12 @@
               <label for="description_en" class="mb-1 block text-sm font-medium text-gray-700">
                 Description (EN)
               </label>
-              <textarea
-                id="description_en"
+              <RichTextEditor
                 name="description_en"
-                bind:value={descriptionEn}
-                rows="3"
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              ></textarea>
+                content={descriptionEn}
+                placeholder="Write collection description..."
+                onchange={(html) => (descriptionEn = html)}
+              />
             </div>
           </div>
         {:else}
@@ -277,13 +277,12 @@
               <label for="description_fi" class="mb-1 block text-sm font-medium text-gray-700">
                 Description (FI)
               </label>
-              <textarea
-                id="description_fi"
+              <RichTextEditor
                 name="description_fi"
-                bind:value={descriptionFi}
-                rows="3"
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              ></textarea>
+                content={descriptionFi}
+                placeholder="Kirjoita kokoelman kuvaus..."
+                onchange={(html) => (descriptionFi = html)}
+              />
             </div>
           </div>
         {/if}

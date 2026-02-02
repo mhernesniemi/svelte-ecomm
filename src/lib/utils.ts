@@ -122,3 +122,11 @@ export function convertPrice(centsInBaseCurrency: number, exchangeRate: number):
 export function getCurrencySymbol(currencyCode: string): string {
 	return CURRENCY_CONFIG[currencyCode]?.symbol ?? currencyCode;
 }
+
+/**
+ * Strip HTML tags from a string (for meta descriptions, etc.)
+ */
+export function stripHtml(html: string | null | undefined): string {
+	if (!html) return "";
+	return html.replace(/<[^>]*>/g, "").trim();
+}

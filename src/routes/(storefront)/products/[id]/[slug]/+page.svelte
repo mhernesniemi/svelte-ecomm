@@ -5,7 +5,7 @@
   import { invalidateAll } from "$app/navigation";
   import { cartStore } from "$lib/stores/cart.svelte";
   import { wishlistStore } from "$lib/stores/wishlist.svelte";
-  import { formatPrice } from "$lib/utils";
+  import { formatPrice, stripHtml } from "$lib/utils";
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
@@ -124,10 +124,10 @@
   <title>{enTrans?.name ?? "Product"} | Hoikka</title>
   <meta
     name="description"
-    content={enTrans?.description?.slice(0, 160) ?? "View product details and add to cart."}
+    content={stripHtml(enTrans?.description)?.slice(0, 160) || "View product details and add to cart."}
   />
   <meta property="og:title" content={enTrans?.name ?? "Product"} />
-  <meta property="og:description" content={enTrans?.description?.slice(0, 160) ?? ""} />
+  <meta property="og:description" content={stripHtml(enTrans?.description)?.slice(0, 160) ?? ""} />
   <meta property="og:type" content="product" />
   {#if product.featuredAsset}
     <meta property="og:image" content={product.featuredAsset.source} />
@@ -138,7 +138,7 @@
     "@context": "https://schema.org",
     "@type": "Product",
     name: enTrans?.name,
-    description: enTrans?.description,
+    description: stripHtml(enTrans?.description),
     image: product.featuredAsset?.source,
     sku: product.variants[0]?.sku,
     offers: {
@@ -244,7 +244,9 @@
       {/if}
 
       {#if enTrans?.description}
-        <p class="mb-12 text-gray-600">{enTrans.description}</p>
+        <div class="prose prose-gray mb-12 max-w-none">
+          {@html enTrans.description}
+        </div>
       {/if}
 
       <!-- Variant Selection -->
