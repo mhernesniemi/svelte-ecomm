@@ -3,7 +3,6 @@ import { facetService } from "$lib/server/services/facets.js";
 import { assetService } from "$lib/server/services/assets.js";
 import { categoryService } from "$lib/server/services/categories.js";
 import { taxService } from "$lib/server/services/tax.js";
-import { revalidate } from "$lib/server/services/cache.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -91,9 +90,6 @@ export const actions: Actions = {
 			// Update categories
 			await categoryService.setProductCategories(id, categoryIds);
 
-			revalidate("/");
-			revalidate("/products");
-
 			return { success: true };
 		} catch (e) {
 			return fail(500, { error: "Failed to update product" });
@@ -104,9 +100,6 @@ export const actions: Actions = {
 		const id = Number(params.id);
 
 		await productService.delete(id);
-
-		revalidate("/");
-		revalidate("/products");
 
 		throw redirect(303, "/admin/products");
 	},

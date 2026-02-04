@@ -3,10 +3,6 @@ import { facetService } from "$lib/server/services/facets.js";
 import type { PageServerLoad } from "./$types";
 import type { FacetCount, FacetWithValues } from "$lib/types.js";
 
-export const config = {
-	isr: { expiration: 86400 }
-};
-
 export const load: PageServerLoad = async ({ url }) => {
 	const search = url.searchParams.get("q") ?? undefined;
 	const page = Number(url.searchParams.get("page")) || 1;

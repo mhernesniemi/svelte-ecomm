@@ -2,7 +2,6 @@ import type { PageServerLoad, Actions } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
-import { revalidate } from "$lib/server/services/cache.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
 
 function slugify(text: string): string {
@@ -62,8 +61,6 @@ export const actions: Actions = {
 					}
 				]
 			});
-
-			revalidate("/collections");
 
 			throw redirect(303, `/admin/collections/${collection.id}`);
 		} catch (err) {
