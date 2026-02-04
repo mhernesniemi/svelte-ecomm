@@ -1,5 +1,6 @@
 import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
+import { revalidate } from "$lib/server/services/cache.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -49,6 +50,9 @@ export const actions: Actions = {
 					}
 				]
 			});
+
+			revalidate("/");
+			revalidate("/products");
 
 			throw redirect(303, `/admin/products/${product.id}`);
 		} catch (error) {

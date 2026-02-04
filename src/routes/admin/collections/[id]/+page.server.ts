@@ -2,6 +2,7 @@ import type { PageServerLoad, Actions } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
+import { revalidate } from "$lib/server/services/cache.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { CollectionFilterField, CollectionFilterOperator } from "$lib/types.js";
 
@@ -76,6 +77,9 @@ export const actions: Actions = {
 				]
 			});
 
+			revalidate(`/collections/${id}/${slugify(slug)}`);
+			revalidate("/collections");
+
 			return { success: true, message: "Collection updated successfully" };
 		} catch (err) {
 			return fail(500, { error: "Failed to update collection" });
@@ -143,6 +147,7 @@ export const actions: Actions = {
 
 		try {
 			await collectionService.delete(id);
+			revalidate("/collections");
 			throw redirect(303, "/admin/collections");
 		} catch (err) {
 			if (isRedirect(err)) throw err;

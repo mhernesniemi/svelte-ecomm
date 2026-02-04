@@ -2,6 +2,10 @@ import type { PageServerLoad } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { error, redirect } from "@sveltejs/kit";
 
+export const config = {
+	isr: { expiration: 86400 }
+};
+
 export const load: PageServerLoad = async ({ params, url }) => {
 	const id = Number(params.id);
 

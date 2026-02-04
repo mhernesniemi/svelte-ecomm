@@ -4,6 +4,10 @@ import { dev } from "$app/environment";
 import { authService } from "$lib/server/services/auth.js";
 import type { PageServerLoad, Actions } from "./$types";
 
+export const config = {
+	isr: { expiration: 86400 }
+};
+
 const ADMIN_SESSION_COOKIE = "admin_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
