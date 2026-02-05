@@ -31,21 +31,5 @@ export const actions: Actions = {
 		}
 
 		return { success: true };
-	},
-
-	deleteSelected: async ({ request }) => {
-		const data = await request.formData();
-		const ids = data.getAll("ids").map(Number).filter(Boolean);
-
-		if (ids.length === 0) {
-			return fail(400, { error: "No collections selected" });
-		}
-
-		try {
-			await Promise.all(ids.map((id) => collectionService.delete(id)));
-			return { success: true };
-		} catch {
-			return fail(500, { error: "Failed to delete collections" });
-		}
 	}
 };

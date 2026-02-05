@@ -1,16 +1,19 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
-  import type { ColumnDef } from "@tanstack/table-core";
-  import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
   import { Button } from "$lib/components/admin/ui/button";
-  import { Checkbox } from "$lib/components/admin/ui/checkbox";
+  import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell
+  } from "$lib/components/admin/ui/table";
   import UsersRound from "@lucide/svelte/icons/users-round";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
-
-  type CustomerRow = (typeof data.customers)[0];
 
   let activeTab = $state<"customers" | "groups">("customers");
   let showCreateForm = $state(false);
@@ -27,59 +30,7 @@
     const customerIdsInGroup = new Set(group?.customers.map((c) => c.id) ?? []);
     return data.allCustomers.filter((c) => !customerIdsInGroup.has(c.id));
   }
-
-  const columns: ColumnDef<CustomerRow>[] = [
-    {
-      id: "select",
-      header: ({ table }) =>
-        renderComponent(Checkbox, {
-          checked: table.getIsAllPageRowsSelected(),
-          indeterminate: table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
-          onCheckedChange: (value: boolean) => table.toggleAllPageRowsSelected(!!value),
-          "aria-label": "Select all"
-        }),
-      cell: ({ row }) =>
-        renderComponent(Checkbox, {
-          checked: row.getIsSelected(),
-          onCheckedChange: (value: boolean) => row.toggleSelected(!!value),
-          "aria-label": "Select row"
-        }),
-      enableSorting: false
-    },
-    {
-      accessorFn: (row) => `${row.firstName} ${row.lastName}`,
-      id: "name",
-      header: "Customer",
-      cell: ({ row }) =>
-        renderSnippet(customerCell, {
-          id: row.original.id,
-          firstName: row.original.firstName,
-          lastName: row.original.lastName
-        })
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-      cell: ({ row }) => row.original.email
-    },
-    {
-      accessorFn: (row) => row.phone ?? "-",
-      id: "phone",
-      header: "Phone"
-    },
-    {
-      accessorKey: "createdAt",
-      header: "Joined",
-      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
-    }
-  ];
 </script>
-
-{#snippet customerCell({ id, firstName, lastName }: { id: number; firstName: string; lastName: string })}
-  <a href="/admin/customers/{id}" class="font-medium text-blue-600 hover:text-blue-800">
-    {firstName} {lastName}
-  </a>
-{/snippet}
 
 <svelte:head><title>Customers | Admin</title></svelte:head>
 
@@ -112,32 +63,82 @@
 
   <!-- Customers Tab -->
   {#if activeTab === "customers"}
-    <DataTable
-      data={data.customers}
-      {columns}
-      searchPlaceholder="Search customers..."
-      enableRowSelection={true}
-    >
-      {#snippet bulkActions({ selectedRows, table })}
-        <form
-          method="POST"
-          action="?/deleteSelected"
-          use:enhance={() => {
-            return async ({ update }) => {
-              table.resetRowSelection();
-              await update();
-            };
-          }}
-        >
-          {#each selectedRows as row}
-            <input type="hidden" name="ids" value={row.id} />
+    <Table>
+      <TableHeader>
+        <TableRow class="hover:bg-transparent">
+          <TableHead>Customer</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead>Phone</TableHead>
+          <TableHead>Joined</TableHead>
+          <TableHead class="text-right">Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {#if data.customers.length === 0}
+          <TableRow class="hover:bg-transparent">
+            <TableCell colspan={5} class="py-12 text-center text-gray-500"
+              >No customers yet</TableCell
+            >
+          </TableRow>
+        {:else}
+          {#each data.customers as customer}
+            <TableRow>
+              <TableCell>
+                <a
+                  href="/admin/customers/{customer.id}"
+                  class="font-medium text-blue-600 hover:text-blue-800"
+                >
+                  {customer.firstName}
+                  {customer.lastName}
+                </a>
+              </TableCell>
+              <TableCell class="text-sm text-gray-500">{customer.email}</TableCell>
+              <TableCell class="text-sm text-gray-500">{customer.phone ?? "-"}</TableCell>
+              <TableCell class="text-sm text-gray-500">
+                {new Date(customer.createdAt).toLocaleDateString()}
+              </TableCell>
+              <TableCell class="text-right text-sm">
+                <a
+                  href="/admin/customers/{customer.id}"
+                  class="font-medium text-blue-600 hover:text-blue-800"
+                >
+                  View
+                </a>
+              </TableCell>
+            </TableRow>
           {/each}
-          <Button type="submit" variant="destructive" size="sm">
-            Delete ({selectedRows.length})
-          </Button>
-        </form>
-      {/snippet}
-    </DataTable>
+        {/if}
+      </TableBody>
+    </Table>
+
+    {#if data.pagination.total > data.pagination.limit}
+      <div class="mt-4 flex items-center justify-between rounded-lg bg-white px-6 py-3 shadow">
+        <div class="text-sm text-gray-500">
+          Showing {data.pagination.offset + 1} to {Math.min(
+            data.pagination.offset + data.pagination.limit,
+            data.pagination.total
+          )} of {data.pagination.total}
+        </div>
+        <div class="flex gap-2">
+          {#if data.currentPage > 1}
+            <a
+              href="?page={data.currentPage - 1}"
+              class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-100"
+            >
+              Previous
+            </a>
+          {/if}
+          {#if data.pagination.hasMore}
+            <a
+              href="?page={data.currentPage + 1}"
+              class="rounded border border-gray-200 px-3 py-1 text-sm hover:bg-gray-100"
+            >
+              Next
+            </a>
+          {/if}
+        </div>
+      </div>
+    {/if}
   {/if}
 
   <!-- Customer Groups Tab -->

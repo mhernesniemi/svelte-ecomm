@@ -1,34 +1,20 @@
 import { productService } from "$lib/server/services/products.js";
-import { fail } from "@sveltejs/kit";
-import type { PageServerLoad, Actions } from "./$types";
+import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
+	const page = Number(url.searchParams.get("page")) || 1;
+	const limit = 20;
+	const offset = (page - 1) * limit;
+
 	const result = await productService.list({
-		limit: 1000,
-		offset: 0,
-		language: "en",
-		visibility: ["public", "private", "hidden"]
+		limit,
+		offset,
+		language: "en"
 	});
 
 	return {
-		products: result.items
+		products: result.items,
+		pagination: result.pagination,
+		currentPage: page
 	};
-};
-
-export const actions: Actions = {
-	deleteSelected: async ({ request }) => {
-		const data = await request.formData();
-		const ids = data.getAll("ids").map(Number).filter(Boolean);
-
-		if (ids.length === 0) {
-			return fail(400, { error: "No products selected" });
-		}
-
-		try {
-			await Promise.all(ids.map((id) => productService.delete(id)));
-			return { success: true };
-		} catch {
-			return fail(500, { error: "Failed to delete products" });
-		}
-	}
 };

@@ -3,10 +3,15 @@ import { customerGroupService } from "$lib/server/services/customerGroups.js";
 import { fail } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
-export const load: PageServerLoad = async () => {
-	const [customerResult, groups] = await Promise.all([
-		customerService.list(1000, 0),
-		customerGroupService.list()
+export const load: PageServerLoad = async ({ url }) => {
+	const page = Number(url.searchParams.get("page")) || 1;
+	const limit = 20;
+	const offset = (page - 1) * limit;
+
+	const [customerResult, groups, { items: allCustomers }] = await Promise.all([
+		customerService.list(limit, offset),
+		customerGroupService.list(),
+		customerService.list(100, 0)
 	]);
 
 	// For each group, get its customers
@@ -22,8 +27,10 @@ export const load: PageServerLoad = async () => {
 
 	return {
 		customers: customerResult.items,
+		pagination: customerResult.pagination,
+		currentPage: page,
 		groups: groupsWithCustomers,
-		allCustomers: customerResult.items
+		allCustomers
 	};
 };
 
@@ -92,22 +99,6 @@ export const actions: Actions = {
 			return { success: true, message: "Customer removed from group" };
 		} catch (err) {
 			return fail(500, { error: "Failed to remove customer from group" });
-		}
-	},
-
-	deleteSelected: async ({ request }) => {
-		const data = await request.formData();
-		const ids = data.getAll("ids").map(Number).filter(Boolean);
-
-		if (ids.length === 0) {
-			return fail(400, { error: "No customers selected" });
-		}
-
-		try {
-			await Promise.all(ids.map((id) => customerService.delete(id)));
-			return { success: true, message: "Customers deleted" };
-		} catch {
-			return fail(500, { error: "Failed to delete customers" });
 		}
 	}
 };

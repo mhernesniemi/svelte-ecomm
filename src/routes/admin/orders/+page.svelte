@@ -1,76 +1,34 @@
 <script lang="ts">
-  import type { ColumnDef } from "@tanstack/table-core";
-  import { DataTable, renderSnippet } from "$lib/components/admin/data-table";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
+  import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell
+  } from "$lib/components/admin/ui/table";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
-
-  type OrderRow = (typeof data.orders)[0];
 
   const states = ["created", "payment_pending", "paid", "shipped", "delivered", "cancelled"];
 
   function getStateVariant(state: string): BadgeVariant {
     switch (state) {
       case "paid":
-      case "delivered":
         return "success";
       case "shipped":
         return "default";
+      case "delivered":
+        return "success";
       case "cancelled":
         return "destructive";
       default:
         return "secondary";
     }
   }
-
-  const columns: ColumnDef<OrderRow>[] = [
-    {
-      accessorKey: "code",
-      header: "Order",
-      cell: ({ row }) =>
-        renderSnippet(orderCell, {
-          code: row.original.code,
-          itemCount: row.original.lines.length,
-          id: row.original.id
-        })
-    },
-    {
-      accessorFn: (row) => row.shippingFullName ?? "Guest",
-      id: "customer",
-      header: "Customer"
-    },
-    {
-      accessorKey: "state",
-      header: "Status",
-      cell: ({ row }) => renderSnippet(statusCell, { state: row.original.state })
-    },
-    {
-      accessorKey: "total",
-      header: "Total",
-      cell: ({ row }) =>
-        `${(row.original.total / 100).toFixed(2)} ${row.original.currencyCode}`
-    },
-    {
-      accessorKey: "createdAt",
-      header: "Date",
-      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
-    }
-  ];
 </script>
-
-{#snippet orderCell({ code, itemCount, id }: { code: string; itemCount: number; id: number })}
-  <a href="/admin/orders/{id}" class="block">
-    <p class="font-medium">{code}</p>
-    <p class="text-sm text-gray-500">{itemCount} items</p>
-  </a>
-{/snippet}
-
-{#snippet statusCell({ state }: { state: string })}
-  <Badge variant={getStateVariant(state)} class="capitalize">
-    {state.replace("_", " ")}
-  </Badge>
-{/snippet}
 
 <svelte:head><title>Orders | Admin</title></svelte:head>
 
@@ -99,9 +57,52 @@
     {/each}
   </div>
 
-  <DataTable
-    data={data.orders}
-    {columns}
-    searchPlaceholder="Search orders..."
-  />
+  <Table>
+    <TableHeader>
+      <TableRow class="hover:bg-transparent">
+        <TableHead>Order</TableHead>
+        <TableHead>Customer</TableHead>
+        <TableHead>Status</TableHead>
+        <TableHead>Total</TableHead>
+        <TableHead>Date</TableHead>
+        <TableHead class="text-right">Actions</TableHead>
+      </TableRow>
+    </TableHeader>
+    <TableBody>
+      {#if data.orders.length === 0}
+        <TableRow class="hover:bg-transparent">
+          <TableCell colspan={6} class="py-12 text-center text-gray-500">No orders found</TableCell>
+        </TableRow>
+      {:else}
+        {#each data.orders as order}
+          <TableRow>
+            <TableCell>
+              <p class="font-medium">{order.code}</p>
+              <p class="text-sm text-gray-500">{order.lines.length} items</p>
+            </TableCell>
+            <TableCell class="text-sm text-gray-500">
+              {order.shippingFullName ?? "Guest"}
+            </TableCell>
+            <TableCell>
+              <Badge variant={getStateVariant(order.state)} class="capitalize">
+                {order.state.replace("_", " ")}
+              </Badge>
+            </TableCell>
+            <TableCell class="text-sm font-medium">
+              {(order.total / 100).toFixed(2)}
+              {order.currencyCode}
+            </TableCell>
+            <TableCell class="text-sm text-gray-500">
+              {new Date(order.createdAt).toLocaleDateString()}
+            </TableCell>
+            <TableCell class="text-right">
+              <a href="/admin/orders/{order.id}" class="text-sm text-blue-600 hover:text-blue-900">
+                View
+              </a>
+            </TableCell>
+          </TableRow>
+        {/each}
+      {/if}
+    </TableBody>
+  </Table>
 </div>
