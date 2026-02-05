@@ -87,6 +87,7 @@
 	],
 	"dependencies": {
 		"@neondatabase/serverless": "^0.10.0",
+		"@tanstack/table-core": "^8.21.3",
 		"@tiptap/core": "^3.18.0",
 		"@tiptap/extension-link": "^3.18.0",
 		"@tiptap/extension-placeholder": "^3.18.0",
