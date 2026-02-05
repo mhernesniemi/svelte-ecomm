@@ -30,100 +30,19 @@ export const actions: Actions = {
 		}
 	},
 
-	createValue: async ({ request }) => {
+	deleteSelected: async ({ request }) => {
 		const formData = await request.formData();
-		const facetId = Number(formData.get("facetId"));
-		const code = formData.get("code") as string;
-		const nameEn = formData.get("name_en") as string;
+		const ids = formData.getAll("ids").map(Number).filter(Boolean);
 
-		if (!facetId || !code || !nameEn) {
-			return fail(400, { valueError: "All fields are required" });
+		if (ids.length === 0) {
+			return fail(400, { error: "No facets selected" });
 		}
 
 		try {
-			await facetService.createValue({
-				facetId,
-				code: code.toLowerCase().replace(/\s+/g, "_"),
-				translations: [{ languageCode: "en", name: nameEn }]
-			});
-
-			return { valueSuccess: true };
-		} catch (e) {
-			return fail(500, { valueError: "Failed to create value" });
-		}
-	},
-
-	update: async ({ request }) => {
-		const formData = await request.formData();
-		const id = Number(formData.get("id"));
-		const code = formData.get("code") as string;
-		const nameEn = formData.get("name_en") as string;
-
-		if (!id || !code || !nameEn) {
-			return fail(400, { error: "All fields are required" });
-		}
-
-		try {
-			await facetService.update(id, {
-				code: code.toLowerCase().replace(/\s+/g, "_"),
-				translations: [{ languageCode: "en", name: nameEn }]
-			});
+			await Promise.all(ids.map((id) => facetService.delete(id)));
 			return { success: true };
 		} catch {
-			return fail(500, { error: "Failed to update facet" });
-		}
-	},
-
-	updateValue: async ({ request }) => {
-		const formData = await request.formData();
-		const id = Number(formData.get("id"));
-		const code = formData.get("code") as string;
-		const nameEn = formData.get("name_en") as string;
-
-		if (!id || !code || !nameEn) {
-			return fail(400, { error: "All fields are required" });
-		}
-
-		try {
-			await facetService.updateValue(id, {
-				code: code.toLowerCase().replace(/\s+/g, "_"),
-				translations: [{ languageCode: "en", name: nameEn }]
-			});
-			return { success: true };
-		} catch {
-			return fail(500, { error: "Failed to update value" });
-		}
-	},
-
-	deleteValue: async ({ request }) => {
-		const formData = await request.formData();
-		const id = Number(formData.get("id"));
-
-		if (!id) {
-			return fail(400, { error: "Value ID is required" });
-		}
-
-		try {
-			await facetService.deleteValue(id);
-			return { success: true };
-		} catch {
-			return fail(500, { error: "Failed to delete value" });
-		}
-	},
-
-	delete: async ({ request }) => {
-		const formData = await request.formData();
-		const id = Number(formData.get("id"));
-
-		if (!id) {
-			return fail(400, { error: "Facet ID is required" });
-		}
-
-		try {
-			await facetService.delete(id);
-			return { success: true };
-		} catch {
-			return fail(500, { error: "Failed to delete facet" });
+			return fail(500, { error: "Failed to delete facets" });
 		}
 	}
 };
