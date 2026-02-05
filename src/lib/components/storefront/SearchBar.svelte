@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import { formatPrice } from "$lib/utils";
   import * as Command from "$lib/components/storefront/ui/command/index.js";
 
@@ -31,14 +32,19 @@
     if (event.key === "Escape") {
       showResults = false;
     }
+    if (event.key === "Enter" && !showResults && searchQuery.length >= 1) {
+      goto(`/products?q=${encodeURIComponent(searchQuery)}`);
+      searchQuery = "";
+    }
   }
 </script>
 
 <svelte:document onclick={handleClickOutside} onkeydown={handleKeydown} />
 
 <div class="relative mx-4 max-w-md flex-1" bind:this={containerEl}>
-  <Command.Root class="rounded-lg border border-gray-300">
+  <Command.Root class="rounded-lg border border-gray-300 ">
     <Command.Input
+      class="placeholder:text-gray-500"
       placeholder="Search products..."
       bind:value={searchQuery}
       onfocus={() => (showResults = true)}
