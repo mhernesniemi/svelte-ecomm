@@ -621,6 +621,59 @@ export class ProductService {
 
 		return matches.map((m) => m.productId);
 	}
+
+	/**
+	 * Get lightweight product catalog for client-side search
+	 * Returns only the fields needed for search: id, name, slug, price, image
+	 */
+	async getSearchCatalog(language = this.defaultLanguage) {
+		const rows = await db
+			.select({
+				id: products.id,
+				name: productTranslations.name,
+				slug: productTranslations.slug,
+				price: productVariants.price,
+				image: assets.source
+			})
+			.from(products)
+			.innerJoin(
+				productTranslations,
+				and(
+					eq(productTranslations.productId, products.id),
+					eq(productTranslations.languageCode, language)
+				)
+			)
+			.leftJoin(
+				productVariants,
+				and(
+					eq(productVariants.productId, products.id),
+					isNull(productVariants.deletedAt)
+				)
+			)
+			.leftJoin(assets, eq(assets.id, products.featuredAssetId))
+			.where(and(eq(products.visibility, "public"), isNull(products.deletedAt)))
+			.orderBy(asc(productTranslations.name));
+
+		// Deduplicate by product id (multiple variants produce multiple rows), keep lowest price
+		const seen = new Map<
+			number,
+			{ id: number; name: string; slug: string; price: number; image: string | null }
+		>();
+		for (const row of rows) {
+			const existing = seen.get(row.id);
+			if (!existing || (row.price !== null && row.price < existing.price)) {
+				seen.set(row.id, {
+					id: row.id,
+					name: row.name,
+					slug: row.slug,
+					price: row.price ?? 0,
+					image: row.image
+				});
+			}
+		}
+
+		return [...seen.values()];
+	}
 }
 
 // Export singleton instance

@@ -1,16 +1,13 @@
 <script lang="ts">
-  import { SignedIn, SignedOut, UserButton, SignInButton, useClerkContext } from "svelte-clerk";
-  import { invalidateAll, goto, onNavigate } from "$app/navigation";
+  import { SignedIn, SignedOut, SignInButton, useClerkContext } from "svelte-clerk";
+  import { invalidateAll, onNavigate } from "$app/navigation";
   import { page } from "$app/stores";
-  import { browser } from "$app/environment";
-  import { throttle, formatPrice, cn } from "$lib/utils";
-  import { searchProducts, type SearchResult } from "$lib/remote/search.remote.js";
+  import { cn } from "$lib/utils";
+  import SearchBar from "$lib/components/storefront/SearchBar.svelte";
   import CartSheet from "$lib/components/storefront/CartSheet.svelte";
-  import { buttonVariants } from "$lib/components/storefront/ui/button";
   import { cartStore } from "$lib/stores/cart.svelte";
   import { wishlistStore } from "$lib/stores/wishlist.svelte";
   import type { LayoutData } from "./$types";
-  import Loader2 from "@lucide/svelte/icons/loader-2";
   import Heart from "@lucide/svelte/icons/heart";
   import Dot from "@lucide/svelte/icons/dot";
   import UserIcon from "@lucide/svelte/icons/user";
@@ -52,44 +49,6 @@
 
   const wishlistCount = $derived.by(() => wishlistStore.count);
 
-  // Search state
-  let searchQuery = $state("");
-  let searchResults = $state<SearchResult[]>([]);
-  let isSearching = $state(false);
-  let showResults = $state(false);
-
-  async function performSearch(query: string) {
-    if (query.length < 2) {
-      searchResults = [];
-      isSearching = false;
-      return;
-    }
-
-    isSearching = true;
-
-    try {
-      searchResults = await searchProducts(query);
-    } catch (e) {
-      console.error("Search error:", e);
-    } finally {
-      isSearching = false;
-    }
-  }
-
-  const throttledSearch = throttle(performSearch, 50);
-
-  $effect(() => {
-    if (browser) {
-      throttledSearch(searchQuery);
-    }
-  });
-
-  function handleResultClick(id: number, slug: string) {
-    searchQuery = "";
-    searchResults = [];
-    showResults = false;
-    goto(`/products/${id}/${slug}`);
-  }
 </script>
 
 <!-- TODO: Remove noindex before launch -->
@@ -105,51 +64,7 @@
         <div class="flex h-16 items-center justify-between">
           <a href="/" class="bg-[#f7d0dd] text-xl font-bold text-gray-900">"Hoikka"</a>
 
-          <!-- Search Bar -->
-          <div class="relative mx-4 max-w-md flex-1">
-            <input
-              type="text"
-              bind:value={searchQuery}
-              onfocus={() => (showResults = true)}
-              onblur={() => setTimeout(() => (showResults = false), 200)}
-              placeholder="Search products..."
-              class="w-full rounded-lg border border-gray-300 px-4 py-2 text-sm"
-            />
-            {#if isSearching}
-              <div class="absolute top-1/2 right-3 -translate-y-1/2">
-                <Loader2 class="h-4 w-4 animate-spin text-gray-400" />
-              </div>
-            {/if}
-
-            <!-- Search Results Dropdown -->
-            {#if showResults && searchQuery.length >= 2}
-              <div
-                class="absolute top-full right-0 left-0 z-50 mt-1 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
-              >
-                {#if searchResults.length > 0}
-                  {#each searchResults as result}
-                    <button
-                      type="button"
-                      onclick={() => handleResultClick(result.id, result.slug)}
-                      class="flex w-full items-center gap-3 border-b border-gray-100 px-4 py-3 text-left last:border-b-0 hover:bg-gray-50"
-                    >
-                      {#if result.image}
-                        <img src={result.image} alt="" class="h-10 w-10 rounded object-cover" />
-                      {:else}
-                        <div class="h-10 w-10 rounded bg-gray-100"></div>
-                      {/if}
-                      <div class="min-w-0 flex-1">
-                        <p class="truncate text-sm font-medium text-gray-900">{result.name}</p>
-                        <p class="text-sm text-gray-500">{formatPrice(result.price)}</p>
-                      </div>
-                    </button>
-                  {/each}
-                {:else if !isSearching}
-                  <div class="px-4 py-3 text-sm text-gray-500">No products found</div>
-                {/if}
-              </div>
-            {/if}
-          </div>
+          <SearchBar products={data.searchCatalog} />
 
           <nav class="flex items-center gap-6">
             <a
