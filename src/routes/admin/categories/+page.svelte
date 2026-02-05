@@ -107,10 +107,12 @@
         {@const fullPath = `${parentPath}/${node.slug}`}
         <div>
           <!-- Display row -->
-          <div
-            class="group flex items-center justify-between px-4 py-3 {editingId === node.id
+          <button
+            type="button"
+            class="group flex w-full cursor-pointer items-center justify-between px-4 py-3 text-left {editingId === node.id
               ? 'bg-gray-50'
               : 'hover:bg-gray-50'}"
+            onclick={() => (editingId = editingId === node.id ? null : node.id)}
           >
             <div class="flex items-center gap-2">
               {#if depth > 0}
@@ -119,17 +121,13 @@
               <span class="font-medium text-gray-900">{getName(node.translations)}</span>
               <span class="text-sm text-gray-400">{fullPath}</span>
             </div>
-            <button
-              type="button"
-              class="rounded p-1 text-gray-600 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-200 hover:text-gray-600 {editingId ===
+            <Pencil
+              class="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 {editingId ===
               node.id
                 ? '!text-blue-600 !opacity-100'
                 : ''}"
-              onclick={() => (editingId = editingId === node.id ? null : node.id)}
-            >
-              <Pencil class="h-4 w-4" />
-            </button>
-          </div>
+            />
+          </button>
 
           <!-- Edit panel -->
           {#if editingId === node.id}
