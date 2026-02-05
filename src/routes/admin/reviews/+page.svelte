@@ -34,10 +34,6 @@
     }
   }
 
-  function formatRating(rating: number): string {
-    return "★".repeat(rating) + "☆".repeat(5 - rating);
-  }
-
   const columns: ColumnDef<ReviewRow>[] = [
     {
       id: "select",
@@ -57,29 +53,20 @@
       enableSorting: false
     },
     {
+      accessorFn: (row) => row.comment ?? "-",
+      id: "comment",
+      header: "Comment",
+      cell: ({ row }) =>
+        renderSnippet(commentCell, { id: row.original.id, comment: row.original.comment })
+    },
+    {
       accessorFn: (row) => getProductName(row),
       id: "product",
-      header: "Product",
-      cell: ({ row }) =>
-        renderSnippet(productCell, {
-          id: row.original.product.id,
-          name: getProductName(row.original)
-        })
+      header: "Product"
     },
     {
       accessorKey: "nickname",
       header: "Nickname"
-    },
-    {
-      accessorKey: "rating",
-      header: "Rating",
-      cell: ({ row }) => renderSnippet(ratingCell, { rating: row.original.rating })
-    },
-    {
-      accessorFn: (row) => row.comment ?? "-",
-      id: "comment",
-      header: "Comment",
-      cell: ({ row }) => renderSnippet(commentCell, { comment: row.original.comment })
     },
     {
       accessorFn: (row) => (row.isVerifiedPurchase ? "Yes" : "No"),
@@ -95,50 +82,23 @@
       accessorKey: "createdAt",
       header: "Date",
       cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
-    },
-    {
-      id: "actions",
-      header: "",
-      cell: ({ row }) =>
-        renderSnippet(actionsCell, { id: row.original.id, status: row.original.status }),
-      enableSorting: false
     }
   ];
 </script>
 
-{#snippet productCell({ id, name }: { id: number; name: string })}
-  <a href="/admin/products/{id}" class="text-sm text-blue-600 hover:text-blue-800">
-    {name}
+{#snippet commentCell({ id, comment }: { id: number; comment: string | null })}
+  <a
+    href="/admin/reviews/{id}"
+    class="block max-w-xs truncate font-medium text-gray-900 hover:text-blue-600"
+  >
+    {comment ?? "-"}
   </a>
-{/snippet}
-
-{#snippet ratingCell({ rating }: { rating: number })}
-  <span class="text-yellow-500">{formatRating(rating)}</span>
-{/snippet}
-
-{#snippet commentCell({ comment }: { comment: string | null })}
-  <span class="block max-w-xs truncate text-gray-500">{comment ?? "-"}</span>
 {/snippet}
 
 {#snippet statusCell({ status }: { status: string })}
   <Badge variant={getStatusVariant(status)} class="capitalize">
     {status}
   </Badge>
-{/snippet}
-
-{#snippet actionsCell({ id, status }: { id: number; status: string })}
-  <div class="flex justify-end gap-2">
-    {#if status === "pending"}
-      <form method="POST" action="?/approve" use:enhance class="inline">
-        <input type="hidden" name="id" value={id} />
-        <Button type="submit" size="sm" variant="outline">Approve</Button>
-      </form>
-      <form method="POST" action="?/reject" use:enhance class="inline">
-        <input type="hidden" name="id" value={id} />
-        <Button type="submit" size="sm" variant="outline">Reject</Button>
-      </form>
-    {/if}
-  </div>
 {/snippet}
 
 <svelte:head><title>Reviews | Admin</title></svelte:head>

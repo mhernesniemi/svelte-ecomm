@@ -19,54 +19,6 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions: Actions = {
-	approve: async ({ request }) => {
-		const data = await request.formData();
-		const id = Number(data.get("id"));
-
-		if (!id) {
-			return fail(400, { error: "Review ID is required" });
-		}
-
-		try {
-			await reviewService.moderate(id, "approved");
-			return { success: true };
-		} catch {
-			return fail(500, { error: "Failed to approve review" });
-		}
-	},
-
-	reject: async ({ request }) => {
-		const data = await request.formData();
-		const id = Number(data.get("id"));
-
-		if (!id) {
-			return fail(400, { error: "Review ID is required" });
-		}
-
-		try {
-			await reviewService.moderate(id, "rejected");
-			return { success: true };
-		} catch {
-			return fail(500, { error: "Failed to reject review" });
-		}
-	},
-
-	delete: async ({ request }) => {
-		const data = await request.formData();
-		const id = Number(data.get("id"));
-
-		if (!id) {
-			return fail(400, { error: "Review ID is required" });
-		}
-
-		try {
-			await reviewService.delete(id);
-			return { success: true };
-		} catch {
-			return fail(500, { error: "Failed to delete review" });
-		}
-	},
-
 	bulkApprove: async ({ request }) => {
 		const data = await request.formData();
 		const ids = data.getAll("ids").map(Number).filter(Boolean);
