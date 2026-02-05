@@ -63,7 +63,7 @@
               class="flex items-center gap-3 px-4 py-3"
             >
               {#if product.image}
-                <img src={product.image} alt="" class="h-10 w-10 rounded object-cover" />
+                <img src="{product.image}?tr=w-100,h-100,fo-auto" alt="" class="h-10 w-10 rounded object-cover" />
               {:else}
                 <div class="h-10 w-10 rounded bg-gray-100"></div>
               {/if}
