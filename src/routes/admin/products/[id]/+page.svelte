@@ -630,15 +630,13 @@
     </div>
   </div>
 
-  <div class="mt-3 border-t border-gray-200 pt-3">
-    <button
-      type="button"
-      class="text-sm text-red-600 hover:text-red-800"
-      onclick={() => (showDelete = true)}
-    >
-      Delete this product
-    </button>
-  </div>
+  <button
+    type="button"
+    class="mt-6 text-sm text-red-600 hover:text-red-800"
+    onclick={() => (showDelete = true)}
+  >
+    Delete this product
+  </button>
 
   <DeleteConfirmDialog
     bind:open={showDelete}
