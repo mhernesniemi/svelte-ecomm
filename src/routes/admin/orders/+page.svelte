@@ -98,5 +98,5 @@
     {/each}
   </div>
 
-  <DataTable data={data.orders} {columns} searchPlaceholder="Search orders..." />
+  <DataTable data={data.orders} {columns} searchPlaceholder="Filter orders..." />
 </div>

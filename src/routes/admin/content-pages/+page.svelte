@@ -101,7 +101,7 @@
   <DataTable
     data={data.pages}
     {columns}
-    searchPlaceholder="Search pages..."
+    searchPlaceholder="Filter pages..."
     enableRowSelection={true}
     emptyIcon={FileText}
     emptyTitle="No content pages"

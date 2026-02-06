@@ -106,7 +106,7 @@
   <DataTable
     data={data.collections}
     {columns}
-    searchPlaceholder="Search collections..."
+    searchPlaceholder="Filter collections..."
     enableRowSelection={true}
     emptyIcon={FolderOpen}
     emptyTitle="No collections"

@@ -131,7 +131,7 @@
   <DataTable
     data={data.reviews}
     {columns}
-    searchPlaceholder="Search reviews..."
+    searchPlaceholder="Filter reviews..."
     enableRowSelection={true}
   >
     {#snippet bulkActions({ selectedRows, table })}

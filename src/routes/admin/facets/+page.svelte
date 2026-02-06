@@ -128,7 +128,7 @@
   <DataTable
     data={data.facets}
     {columns}
-    searchPlaceholder="Search facets..."
+    searchPlaceholder="Filter facets..."
     enableRowSelection={true}
     emptyIcon={Tag}
     emptyTitle="No facets"

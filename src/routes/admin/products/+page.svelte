@@ -109,7 +109,7 @@
   <DataTable
     data={data.products}
     {columns}
-    searchPlaceholder="Search products..."
+    searchPlaceholder="Filter products..."
     enableRowSelection={true}
     emptyIcon={Package}
     emptyTitle="No products"

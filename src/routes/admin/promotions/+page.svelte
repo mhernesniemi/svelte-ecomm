@@ -142,7 +142,7 @@
   <DataTable
     data={data.promotions}
     {columns}
-    searchPlaceholder="Search promotions..."
+    searchPlaceholder="Filter promotions..."
     enableRowSelection={true}
     emptyIcon={Gift}
     emptyTitle="No promotions"
