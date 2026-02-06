@@ -5,15 +5,11 @@
 
   let { product }: { product: ProductWithRelations } = $props();
 
-  const translation = $derived(
-    product.translations.find((t) => t.languageCode === "en")
-  );
+  const translation = $derived(product.translations.find((t) => t.languageCode === "en"));
   const name = $derived(translation?.name ?? "Untitled");
   const slug = $derived(translation?.slug ?? "");
   const lowestPrice = $derived(
-    product.variants.length > 0
-      ? Math.min(...product.variants.map((v) => v.price))
-      : null
+    product.variants.length > 0 ? Math.min(...product.variants.map((v) => v.price)) : null
   );
 </script>
 

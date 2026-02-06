@@ -42,8 +42,7 @@
 
   const flatFacetValues: FlatFacetValue[] = $derived(
     data.facets.flatMap((facet) => {
-      const facetName =
-        facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+      const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
       return facet.values.map((value) => ({
         id: value.id,
         name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
@@ -281,10 +280,7 @@
           <h2 class="font-semibold">Parent Product</h2>
         </div>
         <div class="p-4">
-          <a
-            href="/admin/products/{data.product.id}"
-            class="text-sm text-blue-600 hover:underline"
-          >
+          <a href="/admin/products/{data.product.id}" class="text-sm text-blue-600 hover:underline">
             {data.product.name} &rarr;
           </a>
         </div>
@@ -298,7 +294,8 @@
       <Dialog.Header>
         <Dialog.Title>Delete Variant?</Dialog.Title>
         <Dialog.Description>
-          Are you sure you want to delete variant "{data.variant.sku}"? This action cannot be undone.
+          Are you sure you want to delete variant "{data.variant.sku}"? This action cannot be
+          undone.
         </Dialog.Description>
       </Dialog.Header>
       <Dialog.Footer>

@@ -26,9 +26,7 @@
       <h1 class="text-2xl font-bold">My Account</h1>
       <p class="mt-1 text-gray-600">Manage your account settings and view your orders</p>
     </div>
-    <SignOutButton class={buttonVariants({ variant: "outline" })}>
-      Sign out
-    </SignOutButton>
+    <SignOutButton class={buttonVariants({ variant: "outline" })}>Sign out</SignOutButton>
   </div>
 
   <div class="grid grid-cols-1 gap-8 md:grid-cols-4">

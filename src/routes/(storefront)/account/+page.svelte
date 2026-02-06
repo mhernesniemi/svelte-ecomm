@@ -38,9 +38,7 @@
       class="space-y-4"
     >
       <div>
-        <label for="email" class="mb-1 block text-sm font-medium text-gray-700">
-          Email
-        </label>
+        <label for="email" class="mb-1 block text-sm font-medium text-gray-700"> Email </label>
         <input
           type="email"
           id="email"

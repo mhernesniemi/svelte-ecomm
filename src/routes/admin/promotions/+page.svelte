@@ -29,9 +29,7 @@
       <h1 class="text-2xl font-bold text-gray-900">Promotions</h1>
       <p class="mt-1 text-sm text-gray-600">Manage discount codes and promotions</p>
     </div>
-    <Button type="button" onclick={() => (showCreateForm = !showCreateForm)}>
-      Add Promotion
-    </Button>
+    <Button type="button" onclick={() => (showCreateForm = !showCreateForm)}>Add Promotion</Button>
   </div>
 
   <!-- Create Form -->
@@ -131,9 +129,7 @@
       <h3 class="mt-2 text-sm font-medium text-gray-900">No promotions</h3>
       <p class="mt-1 text-sm text-gray-500">Get started by creating a new promotion.</p>
       <div class="mt-6">
-        <Button type="button" onclick={() => (showCreateForm = true)}>
-          Add Promotion
-        </Button>
+        <Button type="button" onclick={() => (showCreateForm = true)}>Add Promotion</Button>
       </div>
     </div>
   {:else}
@@ -186,9 +182,7 @@
               </form>
               <form method="POST" action="?/delete" use:enhance class="inline">
                 <input type="hidden" name="id" value={promo.id} />
-                <button type="submit" class="text-red-600 hover:text-red-800">
-                  Delete
-                </button>
+                <button type="submit" class="text-red-600 hover:text-red-800"> Delete </button>
               </form>
             </TableCell>
           </TableRow>

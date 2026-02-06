@@ -77,14 +77,17 @@
     {/if}
     <div>
       <p class="font-medium text-gray-900">{name}</p>
-      <p class="text-sm text-gray-500">ID: {id}</p>
     </div>
   </a>
 {/snippet}
 
 {#snippet statusCell({ visibility }: { visibility: string })}
   <Badge
-    variant={visibility === "public" ? "success" : visibility === "private" ? "outline" : "secondary"}
+    variant={visibility === "public"
+      ? "success"
+      : visibility === "private"
+        ? "outline"
+        : "secondary"}
   >
     {visibility === "public" ? "Public" : visibility === "private" ? "Private" : "Hidden"}
   </Badge>

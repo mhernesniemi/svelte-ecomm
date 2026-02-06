@@ -48,8 +48,7 @@
     {
       accessorKey: "total",
       header: "Total",
-      cell: ({ row }) =>
-        `${(row.original.total / 100).toFixed(2)} ${row.original.currencyCode}`
+      cell: ({ row }) => `${(row.original.total / 100).toFixed(2)} ${row.original.currencyCode}`
     },
     {
       accessorKey: "createdAt",
@@ -99,9 +98,5 @@
     {/each}
   </div>
 
-  <DataTable
-    data={data.orders}
-    {columns}
-    searchPlaceholder="Search orders..."
-  />
+  <DataTable data={data.orders} {columns} searchPlaceholder="Search orders..." />
 </div>

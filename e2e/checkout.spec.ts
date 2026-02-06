@@ -58,9 +58,11 @@ test.describe("E-commerce checkout flow", () => {
 			await page.click('button:has-text("Add to Cart")');
 
 			// Wait for cart to open and show the item
-			await page.waitForSelector('[data-testid="cart-sheet"]', { timeout: 5000 }).catch(() => {
-				// Cart might show differently, just wait a moment
-			});
+			await page
+				.waitForSelector('[data-testid="cart-sheet"]', { timeout: 5000 })
+				.catch(() => {
+					// Cart might show differently, just wait a moment
+				});
 
 			// Verify cart has items (check for checkout button)
 			await expect(page.locator('a[href="/checkout"]')).toBeVisible({ timeout: 5000 });

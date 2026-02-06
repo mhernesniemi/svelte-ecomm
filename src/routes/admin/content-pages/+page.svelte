@@ -55,8 +55,7 @@
     {
       accessorKey: "published",
       header: "Published",
-      cell: ({ row }) =>
-        renderSnippet(publishedCell, { published: row.original.published })
+      cell: ({ row }) => renderSnippet(publishedCell, { published: row.original.published })
     },
     {
       accessorKey: "createdAt",
@@ -74,7 +73,9 @@
 
 {#snippet publishedCell({ published }: { published: boolean })}
   {#if published}
-    <span class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">
+    <span
+      class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800"
+    >
       Published
     </span>
   {:else}

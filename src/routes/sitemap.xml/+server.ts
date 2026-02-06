@@ -46,10 +46,7 @@ export const GET: RequestHandler = async () => {
 	}
 
 	// Categories (flatten tree)
-	function addCategories(
-		nodes: typeof categories,
-		parentPath: string[] = []
-	) {
+	function addCategories(nodes: typeof categories, parentPath: string[] = []) {
 		for (const node of nodes) {
 			const path = [...parentPath, node.slug].join("/");
 			urls.push({

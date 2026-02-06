@@ -100,9 +100,7 @@
   });
 
   let selectedCount = $derived(table.getFilteredSelectedRowModel().rows.length);
-  let selectedRows = $derived(
-    table.getFilteredSelectedRowModel().rows.map((r) => r.original)
-  );
+  let selectedRows = $derived(table.getFilteredSelectedRowModel().rows.map((r) => r.original));
   let totalFiltered = $derived(table.getFilteredRowModel().rows.length);
   let pageCount = $derived(table.getPageCount());
   let showingFrom = $derived(pagination.pageIndex * pagination.pageSize + 1);

@@ -65,7 +65,10 @@ export class ContentPageService {
 		if (!existing) return null;
 
 		if (input.published !== undefined) {
-			await db.update(contentPages).set({ published: input.published }).where(eq(contentPages.id, id));
+			await db
+				.update(contentPages)
+				.set({ published: input.published })
+				.where(eq(contentPages.id, id));
 		}
 
 		if (input.translations) {

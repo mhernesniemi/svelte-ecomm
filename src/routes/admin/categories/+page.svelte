@@ -109,7 +109,8 @@
           <!-- Display row -->
           <button
             type="button"
-            class="group flex w-full cursor-pointer items-center justify-between px-4 py-3 text-left {editingId === node.id
+            class="group flex w-full cursor-pointer items-center justify-between px-4 py-3 text-left {editingId ===
+            node.id
               ? 'bg-gray-50'
               : 'hover:bg-gray-50'}"
             onclick={() => (editingId = editingId === node.id ? null : node.id)}

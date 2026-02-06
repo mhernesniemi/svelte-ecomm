@@ -346,9 +346,7 @@
       <Dialog.Footer>
         <Button variant="outline" onclick={onClose}>Cancel</Button>
         {#if activeTab === "existing" && selectedImages.size > 0}
-          <Button onclick={handleSelectExisting}>
-            Next: Add Alt Text
-          </Button>
+          <Button onclick={handleSelectExisting}>Next: Add Alt Text</Button>
         {/if}
       </Dialog.Footer>
     {/if}

@@ -13,7 +13,9 @@
   };
 
   function getTranslation(translations: CollectionTranslation[], lang: string) {
-    return translations.find((t: CollectionTranslation) => t.languageCode === lang) ?? translations[0];
+    return (
+      translations.find((t: CollectionTranslation) => t.languageCode === lang) ?? translations[0]
+    );
   }
 
   const collectionTrans = $derived(getTranslation(data.collection.translations, "en"));
@@ -23,12 +25,14 @@
   <title>{collectionTrans?.name ?? "Collection"} | Hoikka</title>
   <meta
     name="description"
-    content={stripHtml(collectionTrans?.description)?.slice(0, 160) || `Browse our ${collectionTrans?.name} collection.`}
+    content={stripHtml(collectionTrans?.description)?.slice(0, 160) ||
+      `Browse our ${collectionTrans?.name} collection.`}
   />
   <meta property="og:title" content="{collectionTrans?.name ?? 'Collection'} | Hoikka" />
   <meta
     property="og:description"
-    content={stripHtml(collectionTrans?.description)?.slice(0, 160) || `Browse our ${collectionTrans?.name} collection.`}
+    content={stripHtml(collectionTrans?.description)?.slice(0, 160) ||
+      `Browse our ${collectionTrans?.name} collection.`}
   />
   <meta property="og:type" content="website" />
 </svelte:head>
@@ -44,7 +48,7 @@
 
     <h1 class="text-3xl font-bold text-gray-900">{collectionTrans?.name ?? "Collection"}</h1>
     {#if collectionTrans?.description}
-      <div class="prose prose-gray prose-lg mt-2 max-w-none">
+      <div class="prose prose-lg mt-2 max-w-none prose-gray">
         {@html collectionTrans.description}
       </div>
     {/if}

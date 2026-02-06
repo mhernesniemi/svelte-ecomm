@@ -179,9 +179,7 @@
           {#if data.order.state === "paid" && data.orderShipping.status === "pending"}
             <form method="POST" action="?/updateShippingStatus" class="mt-4">
               <input type="hidden" name="status" value="shipped" />
-              <Button type="submit" class="w-full">
-                Mark as Shipped
-              </Button>
+              <Button type="submit" class="w-full">Mark as Shipped</Button>
             </form>
           {/if}
         </div>
@@ -232,15 +230,17 @@
 
           {#if data.payment.state === "pending" || data.payment.state === "authorized"}
             <form method="POST" action="?/confirmPayment" class="mt-4">
-              <Button type="submit" class="w-full">
-                Confirm Payment Status
-              </Button>
+              <Button type="submit" class="w-full">Confirm Payment Status</Button>
             </form>
           {/if}
 
           {#if data.payment.state === "settled" && data.payment.transactionId}
             <form method="POST" action="?/refundPayment" class="mt-4">
-              <Button type="submit" variant="secondary" class="w-full bg-yellow-600 text-white hover:bg-yellow-700">
+              <Button
+                type="submit"
+                variant="secondary"
+                class="w-full bg-yellow-600 text-white hover:bg-yellow-700"
+              >
                 Refund Payment
               </Button>
             </form>

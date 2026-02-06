@@ -140,9 +140,7 @@
 
     <!-- Actions -->
     <div class="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
-      <a href="/admin/products" class={buttonVariants({ variant: "outline" })}>
-        Cancel
-      </a>
+      <a href="/admin/products" class={buttonVariants({ variant: "outline" })}> Cancel </a>
       <Button type="submit">Create Product</Button>
     </div>
   </form>

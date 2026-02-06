@@ -48,8 +48,14 @@ export const actions: Actions = {
 		const taxCode = formData.get("taxCode") as string;
 
 		// Facet values and categories
-		const facetValueIds = formData.getAll("facetValueIds").map(Number).filter((id) => !isNaN(id));
-		const categoryIds = formData.getAll("categoryIds").map(Number).filter((id) => !isNaN(id));
+		const facetValueIds = formData
+			.getAll("facetValueIds")
+			.map(Number)
+			.filter((id) => !isNaN(id));
+		const categoryIds = formData
+			.getAll("categoryIds")
+			.map(Number)
+			.filter((id) => !isNaN(id));
 
 		if (!name || !slug) {
 			return fail(400, { error: "Name and slug are required" });

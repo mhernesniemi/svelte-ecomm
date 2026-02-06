@@ -119,7 +119,9 @@ class AssetService {
 			)
 		).then((results) => {
 			const success = results.filter(Boolean).length;
-			console.log(`[ImageKit] Cache warmed for ${baseUrl}: ${success}/${transformations.length}`);
+			console.log(
+				`[ImageKit] Cache warmed for ${baseUrl}: ${success}/${transformations.length}`
+			);
 		});
 	}
 

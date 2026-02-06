@@ -24,8 +24,7 @@
   let isSubmitting = $state(false);
 
   const translation = $derived(
-    data.page.translations.find((t) => t.languageCode === "en") ??
-    data.page.translations[0]
+    data.page.translations.find((t) => t.languageCode === "en") ?? data.page.translations[0]
   );
 
   let title = $state("");
@@ -110,9 +109,7 @@
           </div>
 
           <div>
-            <label for="body" class="mb-1 block text-sm font-medium text-gray-700">
-              Body
-            </label>
+            <label for="body" class="mb-1 block text-sm font-medium text-gray-700"> Body </label>
             <RichTextEditor
               name="body"
               content={translation?.body ?? ""}
@@ -128,9 +125,7 @@
               bind:checked={published}
               class="h-4 w-4 rounded border-gray-300 text-blue-600"
             />
-            <label for="published" class="text-sm font-medium text-gray-700">
-              Published
-            </label>
+            <label for="published" class="text-sm font-medium text-gray-700"> Published </label>
           </div>
         </div>
 
@@ -147,9 +142,7 @@
   <div class="overflow-hidden rounded-lg border border-red-200 bg-red-50">
     <div class="p-6">
       <h2 class="mb-2 text-lg font-medium text-red-900">Danger Zone</h2>
-      <p class="mb-4 text-sm text-red-700">
-        Deleting this page cannot be undone.
-      </p>
+      <p class="mb-4 text-sm text-red-700">Deleting this page cannot be undone.</p>
       <form
         method="POST"
         action="?/delete"

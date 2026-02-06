@@ -22,9 +22,19 @@
 
 <svelte:head>
   <title>{getName(data.category.translations)} | Hoikka</title>
-  <meta name="description" content="Browse {getName(data.category.translations)} products. Find the best selection at Hoikka." />
+  <meta
+    name="description"
+    content="Browse {getName(
+      data.category.translations
+    )} products. Find the best selection at Hoikka."
+  />
   <meta property="og:title" content="{getName(data.category.translations)} | Hoikka" />
-  <meta property="og:description" content="Browse {getName(data.category.translations)} products. Find the best selection at Hoikka." />
+  <meta
+    property="og:description"
+    content="Browse {getName(
+      data.category.translations
+    )} products. Find the best selection at Hoikka."
+  />
   <meta property="og:type" content="website" />
 </svelte:head>
 

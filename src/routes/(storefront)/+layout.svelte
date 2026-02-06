@@ -48,7 +48,6 @@
   });
 
   const wishlistCount = $derived.by(() => wishlistStore.count);
-
 </script>
 
 <!-- TODO: Remove noindex before launch -->

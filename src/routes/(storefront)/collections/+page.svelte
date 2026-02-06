@@ -55,7 +55,7 @@
             </div>
           </div>
           {#if trans?.description}
-            <div class="prose prose-sm prose-gray mt-3 line-clamp-2 max-w-none">
+            <div class="prose prose-sm mt-3 line-clamp-2 max-w-none prose-gray">
               {@html trans.description}
             </div>
           {/if}

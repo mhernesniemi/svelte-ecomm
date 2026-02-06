@@ -56,11 +56,7 @@
           />
         </div>
 
-        <Button
-          type="submit"
-          disabled={isLoading}
-          class="w-full bg-gray-900 hover:bg-gray-800"
-        >
+        <Button type="submit" disabled={isLoading} class="w-full bg-gray-900 hover:bg-gray-800">
           {isLoading ? "Signing in..." : "Sign in"}
         </Button>
       </form>

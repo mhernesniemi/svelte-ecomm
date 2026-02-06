@@ -645,10 +645,7 @@ export class ProductService {
 			)
 			.leftJoin(
 				productVariants,
-				and(
-					eq(productVariants.productId, products.id),
-					isNull(productVariants.deletedAt)
-				)
+				and(eq(productVariants.productId, products.id), isNull(productVariants.deletedAt))
 			)
 			.leftJoin(assets, eq(assets.id, products.featuredAssetId))
 			.where(and(eq(products.visibility, "public"), isNull(products.deletedAt)))

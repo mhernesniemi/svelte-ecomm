@@ -81,10 +81,7 @@
         <div>
           <h2 class="mb-1 text-sm font-medium text-gray-500">Product</h2>
           {#if data.product}
-            <a
-              href="/admin/products/{data.product.id}"
-              class="text-blue-600 hover:text-blue-800"
-            >
+            <a href="/admin/products/{data.product.id}" class="text-blue-600 hover:text-blue-800">
               {getProductName()}
             </a>
           {:else}
@@ -95,11 +92,9 @@
         <div>
           <h2 class="mb-1 text-sm font-medium text-gray-500">Customer</h2>
           {#if data.customer}
-            <a
-              href="/admin/customers/{data.customer.id}"
-              class="text-blue-600 hover:text-blue-800"
-            >
-              {data.customer.firstName} {data.customer.lastName}
+            <a href="/admin/customers/{data.customer.id}" class="text-blue-600 hover:text-blue-800">
+              {data.customer.firstName}
+              {data.customer.lastName}
             </a>
           {:else}
             <span class="text-gray-400">Deleted customer</span>
@@ -139,9 +134,7 @@
   <div class="overflow-hidden rounded-lg border border-red-200 bg-red-50">
     <div class="p-6">
       <h2 class="mb-2 text-lg font-medium text-red-900">Danger Zone</h2>
-      <p class="mb-4 text-sm text-red-700">
-        Deleting this review cannot be undone.
-      </p>
+      <p class="mb-4 text-sm text-red-700">Deleting this review cannot be undone.</p>
       <form
         method="POST"
         action="?/delete"

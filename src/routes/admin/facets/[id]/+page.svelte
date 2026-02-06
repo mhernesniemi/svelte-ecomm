@@ -36,11 +36,7 @@
 <div class="space-y-6">
   <!-- Header -->
   <div class="flex items-center gap-4">
-    <a
-      href="/admin/facets"
-      class="text-gray-500 hover:text-gray-700"
-      aria-label="Back to facets"
-    >
+    <a href="/admin/facets" class="text-gray-500 hover:text-gray-700" aria-label="Back to facets">
       <ChevronLeft class="h-5 w-5" />
     </a>
     <h1 class="text-2xl font-bold text-gray-900">{getName(data.facet.translations)}</h1>
@@ -171,7 +167,9 @@
     <!-- Values List -->
     {#if data.facet.values.length === 0 && !showAddValue}
       <div class="p-12 text-center">
-        <p class="text-sm text-gray-500">No values yet. Add values to use this facet for filtering.</p>
+        <p class="text-sm text-gray-500">
+          No values yet. Add values to use this facet for filtering.
+        </p>
       </div>
     {:else}
       <div>

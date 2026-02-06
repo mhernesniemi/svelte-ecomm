@@ -98,9 +98,7 @@
           </div>
 
           <div>
-            <label for="body" class="mb-1 block text-sm font-medium text-gray-700">
-              Body
-            </label>
+            <label for="body" class="mb-1 block text-sm font-medium text-gray-700"> Body </label>
             <RichTextEditor
               name="body"
               content={body}
@@ -117,18 +115,14 @@
               checked
               class="h-4 w-4 rounded border-gray-300 text-blue-600"
             />
-            <label for="published" class="text-sm font-medium text-gray-700">
-              Published
-            </label>
+            <label for="published" class="text-sm font-medium text-gray-700"> Published </label>
           </div>
         </div>
       </div>
     </div>
 
     <div class="flex justify-end gap-3">
-      <a href="/admin/content-pages" class={buttonVariants({ variant: "outline" })}>
-        Cancel
-      </a>
+      <a href="/admin/content-pages" class={buttonVariants({ variant: "outline" })}> Cancel </a>
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : "Create Page"}
       </Button>

@@ -75,9 +75,18 @@
   ];
 </script>
 
-{#snippet customerCell({ id, firstName, lastName }: { id: number; firstName: string; lastName: string })}
+{#snippet customerCell({
+  id,
+  firstName,
+  lastName
+}: {
+  id: number;
+  firstName: string;
+  lastName: string;
+})}
   <a href="/admin/customers/{id}" class="font-medium text-blue-600 hover:text-blue-800">
-    {firstName} {lastName}
+    {firstName}
+    {lastName}
   </a>
 {/snippet}
 
@@ -229,7 +238,8 @@
                     type="button"
                     variant="outline"
                     size="sm"
-                    onclick={() => (expandedGroupId = expandedGroupId === group.id ? null : group.id)}
+                    onclick={() =>
+                      (expandedGroupId = expandedGroupId === group.id ? null : group.id)}
                   >
                     {expandedGroupId === group.id ? "Hide" : "Manage"} Customers
                   </Button>
@@ -287,7 +297,8 @@
                           class="flex items-center justify-between rounded-lg bg-gray-100 px-3 py-2"
                         >
                           <div>
-                            <span class="font-medium">{customer.firstName} {customer.lastName}</span>
+                            <span class="font-medium">{customer.firstName} {customer.lastName}</span
+                            >
                             <span class="ml-2 text-sm text-gray-500">{customer.email}</span>
                           </div>
                           <form method="POST" action="?/removeCustomer" use:enhance>

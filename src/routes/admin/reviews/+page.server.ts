@@ -29,7 +29,10 @@ export const actions: Actions = {
 
 		try {
 			await Promise.all(ids.map((id) => reviewService.moderate(id, "approved")));
-			return { success: true, message: `${ids.length} review${ids.length !== 1 ? "s" : ""} approved` };
+			return {
+				success: true,
+				message: `${ids.length} review${ids.length !== 1 ? "s" : ""} approved`
+			};
 		} catch {
 			return fail(500, { error: "Failed to approve reviews" });
 		}
@@ -45,7 +48,10 @@ export const actions: Actions = {
 
 		try {
 			await Promise.all(ids.map((id) => reviewService.moderate(id, "rejected")));
-			return { success: true, message: `${ids.length} review${ids.length !== 1 ? "s" : ""} rejected` };
+			return {
+				success: true,
+				message: `${ids.length} review${ids.length !== 1 ? "s" : ""} rejected`
+			};
 		} catch {
 			return fail(500, { error: "Failed to reject reviews" });
 		}
@@ -61,7 +67,10 @@ export const actions: Actions = {
 
 		try {
 			await Promise.all(ids.map((id) => reviewService.delete(id)));
-			return { success: true, message: `${ids.length} review${ids.length !== 1 ? "s" : ""} deleted` };
+			return {
+				success: true,
+				message: `${ids.length} review${ids.length !== 1 ? "s" : ""} deleted`
+			};
 		} catch {
 			return fail(500, { error: "Failed to delete reviews" });
 		}

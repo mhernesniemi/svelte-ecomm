@@ -33,7 +33,10 @@ export const actions: Actions = {
 		const price = Number(formData.get("price")) * 100; // Convert to cents
 		const stock = Number(formData.get("stock")) || 0;
 		const name = formData.get("variant_name") as string;
-		const facetValueIds = formData.getAll("facetValueIds").map(Number).filter((id) => !isNaN(id));
+		const facetValueIds = formData
+			.getAll("facetValueIds")
+			.map(Number)
+			.filter((id) => !isNaN(id));
 
 		if (!sku || isNaN(price)) {
 			return fail(400, { error: "SKU and price are required", sku, name, stock });

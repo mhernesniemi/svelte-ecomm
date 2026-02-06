@@ -183,9 +183,7 @@
     </div>
 
     <div class="flex justify-end gap-3">
-      <a href="/admin/collections" class={buttonVariants({ variant: "outline" })}>
-        Cancel
-      </a>
+      <a href="/admin/collections" class={buttonVariants({ variant: "outline" })}> Cancel </a>
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : "Create Collection"}
       </Button>
