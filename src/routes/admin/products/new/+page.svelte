@@ -113,7 +113,7 @@
       </div>
 
       <!-- Common Fields -->
-      <div class="space-y-4 border-t border-gray-200 pt-6">
+      <div class="grid grid-cols-2 gap-4 space-y-4 border-t border-gray-200 pt-6">
         <label class="block">
           <span class="text-sm font-medium text-gray-700">Product Type</span>
           <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
@@ -146,6 +146,5 @@
         </label>
       </div>
     </div>
-
   </form>
 </div>
