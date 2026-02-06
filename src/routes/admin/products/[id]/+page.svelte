@@ -393,12 +393,14 @@
     <div class="w-80 shrink-0 space-y-6">
       <!-- Visibility Section -->
       <div class="rounded-lg bg-white shadow">
-        <div class="p-4">
+        <div class="border-b border-gray-200 px-4 py-3">
           <h2 class="font-semibold">Visibility</h2>
+        </div>
+        <div class="p-4">
           <select
             form="product-form"
             name="visibility"
-            class="mt-3 block w-full rounded-md border-gray-300 shadow-sm"
+            class="block w-full rounded-md border-gray-300 shadow-sm"
           >
             <option value="draft" selected={data.product.visibility === "draft"}>Draft</option>
             <option value="public" selected={data.product.visibility === "public"}>Public</option>

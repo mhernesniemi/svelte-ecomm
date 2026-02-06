@@ -108,7 +108,7 @@
           editingValueId = null;
         }}
       >
-        <Plus class="mr-1 h-4 w-4" />
+        <Plus class="h-4 w-4" />
         Add Value
       </Button>
     </div>
