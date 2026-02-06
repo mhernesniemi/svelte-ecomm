@@ -108,7 +108,7 @@
 </script>
 
 {#snippet codeCell({ code, id }: { code: string; id: number })}
-  <a href="/admin/promotions/{id}" class="font-medium text-blue-600 hover:underline">
+  <a href="/admin/promotions/{id}" class="font-medium text-gray-900 hover:text-blue-600">
     {code}
   </a>
 {/snippet}

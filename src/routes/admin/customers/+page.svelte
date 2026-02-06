@@ -84,7 +84,7 @@
   firstName: string;
   lastName: string;
 })}
-  <a href="/admin/customers/{id}" class="font-medium text-blue-600 hover:text-blue-800">
+  <a href="/admin/customers/{id}" class="font-medium text-gray-900 hover:text-blue-600">
     {firstName}
     {lastName}
   </a>

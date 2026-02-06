@@ -59,8 +59,8 @@
 </script>
 
 {#snippet orderCell({ code, itemCount, id }: { code: string; itemCount: number; id: number })}
-  <a href="/admin/orders/{id}" class="block">
-    <p class="font-medium">{code}</p>
+  <a href="/admin/orders/{id}" class="block font-medium text-gray-900 hover:text-blue-600">
+    <p>{code}</p>
     <p class="text-sm text-gray-500">{itemCount} items</p>
   </a>
 {/snippet}
