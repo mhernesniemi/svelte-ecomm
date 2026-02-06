@@ -119,7 +119,7 @@
           </div>
 
           <!-- Common Fields -->
-          <div class="border-t border-gray-200 pt-6">
+          <div>
             <label class="block">
               <span class="text-sm font-medium text-gray-700">Product Type</span>
               <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
