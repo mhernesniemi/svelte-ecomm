@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	// Redirect if slug doesn't match (for SEO and correct URLs)
 	const correctSlug = page.translations.find((t) => t.languageCode === language)?.slug;
 	if (correctSlug && params.slug !== correctSlug) {
-		throw redirect(301, `/content/${id}/${correctSlug}`);
+		throw redirect(301, `/pages/${id}/${correctSlug}`);
 	}
 
 	return { page };
