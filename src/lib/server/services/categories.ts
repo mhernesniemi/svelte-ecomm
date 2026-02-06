@@ -169,17 +169,20 @@ export class CategoryService {
 	 * Get all descendant category IDs (for filtering products)
 	 */
 	async getDescendantIds(categoryId: number): Promise<number[]> {
-		const result = await db.execute(sql`
-			WITH RECURSIVE descendants AS (
-				SELECT id FROM categories WHERE id = ${categoryId}
-				UNION ALL
-				SELECT c.id FROM categories c
-				JOIN descendants d ON c.parent_id = d.id
-			)
-			SELECT id FROM descendants
-		`);
+		const ids: number[] = [categoryId];
+		let currentIds = [categoryId];
 
-		return (result as unknown as { id: number }[]).map((row) => row.id);
+		while (currentIds.length > 0) {
+			const children = await db.query.categories.findMany({
+				where: inArray(categories.parentId, currentIds),
+				columns: { id: true }
+			});
+
+			currentIds = children.map((c) => c.id);
+			ids.push(...currentIds);
+		}
+
+		return ids;
 	}
 
 	/**
