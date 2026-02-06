@@ -315,7 +315,7 @@
       </form>
 
       <!-- Variants Section -->
-      <div class="rounded-lg bg-white shadow">
+      <div class="rounded-lg bg-white pb-4 shadow">
         <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
           <a href="/admin/products/{data.product.id}/variants/new">
@@ -407,7 +407,7 @@
             <option value="private" selected={data.product.visibility === "private"}>Private</option
             >
           </select>
-          <p class="mt-2 text-sm text-gray-500">
+          <p class="mt-3 text-xs text-gray-500">
             Set this to Public to make it available in the store
           </p>
         </div>
