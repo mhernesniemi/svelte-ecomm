@@ -58,12 +58,11 @@
       cell: ({ row }) => `${row.original.productCount} products`
     },
     {
-      accessorFn: (row) => (row.enabled ? "Enabled" : "Disabled"),
+      accessorFn: (row) => (row.isPrivate ? "Private" : "Public"),
       id: "status",
       header: "Status",
       cell: ({ row }) =>
         renderSnippet(statusCell, {
-          enabled: row.original.enabled,
           isPrivate: row.original.isPrivate
         })
     },
@@ -81,17 +80,12 @@
   </a>
 {/snippet}
 
-{#snippet statusCell({ enabled, isPrivate }: { enabled: boolean; isPrivate: boolean })}
-  <div class="flex gap-2">
-    {#if enabled}
-      <Badge variant="success">Enabled</Badge>
-    {:else}
-      <Badge variant="secondary">Disabled</Badge>
-    {/if}
-    {#if isPrivate}
-      <Badge variant="outline">Private</Badge>
-    {/if}
-  </div>
+{#snippet statusCell({ isPrivate }: { isPrivate: boolean })}
+  {#if isPrivate}
+    <Badge variant="outline">Private</Badge>
+  {:else}
+    <Badge variant="success">Public</Badge>
+  {/if}
 {/snippet}
 
 <svelte:head><title>Collections | Admin</title></svelte:head>

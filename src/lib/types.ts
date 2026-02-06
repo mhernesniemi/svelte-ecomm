@@ -494,7 +494,6 @@ export interface UpdatePromotionInput {
 }
 
 export interface CreateCollectionInput {
-	enabled?: boolean;
 	isPrivate?: boolean;
 	position?: number;
 	featuredAssetId?: number;
@@ -512,7 +511,6 @@ export interface CreateCollectionInput {
 }
 
 export interface UpdateCollectionInput {
-	enabled?: boolean;
 	isPrivate?: boolean;
 	position?: number;
 	featuredAssetId?: number | null;

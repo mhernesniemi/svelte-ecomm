@@ -47,7 +47,6 @@ export const actions: Actions = {
 		const name = data.get("name") as string;
 		const slug = data.get("slug") as string;
 		const description = data.get("description") as string;
-		const enabled = data.get("enabled") === "on";
 		const isPrivate = data.get("is_private") === "on";
 
 		if (!name || !slug) {
@@ -56,7 +55,6 @@ export const actions: Actions = {
 
 		try {
 			await collectionService.update(id, {
-				enabled,
 				isPrivate,
 				translations: [
 					{

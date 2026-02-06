@@ -205,7 +205,6 @@ export class CollectionService {
 		const [collection] = await db
 			.insert(collections)
 			.values({
-				enabled: input.enabled ?? true,
 				isPrivate: input.isPrivate ?? false,
 				position: input.position ?? 0,
 				featuredAssetId: input.featuredAssetId
@@ -252,7 +251,6 @@ export class CollectionService {
 
 		// Update main collection
 		const updateData: Partial<Collection> = {};
-		if (input.enabled !== undefined) updateData.enabled = input.enabled;
 		if (input.isPrivate !== undefined) updateData.isPrivate = input.isPrivate;
 		if (input.position !== undefined) updateData.position = input.position;
 		if (input.featuredAssetId !== undefined) updateData.featuredAssetId = input.featuredAssetId;
@@ -351,7 +349,7 @@ export class CollectionService {
 		const collectionList = await db
 			.select()
 			.from(collections)
-			.where(and(eq(collections.enabled, true), eq(collections.isPrivate, false)))
+			.where(eq(collections.isPrivate, false))
 			.orderBy(collections.position, desc(collections.createdAt));
 
 		// Load translations, counts, and featured assets

@@ -24,7 +24,6 @@
   let name = $state("");
   let slug = $state("");
   let description = $state("");
-  let enabled = $state(true);
   let isPrivate = $state(false);
 
   // Initialize/reset form values when collection data changes
@@ -35,7 +34,6 @@
     name = trans?.name ?? "";
     slug = trans?.slug ?? "";
     description = trans?.description ?? "";
-    enabled = data.collection.enabled;
     isPrivate = data.collection.isPrivate;
   });
 
@@ -203,20 +201,7 @@
           </div>
         </div>
 
-        <div class="mt-6 space-y-4">
-          <div class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="enabled"
-              name="enabled"
-              bind:checked={enabled}
-              class="h-4 w-4 rounded border-gray-300 text-blue-600"
-            />
-            <label for="enabled" class="text-sm font-medium text-gray-700">
-              Collection is enabled
-            </label>
-          </div>
-
+        <div class="mt-6">
           <div class="flex items-center gap-2">
             <input
               type="checkbox"
@@ -226,7 +211,7 @@
               class="h-4 w-4 rounded border-gray-300 text-blue-600"
             />
             <label for="is_private" class="text-sm font-medium text-gray-700">
-              Private collection
+              Private collection (hidden from storefront)
             </label>
           </div>
         </div>

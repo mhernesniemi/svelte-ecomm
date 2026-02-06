@@ -20,7 +20,6 @@ export const actions: Actions = {
 
 		try {
 			const collection = await collectionService.create({
-				enabled: true,
 				isPrivate: false,
 				translations: [
 					{

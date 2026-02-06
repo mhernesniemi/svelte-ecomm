@@ -727,7 +727,6 @@ export const collections = pgTable(
 	"collections",
 	{
 		id: serial("id").primaryKey(),
-		enabled: boolean("enabled").default(true).notNull(),
 		isPrivate: boolean("is_private").default(false).notNull(),
 		featuredAssetId: integer("featured_asset_id").references(() => assets.id),
 		position: integer("position").default(0).notNull(),
@@ -736,8 +735,7 @@ export const collections = pgTable(
 			.defaultNow()
 			.$onUpdate(() => new Date())
 			.notNull()
-	},
-	(table) => [index("collections_enabled_idx").on(table.enabled)]
+	}
 );
 
 export const collectionTranslations = pgTable(

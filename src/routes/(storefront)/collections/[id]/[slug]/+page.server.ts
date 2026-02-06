@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const offset = (page - 1) * limit;
 
 	const collection = await collectionService.getById(id, language);
-	if (!collection || collection.isPrivate || !collection.enabled) {
+	if (!collection || collection.isPrivate) {
 		throw error(404, "Collection not found");
 	}
 
