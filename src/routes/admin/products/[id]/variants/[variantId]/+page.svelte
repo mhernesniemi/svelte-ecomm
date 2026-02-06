@@ -279,19 +279,18 @@
     </div>
   </div>
 
-  <div class="mt-3 border-t border-gray-200 pt-3">
-    <button
-      type="button"
-      class="text-sm text-red-600 hover:text-red-800"
-      onclick={() => (showDelete = true)}
-    >
-      Delete this variant
-    </button>
-  </div>
+  <button
+    type="button"
+    class="mt-6 text-sm text-red-600 hover:text-red-800"
+    onclick={() => (showDelete = true)}
+  >
+    Delete this variant
+  </button>
 </div>
 
 <DeleteConfirmDialog
   bind:open={showDelete}
   title="Delete Variant?"
-  description="Are you sure you want to delete variant &quot;{data.variant.sku}&quot;? This action cannot be undone."
+  description="Are you sure you want to delete variant &quot;{data.variant
+    .sku}&quot;? This action cannot be undone."
 />

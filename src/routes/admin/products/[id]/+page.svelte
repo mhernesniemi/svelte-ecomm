@@ -319,7 +319,9 @@
         <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
           <a href="/admin/products/{data.product.id}/variants/new">
-            <Button type="button" size="sm">Add Variant</Button>
+            <Button type="button" variant="outline" size="sm"
+              ><Plus class="h-4 w-4" /> Add Variant</Button
+            >
           </a>
         </div>
 
@@ -378,6 +380,13 @@
           </TableBody>
         </Table>
       </div>
+      <button
+        type="button"
+        class="text-sm text-red-600 hover:text-red-800"
+        onclick={() => (showDelete = true)}
+      >
+        Delete this product
+      </button>
     </div>
 
     <!-- Sidebar (Right) -->
@@ -413,7 +422,7 @@
             onclick={() => (showImagePicker = true)}
             disabled={isSavingImages}
           >
-            <Plus class="mr-1 h-4 w-4" />
+            <Plus class="h-4 w-4" />
             Add
           </Button>
         </div>
@@ -631,14 +640,6 @@
       </div>
     </div>
   </div>
-
-  <button
-    type="button"
-    class="mt-6 text-sm text-red-600 hover:text-red-800"
-    onclick={() => (showDelete = true)}
-  >
-    Delete this product
-  </button>
 
   <DeleteConfirmDialog
     bind:open={showDelete}
