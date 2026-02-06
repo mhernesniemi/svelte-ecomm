@@ -16,25 +16,18 @@
   let isSubmitting = $state(false);
 
   // Form values
-  let code = $state("");
   let name = $state("");
   let slug = $state("");
   let description = $state("");
 
   // Restore values from form after failed submission
   $effect(() => {
-    if (form?.code) code = form.code;
     if (form?.name) name = form.name;
     if (form?.slug) slug = form.slug;
     if (form?.description) description = form.description;
   });
 
-  function slugify(text: string): string {
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  }
+  import { slugify } from "$lib/utils";
 
   // Auto-generate slug from name
   let autoSlug = $state(true);
@@ -44,13 +37,6 @@
     }
   });
 
-  // Auto-generate code from name
-  let autoCode = $state(true);
-  $effect(() => {
-    if (autoCode && name) {
-      code = slugify(name);
-    }
-  });
 </script>
 
 <svelte:head><title>New Collection | Admin</title></svelte:head>
@@ -84,22 +70,6 @@
 
         <div class="space-y-4">
           <div>
-            <label for="code" class="mb-1 block text-sm font-medium text-gray-700">
-              Code <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="code"
-              name="code"
-              bind:value={code}
-              required
-              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-              placeholder="e.g., summer-sale"
-            />
-            <p class="mt-1 text-xs text-gray-500">Unique identifier for this collection</p>
-          </div>
-
-          <div>
             <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
               Name <span class="text-red-500">*</span>
             </label>
@@ -117,14 +87,20 @@
             <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
               Slug <span class="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              id="slug"
-              name="slug"
-              bind:value={slug}
-              required
-              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-            />
+            <div class="flex gap-2">
+              <input
+                type="text"
+                id="slug"
+                name="slug"
+                bind:value={slug}
+                required
+                class="flex-1 rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+              />
+              <label class="flex items-center gap-2 text-sm text-gray-500">
+                <input type="checkbox" bind:checked={autoSlug} class="rounded border-gray-300" />
+                Auto
+              </label>
+            </div>
           </div>
 
           <div>

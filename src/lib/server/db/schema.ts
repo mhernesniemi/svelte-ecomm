@@ -727,7 +727,6 @@ export const collections = pgTable(
 	"collections",
 	{
 		id: serial("id").primaryKey(),
-		code: varchar("code", { length: 255 }).notNull().unique(),
 		enabled: boolean("enabled").default(true).notNull(),
 		isPrivate: boolean("is_private").default(false).notNull(),
 		featuredAssetId: integer("featured_asset_id").references(() => assets.id),

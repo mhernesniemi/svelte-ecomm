@@ -124,6 +124,16 @@ export function getCurrencySymbol(currencyCode: string): string {
 }
 
 /**
+ * Generate a URL-friendly slug from text
+ */
+export function slugify(text: string): string {
+	return text
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/(^-|-$)/g, "");
+}
+
+/**
  * Strip HTML tags from a string (for meta descriptions, etc.)
  */
 export function stripHtml(html: string | null | undefined): string {

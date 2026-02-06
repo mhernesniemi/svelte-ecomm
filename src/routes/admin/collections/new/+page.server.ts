@@ -3,13 +3,7 @@ import { collectionService } from "$lib/server/services/collections.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
-
-function slugify(text: string): string {
-	return text
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/(^-|-$)/g, "");
-}
+import { slugify } from "$lib/utils.js";
 
 export const load: PageServerLoad = async () => {
 	// Load facets for filter builder
@@ -29,7 +23,6 @@ export const actions: Actions = {
 	default: async ({ request }) => {
 		const data = await request.formData();
 
-		const code = data.get("code") as string;
 		const name = data.get("name") as string;
 		const slug = data.get("slug") as string;
 		const description = data.get("description") as string;
@@ -37,10 +30,9 @@ export const actions: Actions = {
 		const isPrivate = data.get("is_private") === "on";
 
 		// Validate required fields
-		if (!code || !name || !slug) {
+		if (!name || !slug) {
 			return fail(400, {
-				error: "Code, name, and slug are required",
-				code,
+				error: "Name and slug are required",
 				name,
 				slug,
 				description
@@ -49,7 +41,6 @@ export const actions: Actions = {
 
 		try {
 			const collection = await collectionService.create({
-				code: slugify(code),
 				enabled,
 				isPrivate,
 				translations: [
@@ -67,7 +58,6 @@ export const actions: Actions = {
 			if (isRedirect(err)) throw err;
 			return fail(500, {
 				error: "Failed to create collection",
-				code,
 				name,
 				slug,
 				description

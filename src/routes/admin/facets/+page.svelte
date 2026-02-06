@@ -2,14 +2,13 @@
   import { enhance } from "$app/forms";
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
-  import { Button } from "$lib/components/admin/ui/button";
+  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Tag from "@lucide/svelte/icons/tag";
+  import PlusIcon from "@lucide/svelte/icons/plus";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
-
-  let showCreate = $state(false);
 
   type FacetRow = (typeof data.facets)[0];
 
@@ -72,58 +71,8 @@
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Facets</h1>
     </div>
-    <Button type="button" onclick={() => (showCreate = !showCreate)}>Add Facet</Button>
+    <a href="/admin/facets/new" class={buttonVariants()}><PlusIcon class="h-4 w-4" /> Add Facet</a>
   </div>
-
-  <!-- Create Facet Form -->
-  {#if showCreate}
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
-      <h2 class="mb-4 text-sm font-semibold text-gray-900">New Facet</h2>
-      <form
-        method="POST"
-        action="?/create"
-        use:enhance={() => {
-          return async ({ update }) => {
-            await update();
-            showCreate = false;
-          };
-        }}
-      >
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label for="facet_name_en" class="mb-1 block text-sm font-medium text-gray-700">
-              Name
-            </label>
-            <input
-              type="text"
-              id="facet_name_en"
-              name="name_en"
-              placeholder="e.g., Color"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label for="facet_code" class="mb-1 block text-sm font-medium text-gray-700">
-              Code
-            </label>
-            <input
-              type="text"
-              id="facet_code"
-              name="code"
-              placeholder="e.g., color"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-            />
-          </div>
-        </div>
-        <div class="mt-4 flex justify-end gap-2">
-          <Button type="button" variant="outline" size="sm" onclick={() => (showCreate = false)}>
-            Cancel
-          </Button>
-          <Button type="submit" size="sm">Create</Button>
-        </div>
-      </form>
-    </div>
-  {/if}
 
   <DataTable
     data={data.facets}
@@ -154,7 +103,7 @@
       </form>
     {/snippet}
     {#snippet emptyAction()}
-      <Button type="button" onclick={() => (showCreate = true)}>Add Facet</Button>
+      <a href="/admin/facets/new" class={buttonVariants()}>Add Facet</a>
     {/snippet}
   </DataTable>
 </div>

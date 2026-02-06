@@ -19,7 +19,6 @@
   let isSubmitting = $state(false);
 
   // Form values - reset when collection changes
-  let code = $state("");
   let name = $state("");
   let slug = $state("");
   let description = $state("");
@@ -31,7 +30,6 @@
     const trans =
       data.collection.translations.find((t) => t.languageCode === "en") ??
       data.collection.translations[0];
-    code = data.collection.code;
     name = trans?.name ?? "";
     slug = trans?.slug ?? "";
     description = trans?.description ?? "";
@@ -46,12 +44,7 @@
   let selectedFacetValues = $state<number[]>([]);
   let selectedProducts = $state<number[]>([]);
 
-  function slugify(text: string): string {
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  }
+  import { slugify } from "$lib/utils";
 
   function getFieldLabel(field: string): string {
     const labels: Record<string, string> = {
@@ -163,20 +156,6 @@
     <div class="overflow-hidden rounded-lg bg-white shadow">
       <div class="p-6">
         <h2 class="mb-4 text-lg font-medium text-gray-900">Basic Information</h2>
-
-        <div class="mb-4">
-          <label for="code" class="mb-1 block text-sm font-medium text-gray-700">
-            Code <span class="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="code"
-            name="code"
-            bind:value={code}
-            required
-            class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-          />
-        </div>
 
         <div class="space-y-4">
           <div>

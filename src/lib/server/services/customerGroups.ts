@@ -7,12 +7,7 @@ import { db } from "../db/index.js";
 import { customerGroups, customerGroupMembers, customers } from "../db/schema.js";
 import type { CustomerGroup, NewCustomerGroup, Customer } from "$lib/types.js";
 
-function slugify(text: string): string {
-	return text
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/(^-|-$)/g, "");
-}
+import { slugify } from "$lib/utils.js";
 
 export class CustomerGroupService {
 	/**

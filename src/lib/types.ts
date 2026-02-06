@@ -494,7 +494,6 @@ export interface UpdatePromotionInput {
 }
 
 export interface CreateCollectionInput {
-	code: string;
 	enabled?: boolean;
 	isPrivate?: boolean;
 	position?: number;
@@ -513,7 +512,6 @@ export interface CreateCollectionInput {
 }
 
 export interface UpdateCollectionInput {
-	code?: string;
 	enabled?: boolean;
 	isPrivate?: boolean;
 	position?: number;

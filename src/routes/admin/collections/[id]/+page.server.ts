@@ -4,13 +4,7 @@ import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { CollectionFilterField, CollectionFilterOperator } from "$lib/types.js";
-
-function slugify(text: string): string {
-	return text
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/(^-|-$)/g, "");
-}
+import { slugify } from "$lib/utils.js";
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);
@@ -50,20 +44,18 @@ export const actions: Actions = {
 		const id = Number(params.id);
 		const data = await request.formData();
 
-		const code = data.get("code") as string;
 		const name = data.get("name") as string;
 		const slug = data.get("slug") as string;
 		const description = data.get("description") as string;
 		const enabled = data.get("enabled") === "on";
 		const isPrivate = data.get("is_private") === "on";
 
-		if (!code || !name || !slug) {
-			return fail(400, { error: "Code, name, and slug are required" });
+		if (!name || !slug) {
+			return fail(400, { error: "Name and slug are required" });
 		}
 
 		try {
 			await collectionService.update(id, {
-				code: slugify(code),
 				enabled,
 				isPrivate,
 				translations: [

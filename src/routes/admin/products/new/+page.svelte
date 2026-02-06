@@ -12,12 +12,8 @@
     if (form?.error) toast.error(form.error);
   });
 
-  function generateSlug(name: string): string {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  }
+  import { slugify } from "$lib/utils";
+
 
   let name = $state("");
   let slug = $state("");
@@ -31,7 +27,7 @@
 
   $effect(() => {
     if (autoSlug && name) {
-      slug = generateSlug(name);
+      slug = slugify(name);
     }
   });
 </script>

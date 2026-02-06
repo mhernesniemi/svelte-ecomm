@@ -44,7 +44,6 @@
       cell: ({ row }) =>
         renderSnippet(collectionCell, {
           name: getTranslation(row.original.translations, "en")?.name ?? "Untitled",
-          code: row.original.code,
           id: row.original.id
         })
     },
@@ -72,7 +71,7 @@
   ];
 </script>
 
-{#snippet collectionCell({ name, code, id }: { name: string; code: string; id: number })}
+{#snippet collectionCell({ name, id }: { name: string; id: number })}
   <a href="/admin/collections/{id}" class="group block">
     <div class="font-medium text-gray-900 group-hover:text-blue-600">{name}</div>
   </a>

@@ -1,13 +1,7 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { contentPageService } from "$lib/server/services/content-pages.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
-
-function slugify(text: string): string {
-	return text
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/(^-|-$)/g, "");
-}
+import { slugify } from "$lib/utils.js";
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);

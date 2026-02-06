@@ -205,7 +205,6 @@ export class CollectionService {
 		const [collection] = await db
 			.insert(collections)
 			.values({
-				code: input.code,
 				enabled: input.enabled ?? true,
 				isPrivate: input.isPrivate ?? false,
 				position: input.position ?? 0,
@@ -253,7 +252,6 @@ export class CollectionService {
 
 		// Update main collection
 		const updateData: Partial<Collection> = {};
-		if (input.code !== undefined) updateData.code = input.code;
 		if (input.enabled !== undefined) updateData.enabled = input.enabled;
 		if (input.isPrivate !== undefined) updateData.isPrivate = input.isPrivate;
 		if (input.position !== undefined) updateData.position = input.position;

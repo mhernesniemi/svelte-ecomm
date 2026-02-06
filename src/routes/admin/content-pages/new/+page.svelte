@@ -23,12 +23,7 @@
     if (form?.body) body = form.body;
   });
 
-  function slugify(text: string): string {
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  }
+  import { slugify } from "$lib/utils";
 
   let autoSlug = $state(true);
   $effect(() => {
