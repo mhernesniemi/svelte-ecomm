@@ -102,14 +102,14 @@
       </div>
     </div>
   {:else}
-    <div class="overflow-hidden rounded-lg border border-gray-200 bg-white">
+    <div class="overflow-hidden rounded-lg border border-gray-200 bg-white py-2">
       {#snippet categoryNode(node: (typeof data.tree)[0], depth: number, parentPath: string)}
         {@const fullPath = `${parentPath}/${node.slug}`}
         <div>
           <!-- Display row -->
           <button
             type="button"
-            class="group flex w-full cursor-pointer items-center justify-between px-4 py-3 text-left {editingId ===
+            class="group flex w-full cursor-pointer items-center justify-between px-4 py-2 text-left {editingId ===
             node.id
               ? 'bg-gray-50'
               : 'hover:bg-gray-50'}"
@@ -223,9 +223,7 @@
                 >
                   <input type="hidden" name="id" value={node.id} />
                   <button type="submit" class="text-sm text-red-600 hover:text-red-800">
-                    Delete this category{node.children.length > 0
-                      ? ` and ${node.children.length} subcategories`
-                      : ""}
+                    Delete this category{node.children.length > 0 ? ` and all subcategories` : ""}
                   </button>
                 </form>
               </div>
