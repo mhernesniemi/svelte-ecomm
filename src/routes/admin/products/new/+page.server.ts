@@ -1,15 +1,6 @@
 import { productService } from "$lib/server/services/products.js";
-import { facetService } from "$lib/server/services/facets.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
-import type { Actions, PageServerLoad } from "./$types";
-
-export const load: PageServerLoad = async () => {
-	const facets = await facetService.list("en");
-
-	return {
-		facets
-	};
-};
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
 	default: async ({ request }) => {
@@ -17,35 +8,23 @@ export const actions: Actions = {
 
 		const name = formData.get("name") as string;
 		const slug = formData.get("slug") as string;
-		const description = formData.get("description") as string;
-		const type = (formData.get("type") as "physical" | "digital") || "physical";
-		const visibility =
-			(formData.get("visibility") as "public" | "private" | "draft") || "draft";
 
-		// Validation
 		if (!name || !slug) {
 			return fail(400, {
 				error: "Name and slug are required",
-				values: {
-					name,
-					slug,
-					description,
-					type,
-					visibility
-				}
+				values: { name, slug }
 			});
 		}
 
 		try {
 			const product = await productService.create({
-				type,
-				visibility,
+				type: "physical",
+				visibility: "draft",
 				translations: [
 					{
 						languageCode: "en",
 						name,
-						slug,
-						description: description || undefined
+						slug
 					}
 				]
 			});
@@ -55,13 +34,7 @@ export const actions: Actions = {
 			if (isRedirect(error)) throw error;
 			return fail(500, {
 				error: "Failed to create product",
-				values: {
-					name,
-					slug,
-					description,
-					type,
-					visibility
-				}
+				values: { name, slug }
 			});
 		}
 	}
