@@ -77,7 +77,7 @@
           {:else}
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
               {#each data.featuredProducts as product}
-                <ProductCard {product} />
+                <ProductCard {product} activeDiscounts={data.activeDiscounts} />
               {/each}
             </div>
           {/if}

@@ -6,6 +6,7 @@
   import { cartStore } from "$lib/stores/cart.svelte";
   import { wishlistStore } from "$lib/stores/wishlist.svelte";
   import { formatPrice, stripHtml } from "$lib/utils";
+  import { findBestDiscount, getDiscountedPrice } from "$lib/promotion-utils";
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
@@ -46,6 +47,18 @@
   });
 
   const selectedVariant = $derived(product.variants.find((v) => v.id === selectedVariantId));
+
+  const bestDiscount = $derived(
+    selectedVariant && data.activeDiscounts
+      ? findBestDiscount(data.activeDiscounts, product.id, selectedVariant.price)
+      : null
+  );
+
+  const discountedVariantPrice = $derived(
+    bestDiscount && selectedVariant
+      ? getDiscountedPrice(bestDiscount, selectedVariant.price)
+      : null
+  );
 
   function getVariantName(variant: (typeof product.variants)[0]): string {
     const trans = variant.translations.find((t) => t.languageCode === "en");
@@ -265,8 +278,25 @@
       </div>
 
       {#if selectedVariant}
-        <div class="mb-8 text-xl font-semibold">
-          {formatPrice(selectedVariant.price)}
+        <div class="mb-8">
+          {#if discountedVariantPrice !== null && bestDiscount}
+            <div class="flex items-center gap-3">
+              <span class="text-lg text-gray-400 line-through">{formatPrice(selectedVariant.price)}</span>
+              <span class="text-xl font-semibold text-red-600">{formatPrice(discountedVariantPrice)}</span>
+              <span class="rounded bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
+                {bestDiscount.discountType === "percentage"
+                  ? `-${bestDiscount.discountValue}%`
+                  : `-${formatPrice(bestDiscount.discountValue)}`}
+              </span>
+            </div>
+            {#if bestDiscount.title}
+              <p class="mt-1 text-sm text-red-600">{bestDiscount.title}</p>
+            {/if}
+          {:else}
+            <div class="text-xl font-semibold">
+              {formatPrice(selectedVariant.price)}
+            </div>
+          {/if}
         </div>
       {/if}
 

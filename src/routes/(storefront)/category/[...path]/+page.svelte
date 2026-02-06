@@ -105,7 +105,7 @@
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {#each data.products as product}
         {#if product}
-          <ProductCard {product} />
+          <ProductCard {product} activeDiscounts={data.activeDiscounts} />
         {/if}
       {/each}
     </div>

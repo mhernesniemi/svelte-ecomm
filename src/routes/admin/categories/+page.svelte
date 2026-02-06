@@ -237,7 +237,7 @@
           {/each}
         {/snippet}
         {#each data.tree as rootNode, i}
-          <div class={i > 0 ? "border-t border-gray-200" : ""}>
+          <div>
             {@render categoryNode(rootNode, 0, "")}
           </div>
         {/each}

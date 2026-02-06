@@ -514,6 +514,39 @@ export class PromotionService {
 	calculateDiscount(promotion: Promotion, orderAmount: number): number {
 		return calculateDiscount(promotion, orderAmount);
 	}
+
+	/**
+	 * Get active automatic discounts that apply to products (for storefront display)
+	 * Returns lightweight objects with resolved product scopes
+	 */
+	async getActiveProductDiscounts(): Promise<
+		{
+			id: number;
+			title: string | null;
+			discountType: string;
+			discountValue: number;
+			promotionType: string;
+			productIds: number[] | null;
+		}[]
+	> {
+		const activeAutomatic = await this.listActiveAutomatic();
+
+		// Filter out free_shipping — it doesn't affect product prices
+		const priceDiscounts = activeAutomatic.filter((p) => p.promotionType !== "free_shipping");
+
+		const results = await Promise.all(
+			priceDiscounts.map(async (p) => ({
+				id: p.id,
+				title: p.title,
+				discountType: p.discountType,
+				discountValue: p.discountValue,
+				promotionType: p.promotionType,
+				productIds: await this.getQualifyingProductIds(p.id)
+			}))
+		);
+
+		return results;
+	}
 }
 
 // Export singleton instance

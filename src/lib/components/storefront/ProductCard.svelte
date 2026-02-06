@@ -1,9 +1,13 @@
 <script lang="ts">
   import type { ProductWithRelations } from "$lib/types";
   import { formatPrice } from "$lib/utils";
+  import { findBestDiscount, getDiscountedPrice, type ActiveDiscount } from "$lib/promotion-utils";
   import ImageIcon from "@lucide/svelte/icons/image";
 
-  let { product }: { product: ProductWithRelations } = $props();
+  let {
+    product,
+    activeDiscounts = []
+  }: { product: ProductWithRelations; activeDiscounts?: ActiveDiscount[] } = $props();
 
   const translation = $derived(product.translations.find((t) => t.languageCode === "en"));
   const name = $derived(translation?.name ?? "Untitled");
@@ -11,12 +15,29 @@
   const lowestPrice = $derived(
     product.variants.length > 0 ? Math.min(...product.variants.map((v) => v.price)) : null
   );
+
+  const bestDiscount = $derived(
+    lowestPrice ? findBestDiscount(activeDiscounts, product.id, lowestPrice) : null
+  );
+
+  const discountedPrice = $derived(
+    bestDiscount && lowestPrice ? getDiscountedPrice(bestDiscount, lowestPrice) : null
+  );
 </script>
 
 <a
   href="/products/{product.id}/{slug}"
-  class="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+  class="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
 >
+  {#if bestDiscount}
+    <div class="absolute top-2 left-2 z-10">
+      <span class="rounded bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
+        {bestDiscount.discountType === "percentage"
+          ? `-${bestDiscount.discountValue}%`
+          : `-${formatPrice(bestDiscount.discountValue)}`}
+      </span>
+    </div>
+  {/if}
   <div
     class="aspect-square overflow-hidden bg-gray-100"
     style="view-transition-name: product-image-{product.id}"
@@ -38,9 +59,16 @@
       {name}
     </h3>
     {#if lowestPrice !== null}
-      <p class="mt-1 text-sm text-gray-700">
-        From {formatPrice(lowestPrice)}
-      </p>
+      {#if discountedPrice !== null}
+        <div class="mt-1 flex items-center gap-2 text-sm">
+          <span class="text-gray-400 line-through">{formatPrice(lowestPrice)}</span>
+          <span class="font-semibold text-red-600">From {formatPrice(discountedPrice)}</span>
+        </div>
+      {:else}
+        <p class="mt-1 text-sm text-gray-700">
+          From {formatPrice(lowestPrice)}
+        </p>
+      {/if}
     {/if}
   </div>
 </a>
