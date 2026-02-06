@@ -20,7 +20,7 @@ export const actions: Actions = {
 		const description = formData.get("description") as string;
 		const type = (formData.get("type") as "physical" | "digital") || "physical";
 		const visibility =
-			(formData.get("visibility") as "public" | "private" | "hidden") || "public";
+			(formData.get("visibility") as "public" | "private" | "draft") || "draft";
 
 		// Validation
 		if (!name || !slug) {

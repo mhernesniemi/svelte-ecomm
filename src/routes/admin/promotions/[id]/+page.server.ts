@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	const { items: products } = await productService.list({
 		language: "fi",
-		visibility: ["public", "private", "hidden"],
+		visibility: ["public", "private", "draft"],
 		limit: 100
 	});
 

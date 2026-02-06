@@ -44,7 +44,7 @@ export const actions: Actions = {
 		const slug = formData.get("slug") as string;
 		const description = formData.get("description") as string;
 		const type = formData.get("type") as "physical" | "digital";
-		const visibility = formData.get("visibility") as "public" | "private" | "hidden";
+		const visibility = formData.get("visibility") as "public" | "private" | "draft";
 		const taxCode = formData.get("taxCode") as string;
 
 		// Facet values and categories

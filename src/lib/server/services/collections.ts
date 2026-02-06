@@ -84,10 +84,10 @@ export class CollectionService {
 
 		/**
 		 * Visibility filter - get products by visibility
-		 * value: "public" | "private" | "hidden"
+		 * value: "public" | "private" | "draft"
 		 */
 		visibility: async (_currentIds, filter) => {
-			const visibility = filter.value as "public" | "private" | "hidden";
+			const visibility = filter.value as "public" | "private" | "draft";
 
 			const matches = await db
 				.selectDistinct({ id: products.id })
@@ -653,7 +653,7 @@ export class CollectionService {
 		product: {
 			id: number;
 			type: "physical" | "digital";
-			visibility: "public" | "private" | "hidden";
+			visibility: "public" | "private" | "draft";
 			taxCode: string;
 			featuredAssetId: number | null;
 			deletedAt: Date | null;

@@ -12,7 +12,7 @@ export const load: PageServerLoad = async () => {
 	// Load all products for manual selection (admin sees all visibility states)
 	const { items: products } = await productService.list({
 		language: "en",
-		visibility: ["public", "private", "hidden"],
+		visibility: ["public", "private", "draft"],
 		limit: 100
 	});
 

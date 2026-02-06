@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	// Load all products for manual selection (admin sees all visibility states)
 	const { items: products } = await productService.list({
 		language: "en",
-		visibility: ["public", "private", "hidden"],
+		visibility: ["public", "private", "draft"],
 		limit: 100
 	});
 
@@ -96,7 +96,7 @@ export const actions: Actions = {
 					.map((v) => Number(v.trim()))
 					.filter((v) => !isNaN(v));
 			} else if (field === "visibility") {
-				value = valueStr; // "public", "private", or "hidden"
+				value = valueStr; // "public", "private", or "draft"
 			} else if (field === "price" || field === "stock") {
 				value = Number(valueStr);
 			} else {

@@ -7,7 +7,7 @@ import { fail, redirect, isRedirect } from "@sveltejs/kit";
 export const load: PageServerLoad = async () => {
 	const { items: products } = await productService.list({
 		language: "fi",
-		visibility: ["public", "private", "hidden"],
+		visibility: ["public", "private", "draft"],
 		limit: 100
 	});
 

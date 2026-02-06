@@ -1,14 +1,18 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Tag from "@lucide/svelte/icons/tag";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
+
+  let showBulkDelete = $state(false);
+  let pendingDeleteIds = $state<number[]>([]);
+  let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
 
   type FacetRow = (typeof data.facets)[0];
 
@@ -84,26 +88,32 @@
     emptyDescription="Get started by creating a new facet."
   >
     {#snippet bulkActions({ selectedRows, table })}
-      <form
-        method="POST"
-        action="?/deleteSelected"
-        use:enhance={() => {
-          return async ({ update }) => {
-            table.resetRowSelection();
-            await update();
-          };
+      <Button
+        variant="destructive"
+        size="sm"
+        onclick={() => {
+          pendingDeleteIds = selectedRows.map((r) => r.id);
+          bulkDeleteTable = table;
+          showBulkDelete = true;
         }}
       >
-        {#each selectedRows as row}
-          <input type="hidden" name="ids" value={row.id} />
-        {/each}
-        <Button type="submit" variant="destructive" size="sm">
-          Delete ({selectedRows.length})
-        </Button>
-      </form>
+        Delete ({selectedRows.length})
+      </Button>
     {/snippet}
     {#snippet emptyAction()}
       <a href="/admin/facets/new" class={buttonVariants()}>Add Facet</a>
     {/snippet}
   </DataTable>
 </div>
+
+<DeleteConfirmDialog
+  bind:open={showBulkDelete}
+  title="Delete selected items?"
+  description="Are you sure you want to delete {pendingDeleteIds.length} selected item(s)? This action cannot be undone."
+  action="?/deleteSelected"
+  ondeleted={() => bulkDeleteTable?.resetRowSelection()}
+>
+  {#each pendingDeleteIds as id}
+    <input type="hidden" name="ids" value={id} />
+  {/each}
+</DeleteConfirmDialog>

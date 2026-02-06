@@ -183,7 +183,7 @@ export class ProductService {
 		// Update product fields
 		const updates: {
 			type?: "physical" | "digital";
-			visibility?: "public" | "private" | "hidden";
+			visibility?: "public" | "private" | "draft";
 			taxCode?: string;
 		} = {};
 		if (input.type !== undefined) updates.type = input.type;

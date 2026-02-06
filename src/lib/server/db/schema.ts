@@ -42,7 +42,7 @@ export const products = pgTable(
 			.default("physical")
 			.notNull(),
 		visibility: text("visibility", {
-			enum: ["public", "private", "hidden"]
+			enum: ["public", "private", "draft"]
 		})
 			.default("public")
 			.notNull(),

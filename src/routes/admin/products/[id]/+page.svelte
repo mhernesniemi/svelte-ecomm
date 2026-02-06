@@ -289,7 +289,7 @@
           </div>
 
           <!-- Common Fields -->
-          <div class="grid grid-cols-3 gap-4 border-t border-gray-200 pt-4">
+          <div class="grid grid-cols-2 gap-4 border-t border-gray-200 pt-4">
             <label class="block">
               <span class="text-sm font-medium text-gray-700">Product Type</span>
               <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
@@ -297,24 +297,6 @@
                   >Physical</option
                 >
                 <option value="digital" selected={data.product.type === "digital"}>Digital</option>
-              </select>
-            </label>
-
-            <label class="block">
-              <span class="text-sm font-medium text-gray-700">Visibility</span>
-              <select
-                name="visibility"
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-              >
-                <option value="public" selected={data.product.visibility === "public"}
-                  >Public</option
-                >
-                <option value="private" selected={data.product.visibility === "private"}
-                  >Private</option
-                >
-                <option value="hidden" selected={data.product.visibility === "hidden"}
-                  >Hidden</option
-                >
               </select>
             </label>
 
@@ -400,6 +382,26 @@
 
     <!-- Sidebar (Right) -->
     <div class="w-80 shrink-0 space-y-6">
+      <!-- Visibility Section -->
+      <div class="rounded-lg bg-white shadow">
+        <div class="p-4">
+          <h2 class="font-semibold">Visibility</h2>
+          <select
+            form="product-form"
+            name="visibility"
+            class="mt-3 block w-full rounded-md border-gray-300 shadow-sm"
+          >
+            <option value="draft" selected={data.product.visibility === "draft"}>Draft</option>
+            <option value="public" selected={data.product.visibility === "public"}>Public</option>
+            <option value="private" selected={data.product.visibility === "private"}>Private</option
+            >
+          </select>
+          <p class="mt-2 text-sm text-gray-500">
+            Set this to Public to make it available in the store
+          </p>
+        </div>
+      </div>
+
       <!-- Images Section -->
       <div class="rounded-lg bg-white shadow">
         <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">

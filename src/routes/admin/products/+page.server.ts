@@ -7,7 +7,7 @@ export const load: PageServerLoad = async () => {
 		limit: 1000,
 		offset: 0,
 		language: "en",
-		visibility: ["public", "private", "hidden"]
+		visibility: ["public", "private", "draft"]
 	});
 
 	return {

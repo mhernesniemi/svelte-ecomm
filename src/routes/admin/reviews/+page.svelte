@@ -5,10 +5,15 @@
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  let showBulkDelete = $state(false);
+  let pendingDeleteIds = $state<number[]>([]);
+  let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
 
   type ReviewRow = (typeof data.reviews)[0];
 
@@ -170,24 +175,30 @@
             Reject ({selectedRows.length})
           </Button>
         </form>
-        <form
-          method="POST"
-          action="?/bulkDelete"
-          use:enhance={() => {
-            return async ({ update }) => {
-              table.resetRowSelection();
-              await update();
-            };
+        <Button
+          variant="destructive"
+          size="sm"
+          onclick={() => {
+            pendingDeleteIds = selectedRows.map((r) => r.id);
+            bulkDeleteTable = table;
+            showBulkDelete = true;
           }}
         >
-          {#each selectedRows as row}
-            <input type="hidden" name="ids" value={row.id} />
-          {/each}
-          <Button type="submit" variant="destructive" size="sm">
-            Delete ({selectedRows.length})
-          </Button>
-        </form>
+          Delete ({selectedRows.length})
+        </Button>
       </div>
     {/snippet}
   </DataTable>
 </div>
+
+<DeleteConfirmDialog
+  bind:open={showBulkDelete}
+  title="Delete selected items?"
+  description="Are you sure you want to delete {pendingDeleteIds.length} selected item(s)? This action cannot be undone."
+  action="?/bulkDelete"
+  ondeleted={() => bulkDeleteTable?.resetRowSelection()}
+>
+  {#each pendingDeleteIds as id}
+    <input type="hidden" name="ids" value={id} />
+  {/each}
+</DeleteConfirmDialog>

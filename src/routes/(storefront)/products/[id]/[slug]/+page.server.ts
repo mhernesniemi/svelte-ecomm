@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	const product = await productService.getById(id, "en");
 
-	if (!product || product.visibility === "hidden") {
+	if (!product || product.visibility === "draft") {
 		throw error(404, "Product not found");
 	}
 
