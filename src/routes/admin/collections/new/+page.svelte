@@ -42,18 +42,27 @@
 <svelte:head><title>New Collection | Admin</title></svelte:head>
 
 <div class="space-y-6">
-  <div class="flex items-center gap-4">
-    <a
-      href="/admin/collections"
-      class="text-gray-500 hover:text-gray-700"
-      aria-label="Back to collections"
-    >
-      <ChevronLeft class="h-5 w-5" />
-    </a>
-    <h1 class="text-2xl font-bold text-gray-900">Create Collection</h1>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a
+        href="/admin/collections"
+        class="text-gray-500 hover:text-gray-700"
+        aria-label="Back to collections"
+      >
+        <ChevronLeft class="h-5 w-5" />
+      </a>
+      <h1 class="text-2xl font-bold text-gray-900">Create Collection</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/admin/collections" class={buttonVariants({ variant: "outline" })}>Cancel</a>
+      <Button type="submit" form="create-collection-form" disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "Create Collection"}
+      </Button>
+    </div>
   </div>
 
   <form
+    id="create-collection-form"
     method="POST"
     use:enhance={() => {
       isSubmitting = true;
@@ -160,11 +169,5 @@
       </div>
     </div>
 
-    <div class="flex justify-end gap-3">
-      <a href="/admin/collections" class={buttonVariants({ variant: "outline" })}> Cancel </a>
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create Collection"}
-      </Button>
-    </div>
   </form>
 </div>

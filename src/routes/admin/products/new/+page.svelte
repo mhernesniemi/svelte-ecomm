@@ -3,6 +3,7 @@
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -33,15 +34,26 @@
 
 <svelte:head><title>New Product | Admin</title></svelte:head>
 
-<div>
-  <div class="mb-8">
-    <a href="/admin/products" class="text-sm text-blue-600 hover:underline"
-      >&larr; Back to Products</a
-    >
-    <h1 class="mt-2 text-2xl font-bold">Create Product</h1>
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a
+        href="/admin/products"
+        class="text-gray-500 hover:text-gray-700"
+        aria-label="Back to products"
+      >
+        <ChevronLeft class="h-5 w-5" />
+      </a>
+      <h1 class="text-2xl font-bold text-gray-900">Create Product</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/admin/products" class={buttonVariants({ variant: "outline" })}>Cancel</a>
+      <Button type="submit" form="create-product-form">Create Product</Button>
+    </div>
   </div>
 
   <form
+    id="create-product-form"
     method="POST"
     use:enhance={() => {
       return async ({ update }) => {
@@ -135,10 +147,5 @@
       </div>
     </div>
 
-    <!-- Actions -->
-    <div class="flex justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
-      <a href="/admin/products" class={buttonVariants({ variant: "outline" })}> Cancel </a>
-      <Button type="submit">Create Product</Button>
-    </div>
   </form>
 </div>

@@ -124,7 +124,7 @@
       </a>
       <h1 class="text-2xl font-bold text-gray-900">Edit Collection</h1>
     </div>
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3">
       <span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
         {data.productCount} products
       </span>
@@ -137,11 +137,15 @@
           View in store &rarr;
         </a>
       {/if}
+      <Button type="submit" form="collection-form" disabled={isSubmitting}>
+        {isSubmitting ? "Saving..." : "Save Changes"}
+      </Button>
     </div>
   </div>
 
   <!-- Basic Info Form -->
   <form
+    id="collection-form"
     method="POST"
     action="?/update"
     use:enhance={() => {
@@ -227,11 +231,6 @@
           </div>
         </div>
 
-        <div class="mt-6 flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
       </div>
     </div>
   </form>

@@ -37,15 +37,21 @@
 
 <div class="space-y-6">
   <!-- Header -->
-  <div class="flex items-center gap-4">
-    <a href="/admin/facets" class="text-gray-500 hover:text-gray-700" aria-label="Back to facets">
-      <ChevronLeft class="h-5 w-5" />
-    </a>
-    <h1 class="text-2xl font-bold text-gray-900">{getName(data.facet.translations)}</h1>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a href="/admin/facets" class="text-gray-500 hover:text-gray-700" aria-label="Back to facets">
+        <ChevronLeft class="h-5 w-5" />
+      </a>
+      <h1 class="text-2xl font-bold text-gray-900">{getName(data.facet.translations)}</h1>
+    </div>
+    <Button type="submit" form="facet-form" disabled={isSubmitting}>
+      {isSubmitting ? "Saving..." : "Save Changes"}
+    </Button>
   </div>
 
   <!-- Edit Facet -->
   <form
+    id="facet-form"
     method="POST"
     action="?/update"
     use:enhance={() => {
@@ -80,11 +86,6 @@
             class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
           />
         </div>
-      </div>
-      <div class="mt-4 flex justify-end">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Save Changes"}
-        </Button>
       </div>
     </div>
   </form>

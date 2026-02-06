@@ -36,18 +36,27 @@
 <svelte:head><title>New Content Page | Admin</title></svelte:head>
 
 <div class="space-y-6">
-  <div class="flex items-center gap-4">
-    <a
-      href="/admin/content-pages"
-      class="text-gray-500 hover:text-gray-700"
-      aria-label="Back to content pages"
-    >
-      <ChevronLeft class="h-5 w-5" />
-    </a>
-    <h1 class="text-2xl font-bold text-gray-900">Create Content Page</h1>
+  <div class="flex items-center justify-between">
+    <div class="flex items-center gap-4">
+      <a
+        href="/admin/content-pages"
+        class="text-gray-500 hover:text-gray-700"
+        aria-label="Back to content pages"
+      >
+        <ChevronLeft class="h-5 w-5" />
+      </a>
+      <h1 class="text-2xl font-bold text-gray-900">Create Content Page</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <a href="/admin/content-pages" class={buttonVariants({ variant: "outline" })}>Cancel</a>
+      <Button type="submit" form="create-content-page-form" disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "Create Page"}
+      </Button>
+    </div>
   </div>
 
   <form
+    id="create-content-page-form"
     method="POST"
     use:enhance={() => {
       isSubmitting = true;
@@ -123,11 +132,5 @@
       </div>
     </div>
 
-    <div class="flex justify-end gap-3">
-      <a href="/admin/content-pages" class={buttonVariants({ variant: "outline" })}> Cancel </a>
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create Page"}
-      </Button>
-    </div>
   </form>
 </div>

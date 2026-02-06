@@ -54,18 +54,24 @@
       </a>
       <h1 class="text-2xl font-bold text-gray-900">Edit Content Page</h1>
     </div>
-    {#if published && slug}
-      <a
-        href="/pages/{data.page.id}/{slug}"
-        target="_blank"
-        class="text-sm text-gray-500 hover:text-gray-700"
-      >
-        View on storefront &rarr;
-      </a>
-    {/if}
+    <div class="flex items-center gap-3">
+      {#if published && slug}
+        <a
+          href="/pages/{data.page.id}/{slug}"
+          target="_blank"
+          class="text-sm text-gray-500 hover:text-gray-700"
+        >
+          View on storefront &rarr;
+        </a>
+      {/if}
+      <Button type="submit" form="content-page-form" disabled={isSubmitting}>
+        {isSubmitting ? "Saving..." : "Save Changes"}
+      </Button>
+    </div>
   </div>
 
   <form
+    id="content-page-form"
     method="POST"
     action="?/update"
     use:enhance={() => {
@@ -133,11 +139,6 @@
           </div>
         </div>
 
-        <div class="mt-6 flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
       </div>
     </div>
   </form>
