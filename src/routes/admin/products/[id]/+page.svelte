@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
   import {
@@ -56,7 +57,7 @@
     if (form?.altUpdated) toast.success("Image updated");
   });
 
-  let showDeleteConfirm = $state(false);
+  let showDelete = $state(false);
   let showImagePicker = $state(false);
   let isSavingImages = $state(false);
   let isSavingProduct = $state(false);
@@ -219,18 +220,9 @@
     </div>
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">Edit Product</h1>
-      <div class="flex items-center gap-6">
-        <button
-          type="button"
-          onclick={() => (showDeleteConfirm = true)}
-          class="text-sm text-red-600 hover:text-red-800"
-        >
-          Delete Product
-        </button>
-        <Button type="submit" form="product-form" disabled={isSavingProduct}>
-          {isSavingProduct ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
+      <Button type="submit" form="product-form" disabled={isSavingProduct}>
+        {isSavingProduct ? "Saving..." : "Save Changes"}
+      </Button>
     </div>
   </div>
 
@@ -638,23 +630,21 @@
     </div>
   </div>
 
-  <!-- Delete Confirmation Modal -->
-  <Dialog.Root bind:open={showDeleteConfirm}>
-    <Dialog.Content>
-      <Dialog.Header>
-        <Dialog.Title>Delete Product?</Dialog.Title>
-        <Dialog.Description>
-          Are you sure you want to delete this product? This action cannot be undone.
-        </Dialog.Description>
-      </Dialog.Header>
-      <Dialog.Footer>
-        <Button variant="outline" onclick={() => (showDeleteConfirm = false)}>Cancel</Button>
-        <form method="POST" action="?/delete" use:enhance class="inline">
-          <Button type="submit" variant="destructive">Delete</Button>
-        </form>
-      </Dialog.Footer>
-    </Dialog.Content>
-  </Dialog.Root>
+  <div class="mt-3 border-t border-gray-200 pt-3">
+    <button
+      type="button"
+      class="text-sm text-red-600 hover:text-red-800"
+      onclick={() => (showDelete = true)}
+    >
+      Delete this product
+    </button>
+  </div>
+
+  <DeleteConfirmDialog
+    bind:open={showDelete}
+    title="Delete Product?"
+    description="Are you sure you want to delete this product? This action cannot be undone."
+  />
 
   <!-- Image Picker Dialog -->
   <ImagePicker

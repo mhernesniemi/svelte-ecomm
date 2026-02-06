@@ -4,6 +4,7 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -17,6 +18,7 @@
   });
 
   let isSubmitting = $state(false);
+  let showDelete = $state(false);
 
   // Form values - reset when collection changes
   let name = $state("");
@@ -43,8 +45,6 @@
   let newFilterValue = $state<string>("");
   let selectedFacetValues = $state<number[]>([]);
   let selectedProducts = $state<number[]>([]);
-
-  import { slugify } from "$lib/utils";
 
   function getFieldLabel(field: string): string {
     const labels: Record<string, string> = {
@@ -520,34 +520,17 @@
     </div>
   {/if}
 
-  <!-- Delete -->
-  <div class="overflow-hidden rounded-lg border border-red-200 bg-red-50">
-    <div class="p-6">
-      <h2 class="mb-2 text-lg font-medium text-red-900">Danger Zone</h2>
-      <p class="mb-4 text-sm text-red-700">
-        Deleting this collection cannot be undone. Products will not be affected.
-      </p>
-      <form
-        method="POST"
-        action="?/delete"
-        use:enhance={() => {
-          return async ({ result, update }) => {
-            await update();
-          };
-        }}
-      >
-        <Button
-          type="submit"
-          variant="destructive-outline"
-          onclick={(e) => {
-            if (!confirm("Are you sure you want to delete this collection?")) {
-              e.preventDefault();
-            }
-          }}
-        >
-          Delete Collection
-        </Button>
-      </form>
-    </div>
-  </div>
+  <button
+    type="button"
+    class="text-sm text-red-600 hover:text-red-800"
+    onclick={() => (showDelete = true)}
+  >
+    Delete this collection
+  </button>
 </div>
+
+<DeleteConfirmDialog
+  bind:open={showDelete}
+  title="Delete Collection?"
+  description="Are you sure you want to delete this collection? This action cannot be undone."
+/>

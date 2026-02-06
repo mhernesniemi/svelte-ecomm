@@ -2,7 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
-  import * as Dialog from "$lib/components/admin/ui/dialog";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import Check from "@lucide/svelte/icons/check";
@@ -18,7 +18,7 @@
   });
 
   let isSubmitting = $state(false);
-  let showDeleteConfirm = $state(false);
+  let showDelete = $state(false);
   let facetComboboxOpen = $state(false);
 
   // Get the English translation name
@@ -81,18 +81,9 @@
     </div>
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">Edit Variant</h1>
-      <div class="flex items-center gap-6">
-        <button
-          type="button"
-          onclick={() => (showDeleteConfirm = true)}
-          class="text-sm text-red-600 hover:text-red-800"
-        >
-          Delete Variant
-        </button>
-        <Button type="submit" form="variant-form" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : "Save Changes"}
-        </Button>
-      </div>
+      <Button type="submit" form="variant-form" disabled={isSubmitting}>
+        {isSubmitting ? "Saving..." : "Save Changes"}
+      </Button>
     </div>
   </div>
 
@@ -288,22 +279,19 @@
     </div>
   </div>
 
-  <!-- Delete Confirmation Modal -->
-  <Dialog.Root bind:open={showDeleteConfirm}>
-    <Dialog.Content>
-      <Dialog.Header>
-        <Dialog.Title>Delete Variant?</Dialog.Title>
-        <Dialog.Description>
-          Are you sure you want to delete variant "{data.variant.sku}"? This action cannot be
-          undone.
-        </Dialog.Description>
-      </Dialog.Header>
-      <Dialog.Footer>
-        <Button variant="outline" onclick={() => (showDeleteConfirm = false)}>Cancel</Button>
-        <form method="POST" action="?/delete" use:enhance class="inline">
-          <Button type="submit" variant="destructive">Delete</Button>
-        </form>
-      </Dialog.Footer>
-    </Dialog.Content>
-  </Dialog.Root>
+  <div class="mt-3 border-t border-gray-200 pt-3">
+    <button
+      type="button"
+      class="text-sm text-red-600 hover:text-red-800"
+      onclick={() => (showDelete = true)}
+    >
+      Delete this variant
+    </button>
+  </div>
 </div>
+
+<DeleteConfirmDialog
+  bind:open={showDelete}
+  title="Delete Variant?"
+  description="Are you sure you want to delete variant &quot;{data.variant.sku}&quot;? This action cannot be undone."
+/>

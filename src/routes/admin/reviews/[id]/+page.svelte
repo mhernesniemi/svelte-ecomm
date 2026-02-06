@@ -3,10 +3,13 @@
   import { toast } from "svelte-sonner";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  let showDelete = $state(false);
 
   $effect(() => {
     if (form?.success) toast.success(form.message || "Success");
@@ -130,32 +133,17 @@
     </div>
   </div>
 
-  <!-- Danger Zone -->
-  <div class="overflow-hidden rounded-lg border border-red-200 bg-red-50">
-    <div class="p-6">
-      <h2 class="mb-2 text-lg font-medium text-red-900">Danger Zone</h2>
-      <p class="mb-4 text-sm text-red-700">Deleting this review cannot be undone.</p>
-      <form
-        method="POST"
-        action="?/delete"
-        use:enhance={() => {
-          return async ({ result, update }) => {
-            await update();
-          };
-        }}
-      >
-        <Button
-          type="submit"
-          variant="destructive-outline"
-          onclick={(e) => {
-            if (!confirm("Are you sure you want to delete this review?")) {
-              e.preventDefault();
-            }
-          }}
-        >
-          Delete Review
-        </Button>
-      </form>
-    </div>
-  </div>
+  <button
+    type="button"
+    class="text-sm text-red-600 hover:text-red-800"
+    onclick={() => (showDelete = true)}
+  >
+    Delete this review
+  </button>
 </div>
+
+<DeleteConfirmDialog
+  bind:open={showDelete}
+  title="Delete Review?"
+  description="Are you sure you want to delete this review? This action cannot be undone."
+/>

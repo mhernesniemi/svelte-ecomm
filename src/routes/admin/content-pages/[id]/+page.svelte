@@ -4,6 +4,7 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import { onMount } from "svelte";
 
@@ -22,6 +23,7 @@
   });
 
   let isSubmitting = $state(false);
+  let showDelete = $state(false);
 
   const translation = $derived(
     data.page.translations.find((t) => t.languageCode === "en") ?? data.page.translations[0]
@@ -140,32 +142,17 @@
     </div>
   </form>
 
-  <!-- Delete -->
-  <div class="overflow-hidden rounded-lg border border-red-200 bg-red-50">
-    <div class="p-6">
-      <h2 class="mb-2 text-lg font-medium text-red-900">Danger Zone</h2>
-      <p class="mb-4 text-sm text-red-700">Deleting this page cannot be undone.</p>
-      <form
-        method="POST"
-        action="?/delete"
-        use:enhance={() => {
-          return async ({ result, update }) => {
-            await update();
-          };
-        }}
-      >
-        <Button
-          type="submit"
-          variant="destructive-outline"
-          onclick={(e) => {
-            if (!confirm("Are you sure you want to delete this page?")) {
-              e.preventDefault();
-            }
-          }}
-        >
-          Delete Page
-        </Button>
-      </form>
-    </div>
-  </div>
+  <button
+    type="button"
+    class="text-sm text-red-600 hover:text-red-800"
+    onclick={() => (showDelete = true)}
+  >
+    Delete this page
+  </button>
 </div>
+
+<DeleteConfirmDialog
+  bind:open={showDelete}
+  title="Delete Page?"
+  description="Are you sure you want to delete this page? This action cannot be undone."
+/>

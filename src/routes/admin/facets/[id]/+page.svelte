@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
@@ -10,6 +11,7 @@
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
   let isSubmitting = $state(false);
+  let showDelete = $state(false);
   let editingValueId = $state<number | null>(null);
   let showAddValue = $state(false);
 
@@ -284,34 +286,17 @@
     {/if}
   </div>
 
-  <!-- Danger Zone -->
-  <div class="overflow-hidden rounded-lg border border-red-200 bg-red-50">
-    <div class="p-6">
-      <h2 class="mb-2 text-lg font-medium text-red-900">Danger Zone</h2>
-      <p class="mb-4 text-sm text-red-700">
-        Deleting this facet will also remove all its values. This cannot be undone.
-      </p>
-      <form
-        method="POST"
-        action="?/delete"
-        use:enhance={() => {
-          return async ({ result, update }) => {
-            await update();
-          };
-        }}
-      >
-        <Button
-          type="submit"
-          variant="destructive-outline"
-          onclick={(e) => {
-            if (!confirm("Are you sure you want to delete this facet and all its values?")) {
-              e.preventDefault();
-            }
-          }}
-        >
-          Delete Facet
-        </Button>
-      </form>
-    </div>
-  </div>
+  <button
+    type="button"
+    class="text-sm text-red-600 hover:text-red-800"
+    onclick={() => (showDelete = true)}
+  >
+    Delete this facet
+  </button>
 </div>
+
+<DeleteConfirmDialog
+  bind:open={showDelete}
+  title="Delete Facet?"
+  description="Are you sure you want to delete this facet and all its values? This action cannot be undone."
+/>

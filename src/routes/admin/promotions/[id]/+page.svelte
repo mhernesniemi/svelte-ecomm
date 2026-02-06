@@ -1,8 +1,8 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Badge } from "$lib/components/admin/ui/badge";
-  import * as Dialog from "$lib/components/admin/ui/dialog";
   import type { PageData, ActionData } from "./$types";
   import { toast } from "svelte-sonner";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -58,8 +58,10 @@
   const promoStatus = $derived.by(() => {
     if (!promo.enabled) return { label: "Disabled", variant: "secondary" as const };
     const now = new Date();
-    if (promo.startsAt && new Date(promo.startsAt) > now) return { label: "Scheduled", variant: "warning" as const };
-    if (promo.endsAt && new Date(promo.endsAt) < now) return { label: "Expired", variant: "destructive" as const };
+    if (promo.startsAt && new Date(promo.startsAt) > now)
+      return { label: "Scheduled", variant: "warning" as const };
+    if (promo.endsAt && new Date(promo.endsAt) < now)
+      return { label: "Expired", variant: "destructive" as const };
     return { label: "Active", variant: "success" as const };
   });
 
@@ -87,7 +89,6 @@
       <Badge variant={promoStatus.variant}>{promoStatus.label}</Badge>
     </div>
     <div class="flex items-center gap-3">
-      <Button type="button" variant="destructive" onclick={() => (showDelete = true)}>Delete</Button>
       <a href="/admin/promotions" class={buttonVariants({ variant: "outline" })}>Cancel</a>
       <Button type="submit" form="edit-form">Save Changes</Button>
     </div>
@@ -157,7 +158,9 @@
                   type="number"
                   id="discountValue"
                   name="discountValue"
-                  value={promo.discountType === "fixed_amount" ? formatPrice(promo.discountValue) : promo.discountValue}
+                  value={promo.discountType === "fixed_amount"
+                    ? formatPrice(promo.discountValue)
+                    : promo.discountValue}
                   min="0"
                   step={discountType === "percentage" ? "1" : "0.01"}
                   class="w-full rounded-lg border border-gray-300 px-3 py-2"
@@ -180,11 +183,21 @@
                 <span class="text-sm">All products</span>
               </label>
               <label class="flex items-center gap-2">
-                <input type="radio" name="appliesTo" value="specific_products" bind:group={appliesTo} />
+                <input
+                  type="radio"
+                  name="appliesTo"
+                  value="specific_products"
+                  bind:group={appliesTo}
+                />
                 <span class="text-sm">Specific products</span>
               </label>
               <label class="flex items-center gap-2">
-                <input type="radio" name="appliesTo" value="specific_collections" bind:group={appliesTo} />
+                <input
+                  type="radio"
+                  name="appliesTo"
+                  value="specific_collections"
+                  bind:group={appliesTo}
+                />
                 <span class="text-sm">Specific collections</span>
               </label>
             </div>
@@ -192,9 +205,13 @@
             {#if appliesTo === "specific_products"}
               <div class="mt-4">
                 <p class="mb-2 text-sm font-medium text-gray-700">Select Products</p>
-                <div class="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-gray-200 p-2">
+                <div
+                  class="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-gray-200 p-2"
+                >
                   {#each data.products as product}
-                    <label class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-50">
+                    <label
+                      class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-50"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedProductIds.includes(product.id)}
@@ -206,7 +223,9 @@
                   {/each}
                 </div>
                 {#if selectedProductIds.length > 0}
-                  <p class="mt-2 text-xs text-gray-500">{selectedProductIds.length} product(s) selected</p>
+                  <p class="mt-2 text-xs text-gray-500">
+                    {selectedProductIds.length} product(s) selected
+                  </p>
                 {/if}
               </div>
             {/if}
@@ -214,9 +233,13 @@
             {#if appliesTo === "specific_collections"}
               <div class="mt-4">
                 <p class="mb-2 text-sm font-medium text-gray-700">Select Collections</p>
-                <div class="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-gray-200 p-2">
+                <div
+                  class="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-gray-200 p-2"
+                >
                   {#each data.collections as collection}
-                    <label class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-50">
+                    <label
+                      class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-50"
+                    >
                       <input
                         type="checkbox"
                         checked={selectedCollectionIds.includes(collection.id)}
@@ -228,7 +251,9 @@
                   {/each}
                 </div>
                 {#if selectedCollectionIds.length > 0}
-                  <p class="mt-2 text-xs text-gray-500">{selectedCollectionIds.length} collection(s) selected</p>
+                  <p class="mt-2 text-xs text-gray-500">
+                    {selectedCollectionIds.length} collection(s) selected
+                  </p>
                 {/if}
               </div>
             {/if}
@@ -271,7 +296,10 @@
               />
             </div>
             <div>
-              <label for="usageLimitPerCustomer" class="mb-1 block text-sm font-medium text-gray-700">
+              <label
+                for="usageLimitPerCustomer"
+                class="mb-1 block text-sm font-medium text-gray-700"
+              >
                 Per Customer Limit
               </label>
               <input
@@ -357,32 +385,28 @@
         <div class="rounded-lg bg-white p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Usage</h2>
           <p class="text-sm text-gray-600">
-            Used <span class="font-medium text-gray-900">{promo.usageCount}</span> time{promo.usageCount !== 1 ? "s" : ""}
+            Used <span class="font-medium text-gray-900">{promo.usageCount}</span>
+            time{promo.usageCount !== 1 ? "s" : ""}
             {#if promo.usageLimit}
               out of {promo.usageLimit}
             {/if}
           </p>
         </div>
-
       </div>
     </div>
   </form>
+
+  <button
+    type="button"
+    class="text-sm text-red-600 hover:text-red-800"
+    onclick={() => (showDelete = true)}
+  >
+    Delete this promotion
+  </button>
 </div>
 
-<!-- Delete Confirmation Dialog -->
-<Dialog.Root bind:open={showDelete}>
-  <Dialog.Content>
-    <Dialog.Header>
-      <Dialog.Title>Delete Promotion?</Dialog.Title>
-      <Dialog.Description>
-        This will permanently delete the promotion code <strong>{promo.code}</strong>. This action cannot be undone.
-      </Dialog.Description>
-    </Dialog.Header>
-    <Dialog.Footer>
-      <Button variant="outline" onclick={() => (showDelete = false)}>Cancel</Button>
-      <form method="POST" action="?/delete" use:enhance>
-        <Button type="submit" variant="destructive">Delete</Button>
-      </form>
-    </Dialog.Footer>
-  </Dialog.Content>
-</Dialog.Root>
+<DeleteConfirmDialog
+  bind:open={showDelete}
+  title="Delete Promotion?"
+  description="This will permanently delete the promotion code {promo.code}. This action cannot be undone."
+/>
