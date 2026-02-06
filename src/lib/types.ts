@@ -233,6 +233,9 @@ export type OrderPromotion = InferSelectModel<typeof orderPromotions>;
 /** Discount type - derived from schema enum */
 export type DiscountType = Promotion["discountType"];
 
+/** Promotion method - code or automatic */
+export type PromotionMethod = Promotion["method"];
+
 /** Promotion type - order, product, or free_shipping */
 export type PromotionType = Promotion["promotionType"];
 
@@ -463,7 +466,9 @@ export interface CreateCustomerInput {
 }
 
 export interface CreatePromotionInput {
-	code: string;
+	method?: "code" | "automatic";
+	code?: string;
+	title?: string;
 	promotionType?: PromotionType;
 	discountType: DiscountType;
 	discountValue: number;
@@ -479,6 +484,7 @@ export interface CreatePromotionInput {
 }
 
 export interface UpdatePromotionInput {
+	title?: string | null;
 	discountType?: DiscountType;
 	discountValue?: number;
 	appliesTo?: PromotionAppliesTo;

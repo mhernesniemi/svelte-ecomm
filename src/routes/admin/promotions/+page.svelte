@@ -80,8 +80,21 @@
     },
     {
       accessorKey: "code",
-      header: "Code",
-      cell: ({ row }) => renderSnippet(codeCell, { code: row.original.code, id: row.original.id })
+      header: "Code / Title",
+      cell: ({ row }) =>
+        renderSnippet(codeCell, {
+          code: row.original.code,
+          title: row.original.title,
+          method: row.original.method,
+          id: row.original.id
+        })
+    },
+    {
+      id: "method",
+      header: "Method",
+      accessorFn: (row) => (row.method === "automatic" ? "Auto" : "Code"),
+      cell: ({ row }) =>
+        renderSnippet(methodCell, { method: row.original.method })
     },
     {
       accessorKey: "promotionType",
@@ -112,10 +125,26 @@
   ];
 </script>
 
-{#snippet codeCell({ code, id }: { code: string; id: number })}
+{#snippet codeCell({
+  code,
+  title,
+  method,
+  id
+}: {
+  code: string | null;
+  title: string | null;
+  method: string;
+  id: number;
+})}
   <a href="/admin/promotions/{id}" class="font-medium text-gray-900 hover:text-blue-600">
-    {code}
+    {method === "automatic" ? title : code}
   </a>
+{/snippet}
+
+{#snippet methodCell({ method }: { method: string })}
+  <Badge variant={method === "automatic" ? "default" : "secondary"}>
+    {method === "automatic" ? "Auto" : "Code"}
+  </Badge>
 {/snippet}
 
 {#snippet typeCell({ type }: { type: string })}

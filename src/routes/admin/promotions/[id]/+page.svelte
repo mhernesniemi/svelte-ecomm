@@ -99,7 +99,10 @@
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">{promo.code}</h1>
+      <h1 class="text-2xl font-bold text-gray-900">
+        {promo.method === "automatic" ? promo.title : promo.code}
+      </h1>
+      <Badge variant="outline">{promo.method === "code" ? "Discount code" : "Automatic"}</Badge>
       <Badge variant="outline">{typeLabels[promo.promotionType]}</Badge>
       <Badge variant={promoStatus.variant}>{promoStatus.label}</Badge>
     </div>
@@ -131,19 +134,37 @@
     <div class="flex gap-6">
       <!-- Left Column -->
       <div class="flex-1 space-y-6">
-        <!-- Code (read-only) -->
+        <!-- Code / Title -->
         <div class="rounded-lg bg-white p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Promotion Code</h2>
-          <div>
-            <label for="code" class="mb-1 block text-sm font-medium text-gray-700">Code</label>
-            <input
-              type="text"
-              id="code"
-              value={promo.code}
-              disabled
-              class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-500"
-            />
-          </div>
+          <h2 class="mb-4 text-lg font-semibold">
+            {promo.method === "code" ? "Promotion Code" : "Automatic Discount"}
+          </h2>
+          {#if promo.method === "code"}
+            <div>
+              <label for="code" class="mb-1 block text-sm font-medium text-gray-700">Code</label>
+              <input
+                type="text"
+                id="code"
+                value={promo.code}
+                disabled
+                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-500"
+              />
+            </div>
+          {:else}
+            <div>
+              <label for="title" class="mb-1 block text-sm font-medium text-gray-700">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={promo.title ?? ""}
+                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+              />
+              <p class="mt-1 text-xs text-gray-500">
+                Customers will see this in their cart and at checkout.
+              </p>
+            </div>
+          {/if}
         </div>
 
         <!-- Discount (hidden for free_shipping) -->

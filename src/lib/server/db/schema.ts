@@ -637,7 +637,9 @@ export const promotions = pgTable(
 	"promotions",
 	{
 		id: serial("id").primaryKey(),
-		code: varchar("code", { length: 50 }).notNull().unique(),
+		method: text("method", { enum: ["code", "automatic"] }).default("code").notNull(),
+		code: varchar("code", { length: 50 }).unique(),
+		title: varchar("title", { length: 255 }),
 		promotionType: text("promotion_type", { enum: ["order", "product", "free_shipping"] })
 			.default("order")
 			.notNull(),

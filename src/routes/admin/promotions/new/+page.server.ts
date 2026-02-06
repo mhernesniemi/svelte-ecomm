@@ -29,7 +29,9 @@ export const actions: Actions = {
 	default: async ({ request }) => {
 		const data = await request.formData();
 
+		const method = (data.get("method") as "code" | "automatic") ?? "code";
 		const code = data.get("code") as string;
+		const title = data.get("title") as string;
 		const promotionType = data.get("promotionType") as "order" | "product" | "free_shipping";
 		const discountType = data.get("discountType") as "percentage" | "fixed_amount";
 		const discountValueRaw = Number(data.get("discountValue"));
@@ -58,8 +60,16 @@ export const actions: Actions = {
 			? JSON.parse(data.get("collectionIds") as string)
 			: [];
 
-		if (!code || !promotionType) {
-			return fail(400, { error: "Code and type are required" });
+		if (!promotionType) {
+			return fail(400, { error: "Promotion type is required" });
+		}
+
+		if (method === "code" && !code) {
+			return fail(400, { error: "Code is required for discount code promotions" });
+		}
+
+		if (method === "automatic" && !title) {
+			return fail(400, { error: "Title is required for automatic discount promotions" });
 		}
 
 		if (promotionType !== "free_shipping" && (isNaN(discountValueRaw) || !discountType)) {
@@ -78,7 +88,9 @@ export const actions: Actions = {
 
 		try {
 			const promotion = await promotionService.create({
-				code,
+				method,
+				code: method === "code" ? code : undefined,
+				title: method === "automatic" ? title : undefined,
 				promotionType,
 				discountType: promotionType === "free_shipping" ? "fixed_amount" : discountType,
 				discountValue,

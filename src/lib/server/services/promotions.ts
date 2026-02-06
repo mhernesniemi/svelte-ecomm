@@ -29,10 +29,14 @@ export class PromotionService {
 	 * Create a new promotion
 	 */
 	async create(input: CreatePromotionInput): Promise<Promotion> {
+		const method = input.method ?? "code";
+
 		const [promotion] = await db
 			.insert(promotions)
 			.values({
-				code: input.code.toUpperCase(),
+				method,
+				code: method === "automatic" ? null : (input.code?.toUpperCase() ?? null),
+				title: input.title ?? null,
 				promotionType: input.promotionType ?? "order",
 				discountType: input.discountType,
 				discountValue: input.discountValue,
@@ -219,6 +223,7 @@ export class PromotionService {
 		const [updated] = await db
 			.update(promotions)
 			.set({
+				...(input.title !== undefined && { title: input.title }),
 				...(input.discountType && { discountType: input.discountType }),
 				...(input.discountValue !== undefined && { discountValue: input.discountValue }),
 				...(input.appliesTo !== undefined && { appliesTo: input.appliesTo }),
@@ -437,6 +442,70 @@ export class PromotionService {
 			);
 
 		return Number(result[0]?.count ?? 0);
+	}
+
+	/**
+	 * List active automatic promotions (enabled, within date range, not exhausted, method=automatic)
+	 */
+	async listActiveAutomatic(): Promise<Promotion[]> {
+		const now = new Date();
+
+		return db
+			.select()
+			.from(promotions)
+			.where(
+				and(
+					eq(promotions.method, "automatic"),
+					eq(promotions.enabled, true),
+					or(isNull(promotions.startsAt), lte(promotions.startsAt, now)),
+					or(isNull(promotions.endsAt), gte(promotions.endsAt, now)),
+					or(
+						isNull(promotions.usageLimit),
+						sql`${promotions.usageCount} < ${promotions.usageLimit}`
+					)
+				)
+			);
+	}
+
+	/**
+	 * Validate an automatic promotion against order conditions (without code lookup)
+	 */
+	async validateAutomatic(
+		promotion: Promotion,
+		orderAmount: number,
+		options?: {
+			customerId?: number;
+			existingPromotionIds?: number[];
+		}
+	): Promise<{ valid: boolean; error?: string }> {
+		if (!promotion.enabled) {
+			return { valid: false, error: "Promotion is not active" };
+		}
+
+		if (promotion.minOrderAmount && orderAmount < promotion.minOrderAmount) {
+			return { valid: false, error: "Minimum order amount not met" };
+		}
+
+		if (promotion.usageLimitPerCustomer && options?.customerId) {
+			const usageCount = await this.getCustomerUsageCount(promotion.id, options.customerId);
+			if (usageCount >= promotion.usageLimitPerCustomer) {
+				return { valid: false, error: "Per-customer usage limit reached" };
+			}
+		}
+
+		if (options?.existingPromotionIds?.length) {
+			const existingPromos = await db
+				.select()
+				.from(promotions)
+				.where(inArray(promotions.id, options.existingPromotionIds));
+
+			const { canCombinePromotions } = await import("./promotion-utils.js");
+			if (!canCombinePromotions(existingPromos, promotion)) {
+				return { valid: false, error: "Cannot combine with existing promotions" };
+			}
+		}
+
+		return { valid: true };
 	}
 
 	/**

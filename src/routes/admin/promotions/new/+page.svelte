@@ -15,6 +15,7 @@
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
+  let method = $state<"code" | "automatic">("code");
   let promotionType = $state<"order" | "product" | "free_shipping">("order");
   let discountType = $state<"percentage" | "fixed_amount">("percentage");
   let appliesTo = $state<"all" | "specific_products" | "specific_collections">("all");
@@ -122,21 +123,62 @@
           </div>
         </div>
 
-        <!-- Code -->
+        <!-- Method + Code/Title -->
         <div class="rounded-lg bg-white p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Promotion Code</h2>
-          <div>
-            <label for="code" class="mb-1 block text-sm font-medium text-gray-700">Code</label>
-            <input
-              type="text"
-              id="code"
-              name="code"
-              placeholder="e.g., SUMMER20"
-              required
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 uppercase"
-            />
-            <p class="mt-1 text-xs text-gray-500">Customers will enter this code at checkout.</p>
+          <h2 class="mb-4 text-lg font-semibold">Discount Method</h2>
+          <input type="hidden" name="method" value={method} />
+          <div class="mb-4 inline-flex rounded-lg border border-gray-200 p-0.5">
+            <button
+              type="button"
+              class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors {method === 'code'
+                ? 'bg-gray-900 text-white'
+                : 'text-gray-600 hover:text-gray-900'}"
+              onclick={() => (method = "code")}
+            >
+              Discount code
+            </button>
+            <button
+              type="button"
+              class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors {method === 'automatic'
+                ? 'bg-gray-900 text-white'
+                : 'text-gray-600 hover:text-gray-900'}"
+              onclick={() => (method = "automatic")}
+            >
+              Automatic discount
+            </button>
           </div>
+
+          {#if method === "code"}
+            <div>
+              <label for="code" class="mb-1 block text-sm font-medium text-gray-700">Code</label>
+              <input
+                type="text"
+                id="code"
+                name="code"
+                placeholder="e.g., SUMMER20"
+                required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 uppercase"
+              />
+              <p class="mt-1 text-xs text-gray-500">
+                Customers will enter this code at checkout.
+              </p>
+            </div>
+          {:else}
+            <div>
+              <label for="title" class="mb-1 block text-sm font-medium text-gray-700">Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="e.g., Summer Sale 20% Off"
+                required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+              />
+              <p class="mt-1 text-xs text-gray-500">
+                Customers will see this in their cart and at checkout.
+              </p>
+            </div>
+          {/if}
         </div>
 
         <!-- Discount (hidden for free_shipping) -->
@@ -426,6 +468,10 @@
         <div class="rounded-lg bg-white p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Summary</h2>
           <div class="space-y-2 text-sm text-gray-600">
+            <p>
+              <span class="font-medium text-gray-900">Method:</span>
+              <Badge variant="outline">{method === "code" ? "Discount code" : "Automatic"}</Badge>
+            </p>
             <p>
               <span class="font-medium text-gray-900">Type:</span>
               <Badge variant="outline">{typeLabels[promotionType]}</Badge>

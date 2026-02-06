@@ -38,6 +38,7 @@ export const actions: Actions = {
 		const id = Number(params.id);
 		const data = await request.formData();
 
+		const title = data.has("title") ? (data.get("title") as string) || null : undefined;
 		const discountType = data.get("discountType") as "percentage" | "fixed_amount" | null;
 		const discountValueRaw = data.get("discountValue")
 			? Number(data.get("discountValue"))
@@ -78,6 +79,7 @@ export const actions: Actions = {
 
 		try {
 			await promotionService.update(id, {
+				title,
 				discountType: discountType ?? undefined,
 				discountValue,
 				appliesTo: appliesTo ?? undefined,

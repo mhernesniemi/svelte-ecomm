@@ -613,23 +613,32 @@
             {/each}
           </div>
 
-          <!-- Promo Code -->
+          <!-- Promotions -->
           <div class="border-t pt-4">
             {#if currentAppliedPromotions.length > 0}
               <div class="space-y-2">
                 {#each currentAppliedPromotions as promo}
                   <div class="flex items-center justify-between rounded bg-green-50 px-3 py-2">
                     <div>
-                      <span class="text-sm font-medium text-green-800">{promo.code}</span>
+                      <span class="text-sm font-medium text-green-800">
+                        {promo.method === "automatic" ? promo.title : promo.code}
+                      </span>
                       <span class="ml-1 text-xs text-green-600">-{formatPrice(promo.discountAmount)}</span>
                     </div>
-                    <form method="POST" action="?/removePromotion" use:enhance>
-                      <button type="submit" class="text-xs text-red-600 hover:underline">Remove</button>
-                    </form>
+                    {#if promo.method === "code"}
+                      <form method="POST" action="?/removePromotion" use:enhance>
+                        <button type="submit" class="text-xs text-red-600 hover:underline">Remove</button>
+                      </form>
+                    {:else}
+                      <span class="text-xs text-green-600">Applied automatically</span>
+                    {/if}
                   </div>
                 {/each}
               </div>
-            {:else}
+            {/if}
+
+            <!-- Promo code input (show if no code-based promotions applied) -->
+            {#if !currentAppliedPromotions.some((p: any) => p.method === "code")}
               <form
                 method="POST"
                 action="?/applyPromotion"
@@ -638,7 +647,7 @@
                     await update({ reset: false });
                   };
                 }}
-                class="flex gap-2"
+                class="flex gap-2 {currentAppliedPromotions.length > 0 ? 'mt-2' : ''}"
               >
                 <input
                   type="text"

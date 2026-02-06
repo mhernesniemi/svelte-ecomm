@@ -619,6 +619,8 @@ export class OrderService {
 				discountAmount: orderPromotions.discountAmount,
 				type: orderPromotions.type,
 				code: promotions.code,
+				title: promotions.title,
+				method: promotions.method,
 				promotionType: promotions.promotionType
 			})
 			.from(orderPromotions)
@@ -817,6 +819,143 @@ export class OrderService {
 		await this.recalculateTotals(orderId);
 	}
 
+	/**
+	 * Apply qualifying automatic promotions and remove ones that no longer qualify
+	 */
+	async applyAutomaticPromotions(orderId: number): Promise<void> {
+		const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
+		if (!order || !order.active) return;
+
+		const lines = await db.select().from(orderLines).where(eq(orderLines.orderId, orderId));
+		const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
+		if (subtotal === 0) return;
+
+		// Get currently applied promotions
+		const applied = await db
+			.select()
+			.from(orderPromotions)
+			.where(eq(orderPromotions.orderId, orderId));
+
+		const appliedPromoIds = applied.map((op) => op.promotionId);
+
+		// Get active automatic promotions
+		const autoPromos = await promotionService.listActiveAutomatic();
+
+		// Remove automatic promotions that no longer qualify
+		for (const ap of applied) {
+			const promo = autoPromos.find((p) => p.id === ap.promotionId);
+			if (!promo) {
+				// Check if this was an automatic promo that's no longer active
+				const [fullPromo] = await db
+					.select()
+					.from(promotions)
+					.where(eq(promotions.id, ap.promotionId));
+				if (fullPromo?.method === "automatic") {
+					await db
+						.delete(orderPromotions)
+						.where(
+							and(
+								eq(orderPromotions.orderId, orderId),
+								eq(orderPromotions.promotionId, ap.promotionId)
+							)
+						);
+					continue;
+				}
+			}
+			if (promo) {
+				// Re-validate: check min order amount
+				const validation = await promotionService.validateAutomatic(promo, subtotal, {
+					customerId: order.customerId ?? undefined,
+					existingPromotionIds: appliedPromoIds.filter((id) => id !== promo.id)
+				});
+				if (!validation.valid) {
+					await db
+						.delete(orderPromotions)
+						.where(
+							and(
+								eq(orderPromotions.orderId, orderId),
+								eq(orderPromotions.promotionId, promo.id)
+							)
+						);
+				}
+			}
+		}
+
+		// Re-fetch applied after removals
+		const currentApplied = await db
+			.select()
+			.from(orderPromotions)
+			.where(eq(orderPromotions.orderId, orderId));
+		const currentAppliedIds = currentApplied.map((op) => op.promotionId);
+
+		// Try to apply new automatic promotions
+		for (const promo of autoPromos) {
+			if (currentAppliedIds.includes(promo.id)) continue;
+
+			const validation = await promotionService.validateAutomatic(promo, subtotal, {
+				customerId: order.customerId ?? undefined,
+				existingPromotionIds: currentAppliedIds
+			});
+
+			if (!validation.valid) continue;
+
+			// Calculate discount
+			let discountAmount = 0;
+			let orderPromotionType: "order" | "product" | "shipping" = "order";
+
+			if (promo.promotionType === "free_shipping") {
+				const [shippingRecord] = await db
+					.select()
+					.from(orderShipping)
+					.where(eq(orderShipping.orderId, orderId))
+					.limit(1);
+				discountAmount = shippingRecord?.price ?? 0;
+				orderPromotionType = "shipping";
+			} else if (promo.promotionType === "product") {
+				const qualifyingProductIds = await promotionService.getQualifyingProductIds(promo.id);
+				const linesWithProducts = await db
+					.select({
+						lineTotal: orderLines.lineTotal,
+						productId: products.id
+					})
+					.from(orderLines)
+					.innerJoin(productVariants, eq(orderLines.variantId, productVariants.id))
+					.innerJoin(products, eq(productVariants.productId, products.id))
+					.where(eq(orderLines.orderId, orderId));
+
+				const qualifyingLineTotal = linesWithProducts
+					.filter(
+						(l) =>
+							qualifyingProductIds === null ||
+							qualifyingProductIds.includes(l.productId)
+					)
+					.reduce((sum, l) => sum + l.lineTotal, 0);
+
+				if (qualifyingLineTotal === 0) continue;
+
+				discountAmount = calculateProductDiscount(promo, qualifyingLineTotal);
+				orderPromotionType = "product";
+			} else {
+				discountAmount = calculateDiscount(promo, subtotal);
+				orderPromotionType = "order";
+			}
+
+			if (discountAmount <= 0) continue;
+
+			await db
+				.insert(orderPromotions)
+				.values({
+					orderId,
+					promotionId: promo.id,
+					discountAmount,
+					type: orderPromotionType
+				})
+				.onConflictDoNothing();
+
+			currentAppliedIds.push(promo.id);
+		}
+	}
+
 	// ============================================================================
 	// PRIVATE HELPERS
 	// ============================================================================
@@ -846,7 +985,12 @@ export class OrderService {
 		};
 	}
 
-	private async recalculateTotals(orderId: number): Promise<void> {
+	private async recalculateTotals(orderId: number, skipAutoPromotions = false): Promise<void> {
+		// Apply automatic promotions first (unless we're called from within applyAutomaticPromotions)
+		if (!skipAutoPromotions) {
+			await this.applyAutomaticPromotions(orderId);
+		}
+
 		// Get all lines
 		const lines = await db.select().from(orderLines).where(eq(orderLines.orderId, orderId));
 
