@@ -1,0 +1,96 @@
+import { customerGroupService } from "$lib/server/services/customerGroups.js";
+import { customerService } from "$lib/server/services/customers.js";
+import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
+import type { Actions, PageServerLoad } from "./$types";
+
+export const load: PageServerLoad = async ({ params }) => {
+	const id = Number(params.id);
+	if (isNaN(id)) {
+		throw error(400, "Invalid group ID");
+	}
+
+	const group = await customerGroupService.getById(id);
+	if (!group) {
+		throw error(404, "Customer group not found");
+	}
+
+	const [groupCustomers, allCustomers] = await Promise.all([
+		customerGroupService.getCustomers(id),
+		customerService.list(1000, 0)
+	]);
+
+	return {
+		group,
+		groupCustomers,
+		allCustomers: allCustomers.items
+	};
+};
+
+export const actions: Actions = {
+	update: async ({ params, request }) => {
+		const id = Number(params.id);
+		const formData = await request.formData();
+		const name = formData.get("name") as string;
+		const description = formData.get("description") as string;
+
+		if (!name) {
+			return fail(400, { error: "Name is required" });
+		}
+
+		try {
+			await customerGroupService.update(id, {
+				name,
+				description: description || undefined
+			});
+			return { success: true, message: "Group updated" };
+		} catch {
+			return fail(500, { error: "Failed to update group" });
+		}
+	},
+
+	addCustomer: async ({ params, request }) => {
+		const groupId = Number(params.id);
+		const formData = await request.formData();
+		const customerId = Number(formData.get("customerId"));
+
+		if (!customerId) {
+			return fail(400, { error: "Customer is required" });
+		}
+
+		try {
+			await customerGroupService.addCustomer(groupId, customerId);
+			return { success: true, message: "Customer added to group" };
+		} catch {
+			return fail(500, { error: "Failed to add customer" });
+		}
+	},
+
+	removeCustomer: async ({ params, request }) => {
+		const groupId = Number(params.id);
+		const formData = await request.formData();
+		const customerId = Number(formData.get("customerId"));
+
+		if (!customerId) {
+			return fail(400, { error: "Customer ID is required" });
+		}
+
+		try {
+			await customerGroupService.removeCustomer(groupId, customerId);
+			return { success: true, message: "Customer removed from group" };
+		} catch {
+			return fail(500, { error: "Failed to remove customer" });
+		}
+	},
+
+	delete: async ({ params }) => {
+		const id = Number(params.id);
+
+		try {
+			await customerGroupService.delete(id);
+			throw redirect(303, "/admin/customers?tab=groups");
+		} catch (err) {
+			if (isRedirect(err)) throw err;
+			return fail(500, { error: "Failed to delete group" });
+		}
+	}
+};
