@@ -158,31 +158,33 @@
         <h2 class="mb-4 text-lg font-medium text-gray-900">Basic Information</h2>
 
         <div class="space-y-4">
-          <div>
-            <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
-              Name <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              bind:value={name}
-              required
-              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-            />
-          </div>
-          <div>
-            <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
-              Slug <span class="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="slug"
-              name="slug"
-              bind:value={slug}
-              required
-              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
-            />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+                Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                bind:value={name}
+                required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+              />
+            </div>
+            <div>
+              <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+                Slug <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="slug"
+                name="slug"
+                bind:value={slug}
+                required
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+              />
+            </div>
           </div>
           <div>
             <label for="description" class="mb-1 block text-sm font-medium text-gray-700">

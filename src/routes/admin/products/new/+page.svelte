@@ -14,7 +14,6 @@
 
   import { slugify } from "$lib/utils";
 
-
   let name = $state("");
   let slug = $state("");
   let autoSlug = $state(true);
@@ -53,37 +52,39 @@
   >
     <div class="space-y-6 p-6">
       <div class="space-y-4">
-        <div>
-          <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
-            Name <span class="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            bind:value={name}
-            required
-            class="w-full rounded-lg border border-gray-300 px-3 py-2"
-          />
-        </div>
-
-        <div>
-          <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
-            Slug <span class="text-red-500">*</span>
-          </label>
-          <div class="flex gap-2">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+              Name <span class="text-red-500">*</span>
+            </label>
             <input
               type="text"
-              id="slug"
-              name="slug"
-              bind:value={slug}
+              id="name"
+              name="name"
+              bind:value={name}
               required
-              class="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+              class="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
-            <label class="flex items-center gap-2 text-sm text-gray-500">
-              <input type="checkbox" bind:checked={autoSlug} class="rounded border-gray-300" />
-              Auto
+          </div>
+
+          <div>
+            <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+              Slug <span class="text-red-500">*</span>
             </label>
+            <div class="flex gap-2">
+              <input
+                type="text"
+                id="slug"
+                name="slug"
+                bind:value={slug}
+                required
+                class="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+              />
+              <label class="flex items-center gap-2 text-sm text-gray-500">
+                <input type="checkbox" bind:checked={autoSlug} class="rounded border-gray-300" />
+                Auto
+              </label>
+            </div>
           </div>
         </div>
 

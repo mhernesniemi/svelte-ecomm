@@ -254,32 +254,34 @@
       >
         <div class="space-y-6 p-6">
           <div class="space-y-4">
-            <div>
-              <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
-                Name <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={translation?.name ?? ""}
-                required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
-              />
-            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+                  Name <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={translation?.name ?? ""}
+                  required
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+              </div>
 
-            <div>
-              <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
-                Slug <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="slug"
-                name="slug"
-                value={translation?.slug ?? ""}
-                required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
-              />
+              <div>
+                <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+                  Slug <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="slug"
+                  name="slug"
+                  value={translation?.slug ?? ""}
+                  required
+                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+              </div>
             </div>
 
             <div>
