@@ -14,6 +14,7 @@
   import Users from "@lucide/svelte/icons/users";
     import Star from "@lucide/svelte/icons/star";
   import Tag from "@lucide/svelte/icons/tag";
+  import FileText from "@lucide/svelte/icons/file-text";
 
   let { children, data }: { children: any; data: LayoutData } = $props();
 
@@ -32,7 +33,8 @@
     { href: "/admin/orders", label: "Orders", icon: "shopping-cart" },
     { href: "/admin/customers", label: "Customers", icon: "users" },
     { href: "/admin/reviews", label: "Reviews", icon: "star" },
-    { href: "/admin/promotions", label: "Promotions", icon: "tag" }
+    { href: "/admin/promotions", label: "Promotions", icon: "tag" },
+    { href: "/admin/content-pages", label: "Pages", icon: "file-text" }
   ];
 
   function isActive(href: string): boolean {
@@ -80,6 +82,8 @@
               <FolderOpen class="h-5 w-5" />
             {:else if item.icon === "star"}
               <Star class="h-5 w-5" />
+            {:else if item.icon === "file-text"}
+              <FileText class="h-5 w-5" />
             {/if}
           </span>
           {item.label}

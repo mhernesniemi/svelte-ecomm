@@ -1304,3 +1304,49 @@ export const jobs = pgTable(
 		index("jobs_status_idx").on(table.status)
 	]
 );
+
+// ============================================================================
+// CONTENT PAGES
+// ============================================================================
+
+export const contentPages = pgTable("content_pages", {
+	id: serial("id").primaryKey(),
+	published: boolean("published").default(false).notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.$onUpdate(() => new Date())
+		.notNull()
+});
+
+export const contentPageTranslations = pgTable(
+	"content_page_translations",
+	{
+		id: serial("id").primaryKey(),
+		contentPageId: integer("content_page_id")
+			.references(() => contentPages.id, { onDelete: "cascade" })
+			.notNull(),
+		languageCode: varchar("language_code", { length: 10 }).notNull(),
+		title: varchar("title", { length: 255 }).notNull(),
+		slug: varchar("slug", { length: 255 }).notNull(),
+		body: text("body")
+	},
+	(table) => [
+		uniqueIndex("content_page_translations_page_lang_idx").on(
+			table.contentPageId,
+			table.languageCode
+		),
+		index("content_page_translations_slug_idx").on(table.slug)
+	]
+);
+
+export const contentPagesRelations = relations(contentPages, ({ many }) => ({
+	translations: many(contentPageTranslations)
+}));
+
+export const contentPageTranslationsRelations = relations(contentPageTranslations, ({ one }) => ({
+	contentPage: one(contentPages, {
+		fields: [contentPageTranslations.contentPageId],
+		references: [contentPages.id]
+	})
+}));

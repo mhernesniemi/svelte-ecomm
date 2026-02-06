@@ -32,7 +32,9 @@ import type {
 	wishlistItems,
 	reviews,
 	stockReservations,
-	taxRates
+	taxRates,
+	contentPages,
+	contentPageTranslations
 } from "$lib/server/db/schema.js";
 
 // ============================================================================
@@ -312,6 +314,20 @@ export interface ReviewWithCustomer extends Review {
 export interface ReviewWithRelations extends Review {
 	product: ProductWithTranslations;
 	customer: Customer;
+}
+
+// ============================================================================
+// CONTENT PAGE TYPES
+// ============================================================================
+
+export type ContentPage = InferSelectModel<typeof contentPages>;
+export type NewContentPage = InferInsertModel<typeof contentPages>;
+
+export type ContentPageTranslation = InferSelectModel<typeof contentPageTranslations>;
+export type NewContentPageTranslation = InferInsertModel<typeof contentPageTranslations>;
+
+export interface ContentPageWithTranslations extends ContentPage {
+	translations: ContentPageTranslation[];
 }
 
 // ============================================================================

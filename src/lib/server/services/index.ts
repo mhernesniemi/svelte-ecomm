@@ -20,3 +20,4 @@ export type {
 	CategoryTreeNode,
 	CategoryBreadcrumb
 } from "./categories.js";
+export { contentPageService, ContentPageService } from "./content-pages.js";
