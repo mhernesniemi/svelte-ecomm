@@ -25,6 +25,7 @@
   let element: HTMLDivElement;
   let editor: Editor | undefined = $state();
   let html = $state(content);
+  let editorVersion = $state(0);
 
   onMount(() => {
     editor = new Editor({
@@ -50,6 +51,9 @@
         attributes: {
           class: "prose prose-base max-w-none focus:outline-none min-h-[100px] px-3 py-2"
         }
+      },
+      onTransaction: () => {
+        editorVersion++;
       },
       onUpdate: ({ editor }) => {
         html = editor.getHTML();
@@ -99,6 +103,12 @@
   function unsetLink() {
     editor?.chain().focus().unsetLink().run();
   }
+
+  function isActive(name: string, attrs?: Record<string, unknown>): boolean {
+    // Reference editorVersion to create reactivity on every transaction
+    void editorVersion;
+    return editor?.isActive(name, attrs) ?? false;
+  }
 </script>
 
 <div
@@ -114,7 +124,7 @@
       onclick={toggleBold}
       class={cn(
         "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-gray-200",
-        editor?.isActive("bold") && "bg-gray-200"
+        isActive("bold") && "bg-gray-200"
       )}
       title="Bold"
     >
@@ -126,7 +136,7 @@
       onclick={toggleItalic}
       class={cn(
         "rounded px-2 py-1 text-sm italic transition-colors hover:bg-gray-200",
-        editor?.isActive("italic") && "bg-gray-200"
+        isActive("italic") && "bg-gray-200"
       )}
       title="Italic"
     >
@@ -140,7 +150,7 @@
       onclick={() => toggleHeading(2)}
       class={cn(
         "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-gray-200",
-        editor?.isActive("heading", { level: 2 }) && "bg-gray-200"
+        isActive("heading", { level: 2 }) && "bg-gray-200"
       )}
       title="Heading 2"
     >
@@ -152,7 +162,7 @@
       onclick={() => toggleHeading(3)}
       class={cn(
         "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-gray-200",
-        editor?.isActive("heading", { level: 3 }) && "bg-gray-200"
+        isActive("heading", { level: 3 }) && "bg-gray-200"
       )}
       title="Heading 3"
     >
@@ -166,7 +176,7 @@
       onclick={toggleBulletList}
       class={cn(
         "rounded px-2 py-1 text-sm transition-colors hover:bg-gray-200",
-        editor?.isActive("bulletList") && "bg-gray-200"
+        isActive("bulletList") && "bg-gray-200"
       )}
       title="Bullet List"
     >
@@ -178,7 +188,7 @@
       onclick={toggleOrderedList}
       class={cn(
         "rounded px-2 py-1 text-sm transition-colors hover:bg-gray-200",
-        editor?.isActive("orderedList") && "bg-gray-200"
+        isActive("orderedList") && "bg-gray-200"
       )}
       title="Numbered List"
     >
@@ -187,7 +197,7 @@
 
     <span class="mx-1 w-px bg-gray-300"></span>
 
-    {#if editor?.isActive("link")}
+    {#if isActive("link")}
       <button
         type="button"
         onclick={unsetLink}
