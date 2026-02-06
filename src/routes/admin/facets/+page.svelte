@@ -67,11 +67,10 @@
 
 <svelte:head><title>Facets | Admin</title></svelte:head>
 
-<div class="space-y-6">
-  <div class="flex items-center justify-between">
+<div>
+  <div class="mb-6 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Facets</h1>
-      <p class="mt-1 text-sm text-gray-600">Manage product attributes for filtering</p>
     </div>
     <Button type="button" onclick={() => (showCreate = !showCreate)}>Add Facet</Button>
   </div>

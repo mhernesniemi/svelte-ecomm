@@ -6,7 +6,7 @@
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
-  import type { PageData } from "./$types";
+  import PlusIcon from "@lucide/svelte/icons/plus";
 
   let { data } = $props();
 
@@ -73,9 +73,8 @@
 </script>
 
 {#snippet collectionCell({ name, code, id }: { name: string; code: string; id: number })}
-  <a href="/admin/collections/{id}" class="block">
-    <div class="text-sm font-medium text-gray-900">{name}</div>
-    <div class="text-sm text-gray-500">{code}</div>
+  <a href="/admin/collections/{id}" class="group block">
+    <div class="font-medium text-gray-900 group-hover:text-blue-600">{name}</div>
   </a>
 {/snippet}
 
@@ -94,13 +93,14 @@
 
 <svelte:head><title>Collections | Admin</title></svelte:head>
 
-<div class="space-y-6">
-  <div class="flex items-center justify-between">
+<div>
+  <div class="mb-6 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Collections</h1>
-      <p class="mt-1 text-sm text-gray-600">Manage product collections with dynamic filters</p>
     </div>
-    <a href="/admin/collections/new" class={buttonVariants()}>Create Collection</a>
+    <a href="/admin/collections/new" class={buttonVariants()}>
+      <PlusIcon class="h-4 w-4" /> Add Collection</a
+    >
   </div>
 
   <DataTable

@@ -6,6 +6,7 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FileText from "@lucide/svelte/icons/file-text";
   import type { PageData } from "./$types";
+  import PlusIcon from "@lucide/svelte/icons/plus";
 
   let { data }: { data: PageData } = $props();
 
@@ -87,13 +88,14 @@
 
 <svelte:head><title>Content Pages | Admin</title></svelte:head>
 
-<div class="space-y-6">
-  <div class="flex items-center justify-between">
+<div>
+  <div class="mb-6 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Content Pages</h1>
-      <p class="mt-1 text-sm text-gray-600">Manage static pages like About, FAQ, Terms</p>
     </div>
-    <a href="/admin/content-pages/new" class={buttonVariants()}>Create Page</a>
+    <a href="/admin/content-pages/new" class={buttonVariants()}
+      ><PlusIcon class="h-4 w-4" /> Add Page</a
+    >
   </div>
 
   <DataTable

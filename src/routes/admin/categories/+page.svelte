@@ -4,6 +4,7 @@
   import type { PageData } from "./$types";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import Pencil from "@lucide/svelte/icons/pencil";
+  import PlusIcon from "@lucide/svelte/icons/plus";
 
   let { data }: { data: PageData } = $props();
 
@@ -17,18 +18,19 @@
 
 <svelte:head><title>Categories | Admin</title></svelte:head>
 
-<div class="space-y-6">
-  <div class="flex items-center justify-between">
+<div>
+  <div class="mb-6 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
-      <p class="mt-1 text-sm text-gray-600">Organize products in a hierarchical navigation tree</p>
     </div>
-    <Button type="button" onclick={() => (showCreate = !showCreate)}>Add Category</Button>
+    <Button type="button" onclick={() => (showCreate = !showCreate)}
+      ><PlusIcon class="h-4 w-4" /> Add Category</Button
+    >
   </div>
 
   <!-- Create Category Form -->
   {#if showCreate}
-    <div class="rounded-lg border border-gray-200 bg-white p-6">
+    <div class="mb-6 rounded-lg border border-gray-200 bg-white p-6">
       <h2 class="mb-4 text-sm font-semibold text-gray-900">New Category</h2>
       <form
         method="POST"

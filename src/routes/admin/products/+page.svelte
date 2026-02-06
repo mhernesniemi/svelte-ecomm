@@ -8,6 +8,7 @@
   import Package from "@lucide/svelte/icons/package";
   import ImageIcon from "@lucide/svelte/icons/image";
   import type { PageData } from "./$types";
+  import PlusIcon from "@lucide/svelte/icons/plus";
 
   let { data }: { data: PageData } = $props();
 
@@ -67,7 +68,7 @@
 </script>
 
 {#snippet productCell({ name, id, image }: { name: string; id: number; image: string | null })}
-  <a href="/admin/products/{id}" class="flex items-center">
+  <a href="/admin/products/{id}" class="group flex items-center">
     {#if image}
       <img src={image} alt="" class="mr-3 h-10 w-10 rounded object-cover" />
     {:else}
@@ -76,7 +77,7 @@
       </div>
     {/if}
     <div>
-      <p class="font-medium text-gray-900">{name}</p>
+      <p class="font-medium text-gray-900 group-hover:text-blue-600">{name}</p>
     </div>
   </a>
 {/snippet}
@@ -95,13 +96,14 @@
 
 <svelte:head><title>Products | Admin</title></svelte:head>
 
-<div class="space-y-6">
-  <div class="flex items-center justify-between">
+<div>
+  <div class="mb-6 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Products</h1>
-      <p class="mt-1 text-sm text-gray-600">Manage your product catalog</p>
     </div>
-    <a href="/admin/products/new" class={buttonVariants()}>Add Product</a>
+    <a href="/admin/products/new" class={buttonVariants()}
+      ><PlusIcon class="h-4 w-4" /> Add Product</a
+    >
   </div>
 
   <DataTable

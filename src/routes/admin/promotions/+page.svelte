@@ -7,6 +7,7 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import type { PageData } from "./$types";
   import Gift from "@lucide/svelte/icons/gift";
+  import PlusIcon from "@lucide/svelte/icons/plus";
 
   let { data }: { data: PageData } = $props();
 
@@ -60,8 +61,7 @@
       header: ({ table }) =>
         renderComponent(Checkbox, {
           checked: table.getIsAllPageRowsSelected(),
-          indeterminate:
-            table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
+          indeterminate: table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
           onCheckedChange: (value: boolean) => table.toggleAllPageRowsSelected(!!value),
           "aria-label": "Select all"
         }),
@@ -76,8 +76,7 @@
     {
       accessorKey: "code",
       header: "Code",
-      cell: ({ row }) =>
-        renderSnippet(codeCell, { code: row.original.code, id: row.original.id })
+      cell: ({ row }) => renderSnippet(codeCell, { code: row.original.code, id: row.original.id })
     },
     {
       accessorKey: "promotionType",
@@ -95,8 +94,7 @@
       header: "Active Dates"
     },
     {
-      accessorFn: (row) =>
-        `${row.usageCount}${row.usageLimit ? ` / ${row.usageLimit}` : ""}`,
+      accessorFn: (row) => `${row.usageCount}${row.usageLimit ? ` / ${row.usageLimit}` : ""}`,
       id: "usage",
       header: "Usage"
     },
@@ -119,7 +117,13 @@
   <Badge variant="outline">{getTypeLabel(type)}</Badge>
 {/snippet}
 
-{#snippet statusCell({ label, variant }: { label: string; variant: "success" | "secondary" | "warning" | "destructive" })}
+{#snippet statusCell({
+  label,
+  variant
+}: {
+  label: string;
+  variant: "success" | "secondary" | "warning" | "destructive";
+})}
   <Badge {variant}>{label}</Badge>
 {/snippet}
 
@@ -129,9 +133,10 @@
   <div class="mb-8 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Promotions</h1>
-      <p class="mt-1 text-sm text-gray-600">Manage discount codes and promotions</p>
     </div>
-    <a href="/admin/promotions/new" class={buttonVariants()}>Create promotion</a>
+    <a href="/admin/promotions/new" class={buttonVariants()}
+      ><PlusIcon class="h-4 w-4" /> Add Promotion</a
+    >
   </div>
 
   <DataTable
