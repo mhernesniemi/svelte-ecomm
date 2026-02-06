@@ -4,9 +4,8 @@
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import Info from "@lucide/svelte/icons/info";
 
-  let { data, form } = $props();
+  let { form } = $props();
 
   // Show toast notifications based on form results
   $effect(() => {
@@ -36,7 +35,6 @@
       slug = slugify(name);
     }
   });
-
 </script>
 
 <svelte:head><title>New Collection | Admin</title></svelte:head>
@@ -155,19 +153,5 @@
         </div>
       </div>
     </div>
-
-    <div class="rounded-lg bg-blue-50 p-4">
-      <div class="flex items-start gap-3">
-        <Info class="mt-0.5 h-5 w-5 text-blue-600" />
-        <div>
-          <h3 class="text-sm font-medium text-blue-800">Add filters after creation</h3>
-          <p class="mt-1 text-sm text-blue-600">
-            After creating the collection, you'll be able to add filters (facet values, price
-            ranges, manual product selection) to define which products belong to this collection.
-          </p>
-        </div>
-      </div>
-    </div>
-
   </form>
 </div>
