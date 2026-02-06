@@ -1,6 +1,6 @@
 <script lang="ts">
   import Package from "@lucide/svelte/icons/package";
-  import ImageIcon from "@lucide/svelte/icons/image";
+  import ProductCard from "$lib/components/storefront/ProductCard.svelte";
   import { stripHtml } from "$lib/utils";
 
   let { data } = $props();
@@ -12,27 +12,8 @@
     description?: string | null;
   };
 
-  type ProductTranslation = {
-    languageCode: string;
-    name: string;
-    slug: string;
-  };
-
   function getTranslation(translations: CollectionTranslation[], lang: string) {
     return translations.find((t: CollectionTranslation) => t.languageCode === lang) ?? translations[0];
-  }
-
-  function getProductTranslation(translations: ProductTranslation[], lang: string) {
-    return translations.find((t: ProductTranslation) => t.languageCode === lang) ?? translations[0];
-  }
-
-  function getLowestPrice(variants: { price: number }[]): number {
-    if (variants.length === 0) return 0;
-    return Math.min(...variants.map((v) => v.price));
-  }
-
-  function formatPrice(cents: number): string {
-    return (cents / 100).toFixed(2);
   }
 
   const collectionTrans = $derived(getTranslation(data.collection.translations, "en"));
@@ -82,41 +63,7 @@
   {:else}
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {#each data.products as product}
-        {@const trans = getProductTranslation(product.translations, "en")}
-        {@const lowestPrice = getLowestPrice(product.variants)}
-        <a
-          href="/products/{product.id}/{trans?.slug}"
-          class="group overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
-        >
-          {#if product.featuredAsset}
-            <div
-              class="aspect-square overflow-hidden"
-              style="view-transition-name: product-image-{product.id}"
-            >
-              <img
-                src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto"
-                alt={trans?.name ?? "Product"}
-                class="h-full w-full object-cover transition-transform group-hover:scale-105"
-              />
-            </div>
-          {:else}
-            <div
-              class="flex aspect-square items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200"
-              style="view-transition-name: product-image-{product.id}"
-            >
-              <ImageIcon class="h-16 w-16 text-gray-400" />
-            </div>
-          {/if}
-
-          <div class="p-4">
-            <h2 class="text-sm font-medium text-gray-900 group-hover:text-blue-600">
-              {trans?.name ?? "Untitled"}
-            </h2>
-            <p class="mt-1 text-sm font-semibold text-gray-700">
-              From {formatPrice(lowestPrice)} EUR
-            </p>
-          </div>
-        </a>
+        <ProductCard {product} />
       {/each}
     </div>
 

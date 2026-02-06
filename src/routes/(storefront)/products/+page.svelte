@@ -2,27 +2,13 @@
   import { page } from "$app/stores";
   import { Input } from "$lib/components/storefront/ui/input";
   import { Button } from "$lib/components/storefront/ui/button";
-  import { formatPrice } from "$lib/utils";
+  import ProductCard from "$lib/components/storefront/ProductCard.svelte";
   import type { PageData } from "./$types";
   import Check from "@lucide/svelte/icons/check";
-  import ImageIcon from "@lucide/svelte/icons/image";
 
   let { data }: { data: PageData } = $props();
 
   const pageTitle = $derived(data.search ? `Search: ${data.search} | Hoikka` : "Products | Hoikka");
-
-  function getProductName(product: (typeof data.products)[0]): string {
-    return product.translations.find((t) => t.languageCode === "en")?.name ?? "Untitled";
-  }
-
-  function getProductSlug(product: (typeof data.products)[0]): string {
-    return product.translations.find((t) => t.languageCode === "en")?.slug ?? "";
-  }
-
-  function getLowestPrice(product: (typeof data.products)[0]): number | null {
-    if (product.variants.length === 0) return null;
-    return Math.min(...product.variants.map((v) => v.price));
-  }
 
   function getFacetName(facet: (typeof data.facets)[0]): string {
     return facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
@@ -146,37 +132,7 @@
       {:else}
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {#each data.products as product}
-            <a
-              href="/products/{product.id}/{getProductSlug(product)}"
-              class="group overflow-hidden rounded-lg border border-gray-300 bg-white transition-shadow hover:shadow-lg"
-            >
-              <div
-                class="relative aspect-square bg-gray-100"
-                style="view-transition-name: product-image-{product.id}"
-              >
-                {#if product.featuredAsset}
-                  <img
-                    src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto"
-                    alt={getProductName(product)}
-                    class="h-full w-full object-cover"
-                  />
-                {:else}
-                  <div class="flex h-full w-full items-center justify-center text-gray-400">
-                    <ImageIcon class="h-12 w-12" />
-                  </div>
-                {/if}
-              </div>
-              <div class="p-4">
-                <h3 class="font-medium transition-colors group-hover:text-blue-600">
-                  {getProductName(product)}
-                </h3>
-                {#if getLowestPrice(product) !== null}
-                  <p class="mt-1 text-gray-600">
-                    From {formatPrice(getLowestPrice(product)!)}
-                  </p>
-                {/if}
-              </div>
-            </a>
+            <ProductCard {product} />
           {/each}
         </div>
 
