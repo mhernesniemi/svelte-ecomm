@@ -3,9 +3,14 @@
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Badge } from "$lib/components/admin/ui/badge";
+  import * as Popover from "$lib/components/admin/ui/popover";
+  import * as Command from "$lib/components/admin/ui/command";
   import type { PageData, ActionData } from "./$types";
   import { toast } from "svelte-sonner";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
+  import Check from "@lucide/svelte/icons/check";
+  import X from "@lucide/svelte/icons/x";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -16,6 +21,8 @@
   let selectedProductIds = $state<number[]>(promo.products.map((p) => p.productId));
   let selectedCollectionIds = $state<number[]>(promo.collections.map((c) => c.collectionId));
   let showDelete = $state(false);
+  let productComboboxOpen = $state(false);
+  let collectionComboboxOpen = $state(false);
 
   function toggleProduct(id: number) {
     if (selectedProductIds.includes(id)) {
@@ -31,6 +38,14 @@
     } else {
       selectedCollectionIds = [...selectedCollectionIds, id];
     }
+  }
+
+  function getProductName(id: number): string {
+    return data.products.find((p) => p.id === id)?.name ?? `Product #${id}`;
+  }
+
+  function getCollectionName(id: number): string {
+    return data.collections.find((c) => c.id === id)?.name ?? `Collection #${id}`;
   }
 
   function formatPrice(cents: number): string {
@@ -205,27 +220,54 @@
             {#if appliesTo === "specific_products"}
               <div class="mt-4">
                 <p class="mb-2 text-sm font-medium text-gray-700">Select Products</p>
-                <div
-                  class="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-gray-200 p-2"
-                >
-                  {#each data.products as product}
-                    <label
-                      class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-50"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedProductIds.includes(product.id)}
-                        onchange={() => toggleProduct(product.id)}
-                        class="h-4 w-4 rounded border-gray-300"
-                      />
-                      <span class="text-sm">{product.name}</span>
-                    </label>
-                  {/each}
-                </div>
+                <Popover.Root bind:open={productComboboxOpen}>
+                  <Popover.Trigger
+                    class="flex h-9 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    <span class="text-gray-500">
+                      {selectedProductIds.length > 0
+                        ? `${selectedProductIds.length} product(s) selected`
+                        : "Search products..."}
+                    </span>
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                  </Popover.Trigger>
+                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+                    <Command.Root>
+                      <Command.Input placeholder="Search products..." />
+                      <Command.List class="max-h-60">
+                        <Command.Empty>No products found.</Command.Empty>
+                        {#each data.products as product}
+                          <Command.Item
+                            value={product.name}
+                            onSelect={() => toggleProduct(product.id)}
+                          >
+                            <Check
+                              class="mr-2 h-4 w-4 {selectedProductIds.includes(product.id)
+                                ? 'opacity-100'
+                                : 'opacity-0'}"
+                            />
+                            {product.name}
+                          </Command.Item>
+                        {/each}
+                      </Command.List>
+                    </Command.Root>
+                  </Popover.Content>
+                </Popover.Root>
                 {#if selectedProductIds.length > 0}
-                  <p class="mt-2 text-xs text-gray-500">
-                    {selectedProductIds.length} product(s) selected
-                  </p>
+                  <div class="mt-2 flex flex-wrap gap-1">
+                    {#each selectedProductIds as id}
+                      <Badge variant="secondary" class="gap-1">
+                        {getProductName(id)}
+                        <button
+                          type="button"
+                          onclick={() => toggleProduct(id)}
+                          class="ml-0.5 rounded-full hover:bg-gray-300"
+                        >
+                          <X class="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    {/each}
+                  </div>
                 {/if}
               </div>
             {/if}
@@ -233,27 +275,54 @@
             {#if appliesTo === "specific_collections"}
               <div class="mt-4">
                 <p class="mb-2 text-sm font-medium text-gray-700">Select Collections</p>
-                <div
-                  class="max-h-60 space-y-1 overflow-y-auto rounded-lg border border-gray-200 p-2"
-                >
-                  {#each data.collections as collection}
-                    <label
-                      class="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 hover:bg-gray-50"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedCollectionIds.includes(collection.id)}
-                        onchange={() => toggleCollection(collection.id)}
-                        class="h-4 w-4 rounded border-gray-300"
-                      />
-                      <span class="text-sm">{collection.name}</span>
-                    </label>
-                  {/each}
-                </div>
+                <Popover.Root bind:open={collectionComboboxOpen}>
+                  <Popover.Trigger
+                    class="flex h-9 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                  >
+                    <span class="text-gray-500">
+                      {selectedCollectionIds.length > 0
+                        ? `${selectedCollectionIds.length} collection(s) selected`
+                        : "Search collections..."}
+                    </span>
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                  </Popover.Trigger>
+                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+                    <Command.Root>
+                      <Command.Input placeholder="Search collections..." />
+                      <Command.List class="max-h-60">
+                        <Command.Empty>No collections found.</Command.Empty>
+                        {#each data.collections as collection}
+                          <Command.Item
+                            value={collection.name}
+                            onSelect={() => toggleCollection(collection.id)}
+                          >
+                            <Check
+                              class="mr-2 h-4 w-4 {selectedCollectionIds.includes(collection.id)
+                                ? 'opacity-100'
+                                : 'opacity-0'}"
+                            />
+                            {collection.name}
+                          </Command.Item>
+                        {/each}
+                      </Command.List>
+                    </Command.Root>
+                  </Popover.Content>
+                </Popover.Root>
                 {#if selectedCollectionIds.length > 0}
-                  <p class="mt-2 text-xs text-gray-500">
-                    {selectedCollectionIds.length} collection(s) selected
-                  </p>
+                  <div class="mt-2 flex flex-wrap gap-1">
+                    {#each selectedCollectionIds as id}
+                      <Badge variant="secondary" class="gap-1">
+                        {getCollectionName(id)}
+                        <button
+                          type="button"
+                          onclick={() => toggleCollection(id)}
+                          class="ml-0.5 rounded-full hover:bg-gray-300"
+                        >
+                          <X class="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    {/each}
+                  </div>
                 {/if}
               </div>
             {/if}
