@@ -152,7 +152,7 @@
       {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
         <TableRow class="hover:bg-transparent">
           {#each headerGroup.headers as header (header.id)}
-            <TableHead colspan={header.colSpan}>
+            <TableHead colspan={header.colSpan} class={header.id === "select" ? "w-10" : ""}>
               <DataTableColumnHeader {header} />
             </TableHead>
           {/each}

@@ -104,118 +104,40 @@
       </div>
     </div>
   {:else}
-    <div class="overflow-hidden rounded-lg border border-gray-200 bg-white py-2">
-      {#snippet categoryNode(node: (typeof data.tree)[0], depth: number, parentPath: string)}
-        {@const fullPath = `${parentPath}/${node.slug}`}
-        <div>
-          <!-- Display row -->
-          <button
-            type="button"
-            class="group flex w-full cursor-pointer items-center justify-between px-4 py-2 text-left {editingId ===
-            node.id
-              ? 'bg-gray-50'
-              : 'hover:bg-gray-50'}"
-            onclick={() => (editingId = editingId === node.id ? null : node.id)}
-          >
-            <div class="flex items-center gap-2">
-              {#if depth > 0}
-                <span class="whitespace-pre text-gray-300">{"— ".repeat(depth)}</span>
-              {/if}
-              <span class="font-medium text-gray-900">{getName(node.translations)}</span>
-              <span class="text-sm text-gray-400">{fullPath}</span>
-            </div>
-            <Pencil
-              class="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 {editingId ===
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div class="overflow-hidden rounded-lg border border-gray-200 bg-white py-2">
+        {#snippet categoryNode(node: (typeof data.tree)[0], depth: number, parentPath: string)}
+          {@const fullPath = `${parentPath}/${node.slug}`}
+          <div>
+            <!-- Display row -->
+            <button
+              type="button"
+              class="group flex w-full cursor-pointer items-center justify-between px-4 py-2 text-left {editingId ===
               node.id
-                ? '!text-blue-600 !opacity-100'
-                : ''}"
-            />
-          </button>
-
-          <!-- Edit panel -->
-          {#if editingId === node.id}
-            <div class="border-t border-gray-100 bg-gray-50 px-4 pt-3 pb-4">
-              <form
-                method="POST"
-                action="?/update"
-                use:enhance={() => {
-                  return async ({ update }) => {
-                    await update();
-                    editingId = null;
-                  };
-                }}
-              >
-                <input type="hidden" name="id" value={node.id} />
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                  <div>
-                    <label
-                      for="edit_name_{node.id}"
-                      class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      id="edit_name_{node.id}"
-                      name="name_en"
-                      value={getName(node.translations)}
-                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      for="edit_slug_{node.id}"
-                      class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                      Slug
-                    </label>
-                    <input
-                      type="text"
-                      id="edit_slug_{node.id}"
-                      name="slug"
-                      value={node.slug}
-                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label
-                      for="edit_parent_{node.id}"
-                      class="mb-1 block text-sm font-medium text-gray-700"
-                    >
-                      Parent
-                    </label>
-                    <select
-                      id="edit_parent_{node.id}"
-                      name="parent_id"
-                      class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                    >
-                      <option value="">None (Root)</option>
-                      {#each data.categories.filter((c) => c.id !== node.id) as category}
-                        <option value={category.id} selected={category.id === node.parentId}>
-                          {getName(category.translations)}
-                        </option>
-                      {/each}
-                    </select>
-                  </div>
-                </div>
-                <div class="mt-4 flex items-center justify-between">
-                  <div class="flex gap-2">
-                    <Button type="submit" size="sm">Save Changes</Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onclick={() => (editingId = null)}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              </form>
-              <div class="mt-3 border-t border-gray-200 pt-3">
+                ? 'bg-gray-50'
+                : 'hover:bg-gray-50'}"
+              onclick={() => (editingId = editingId === node.id ? null : node.id)}
+            >
+              <div class="flex items-center gap-2">
+                {#if depth > 0}
+                  <span class="whitespace-pre text-gray-300">{"— ".repeat(depth)}</span>
+                {/if}
+                <span class="text-sm font-medium text-gray-900">{getName(node.translations)}</span>
+                <span class="text-sm text-gray-400">{fullPath}</span>
+              </div>
+              <Pencil
+                class="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 {editingId ===
+                node.id
+                  ? '!text-blue-600 !opacity-100'
+                  : ''}"
+              />
+            </button>
+            <!-- Edit panel -->
+            {#if editingId === node.id}
+              <div class="border-t border-gray-100 bg-gray-50 px-4 pt-3 pb-4">
                 <form
                   method="POST"
-                  action="?/delete"
+                  action="?/update"
                   use:enhance={() => {
                     return async ({ update }) => {
                       await update();
@@ -224,25 +146,102 @@
                   }}
                 >
                   <input type="hidden" name="id" value={node.id} />
-                  <button type="submit" class="text-sm text-red-600 hover:text-red-800">
-                    Delete this category{node.children.length > 0 ? ` and all subcategories` : ""}
-                  </button>
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div>
+                      <label
+                        for="edit_name_{node.id}"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                      >
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        id="edit_name_{node.id}"
+                        name="name_en"
+                        value={getName(node.translations)}
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="edit_slug_{node.id}"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                      >
+                        Slug
+                      </label>
+                      <input
+                        type="text"
+                        id="edit_slug_{node.id}"
+                        name="slug"
+                        value={node.slug}
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="edit_parent_{node.id}"
+                        class="mb-1 block text-sm font-medium text-gray-700"
+                      >
+                        Parent
+                      </label>
+                      <select
+                        id="edit_parent_{node.id}"
+                        name="parent_id"
+                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                      >
+                        <option value="">None (Root)</option>
+                        {#each data.categories.filter((c) => c.id !== node.id) as category}
+                          <option value={category.id} selected={category.id === node.parentId}>
+                            {getName(category.translations)}
+                          </option>
+                        {/each}
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mt-4 flex items-center justify-between">
+                    <div class="flex gap-2">
+                      <Button type="submit" size="sm">Save Changes</Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onclick={() => (editingId = null)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
                 </form>
+                <div class="mt-3 border-t border-gray-200 pt-3">
+                  <form
+                    method="POST"
+                    action="?/delete"
+                    use:enhance={() => {
+                      return async ({ update }) => {
+                        await update();
+                        editingId = null;
+                      };
+                    }}
+                  >
+                    <input type="hidden" name="id" value={node.id} />
+                    <button type="submit" class="text-sm text-red-600 hover:text-red-800">
+                      Delete this category{node.children.length > 0 ? ` and all subcategories` : ""}
+                    </button>
+                  </form>
+                </div>
               </div>
-            </div>
-          {/if}
-        </div>
-
-        {#each node.children as child}
-          {@render categoryNode(child, depth + 1, fullPath)}
+            {/if}
+          </div>
+          {#each node.children as child}
+            {@render categoryNode(child, depth + 1, fullPath)}
+          {/each}
+        {/snippet}
+        {#each data.tree as rootNode, i}
+          <div class={i > 0 ? "border-t border-gray-200" : ""}>
+            {@render categoryNode(rootNode, 0, "")}
+          </div>
         {/each}
-      {/snippet}
-
-      {#each data.tree as rootNode, i}
-        <div class={i > 0 ? "border-t border-gray-200" : ""}>
-          {@render categoryNode(rootNode, 0, "")}
-        </div>
-      {/each}
+      </div>
     </div>
   {/if}
 </div>
