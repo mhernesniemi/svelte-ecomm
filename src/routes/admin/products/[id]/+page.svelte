@@ -1,10 +1,10 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { page } from "$app/stores";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
-  import { Badge } from "$lib/components/admin/ui/badge";
   import {
     Table,
     TableHeader,
@@ -28,13 +28,28 @@
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
+  // Show toast from URL params (variant created/deleted redirects)
+  $effect(() => {
+    const url = $page.url;
+    if (url.searchParams.has("variantCreated")) {
+      toast.success("Variant created successfully");
+      // Clean the URL
+      const newUrl = new URL(url);
+      newUrl.searchParams.delete("variantCreated");
+      history.replaceState({}, "", newUrl.pathname + newUrl.search);
+    }
+    if (url.searchParams.has("variantDeleted")) {
+      toast.success("Variant deleted successfully");
+      const newUrl = new URL(url);
+      newUrl.searchParams.delete("variantDeleted");
+      history.replaceState({}, "", newUrl.pathname + newUrl.search);
+    }
+  });
+
   // Show toast notifications based on form results
   $effect(() => {
     if (form?.success) toast.success("Product updated successfully");
     if (form?.error) toast.error(form.error);
-    if (form?.variantSuccess) toast.success("Variant saved successfully");
-    if (form?.variantError) toast.error(form.variantError);
-    if (form?.variantFacetSuccess) toast.success("Variant facet values updated");
     if (form?.imageError) toast.error(form.imageError);
     if (form?.imageRemoved) toast.success("Image removed");
     if (form?.featuredSet) toast.success("Featured image updated");
@@ -43,15 +58,12 @@
 
   let showDeleteConfirm = $state(false);
   let showImagePicker = $state(false);
-  let editingVariant = $state<(typeof data.product.variants)[number] | "new" | null>(null);
-  let editingVariantFacets = $state<number | null>(null);
   let isSavingImages = $state(false);
   let isSavingProduct = $state(false);
   let editingImageAlt = $state<{ id: number; alt: string; isFeatured: boolean } | null>(null);
 
   // Selected facet values and categories - reset when product changes
   let selectedProductFacets = $state<number[]>([]);
-  let variantFacets = $state<Record<number, number[]>>({});
   let selectedCategories = $state<number[]>([]);
   let categoryComboboxOpen = $state(false);
   let facetComboboxOpen = $state(false);
@@ -59,9 +71,6 @@
   // Initialize selections when product data changes
   $effect(() => {
     selectedProductFacets = data.product.facetValues.map((fv) => fv.id);
-    variantFacets = Object.fromEntries(
-      data.product.variants.map((v) => [v.id, v.facetValues.map((fv) => fv.id)])
-    );
     selectedCategories = data.productCategories.map((c) => c.id);
   });
 
@@ -333,110 +342,10 @@
       <div class="rounded-lg bg-white shadow">
         <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
-          <Button
-            type="button"
-            size="sm"
-            onclick={() => (editingVariant = editingVariant === "new" ? null : "new")}
-          >
-            Add Variant
-          </Button>
+          <a href="/admin/products/{data.product.id}/variants/new">
+            <Button type="button" size="sm">Add Variant</Button>
+          </a>
         </div>
-
-        <!-- Add/Edit Variant Form -->
-        {#if editingVariant}
-          {@const isEditing = editingVariant !== "new"}
-          {@const variant = typeof editingVariant === "object" ? editingVariant : null}
-          {@const variantNameEn =
-            variant?.translations.find((t) => t.languageCode === "en")?.name ?? ""}
-          <form
-            method="POST"
-            action={isEditing ? "?/updateVariant" : "?/addVariant"}
-            use:enhance={() => {
-              return async ({ result, update }) => {
-                await update();
-                if (result.type === "success") {
-                  editingVariant = null;
-                }
-              };
-            }}
-            class="border-b border-gray-200 bg-gray-50 p-6"
-          >
-            {#if isEditing && variant}
-              <input type="hidden" name="variantId" value={variant.id} />
-            {/if}
-            <div class="mb-4 text-sm font-medium text-gray-700">
-              {isEditing ? "Edit Variant" : "Add New Variant"}
-            </div>
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-              <div>
-                <label for="variant_sku" class="mb-1 block text-sm font-medium text-gray-700"
-                  >SKU *</label
-                >
-                <input
-                  type="text"
-                  id="variant_sku"
-                  name="sku"
-                  value={variant?.sku ?? ""}
-                  required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label for="variant_price" class="mb-1 block text-sm font-medium text-gray-700"
-                  >Price *</label
-                >
-                <input
-                  type="number"
-                  id="variant_price"
-                  name="price"
-                  step="0.01"
-                  min="0"
-                  value={variant ? (variant.price / 100).toFixed(2) : ""}
-                  required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label for="variant_stock" class="mb-1 block text-sm font-medium text-gray-700"
-                  >Stock</label
-                >
-                <input
-                  type="number"
-                  id="variant_stock"
-                  name="stock"
-                  min="0"
-                  value={variant?.stock ?? 0}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                />
-              </div>
-              <div>
-                <label for="variant_name" class="mb-1 block text-sm font-medium text-gray-700"
-                  >Name</label
-                >
-                <input
-                  type="text"
-                  id="variant_name"
-                  name="variant_name"
-                  value={variantNameEn}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
-                />
-              </div>
-            </div>
-            <div class="mt-4 flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onclick={() => (editingVariant = null)}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" size="sm">
-                {isEditing ? "Save Changes" : "Add Variant"}
-              </Button>
-            </div>
-          </form>
-        {/if}
 
         <!-- Variants Table -->
         <Table class="rounded-none border-0 shadow-none">
@@ -479,74 +388,15 @@
                       </div>
                     {/if}
                   </TableCell>
-                  <TableCell class="space-x-3 text-right text-sm">
-                    <button
-                      type="button"
+                  <TableCell class="text-right text-sm">
+                    <a
+                      href="/admin/products/{data.product.id}/variants/{variant.id}"
                       class="text-blue-600 hover:underline"
-                      onclick={() => (editingVariant = editingVariant === variant ? null : variant)}
                     >
                       Edit
-                    </button>
-                    <button
-                      type="button"
-                      class="text-gray-600 hover:text-gray-900"
-                      onclick={() =>
-                        (editingVariantFacets =
-                          editingVariantFacets === variant.id ? null : variant.id)}
-                    >
-                      {editingVariantFacets === variant.id ? "Cancel" : "Facets"}
-                    </button>
+                    </a>
                   </TableCell>
                 </TableRow>
-                {#if editingVariantFacets === variant.id}
-                  <TableRow class="bg-gray-50 hover:bg-gray-50">
-                    <TableCell colspan={6}>
-                      <form method="POST" action="?/updateVariantFacetValues" use:enhance>
-                        <input type="hidden" name="variantId" value={variant.id} />
-                        <div class="space-y-4">
-                          {#each data.facets as facet}
-                            {@const facetName =
-                              facet.translations.find((t) => t.languageCode === "en")?.name ??
-                              facet.code}
-                            <div>
-                              <p class="mb-2 text-sm font-medium text-gray-700">{facetName}</p>
-                              {#if facet.values.length === 0}
-                                <p class="text-sm text-gray-400">No values</p>
-                              {:else}
-                                <div class="flex flex-wrap gap-2">
-                                  {#each facet.values as value}
-                                    {@const valueName =
-                                      value.translations.find((t) => t.languageCode === "en")
-                                        ?.name ?? value.code}
-                                    <label
-                                      class="cursor-pointer rounded-full px-3 py-1.5 text-sm transition-colors {variantFacets[
-                                        variant.id
-                                      ]?.includes(value.id)
-                                        ? 'border-2 border-blue-300 bg-blue-100 text-blue-800'
-                                        : 'border-2 border-transparent bg-gray-100 text-gray-700 hover:bg-gray-200'}"
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        name="facetValueIds"
-                                        value={value.id}
-                                        bind:group={variantFacets[variant.id]}
-                                        class="sr-only"
-                                      />
-                                      {valueName}
-                                    </label>
-                                  {/each}
-                                </div>
-                              {/if}
-                            </div>
-                          {/each}
-                        </div>
-                        <div class="mt-4">
-                          <Button type="submit" size="sm">Save Variant Facets</Button>
-                        </div>
-                      </form>
-                    </TableCell>
-                  </TableRow>
-                {/if}
               {/each}
             {/if}
           </TableBody>
