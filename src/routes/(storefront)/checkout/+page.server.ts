@@ -98,6 +98,9 @@ export const load: PageServerLoad = async ({ locals }) => {
 		}
 	}
 
+	// Load applied promotions
+	const appliedPromotions = await orderService.getAppliedPromotions(cart.id);
+
 	return {
 		cart,
 		shippingRates,
@@ -109,11 +112,77 @@ export const load: PageServerLoad = async ({ locals }) => {
 		customerEmail,
 		customerFullName,
 		savedAddresses,
+		appliedPromotions,
 		isLoggedIn: !!locals.customer?.id
 	};
 };
 
 export const actions: Actions = {
+	applyPromotion: async ({ request, locals }) => {
+		const cart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
+		if (!cart) {
+			return fail(404, { error: "Cart not found" });
+		}
+
+		const data = await request.formData();
+		const code = data.get("promoCode")?.toString()?.trim();
+
+		if (!code) {
+			return fail(400, { promoError: "Please enter a promotion code" });
+		}
+
+		const result = await orderService.applyPromotion(
+			cart.id,
+			code.toUpperCase(),
+			locals.customer?.id
+		);
+
+		if (!result.success) {
+			return fail(400, { promoError: result.message });
+		}
+
+		const updatedCart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
+		const appliedPromotions = updatedCart
+			? await orderService.getAppliedPromotions(updatedCart.id)
+			: [];
+
+		return {
+			success: true,
+			promoSuccess: result.message,
+			cart: updatedCart,
+			appliedPromotions
+		};
+	},
+
+	removePromotion: async ({ locals }) => {
+		const cart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
+		if (!cart) {
+			return fail(404, { error: "Cart not found" });
+		}
+
+		await orderService.removeAllPromotions(cart.id);
+
+		const updatedCart = await orderService.getActiveCart({
+			customerId: locals.customer?.id,
+			cartToken: locals.cartToken
+		});
+
+		return {
+			success: true,
+			cart: updatedCart,
+			appliedPromotions: []
+		};
+	},
+
 	useSavedAddress: async ({ request, locals }) => {
 		const cart = await orderService.getActiveCart({
 			customerId: locals.customer?.id,

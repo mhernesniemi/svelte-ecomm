@@ -13,6 +13,7 @@
   let selectedPaymentMethod = $state<NonNullable<typeof data.paymentMethods>[number] | null>(null);
   let isProcessingPayment = $state(false);
   let isCompletingOrder = $state(false);
+  let promoCode = $state("");
 
   // Combine form and data for reactive state
   const currentOrderShipping = $derived(form?.orderShipping ?? data.orderShipping);
@@ -24,6 +25,8 @@
   const contactInfoSet = $derived(
     form?.contactInfoSet || (isDigitalOnly && currentCart?.customerEmail)
   );
+  const currentAppliedPromotions = $derived(form?.appliedPromotions ?? data.appliedPromotions ?? []);
+  const hasShippingPromo = $derived(currentAppliedPromotions.some((p: any) => p.type === "shipping"));
 
   // Initialize selected shipping rate if already set
   $effect(() => {
@@ -610,6 +613,51 @@
             {/each}
           </div>
 
+          <!-- Promo Code -->
+          <div class="border-t pt-4">
+            {#if currentAppliedPromotions.length > 0}
+              <div class="space-y-2">
+                {#each currentAppliedPromotions as promo}
+                  <div class="flex items-center justify-between rounded bg-green-50 px-3 py-2">
+                    <div>
+                      <span class="text-sm font-medium text-green-800">{promo.code}</span>
+                      <span class="ml-1 text-xs text-green-600">-{formatPrice(promo.discountAmount)}</span>
+                    </div>
+                    <form method="POST" action="?/removePromotion" use:enhance>
+                      <button type="submit" class="text-xs text-red-600 hover:underline">Remove</button>
+                    </form>
+                  </div>
+                {/each}
+              </div>
+            {:else}
+              <form
+                method="POST"
+                action="?/applyPromotion"
+                use:enhance={() => {
+                  return async ({ update }) => {
+                    await update({ reset: false });
+                  };
+                }}
+                class="flex gap-2"
+              >
+                <input
+                  type="text"
+                  name="promoCode"
+                  bind:value={promoCode}
+                  placeholder="Promo code"
+                  class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm uppercase"
+                />
+                <Button type="submit" variant="outline" class="shrink-0">Apply</Button>
+              </form>
+              {#if form?.promoError}
+                <p class="mt-1 text-xs text-red-600">{form.promoError}</p>
+              {/if}
+              {#if form?.promoSuccess}
+                <p class="mt-1 text-xs text-green-600">{form.promoSuccess}</p>
+              {/if}
+            {/if}
+          </div>
+
           <div class="space-y-2 border-t pt-4">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600">Subtotal</span>
@@ -628,7 +676,17 @@
             {#if !isDigitalOnly}
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Shipping</span>
-                <span class="font-medium">{formatPrice(currentCart.shipping)}</span>
+                {#if hasShippingPromo}
+                  {@const shippingPromo = currentAppliedPromotions.find((p: any) => p.type === "shipping")}
+                  <span class="font-medium">
+                    {#if shippingPromo}
+                      <span class="text-gray-400 line-through">{formatPrice(shippingPromo.discountAmount)}</span>
+                    {/if}
+                    <span class="ml-1 text-green-600">Free</span>
+                  </span>
+                {:else}
+                  <span class="font-medium">{formatPrice(currentCart.shipping)}</span>
+                {/if}
               </div>
             {/if}
 

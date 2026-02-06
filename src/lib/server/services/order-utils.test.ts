@@ -115,10 +115,10 @@ describe("calculateOrderTotals", () => {
 		expect(result.totalNet).toBe(2919);
 	});
 
-	it("applies discount correctly", () => {
+	it("applies order discount correctly", () => {
 		const result = calculateOrderTotals({
 			lines: [{ lineTotal: 5000, taxAmount: 968, lineTotalNet: 4032 }],
-			appliedPromotions: [{ discountAmount: 500 }],
+			appliedPromotions: [{ discountAmount: 500, type: "order" }],
 			shipping: 0,
 			isTaxExempt: false
 		});
@@ -131,13 +131,59 @@ describe("calculateOrderTotals", () => {
 	it("handles multiple promotions", () => {
 		const result = calculateOrderTotals({
 			lines: [{ lineTotal: 10000, taxAmount: 1935, lineTotalNet: 8065 }],
-			appliedPromotions: [{ discountAmount: 500 }, { discountAmount: 300 }],
+			appliedPromotions: [
+				{ discountAmount: 500, type: "order" },
+				{ discountAmount: 300, type: "product" }
+			],
 			shipping: 0,
 			isTaxExempt: false
 		});
 
 		expect(result.discount).toBe(800);
 		expect(result.total).toBe(9200);
+	});
+
+	it("handles shipping discount separately", () => {
+		const result = calculateOrderTotals({
+			lines: [{ lineTotal: 5000, taxAmount: 968, lineTotalNet: 4032 }],
+			appliedPromotions: [{ discountAmount: 500, type: "shipping" }],
+			shipping: 500,
+			isTaxExempt: false
+		});
+
+		expect(result.subtotal).toBe(5000);
+		expect(result.shipping).toBe(0); // 500 - 500 shipping discount
+		expect(result.discount).toBe(500); // total discount includes shipping
+		expect(result.total).toBe(5000); // subtotal + 0 shipping
+	});
+
+	it("handles mixed order and shipping discounts", () => {
+		const result = calculateOrderTotals({
+			lines: [{ lineTotal: 10000, taxAmount: 1935, lineTotalNet: 8065 }],
+			appliedPromotions: [
+				{ discountAmount: 1000, type: "order" },
+				{ discountAmount: 500, type: "shipping" }
+			],
+			shipping: 500,
+			isTaxExempt: false
+		});
+
+		expect(result.subtotal).toBe(10000);
+		expect(result.shipping).toBe(0); // free shipping
+		expect(result.discount).toBe(1500); // 1000 order + 500 shipping
+		expect(result.total).toBe(9000); // 10000 - 1000 + 0
+	});
+
+	it("caps shipping discount at shipping amount", () => {
+		const result = calculateOrderTotals({
+			lines: [{ lineTotal: 5000, taxAmount: 968, lineTotalNet: 4032 }],
+			appliedPromotions: [{ discountAmount: 1000, type: "shipping" }],
+			shipping: 500,
+			isTaxExempt: false
+		});
+
+		expect(result.shipping).toBe(0); // max(0, 500 - 1000)
+		expect(result.total).toBe(5000);
 	});
 
 	it("handles tax-exempt orders", () => {
@@ -156,7 +202,7 @@ describe("calculateOrderTotals", () => {
 	it("prevents negative totals", () => {
 		const result = calculateOrderTotals({
 			lines: [{ lineTotal: 500, taxAmount: 97, lineTotalNet: 403 }],
-			appliedPromotions: [{ discountAmount: 1000 }],
+			appliedPromotions: [{ discountAmount: 1000, type: "order" }],
 			shipping: 0,
 			isTaxExempt: false
 		});

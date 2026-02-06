@@ -52,6 +52,7 @@ export interface OrderLine {
 
 export interface AppliedPromotion {
 	discountAmount: number;
+	type: "order" | "product" | "shipping";
 }
 
 export interface OrderTotalsInput {
@@ -80,18 +81,30 @@ export function calculateOrderTotals(input: OrderTotalsInput): OrderTotals {
 	const subtotal = lines.reduce((sum, line) => sum + line.lineTotal, 0);
 	const taxTotal = lines.reduce((sum, line) => sum + line.taxAmount, 0);
 	const subtotalNet = lines.reduce((sum, line) => sum + line.lineTotalNet, 0);
-	const discount = appliedPromotions.reduce((sum, op) => sum + op.discountAmount, 0);
 
-	const total = Math.max(0, subtotal - discount + shipping);
+	// Split discounts: order/product discounts apply to subtotal, shipping discounts apply to shipping
+	const orderProductDiscount = appliedPromotions
+		.filter((op) => op.type === "order" || op.type === "product")
+		.reduce((sum, op) => sum + op.discountAmount, 0);
+	const shippingDiscount = appliedPromotions
+		.filter((op) => op.type === "shipping")
+		.reduce((sum, op) => sum + op.discountAmount, 0);
+
+	const discount = orderProductDiscount;
+	const effectiveShipping = Math.max(0, shipping - shippingDiscount);
+
+	const total = Math.max(0, subtotal - discount + effectiveShipping);
 	// For tax-exempt orders, totalNet equals total (no tax). Otherwise use subtotalNet.
-	const totalNet = isTaxExempt ? total : Math.max(0, subtotalNet - discount + shipping);
+	const totalNet = isTaxExempt
+		? total
+		: Math.max(0, subtotalNet - discount + effectiveShipping);
 
 	return {
 		subtotal,
 		taxTotal: isTaxExempt ? 0 : taxTotal,
 		subtotalNet,
-		discount,
-		shipping,
+		discount: discount + shippingDiscount,
+		shipping: effectiveShipping,
 		total,
 		totalNet
 	};

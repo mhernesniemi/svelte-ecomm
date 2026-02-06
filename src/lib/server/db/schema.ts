@@ -638,11 +638,23 @@ export const promotions = pgTable(
 	{
 		id: serial("id").primaryKey(),
 		code: varchar("code", { length: 50 }).notNull().unique(),
+		promotionType: text("promotion_type", { enum: ["order", "product", "free_shipping"] })
+			.default("order")
+			.notNull(),
 		discountType: text("discount_type", { enum: ["percentage", "fixed_amount"] }).notNull(),
 		discountValue: integer("discount_value").notNull(), // Percentage (0-100) or amount in cents
+		appliesTo: text("applies_to", {
+			enum: ["all", "specific_products", "specific_collections"]
+		})
+			.default("all")
+			.notNull(),
 		minOrderAmount: integer("min_order_amount"), // Minimum order amount for promotion
 		usageLimit: integer("usage_limit"), // Max number of times this can be used
 		usageCount: integer("usage_count").default(0).notNull(),
+		usageLimitPerCustomer: integer("usage_limit_per_customer"),
+		combinesWithOtherPromotions: boolean("combines_with_other_promotions")
+			.default(false)
+			.notNull(),
 		enabled: boolean("enabled").default(true).notNull(),
 		startsAt: timestamp("starts_at"),
 		endsAt: timestamp("ends_at"),
@@ -658,6 +670,34 @@ export const promotions = pgTable(
 	]
 );
 
+// Promotion-Product junction table (for product-specific promotions)
+export const promotionProducts = pgTable(
+	"promotion_products",
+	{
+		promotionId: integer("promotion_id")
+			.references(() => promotions.id, { onDelete: "cascade" })
+			.notNull(),
+		productId: integer("product_id")
+			.references(() => products.id, { onDelete: "cascade" })
+			.notNull()
+	},
+	(table) => [primaryKey({ columns: [table.promotionId, table.productId] })]
+);
+
+// Promotion-Collection junction table (for collection-specific promotions)
+export const promotionCollections = pgTable(
+	"promotion_collections",
+	{
+		promotionId: integer("promotion_id")
+			.references(() => promotions.id, { onDelete: "cascade" })
+			.notNull(),
+		collectionId: integer("collection_id")
+			.references(() => collections.id, { onDelete: "cascade" })
+			.notNull()
+	},
+	(table) => [primaryKey({ columns: [table.promotionId, table.collectionId] })]
+);
+
 // Applied promotions to orders
 export const orderPromotions = pgTable(
 	"order_promotions",
@@ -668,7 +708,10 @@ export const orderPromotions = pgTable(
 		promotionId: integer("promotion_id")
 			.references(() => promotions.id)
 			.notNull(),
-		discountAmount: integer("discount_amount").notNull() // Actual discount applied (in cents)
+		discountAmount: integer("discount_amount").notNull(), // Actual discount applied (in cents)
+		type: text("type", { enum: ["order", "product", "shipping"] })
+			.default("order")
+			.notNull()
 	},
 	(table) => [
 		primaryKey({ columns: [table.orderId, table.promotionId] }),
@@ -1105,7 +1148,31 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
 }));
 
 export const promotionsRelations = relations(promotions, ({ many }) => ({
-	orderPromotions: many(orderPromotions)
+	orderPromotions: many(orderPromotions),
+	promotionProducts: many(promotionProducts),
+	promotionCollections: many(promotionCollections)
+}));
+
+export const promotionProductsRelations = relations(promotionProducts, ({ one }) => ({
+	promotion: one(promotions, {
+		fields: [promotionProducts.promotionId],
+		references: [promotions.id]
+	}),
+	product: one(products, {
+		fields: [promotionProducts.productId],
+		references: [products.id]
+	})
+}));
+
+export const promotionCollectionsRelations = relations(promotionCollections, ({ one }) => ({
+	promotion: one(promotions, {
+		fields: [promotionCollections.promotionId],
+		references: [promotions.id]
+	}),
+	collection: one(collections, {
+		fields: [promotionCollections.collectionId],
+		references: [collections.id]
+	})
 }));
 
 export const orderPromotionsRelations = relations(orderPromotions, ({ one }) => ({

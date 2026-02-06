@@ -1,193 +1,206 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { Button } from "$lib/components/admin/ui/button";
-  import {
-    Table,
-    TableHeader,
-    TableBody,
-    TableRow,
-    TableHead,
-    TableCell
-  } from "$lib/components/admin/ui/table";
+  import type { ColumnDef } from "@tanstack/table-core";
+  import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
+  import { Badge } from "$lib/components/admin/ui/badge";
+  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import type { PageData } from "./$types";
   import Gift from "@lucide/svelte/icons/gift";
 
   let { data }: { data: PageData } = $props();
 
-  let showCreateForm = $state(false);
+  type PromoRow = (typeof data.promotions)[0];
 
   function formatPrice(cents: number): string {
     return (cents / 100).toFixed(2);
   }
+
+  function getPromotionStatus(promo: PromoRow) {
+    if (!promo.enabled) return { label: "Disabled", variant: "secondary" as const };
+    const now = new Date();
+    if (promo.startsAt && promo.startsAt > now)
+      return { label: "Scheduled", variant: "warning" as const };
+    if (promo.endsAt && promo.endsAt < now)
+      return { label: "Expired", variant: "destructive" as const };
+    return { label: "Active", variant: "success" as const };
+  }
+
+  function getTypeLabel(type: string) {
+    switch (type) {
+      case "order":
+        return "Amount off order";
+      case "product":
+        return "Amount off products";
+      case "free_shipping":
+        return "Free shipping";
+      default:
+        return type;
+    }
+  }
+
+  function getDiscountLabel(promo: PromoRow) {
+    if (promo.promotionType === "free_shipping") return "Free shipping";
+    if (promo.discountType === "percentage") return `${promo.discountValue}%`;
+    return `${formatPrice(promo.discountValue)} EUR`;
+  }
+
+  function formatDate(date: Date | null) {
+    if (!date) return "-";
+    return new Date(date).toLocaleDateString("fi-FI", {
+      day: "numeric",
+      month: "numeric",
+      year: "numeric"
+    });
+  }
+
+  const columns: ColumnDef<PromoRow>[] = [
+    {
+      id: "select",
+      header: ({ table }) =>
+        renderComponent(Checkbox, {
+          checked: table.getIsAllPageRowsSelected(),
+          indeterminate:
+            table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected(),
+          onCheckedChange: (value: boolean) => table.toggleAllPageRowsSelected(!!value),
+          "aria-label": "Select all"
+        }),
+      cell: ({ row }) =>
+        renderComponent(Checkbox, {
+          checked: row.getIsSelected(),
+          onCheckedChange: (value: boolean) => row.toggleSelected(!!value),
+          "aria-label": "Select row"
+        }),
+      enableSorting: false
+    },
+    {
+      accessorKey: "code",
+      header: "Code",
+      cell: ({ row }) =>
+        renderSnippet(codeCell, { code: row.original.code, id: row.original.id })
+    },
+    {
+      accessorKey: "promotionType",
+      header: "Type",
+      cell: ({ row }) => renderSnippet(typeCell, { type: row.original.promotionType })
+    },
+    {
+      accessorFn: (row) => getDiscountLabel(row),
+      id: "discount",
+      header: "Discount"
+    },
+    {
+      accessorFn: (row) => `${formatDate(row.startsAt)} - ${formatDate(row.endsAt)}`,
+      id: "dates",
+      header: "Active Dates"
+    },
+    {
+      accessorFn: (row) =>
+        `${row.usageCount}${row.usageLimit ? ` / ${row.usageLimit}` : ""}`,
+      id: "usage",
+      header: "Usage"
+    },
+    {
+      accessorFn: (row) => getPromotionStatus(row).label,
+      id: "status",
+      header: "Status",
+      cell: ({ row }) => renderSnippet(statusCell, getPromotionStatus(row.original))
+    }
+  ];
 </script>
+
+{#snippet codeCell({ code, id }: { code: string; id: number })}
+  <a href="/admin/promotions/{id}" class="font-mono font-medium text-blue-600 hover:underline">
+    {code}
+  </a>
+{/snippet}
+
+{#snippet typeCell({ type }: { type: string })}
+  <Badge variant="outline">{getTypeLabel(type)}</Badge>
+{/snippet}
+
+{#snippet statusCell({ label, variant }: { label: string; variant: "success" | "secondary" | "warning" | "destructive" })}
+  <Badge {variant}>{label}</Badge>
+{/snippet}
 
 <svelte:head><title>Promotions | Admin</title></svelte:head>
 
-<div class="space-y-6">
-  <div class="flex items-center justify-between">
+<div>
+  <div class="mb-8 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Promotions</h1>
       <p class="mt-1 text-sm text-gray-600">Manage discount codes and promotions</p>
     </div>
-    <Button type="button" onclick={() => (showCreateForm = !showCreateForm)}>Add Promotion</Button>
+    <a href="/admin/promotions/new" class={buttonVariants()}>Create promotion</a>
   </div>
 
-  <!-- Create Form -->
-  {#if showCreateForm}
-    <div class="mb-6 rounded-lg bg-white p-6 shadow">
-      <h2 class="mb-4 font-semibold">Create Promotion</h2>
+  <DataTable
+    data={data.promotions}
+    {columns}
+    searchPlaceholder="Search promotions..."
+    enableRowSelection={true}
+    emptyIcon={Gift}
+    emptyTitle="No promotions"
+    emptyDescription="Get started by creating a new promotion."
+  >
+    {#snippet bulkActions({ selectedRows, table })}
       <form
         method="POST"
-        action="?/create"
+        action="?/enableSelected"
         use:enhance={() => {
           return async ({ update }) => {
+            table.resetRowSelection();
             await update();
-            showCreateForm = false;
           };
         }}
+        class="inline"
       >
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div>
-            <label for="promo_code" class="mb-1 block text-sm font-medium text-gray-700">Code</label
-            >
-            <input
-              type="text"
-              id="promo_code"
-              name="code"
-              placeholder="e.g., SUMMER20"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 uppercase"
-            />
-          </div>
-          <div>
-            <label for="promo_discount_type" class="mb-1 block text-sm font-medium text-gray-700"
-              >Discount Type</label
-            >
-            <select
-              id="promo_discount_type"
-              name="discountType"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2"
-            >
-              <option value="percentage">Percentage (%)</option>
-              <option value="fixed_amount">Fixed Amount (EUR)</option>
-            </select>
-          </div>
-          <div>
-            <label for="promo_value" class="mb-1 block text-sm font-medium text-gray-700"
-              >Value</label
-            >
-            <input
-              type="number"
-              id="promo_value"
-              name="discountValue"
-              placeholder="e.g., 20"
-              min="0"
-              step="0.01"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2"
-            />
-          </div>
-          <div>
-            <label for="promo_min_order" class="mb-1 block text-sm font-medium text-gray-700"
-              >Min Order (EUR)</label
-            >
-            <input
-              type="number"
-              id="promo_min_order"
-              name="minOrderAmount"
-              placeholder="Optional"
-              min="0"
-              step="0.01"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2"
-            />
-          </div>
-          <div>
-            <label for="promo_usage_limit" class="mb-1 block text-sm font-medium text-gray-700"
-              >Usage Limit</label
-            >
-            <input
-              type="number"
-              id="promo_usage_limit"
-              name="usageLimit"
-              placeholder="Unlimited"
-              min="0"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2"
-            />
-          </div>
-        </div>
-        <div class="mt-4 flex justify-end gap-2">
-          <Button type="button" variant="outline" onclick={() => (showCreateForm = false)}>
-            Cancel
-          </Button>
-          <Button type="submit">Create Promotion</Button>
-        </div>
-      </form>
-    </div>
-  {/if}
-
-  {#if data.promotions.length === 0}
-    <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
-      <Gift class="mx-auto h-12 w-12 text-gray-400" />
-      <h3 class="mt-2 text-sm font-medium text-gray-900">No promotions</h3>
-      <p class="mt-1 text-sm text-gray-500">Get started by creating a new promotion.</p>
-      <div class="mt-6">
-        <Button type="button" onclick={() => (showCreateForm = true)}>Add Promotion</Button>
-      </div>
-    </div>
-  {:else}
-    <Table>
-      <TableHeader>
-        <TableRow class="hover:bg-transparent">
-          <TableHead>Code</TableHead>
-          <TableHead>Discount</TableHead>
-          <TableHead>Min Order</TableHead>
-          <TableHead>Usage</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead class="text-right">
-            <span class="sr-only">Actions</span>
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {#each data.promotions as promo}
-          <TableRow>
-            <TableCell class="font-mono font-medium">{promo.code}</TableCell>
-            <TableCell class="text-sm">
-              {#if promo.discountType === "percentage"}
-                {promo.discountValue}%
-              {:else}
-                {formatPrice(promo.discountValue)} EUR
-              {/if}
-            </TableCell>
-            <TableCell class="text-sm text-gray-500">
-              {promo.minOrderAmount ? `${formatPrice(promo.minOrderAmount)} EUR` : "-"}
-            </TableCell>
-            <TableCell class="text-sm text-gray-500">
-              {promo.usageCount}{promo.usageLimit ? ` / ${promo.usageLimit}` : ""}
-            </TableCell>
-            <TableCell>
-              <span
-                class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {promo.enabled
-                  ? 'bg-green-100 text-green-800'
-                  : 'bg-gray-100 text-gray-800'}"
-              >
-                {promo.enabled ? "Active" : "Inactive"}
-              </span>
-            </TableCell>
-            <TableCell class="text-right text-sm">
-              <form method="POST" action="?/toggle" use:enhance class="inline">
-                <input type="hidden" name="id" value={promo.id} />
-                <input type="hidden" name="enabled" value={!promo.enabled} />
-                <button type="submit" class="mr-3 text-blue-600 hover:underline">
-                  {promo.enabled ? "Disable" : "Enable"}
-                </button>
-              </form>
-              <form method="POST" action="?/delete" use:enhance class="inline">
-                <input type="hidden" name="id" value={promo.id} />
-                <button type="submit" class="text-red-600 hover:text-red-800"> Delete </button>
-              </form>
-            </TableCell>
-          </TableRow>
+        {#each selectedRows as row}
+          <input type="hidden" name="ids" value={row.id} />
         {/each}
-      </TableBody>
-    </Table>
-  {/if}
+        <Button type="submit" variant="outline" size="sm">
+          Enable ({selectedRows.length})
+        </Button>
+      </form>
+      <form
+        method="POST"
+        action="?/disableSelected"
+        use:enhance={() => {
+          return async ({ update }) => {
+            table.resetRowSelection();
+            await update();
+          };
+        }}
+        class="inline"
+      >
+        {#each selectedRows as row}
+          <input type="hidden" name="ids" value={row.id} />
+        {/each}
+        <Button type="submit" variant="outline" size="sm">
+          Disable ({selectedRows.length})
+        </Button>
+      </form>
+      <form
+        method="POST"
+        action="?/deleteSelected"
+        use:enhance={() => {
+          return async ({ update }) => {
+            table.resetRowSelection();
+            await update();
+          };
+        }}
+        class="inline"
+      >
+        {#each selectedRows as row}
+          <input type="hidden" name="ids" value={row.id} />
+        {/each}
+        <Button type="submit" variant="destructive" size="sm">
+          Delete ({selectedRows.length})
+        </Button>
+      </form>
+    {/snippet}
+    {#snippet emptyAction()}
+      <a href="/admin/promotions/new" class={buttonVariants()}>Create promotion</a>
+    {/snippet}
+  </DataTable>
 </div>

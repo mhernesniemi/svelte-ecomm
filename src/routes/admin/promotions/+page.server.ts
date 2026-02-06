@@ -9,57 +9,39 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	create: async ({ request }) => {
-		const formData = await request.formData();
+	deleteSelected: async ({ request }) => {
+		const data = await request.formData();
+		const ids = data.getAll("ids").map(Number).filter(Boolean);
 
-		const code = formData.get("code") as string;
-		const discountType = formData.get("discountType") as "percentage" | "fixed_amount";
-		const discountValue = Number(formData.get("discountValue"));
-		const minOrderAmount = formData.get("minOrderAmount")
-			? Number(formData.get("minOrderAmount")) * 100
-			: undefined;
-		const usageLimit = formData.get("usageLimit")
-			? Number(formData.get("usageLimit"))
-			: undefined;
-
-		if (!code || !discountType || isNaN(discountValue)) {
-			return fail(400, { error: "Code, type, and value are required" });
+		if (ids.length === 0) {
+			return fail(400, { error: "No promotions selected" });
 		}
 
-		// Convert to cents for fixed_amount
-		const value = discountType === "fixed_amount" ? discountValue * 100 : discountValue;
+		await Promise.all(ids.map((id) => promotionService.delete(id)));
+		return { success: true };
+	},
 
-		try {
-			await promotionService.create({
-				code,
-				discountType,
-				discountValue: value,
-				minOrderAmount,
-				usageLimit
-			});
+	enableSelected: async ({ request }) => {
+		const data = await request.formData();
+		const ids = data.getAll("ids").map(Number).filter(Boolean);
 
-			return { success: true };
-		} catch (e) {
-			return fail(500, { error: "Failed to create promotion" });
+		if (ids.length === 0) {
+			return fail(400, { error: "No promotions selected" });
 		}
+
+		await Promise.all(ids.map((id) => promotionService.setEnabled(id, true)));
+		return { success: true };
 	},
 
-	toggle: async ({ request }) => {
-		const formData = await request.formData();
-		const id = Number(formData.get("id"));
-		const enabled = formData.get("enabled") === "true";
+	disableSelected: async ({ request }) => {
+		const data = await request.formData();
+		const ids = data.getAll("ids").map(Number).filter(Boolean);
 
-		await promotionService.setEnabled(id, enabled);
+		if (ids.length === 0) {
+			return fail(400, { error: "No promotions selected" });
+		}
 
-		return { toggled: true };
-	},
-
-	delete: async ({ request }) => {
-		const formData = await request.formData();
-		const id = Number(formData.get("id"));
-
-		await promotionService.delete(id);
-
-		return { deleted: true };
+		await Promise.all(ids.map((id) => promotionService.setEnabled(id, false)));
+		return { success: true };
 	}
 };

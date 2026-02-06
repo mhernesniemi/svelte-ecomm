@@ -23,6 +23,9 @@ import type {
 	payments,
 	paymentMethods,
 	promotions,
+	promotionProducts,
+	promotionCollections,
+	orderPromotions,
 	shippingMethods,
 	orderShipping,
 	collections,
@@ -222,8 +225,28 @@ export type TaxCode = "standard" | "food" | "books" | "zero";
 export type Promotion = InferSelectModel<typeof promotions>;
 export type NewPromotion = InferInsertModel<typeof promotions>;
 
+export type PromotionProduct = InferSelectModel<typeof promotionProducts>;
+export type PromotionCollection = InferSelectModel<typeof promotionCollections>;
+
+export type OrderPromotion = InferSelectModel<typeof orderPromotions>;
+
 /** Discount type - derived from schema enum */
 export type DiscountType = Promotion["discountType"];
+
+/** Promotion type - order, product, or free_shipping */
+export type PromotionType = Promotion["promotionType"];
+
+/** Promotion applies to - all, specific_products, or specific_collections */
+export type PromotionAppliesTo = Promotion["appliesTo"];
+
+/** Order promotion type - order, product, or shipping */
+export type OrderPromotionType = OrderPromotion["type"];
+
+/** Promotion with related products and collections */
+export interface PromotionWithRelations extends Promotion {
+	products: { productId: number; productName?: string }[];
+	collections: { collectionId: number; collectionName?: string }[];
+}
 
 // ============================================================================
 // SHIPPING TYPES
@@ -441,12 +464,33 @@ export interface CreateCustomerInput {
 
 export interface CreatePromotionInput {
 	code: string;
+	promotionType?: PromotionType;
 	discountType: DiscountType;
 	discountValue: number;
+	appliesTo?: PromotionAppliesTo;
 	minOrderAmount?: number;
 	usageLimit?: number;
+	usageLimitPerCustomer?: number;
+	combinesWithOtherPromotions?: boolean;
 	startsAt?: Date;
 	endsAt?: Date;
+	productIds?: number[];
+	collectionIds?: number[];
+}
+
+export interface UpdatePromotionInput {
+	discountType?: DiscountType;
+	discountValue?: number;
+	appliesTo?: PromotionAppliesTo;
+	minOrderAmount?: number | null;
+	usageLimit?: number | null;
+	usageLimitPerCustomer?: number | null;
+	combinesWithOtherPromotions?: boolean;
+	enabled?: boolean;
+	startsAt?: Date | null;
+	endsAt?: Date | null;
+	productIds?: number[];
+	collectionIds?: number[];
 }
 
 export interface CreateCollectionInput {

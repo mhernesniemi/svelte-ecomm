@@ -35,6 +35,8 @@ import { nanoid } from "nanoid";
 import { reservationService } from "./reservations.js";
 import { taxService } from "./tax.js";
 import { STATE_TRANSITIONS, isValidTransition } from "./order-utils.js";
+import { promotionService } from "./promotions.js";
+import { calculateDiscount, calculateProductDiscount } from "./promotion-utils.js";
 
 // Generate a secure cart token for guest users
 function generateCartToken(): string {
@@ -476,48 +478,84 @@ export class OrderService {
 	 */
 	async applyPromotion(
 		orderId: number,
-		code: string
+		code: string,
+		customerId?: number
 	): Promise<{ success: boolean; message: string }> {
 		const order = await this.getById(orderId);
 		if (!order) return { success: false, message: "Order not found" };
 		if (!order.active) return { success: false, message: "Cannot modify completed order" };
 
-		// Find promotion
-		const [promotion] = await db
+		// Get existing applied promotions for combination checking
+		const existingApplied = await db
 			.select()
-			.from(promotions)
-			.where(and(eq(promotions.code, code), eq(promotions.enabled, true)));
+			.from(orderPromotions)
+			.where(eq(orderPromotions.orderId, orderId));
 
-		if (!promotion) return { success: false, message: "Invalid promotion code" };
+		const existingPromotionIds = existingApplied.map((op) => op.promotionId);
 
-		// Check usage limit
-		if (promotion.usageLimit && promotion.usageCount >= promotion.usageLimit) {
-			return { success: false, message: "Promotion code has reached its usage limit" };
+		// Validate using promotion service (handles dates, limits, combinations, per-customer)
+		const validation = await promotionService.validate(code, order.subtotal, {
+			customerId,
+			existingPromotionIds
+		});
+
+		if (!validation.valid || !validation.promotion) {
+			return { success: false, message: validation.error ?? "Invalid promotion code" };
 		}
 
-		// Check dates
-		const now = new Date();
-		if (promotion.startsAt && promotion.startsAt > now) {
-			return { success: false, message: "Promotion is not yet active" };
-		}
-		if (promotion.endsAt && promotion.endsAt < now) {
-			return { success: false, message: "Promotion has expired" };
-		}
+		const promotion = validation.promotion;
 
-		// Check minimum order amount
-		if (promotion.minOrderAmount && order.subtotal < promotion.minOrderAmount) {
-			return {
-				success: false,
-				message: `Minimum order amount of ${promotion.minOrderAmount / 100} not met`
-			};
-		}
-
-		// Calculate discount
+		// Calculate discount based on promotion type
 		let discountAmount = 0;
-		if (promotion.discountType === "percentage") {
-			discountAmount = Math.round(order.subtotal * (promotion.discountValue / 100));
+		let orderPromotionType: "order" | "product" | "shipping" = "order";
+
+		if (promotion.promotionType === "free_shipping") {
+			// Free shipping: discount = current shipping cost
+			const [shippingRecord] = await db
+				.select()
+				.from(orderShipping)
+				.where(eq(orderShipping.orderId, orderId))
+				.limit(1);
+			discountAmount = shippingRecord?.price ?? 0;
+			orderPromotionType = "shipping";
+		} else if (promotion.promotionType === "product") {
+			// Product-level discount: only qualifying lines
+			const qualifyingProductIds = await promotionService.getQualifyingProductIds(
+				promotion.id
+			);
+
+			// Get order lines with their product IDs
+			const linesWithProducts = await db
+				.select({
+					lineTotal: orderLines.lineTotal,
+					productId: products.id
+				})
+				.from(orderLines)
+				.innerJoin(productVariants, eq(orderLines.variantId, productVariants.id))
+				.innerJoin(products, eq(productVariants.productId, products.id))
+				.where(eq(orderLines.orderId, orderId));
+
+			const qualifyingLineTotal = linesWithProducts
+				.filter(
+					(l) =>
+						qualifyingProductIds === null ||
+						qualifyingProductIds.includes(l.productId)
+				)
+				.reduce((sum, l) => sum + l.lineTotal, 0);
+
+			if (qualifyingLineTotal === 0) {
+				return {
+					success: false,
+					message: "No qualifying products in your cart"
+				};
+			}
+
+			discountAmount = calculateProductDiscount(promotion, qualifyingLineTotal);
+			orderPromotionType = "product";
 		} else {
-			discountAmount = Math.min(promotion.discountValue, order.subtotal);
+			// Order-level discount
+			discountAmount = calculateDiscount(promotion, order.subtotal);
+			orderPromotionType = "order";
 		}
 
 		// Apply promotion
@@ -526,7 +564,8 @@ export class OrderService {
 			.values({
 				orderId,
 				promotionId: promotion.id,
-				discountAmount
+				discountAmount,
+				type: orderPromotionType
 			})
 			.onConflictDoNothing();
 
@@ -534,7 +573,8 @@ export class OrderService {
 			orderId,
 			promotionId: promotion.id,
 			code,
-			discountAmount
+			discountAmount,
+			type: orderPromotionType
 		});
 
 		await this.recalculateTotals(orderId);
@@ -543,7 +583,7 @@ export class OrderService {
 	}
 
 	/**
-	 * Remove a promotion
+	 * Remove a specific promotion from an order
 	 */
 	async removePromotion(orderId: number, promotionId: number): Promise<void> {
 		await db
@@ -556,6 +596,34 @@ export class OrderService {
 			);
 
 		await this.recalculateTotals(orderId);
+	}
+
+	/**
+	 * Remove all promotions from an order
+	 */
+	async removeAllPromotions(orderId: number): Promise<void> {
+		await db
+			.delete(orderPromotions)
+			.where(eq(orderPromotions.orderId, orderId));
+
+		await this.recalculateTotals(orderId);
+	}
+
+	/**
+	 * Get applied promotions for an order with promotion details
+	 */
+	async getAppliedPromotions(orderId: number) {
+		return db
+			.select({
+				promotionId: orderPromotions.promotionId,
+				discountAmount: orderPromotions.discountAmount,
+				type: orderPromotions.type,
+				code: promotions.code,
+				promotionType: promotions.promotionType
+			})
+			.from(orderPromotions)
+			.innerJoin(promotions, eq(orderPromotions.promotionId, promotions.id))
+			.where(eq(orderPromotions.orderId, orderId));
 	}
 
 	/**
@@ -792,7 +860,13 @@ export class OrderService {
 			.from(orderPromotions)
 			.where(eq(orderPromotions.orderId, orderId));
 
-		const discount = appliedPromotions.reduce((sum, op) => sum + op.discountAmount, 0);
+		// Split discounts: order/product vs shipping
+		const orderProductDiscount = appliedPromotions
+			.filter((op) => op.type === "order" || op.type === "product")
+			.reduce((sum, op) => sum + op.discountAmount, 0);
+		const shippingDiscount = appliedPromotions
+			.filter((op) => op.type === "shipping")
+			.reduce((sum, op) => sum + op.discountAmount, 0);
 
 		// Get shipping cost from order_shipping table
 		const [shippingRecord] = await db
@@ -800,22 +874,48 @@ export class OrderService {
 			.from(orderShipping)
 			.where(eq(orderShipping.orderId, orderId))
 			.limit(1);
-		const shipping = shippingRecord?.price ?? 0;
+		const rawShipping = shippingRecord?.price ?? 0;
+
+		// Update free shipping promo amounts when shipping method changes
+		if (shippingDiscount > 0) {
+			const shippingPromos = appliedPromotions.filter((op) => op.type === "shipping");
+			for (const sp of shippingPromos) {
+				if (sp.discountAmount !== rawShipping) {
+					await db
+						.update(orderPromotions)
+						.set({ discountAmount: rawShipping })
+						.where(
+							and(
+								eq(orderPromotions.orderId, orderId),
+								eq(orderPromotions.promotionId, sp.promotionId)
+							)
+						);
+				}
+			}
+		}
+
+		// Recalculate shipping discount after potential update
+		const effectiveShippingDiscount = appliedPromotions.some((op) => op.type === "shipping")
+			? rawShipping
+			: 0;
+		const effectiveShipping = Math.max(0, rawShipping - effectiveShippingDiscount);
+		const discount = orderProductDiscount + effectiveShippingDiscount;
 
 		// Get order to check tax exemption status
 		const [order] = await db.select().from(orders).where(eq(orders.id, orderId));
 		const isTaxExempt = order ? await taxService.isCustomerTaxExempt(order.customerId) : false;
 
-		const total = Math.max(0, subtotal - discount + shipping);
-		// For tax-exempt orders, totalNet equals total (no tax). Otherwise subtract the tax.
-		const totalNet = isTaxExempt ? total : Math.max(0, subtotalNet - discount + shipping);
+		const total = Math.max(0, subtotal - orderProductDiscount + effectiveShipping);
+		const totalNet = isTaxExempt
+			? total
+			: Math.max(0, subtotalNet - orderProductDiscount + effectiveShipping);
 
 		await db
 			.update(orders)
 			.set({
 				subtotal,
 				discount,
-				shipping,
+				shipping: effectiveShipping,
 				total,
 				taxTotal: isTaxExempt ? 0 : taxTotal,
 				totalNet,

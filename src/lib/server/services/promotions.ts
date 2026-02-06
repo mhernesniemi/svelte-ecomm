@@ -2,10 +2,26 @@
  * Promotion Service
  * Handles coupon codes and discounts
  */
-import { eq, and, desc, sql, gte, lte, or, isNull } from "drizzle-orm";
+import { eq, and, desc, sql, gte, lte, or, isNull, inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { promotions } from "../db/schema.js";
-import type { Promotion, CreatePromotionInput, PaginatedResult } from "$lib/types.js";
+import {
+	promotions,
+	promotionProducts,
+	promotionCollections,
+	orderPromotions,
+	orders,
+	productTranslations,
+	collectionTranslations,
+	collectionFilters,
+	productFacetValues
+} from "../db/schema.js";
+import type {
+	Promotion,
+	CreatePromotionInput,
+	UpdatePromotionInput,
+	PromotionWithRelations,
+	PaginatedResult
+} from "$lib/types.js";
 import { calculateDiscount } from "./promotion-utils.js";
 
 export class PromotionService {
@@ -17,16 +33,39 @@ export class PromotionService {
 			.insert(promotions)
 			.values({
 				code: input.code.toUpperCase(),
+				promotionType: input.promotionType ?? "order",
 				discountType: input.discountType,
 				discountValue: input.discountValue,
+				appliesTo: input.appliesTo ?? "all",
 				minOrderAmount: input.minOrderAmount,
 				usageLimit: input.usageLimit,
+				usageLimitPerCustomer: input.usageLimitPerCustomer,
+				combinesWithOtherPromotions: input.combinesWithOtherPromotions ?? false,
 				startsAt: input.startsAt,
 				endsAt: input.endsAt,
 				enabled: true,
 				usageCount: 0
 			})
 			.returning();
+
+		// Insert junction table rows
+		if (input.productIds?.length) {
+			await db.insert(promotionProducts).values(
+				input.productIds.map((productId) => ({
+					promotionId: promotion.id,
+					productId
+				}))
+			);
+		}
+
+		if (input.collectionIds?.length) {
+			await db.insert(promotionCollections).values(
+				input.collectionIds.map((collectionId) => ({
+					promotionId: promotion.id,
+					collectionId
+				}))
+			);
+		}
 
 		return promotion;
 	}
@@ -38,6 +77,59 @@ export class PromotionService {
 		const [promotion] = await db.select().from(promotions).where(eq(promotions.id, id));
 
 		return promotion ?? null;
+	}
+
+	/**
+	 * Get promotion by ID with related products and collections
+	 */
+	async getByIdWithRelations(id: number): Promise<PromotionWithRelations | null> {
+		const [promotion] = await db.select().from(promotions).where(eq(promotions.id, id));
+
+		if (!promotion) return null;
+
+		// Get related products with names
+		const relatedProducts = await db
+			.select({
+				productId: promotionProducts.productId,
+				productName: productTranslations.name
+			})
+			.from(promotionProducts)
+			.leftJoin(
+				productTranslations,
+				and(
+					eq(promotionProducts.productId, productTranslations.productId),
+					eq(productTranslations.languageCode, "fi")
+				)
+			)
+			.where(eq(promotionProducts.promotionId, id));
+
+		// Get related collections with names
+		const relatedCollections = await db
+			.select({
+				collectionId: promotionCollections.collectionId,
+				collectionName: collectionTranslations.name
+			})
+			.from(promotionCollections)
+			.leftJoin(
+				collectionTranslations,
+				and(
+					eq(promotionCollections.collectionId, collectionTranslations.collectionId),
+					eq(collectionTranslations.languageCode, "fi")
+				)
+			)
+			.where(eq(promotionCollections.promotionId, id));
+
+		return {
+			...promotion,
+			products: relatedProducts.map((p) => ({
+				productId: p.productId,
+				productName: p.productName ?? undefined
+			})),
+			collections: relatedCollections.map((c) => ({
+				collectionId: c.collectionId,
+				collectionName: c.collectionName ?? undefined
+			}))
+		};
 	}
 
 	/**
@@ -119,10 +211,7 @@ export class PromotionService {
 	/**
 	 * Update a promotion
 	 */
-	async update(
-		id: number,
-		input: Partial<Omit<CreatePromotionInput, "code"> & { enabled?: boolean }>
-	): Promise<Promotion | null> {
+	async update(id: number, input: UpdatePromotionInput): Promise<Promotion | null> {
 		const [promotion] = await db.select().from(promotions).where(eq(promotions.id, id));
 
 		if (!promotion) return null;
@@ -132,14 +221,52 @@ export class PromotionService {
 			.set({
 				...(input.discountType && { discountType: input.discountType }),
 				...(input.discountValue !== undefined && { discountValue: input.discountValue }),
-				...(input.minOrderAmount !== undefined && { minOrderAmount: input.minOrderAmount }),
+				...(input.appliesTo !== undefined && { appliesTo: input.appliesTo }),
+				...(input.minOrderAmount !== undefined && {
+					minOrderAmount: input.minOrderAmount
+				}),
 				...(input.usageLimit !== undefined && { usageLimit: input.usageLimit }),
+				...(input.usageLimitPerCustomer !== undefined && {
+					usageLimitPerCustomer: input.usageLimitPerCustomer
+				}),
+				...(input.combinesWithOtherPromotions !== undefined && {
+					combinesWithOtherPromotions: input.combinesWithOtherPromotions
+				}),
 				...(input.startsAt !== undefined && { startsAt: input.startsAt }),
 				...(input.endsAt !== undefined && { endsAt: input.endsAt }),
 				...(input.enabled !== undefined && { enabled: input.enabled })
 			})
 			.where(eq(promotions.id, id))
 			.returning();
+
+		// Sync junction tables if provided
+		if (input.productIds !== undefined) {
+			await db
+				.delete(promotionProducts)
+				.where(eq(promotionProducts.promotionId, id));
+			if (input.productIds.length > 0) {
+				await db.insert(promotionProducts).values(
+					input.productIds.map((productId) => ({
+						promotionId: id,
+						productId
+					}))
+				);
+			}
+		}
+
+		if (input.collectionIds !== undefined) {
+			await db
+				.delete(promotionCollections)
+				.where(eq(promotionCollections.promotionId, id));
+			if (input.collectionIds.length > 0) {
+				await db.insert(promotionCollections).values(
+					input.collectionIds.map((collectionId) => ({
+						promotionId: id,
+						collectionId
+					}))
+				);
+			}
+		}
 
 		return updated;
 	}
@@ -165,7 +292,11 @@ export class PromotionService {
 	 */
 	async validate(
 		code: string,
-		orderAmount: number
+		orderAmount: number,
+		options?: {
+			customerId?: number;
+			existingPromotionIds?: number[];
+		}
 	): Promise<{ valid: boolean; promotion?: Promotion; error?: string }> {
 		const promotion = await this.getByCode(code);
 
@@ -198,7 +329,114 @@ export class PromotionService {
 			};
 		}
 
+		// Per-customer usage check
+		if (promotion.usageLimitPerCustomer && options?.customerId) {
+			const usageCount = await this.getCustomerUsageCount(
+				promotion.id,
+				options.customerId
+			);
+			if (usageCount >= promotion.usageLimitPerCustomer) {
+				return { valid: false, error: "You have already used this promotion" };
+			}
+		}
+
+		// Combination check
+		if (options?.existingPromotionIds?.length) {
+			const existingPromos = await db
+				.select()
+				.from(promotions)
+				.where(inArray(promotions.id, options.existingPromotionIds));
+
+			const { canCombinePromotions } = await import("./promotion-utils.js");
+			if (!canCombinePromotions(existingPromos, promotion)) {
+				return {
+					valid: false,
+					error: "This promotion cannot be combined with other promotions"
+				};
+			}
+		}
+
 		return { valid: true, promotion };
+	}
+
+	/**
+	 * Get product IDs that a promotion applies to
+	 * Returns null if applies to all products
+	 */
+	async getQualifyingProductIds(promotionId: number): Promise<number[] | null> {
+		const promotion = await this.getById(promotionId);
+		if (!promotion) return null;
+
+		if (promotion.appliesTo === "all") return null;
+
+		if (promotion.appliesTo === "specific_products") {
+			const rows = await db
+				.select({ productId: promotionProducts.productId })
+				.from(promotionProducts)
+				.where(eq(promotionProducts.promotionId, promotionId));
+			return rows.map((r) => r.productId);
+		}
+
+		if (promotion.appliesTo === "specific_collections") {
+			// Get collection IDs linked to this promotion
+			const collectionRows = await db
+				.select({ collectionId: promotionCollections.collectionId })
+				.from(promotionCollections)
+				.where(eq(promotionCollections.promotionId, promotionId));
+
+			if (collectionRows.length === 0) return [];
+
+			const collectionIds = collectionRows.map((r) => r.collectionId);
+
+			// Get filters for these collections and resolve product IDs
+			// Collections use filter-based matching; get products matching the collection filters
+			const filters = await db
+				.select()
+				.from(collectionFilters)
+				.where(inArray(collectionFilters.collectionId, collectionIds));
+
+			// For product-type filters (field='product'), extract product IDs directly
+			const productIds = new Set<number>();
+			for (const filter of filters) {
+				if (filter.field === "product" && filter.operator === "in") {
+					const ids = filter.value as number[];
+					for (const id of ids) productIds.add(id);
+				} else if (filter.field === "facet" && filter.operator === "in") {
+					// Resolve facet-based filter to product IDs
+					const facetValueIds = filter.value as number[];
+					if (facetValueIds.length > 0) {
+						const facetProducts = await db
+							.select({ productId: productFacetValues.productId })
+							.from(productFacetValues)
+							.where(inArray(productFacetValues.facetValueId, facetValueIds));
+						for (const fp of facetProducts) productIds.add(fp.productId);
+					}
+				}
+			}
+
+			return Array.from(productIds);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get how many completed orders a customer has used a promotion on
+	 */
+	async getCustomerUsageCount(promotionId: number, customerId: number): Promise<number> {
+		const result = await db
+			.select({ count: sql<number>`count(*)` })
+			.from(orderPromotions)
+			.innerJoin(orders, eq(orderPromotions.orderId, orders.id))
+			.where(
+				and(
+					eq(orderPromotions.promotionId, promotionId),
+					eq(orders.customerId, customerId),
+					eq(orders.active, false)
+				)
+			);
+
+		return Number(result[0]?.count ?? 0);
 	}
 
 	/**
