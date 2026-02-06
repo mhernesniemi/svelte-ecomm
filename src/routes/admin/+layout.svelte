@@ -12,7 +12,7 @@
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
   import Users from "@lucide/svelte/icons/users";
-    import Star from "@lucide/svelte/icons/star";
+  import Star from "@lucide/svelte/icons/star";
   import Tag from "@lucide/svelte/icons/tag";
   import FileText from "@lucide/svelte/icons/file-text";
 
@@ -27,9 +27,9 @@
   const navItems: NavItem[] = [
     { href: "/admin", label: "Dashboard", icon: "home" },
     { href: "/admin/products", label: "Products", icon: "package" },
-    { href: "/admin/categories", label: "Categories", icon: "category" },
-    { href: "/admin/facets", label: "Facets", icon: "filter" },
     { href: "/admin/collections", label: "Collections", icon: "folder" },
+    { href: "/admin/facets", label: "Facets", icon: "filter" },
+    { href: "/admin/categories", label: "Categories", icon: "category" },
     { href: "/admin/orders", label: "Orders", icon: "shopping-cart" },
     { href: "/admin/customers", label: "Customers", icon: "users" },
     { href: "/admin/reviews", label: "Reviews", icon: "star" },
