@@ -2,10 +2,8 @@
   import "./admin.css";
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
-  import { Button } from "$lib/components/admin/ui/button";
   import { Toaster } from "$lib/components/admin/ui/sonner";
   import type { LayoutData } from "./$types";
-  import Home from "@lucide/svelte/icons/home";
   import Package from "@lucide/svelte/icons/package";
   import LayoutGrid from "@lucide/svelte/icons/layout-grid";
   import Filter from "@lucide/svelte/icons/filter";
@@ -25,12 +23,11 @@
   }
 
   const navItems: NavItem[] = [
-    { href: "/admin", label: "Dashboard", icon: "home" },
+    { href: "/admin/orders", label: "Orders", icon: "shopping-cart" },
     { href: "/admin/products", label: "Products", icon: "package" },
     { href: "/admin/collections", label: "Collections", icon: "folder" },
     { href: "/admin/facets", label: "Facets", icon: "filter" },
     { href: "/admin/categories", label: "Categories", icon: "category" },
-    { href: "/admin/orders", label: "Orders", icon: "shopping-cart" },
     { href: "/admin/customers", label: "Customers", icon: "users" },
     { href: "/admin/reviews", label: "Reviews", icon: "star" },
     { href: "/admin/promotions", label: "Promotions", icon: "tag" },
@@ -38,9 +35,6 @@
   ];
 
   function isActive(href: string): boolean {
-    if (href === "/admin") {
-      return $page.url.pathname === "/admin";
-    }
     return $page.url.pathname.startsWith(href);
   }
 </script>
@@ -64,9 +58,7 @@
             : ''}"
         >
           <span class="h-5 w-5">
-            {#if item.icon === "home"}
-              <Home class="h-5 w-5" />
-            {:else if item.icon === "package"}
+            {#if item.icon === "package"}
               <Package class="h-5 w-5" />
             {:else if item.icon === "shopping-cart"}
               <ShoppingCart class="h-5 w-5" />
