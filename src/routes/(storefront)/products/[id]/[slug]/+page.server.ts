@@ -1,6 +1,7 @@
 import { productService } from "$lib/server/services/products.js";
 import { wishlistService } from "$lib/server/services/wishlist.js";
 import { reviewService } from "$lib/server/services/reviews.js";
+import { categoryService } from "$lib/server/services/categories.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
@@ -28,18 +29,26 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		throw redirect(301, `/products/${id}/${correctSlug}`);
 	}
 
-	const [isWishlisted, rating, reviewsResult, customerReview] = await Promise.all([
-		wishlistService.hasItem({
-			productId: product.id,
-			customerId: locals.customer?.id,
-			guestToken: locals.wishlistToken
-		}),
-		reviewService.getProductRating(product.id),
-		reviewService.getProductReviews(product.id, { limit: 10 }),
-		locals.customer
-			? reviewService.getCustomerReviewForProduct(locals.customer.id, product.id)
-			: null
-	]);
+	const [isWishlisted, rating, reviewsResult, customerReview, productCategories] =
+		await Promise.all([
+			wishlistService.hasItem({
+				productId: product.id,
+				customerId: locals.customer?.id,
+				guestToken: locals.wishlistToken
+			}),
+			reviewService.getProductRating(product.id),
+			reviewService.getProductReviews(product.id, { limit: 10 }),
+			locals.customer
+				? reviewService.getCustomerReviewForProduct(locals.customer.id, product.id)
+				: null,
+			categoryService.getProductCategories(product.id)
+		]);
+
+	// Get breadcrumbs for the first category (primary category path)
+	const breadcrumbs =
+		productCategories.length > 0
+			? await categoryService.getBreadcrumbs(productCategories[0].id, "en")
+			: [];
 
 	return {
 		product,
@@ -49,7 +58,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		reviewsPagination: reviewsResult.pagination,
 		customerReview,
 		customerId: locals.customer?.id ?? null,
-		isAdmin: !!locals.adminUser
+		isAdmin: !!locals.adminUser,
+		breadcrumbs
 	};
 };
 

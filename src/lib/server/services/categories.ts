@@ -138,29 +138,31 @@ export class CategoryService {
 	 */
 	async getBreadcrumbs(categoryId: number, language?: string): Promise<CategoryBreadcrumb[]> {
 		const lang = language ?? this.defaultLanguage;
+		const breadcrumbs: CategoryBreadcrumb[] = [];
+		let currentId: number | null = categoryId;
 
-		// Use recursive CTE to get all ancestors
-		const result = await db.execute(sql`
-			WITH RECURSIVE ancestors AS (
-				SELECT id, parent_id, slug, 0 as depth
-				FROM categories
-				WHERE id = ${categoryId}
-				UNION ALL
-				SELECT c.id, c.parent_id, c.slug, a.depth + 1
-				FROM categories c
-				JOIN ancestors a ON c.id = a.parent_id
-			)
-			SELECT a.id, a.slug, ct.name
-			FROM ancestors a
-			LEFT JOIN category_translations ct ON ct.category_id = a.id AND ct.language_code = ${lang}
-			ORDER BY a.depth DESC
-		`);
+		while (currentId !== null) {
+			const category: CategoryWithTranslations | undefined =
+				await db.query.categories.findFirst({
+					where: eq(categories.id, currentId),
+					with: { translations: true }
+				});
 
-		return (result as unknown as { id: number; slug: string; name: string }[]).map((row) => ({
-			id: row.id,
-			slug: row.slug,
-			name: row.name ?? row.slug
-		}));
+			if (!category) break;
+
+			const translation = category.translations.find(
+				(t: CategoryTranslation) => t.languageCode === lang
+			);
+			breadcrumbs.unshift({
+				id: category.id,
+				slug: category.slug,
+				name: translation?.name ?? category.slug
+			});
+
+			currentId = category.parentId;
+		}
+
+		return breadcrumbs;
 	}
 
 	/**

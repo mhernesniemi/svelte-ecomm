@@ -12,8 +12,8 @@
   import ImageIcon from "@lucide/svelte/icons/image";
   import Heart from "@lucide/svelte/icons/heart";
   import CheckIcon from "@lucide/svelte/icons/check";
+  import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import type { PageData, ActionData } from "./$types";
-  import ArrowLeft from "@lucide/svelte/icons/arrow-left";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -58,6 +58,16 @@
   let reviewComment = $state("");
   let isSubmittingReview = $state(false);
   let hoverRating = $state(0);
+
+  function buildCategoryPath(breadcrumbs: typeof data.breadcrumbs, upToIndex: number): string {
+    return (
+      "/category/" +
+      breadcrumbs
+        .slice(0, upToIndex + 1)
+        .map((b) => b.slug)
+        .join("/")
+    );
+  }
 
   function formatDate(date: Date | string): string {
     return new Date(date).toLocaleDateString("en-US", {
@@ -163,16 +173,35 @@
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-  <nav class="mb-6 flex items-center justify-between">
-    <a href="/products" class="inline-flex items-center gap-2 text-sm text-blue-600 hover:underline"
-      ><ArrowLeft class="h-4 w-4" /> Back to Products</a
-    >
+  <div class="mb-6 flex items-center justify-between">
+    <nav aria-label="Breadcrumb">
+      <ol class="flex items-center gap-1 text-sm">
+        <li>
+          <a href="/" class="text-gray-500 hover:text-gray-700">Home</a>
+        </li>
+        {#each data.breadcrumbs as crumb, index}
+          <li class="flex items-center gap-1">
+            <ChevronRight class="h-3.5 w-3.5 text-gray-400" />
+            <a
+              href={buildCategoryPath(data.breadcrumbs, index)}
+              class="text-gray-500 hover:text-gray-700"
+            >
+              {crumb.name}
+            </a>
+          </li>
+        {/each}
+        <li class="flex items-center gap-1">
+          <ChevronRight class="h-3.5 w-3.5 text-gray-400" />
+          <span class="font-medium text-gray-900">{enTrans?.name ?? "Product"}</span>
+        </li>
+      </ol>
+    </nav>
     {#if data.isAdmin}
       <a href="/admin/products/{product.id}">
         <Button variant="outline" size="sm">Edit</Button>
       </a>
     {/if}
-  </nav>
+  </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2">
     <!-- Product Images -->
