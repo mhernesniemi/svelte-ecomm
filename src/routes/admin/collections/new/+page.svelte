@@ -68,6 +68,7 @@
           name="name"
           bind:value={name}
           required
+          autofocus
           class="w-full rounded-lg border border-input-border px-3 py-2"
         />
       </div>

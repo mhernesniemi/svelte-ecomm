@@ -64,6 +64,7 @@
             name="name_en"
             placeholder="e.g., Color"
             required
+            autofocus
             class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>

@@ -216,7 +216,7 @@
   {/if}
 
   <!-- Selection count (when row selection enabled) -->
-  {#if enableRowSelection}
+  {#if enableRowSelection && selectedCount > 0}
     <div class="mt-2 text-sm text-muted-foreground">
       {selectedCount} of {totalFiltered} row(s) selected
     </div>
