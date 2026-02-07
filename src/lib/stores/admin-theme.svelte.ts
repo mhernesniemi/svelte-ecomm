@@ -28,7 +28,10 @@ export function initTheme() {
 	};
 	mql.addEventListener("change", handler);
 
-	return () => mql.removeEventListener("change", handler);
+	return () => {
+		mql.removeEventListener("change", handler);
+		document.documentElement.classList.remove("dark");
+	};
 }
 
 export function setTheme(value: Theme) {
