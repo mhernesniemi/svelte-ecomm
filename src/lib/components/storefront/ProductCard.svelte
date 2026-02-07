@@ -44,7 +44,7 @@
   >
     {#if product.featuredAsset}
       <img
-        src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto"
+        src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto,e-grayscale"
         alt={name}
         class="h-full w-full object-cover transition-transform group-hover:scale-105"
       />
