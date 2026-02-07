@@ -141,7 +141,9 @@
           </h2>
           {#if promo.method === "code"}
             <div>
-              <label for="code" class="mb-1 block text-sm font-medium text-foreground-secondary">Code</label>
+              <label for="code" class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >Code</label
+              >
               <input
                 type="text"
                 id="code"
@@ -152,7 +154,9 @@
             </div>
           {:else}
             <div>
-              <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary">Title</label>
+              <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >Title</label
+              >
               <input
                 type="text"
                 id="title"
@@ -173,7 +177,10 @@
             <h2 class="mb-4 text-lg font-semibold">Discount Value</h2>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="discountType" class="mb-1 block text-sm font-medium text-foreground-secondary">
+                <label
+                  for="discountType"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
                   Discount Type
                 </label>
                 <select
@@ -187,7 +194,10 @@
                 </select>
               </div>
               <div>
-                <label for="discountValue" class="mb-1 block text-sm font-medium text-foreground-secondary">
+                <label
+                  for="discountValue"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
                   Value
                 </label>
                 <input
@@ -357,7 +367,10 @@
           <h2 class="mb-4 text-lg font-semibold">Conditions</h2>
           <div class="grid grid-cols-3 gap-4">
             <div>
-              <label for="minOrderAmount" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              <label
+                for="minOrderAmount"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
                 Min Order (EUR)
               </label>
               <input
@@ -372,7 +385,10 @@
               />
             </div>
             <div>
-              <label for="usageLimit" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              <label
+                for="usageLimit"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
                 Total Usage Limit
               </label>
               <input
@@ -410,7 +426,10 @@
           <h2 class="mb-4 text-lg font-semibold">Active Dates</h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="startsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              <label
+                for="startsAt"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
                 Starts At
               </label>
               <input
@@ -434,7 +453,9 @@
               />
             </div>
           </div>
-          <p class="mt-2 text-xs text-muted-foreground">Leave empty for no start/end date restrictions.</p>
+          <p class="mt-2 text-xs text-muted-foreground">
+            Leave empty for no start/end date restrictions.
+          </p>
         </div>
       </div>
 
@@ -488,7 +509,7 @@
 
   <button
     type="button"
-    class="text-sm text-red-600 hover:text-red-800"
+    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
     onclick={() => (showDelete = true)}
   >
     Delete this promotion

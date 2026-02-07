@@ -44,7 +44,10 @@
       >
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label for="cat_name_en" class="mb-1 block text-sm font-medium text-foreground-secondary">
+            <label
+              for="cat_name_en"
+              class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >
               Name
             </label>
             <input
@@ -68,7 +71,10 @@
             />
           </div>
           <div>
-            <label for="cat_parent" class="mb-1 block text-sm font-medium text-foreground-secondary">
+            <label
+              for="cat_parent"
+              class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >
               Parent
             </label>
             <select
@@ -122,7 +128,8 @@
                 {#if depth > 0}
                   <span class="whitespace-pre text-gray-300">{"— ".repeat(depth)}</span>
                 {/if}
-                <span class="text-sm font-medium text-foreground">{getName(node.translations)}</span>
+                <span class="text-sm font-medium text-foreground">{getName(node.translations)}</span
+                >
                 <span class="text-sm text-placeholder">{fullPath}</span>
               </div>
               <Pencil
@@ -224,7 +231,10 @@
                     }}
                   >
                     <input type="hidden" name="id" value={node.id} />
-                    <button type="submit" class="text-sm text-red-600 hover:text-red-800">
+                    <button
+                      type="submit"
+                      class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
+                    >
                       Delete this category{node.children.length > 0 ? ` and all subcategories` : ""}
                     </button>
                   </form>

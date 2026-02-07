@@ -119,7 +119,9 @@
           </div>
 
           <div>
-            <label for="body" class="mb-1 block text-sm font-medium text-foreground-secondary"> Body </label>
+            <label for="body" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              Body
+            </label>
             <RichTextEditor
               name="body"
               content={translation?.body ?? ""}
@@ -135,17 +137,18 @@
               bind:checked={published}
               class="h-4 w-4 rounded border-input-border text-blue-600"
             />
-            <label for="published" class="text-sm font-medium text-foreground-secondary"> Published </label>
+            <label for="published" class="text-sm font-medium text-foreground-secondary">
+              Published
+            </label>
           </div>
         </div>
-
       </div>
     </div>
   </form>
 
   <button
     type="button"
-    class="text-sm text-red-600 hover:text-red-800"
+    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
     onclick={() => (showDelete = true)}
   >
     Delete this page

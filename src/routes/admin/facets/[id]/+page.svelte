@@ -39,7 +39,11 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <a href="/admin/facets" class="text-muted-foreground hover:text-foreground-secondary" aria-label="Back to facets">
+      <a
+        href="/admin/facets"
+        class="text-muted-foreground hover:text-foreground-secondary"
+        aria-label="Back to facets"
+      >
         <ChevronLeft class="h-5 w-5" />
       </a>
       <h1 class="text-2xl font-bold text-foreground">{getName(data.facet.translations)}</h1>
@@ -67,7 +71,9 @@
       <h2 class="mb-4 text-lg font-medium text-foreground">Facet Details</h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label for="facet_name" class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label>
+          <label for="facet_name" class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >Name</label
+          >
           <input
             type="text"
             id="facet_name"
@@ -77,7 +83,9 @@
           />
         </div>
         <div>
-          <label for="facet_code" class="mb-1 block text-sm font-medium text-foreground-secondary">Code</label>
+          <label for="facet_code" class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >Code</label
+          >
           <input
             type="text"
             id="facet_code"
@@ -128,7 +136,10 @@
         >
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label for="new_value_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              <label
+                for="new_value_name"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
                 Name
               </label>
               <input
@@ -140,7 +151,10 @@
               />
             </div>
             <div>
-              <label for="new_value_code" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              <label
+                for="new_value_code"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
                 Code
               </label>
               <input
@@ -274,7 +288,10 @@
                     }}
                   >
                     <input type="hidden" name="id" value={value.id} />
-                    <button type="submit" class="text-sm text-red-600 hover:text-red-800">
+                    <button
+                      type="submit"
+                      class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
+                    >
                       Delete this value
                     </button>
                   </form>
@@ -289,7 +306,7 @@
 
   <button
     type="button"
-    class="text-sm text-red-600 hover:text-red-800"
+    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
     onclick={() => (showDelete = true)}
   >
     Delete this facet

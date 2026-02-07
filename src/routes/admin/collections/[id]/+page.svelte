@@ -188,7 +188,10 @@
             </div>
           </div>
           <div>
-            <label for="description" class="mb-1 block text-sm font-medium text-foreground-secondary">
+            <label
+              for="description"
+              class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >
               Description
             </label>
             <RichTextEditor
@@ -214,7 +217,6 @@
             </label>
           </div>
         </div>
-
       </div>
     </div>
   </form>
@@ -238,7 +240,9 @@
               <div>
                 <span class="font-medium text-foreground">{getFieldLabel(filter.field)}</span>
                 <span class="mx-2 text-muted-foreground">{getOperatorLabel(filter.operator)}</span>
-                <span class="text-foreground-secondary">{formatFilterValue(filter.field, filter.value)}</span>
+                <span class="text-foreground-secondary"
+                  >{formatFilterValue(filter.field, filter.value)}</span
+                >
               </div>
               <form
                 method="POST"
@@ -341,7 +345,9 @@
           </div>
 
           <div>
-            <label for="value" class="mb-1 block text-sm font-medium text-foreground-secondary">Value</label>
+            <label for="value" class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >Value</label
+            >
             {#if newFilterField === "facet"}
               <input type="hidden" name="value" value={selectedFacetValues.join(",")} />
               <div class="text-sm text-muted-foreground">Select facet values below</div>
@@ -505,7 +511,7 @@
 
   <button
     type="button"
-    class="text-sm text-red-600 hover:text-red-800"
+    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
     onclick={() => (showDelete = true)}
   >
     Delete this collection

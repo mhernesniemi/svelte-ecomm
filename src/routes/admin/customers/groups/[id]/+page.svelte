@@ -83,7 +83,9 @@
       <h2 class="mb-4 text-lg font-medium text-foreground">Group Details</h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label for="group_name" class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label>
+          <label for="group_name" class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >Name</label
+          >
           <input
             type="text"
             id="group_name"
@@ -94,7 +96,10 @@
           />
         </div>
         <div>
-          <label for="group_description" class="mb-1 block text-sm font-medium text-foreground-secondary">
+          <label
+            for="group_description"
+            class="mb-1 block text-sm font-medium text-foreground-secondary"
+          >
             Description
           </label>
           <input
@@ -189,7 +194,10 @@
               </div>
               <form method="POST" action="?/removeCustomer" use:enhance>
                 <input type="hidden" name="customerId" value={customer.id} />
-                <button type="submit" class="text-sm text-red-600 hover:text-red-800">
+                <button
+                  type="submit"
+                  class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
+                >
                   Remove
                 </button>
               </form>
@@ -202,7 +210,7 @@
 
   <button
     type="button"
-    class="text-sm text-red-600 hover:text-red-800"
+    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
     onclick={() => (showDelete = true)}
   >
     Delete this group

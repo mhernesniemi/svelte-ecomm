@@ -392,7 +392,7 @@
       </div>
       <button
         type="button"
-        class="text-sm text-red-600 hover:text-red-800"
+        class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
         onclick={() => (showDelete = true)}
       >
         Delete this product

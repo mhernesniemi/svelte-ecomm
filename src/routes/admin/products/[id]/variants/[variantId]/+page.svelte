@@ -109,7 +109,10 @@
         <div class="space-y-4 p-6">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="variant_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              <label
+                for="variant_name"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
                 Name
               </label>
               <input
@@ -280,7 +283,7 @@
 
   <button
     type="button"
-    class="mt-6 text-sm text-red-600 hover:text-red-800"
+    class="mt-6 text-sm text-red-600 hover:text-red-800 dark:text-red-700"
     onclick={() => (showDelete = true)}
   >
     Delete this variant
