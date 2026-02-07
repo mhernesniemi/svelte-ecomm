@@ -135,10 +135,7 @@
   method: string;
   id: number;
 })}
-  <a
-    href="/admin/promotions/{id}"
-    class="font-medium text-foreground hover:text-blue-600 dark:text-blue-400"
-  >
+  <a href="/admin/promotions/{id}" class="font-medium text-foreground hover:underline">
     {method === "automatic" ? title : code}
   </a>
 {/snippet}

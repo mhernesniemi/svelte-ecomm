@@ -94,7 +94,7 @@
 {#snippet commentCell({ id, comment }: { id: number; comment: string | null })}
   <a
     href="/admin/reviews/{id}"
-    class="block max-w-xs truncate font-medium text-foreground hover:text-blue-600 dark:text-blue-400"
+    class="inline-block max-w-xs truncate font-medium text-foreground hover:underline"
   >
     {comment ?? "-"}
   </a>
