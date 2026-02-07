@@ -1,7 +1,7 @@
 @reference "tailwindcss";
 
-/* ── Theme tokens (light = default, dark = .dark on <html>) ────────── */
-:root {
+/* ── Theme tokens (scoped to admin wrapper) ──────────────────────── */
+[data-admin] {
 	--color-background: oklch(0.985 0.002 247);
 	--color-surface: oklch(1 0 0);
 	--color-muted: oklch(0.968 0.003 264);
@@ -22,8 +22,7 @@
 	--color-accent-subtle: oklch(0.932 0.032 255);
 }
 
-.dark {
-	/* Dark, neutral bluish-gray ramp (Tailwind gray-ish) */
+[data-admin].dark {
 	--color-background: oklch(0.175 0.014 265);
 	--color-surface: oklch(0.215 0.014 265);
 	--color-muted: oklch(0.255 0.014 265);
@@ -44,44 +43,44 @@
 	--color-accent-subtle: oklch(0.24 0.03 265);
 }
 
-/* ── Dark mode: override @tailwindcss/forms (scoped to admin) ────── */
-.dark [data-admin] select,
-.dark [data-admin] [type="text"],
-.dark [data-admin] [type="email"],
-.dark [data-admin] [type="url"],
-.dark [data-admin] [type="password"],
-.dark [data-admin] [type="number"],
-.dark [data-admin] [type="date"],
-.dark [data-admin] [type="datetime-local"],
-.dark [data-admin] [type="month"],
-.dark [data-admin] [type="search"],
-.dark [data-admin] [type="tel"],
-.dark [data-admin] [type="time"],
-.dark [data-admin] [type="week"],
-.dark [data-admin] [multiple],
-.dark [data-admin] textarea {
+/* ── Dark mode: override @tailwindcss/forms ──────────────────────── */
+[data-admin].dark select,
+[data-admin].dark [type="text"],
+[data-admin].dark [type="email"],
+[data-admin].dark [type="url"],
+[data-admin].dark [type="password"],
+[data-admin].dark [type="number"],
+[data-admin].dark [type="date"],
+[data-admin].dark [type="datetime-local"],
+[data-admin].dark [type="month"],
+[data-admin].dark [type="search"],
+[data-admin].dark [type="tel"],
+[data-admin].dark [type="time"],
+[data-admin].dark [type="week"],
+[data-admin].dark [multiple],
+[data-admin].dark textarea {
 	background-color: var(--color-surface);
 	border-color: var(--color-input-border);
 	color: var(--color-foreground);
 }
 
-.dark [data-admin] select {
+[data-admin].dark select {
 	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
 }
 
-.dark [data-admin] input::placeholder,
-.dark [data-admin] textarea::placeholder {
+[data-admin].dark input::placeholder,
+[data-admin].dark textarea::placeholder {
 	color: var(--color-placeholder);
 }
 
-.dark [data-admin] [type="checkbox"],
-.dark [data-admin] [type="radio"] {
+[data-admin].dark [type="checkbox"],
+[data-admin].dark [type="radio"] {
 	background-color: var(--color-surface);
 	border-color: var(--color-input-border);
 }
 
-/* ── Dark mode: prose (typography plugin for rich text editor) ────── */
-.dark .prose {
+/* ── Dark mode: prose (rich text editor) ─────────────────────────── */
+[data-admin].dark .prose {
 	--tw-prose-body: var(--color-foreground);
 	--tw-prose-headings: var(--color-foreground);
 	--tw-prose-lead: var(--color-foreground-secondary);
@@ -101,18 +100,16 @@
 }
 
 /* ── Dark mode: Tiptap placeholder ───────────────────────────────── */
-.dark .tiptap p.is-editor-empty:first-child::before {
+[data-admin].dark .tiptap p.is-editor-empty:first-child::before {
 	color: var(--color-placeholder) !important;
 }
 
-/* ── Dark mode: focus ring offset color (scoped to admin) ────────── */
-.dark [data-admin] *:focus-visible {
+/* ── Dark mode: focus ring offset ────────────────────────────────── */
+[data-admin].dark *:focus-visible {
 	--tw-ring-offset-color: var(--color-surface);
 }
 
-/* ── Admin-specific styles ───────────────────────────────────────── */
-
-/* Override global focus styles for admin UI */
+/* ── Admin-specific: override global focus styles ────────────────── */
 [data-admin] *:focus-visible {
 	@apply ring-2 ring-blue-500 ring-offset-2 outline-none;
 }

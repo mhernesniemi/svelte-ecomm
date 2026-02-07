@@ -5,7 +5,7 @@
   import { enhance } from "$app/forms";
   import { Toaster } from "$lib/components/admin/ui/sonner";
   import ThemeToggle from "$lib/components/admin/ThemeToggle.svelte";
-  import { initTheme } from "$lib/stores/admin-theme.svelte";
+  import { initTheme, isDark } from "$lib/stores/admin-theme.svelte";
   import type { LayoutData } from "./$types";
   import Package from "@lucide/svelte/icons/package";
   import LayoutGrid from "@lucide/svelte/icons/layout-grid";
@@ -46,7 +46,7 @@
   }
 </script>
 
-<div class="min-h-screen bg-background font-sans text-foreground" data-admin>
+<div class="min-h-screen bg-background font-sans text-foreground" data-admin class:dark={isDark()}>
   <!-- Sidebar -->
   <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white dark:bg-gray-900/70">
     <div class="p-6">
