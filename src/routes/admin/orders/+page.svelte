@@ -81,8 +81,8 @@
     <a
       href="/admin/orders"
       class="rounded-full px-3 py-1 text-sm {!data.currentState
-        ? 'bg-blue-600 text-white'
-        : 'bg-muted-strong text-foreground-secondary hover:bg-muted'}"
+        ? 'bg-blue-800 text-white'
+        : 'bg-muted-strong text-foreground-secondary hover:text-white'}"
     >
       All
     </a>
@@ -90,8 +90,8 @@
       <a
         href="/admin/orders?state={state}"
         class="rounded-full px-3 py-1 text-sm capitalize {data.currentState === state
-          ? 'bg-blue-600 text-white'
-          : 'bg-muted-strong text-foreground-secondary hover:bg-muted'}"
+          ? 'bg-blue-800 text-white'
+          : 'bg-muted-strong text-foreground-secondary hover:text-white'}"
       >
         {state.replace("_", " ")}
       </a>

@@ -117,7 +117,7 @@
       href="/admin/reviews"
       class="rounded-full px-3 py-1 text-sm {!data.currentStatus
         ? 'bg-blue-800 text-white'
-        : 'bg-muted-strong text-foreground-secondary hover:bg-muted'}"
+        : 'bg-muted-strong text-foreground-secondary hover:text-white'}"
     >
       All
     </a>
@@ -126,7 +126,7 @@
         href="/admin/reviews?status={status}"
         class="rounded-full px-3 py-1 text-sm capitalize {data.currentStatus === status
           ? 'bg-blue-800 text-white'
-          : 'bg-muted-strong text-foreground-secondary hover:bg-muted'}"
+          : 'bg-muted-strong text-foreground-secondary hover:text-white'}"
       >
         {status}
       </a>
