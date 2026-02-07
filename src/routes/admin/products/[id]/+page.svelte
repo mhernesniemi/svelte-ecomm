@@ -277,7 +277,10 @@
             </div>
 
             <div>
-              <label for="description" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              <label
+                for="description"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
                 Description
               </label>
               <RichTextEditor
@@ -292,7 +295,10 @@
           <div class="grid grid-cols-2 gap-4">
             <label class="block">
               <span class="text-sm font-medium text-foreground-secondary">Product Type</span>
-              <select name="type" class="mt-1 block w-full rounded-md border-input-border shadow-sm">
+              <select
+                name="type"
+                class="mt-1 block w-full rounded-md border-input-border shadow-sm"
+              >
                 <option value="physical" selected={data.product.type === "physical"}
                   >Physical</option
                 >
@@ -302,7 +308,10 @@
 
             <label class="block">
               <span class="text-sm font-medium text-foreground-secondary">Tax Rate</span>
-              <select name="taxCode" class="mt-1 block w-full rounded-md border-input-border shadow-sm">
+              <select
+                name="taxCode"
+                class="mt-1 block w-full rounded-md border-input-border shadow-sm"
+              >
                 {#each data.taxRates as rate}
                   <option value={rate.code} selected={data.product.taxCode === rate.code}>
                     {rate.name} ({(rate.rate * 100).toFixed(0)}%)
@@ -340,7 +349,7 @@
           <TableBody>
             {#if data.product.variants.length === 0}
               <TableRow class="hover:bg-transparent">
-                <TableCell colspan={6} class="py-8 text-center text-muted-foreground">
+                <TableCell colspan={6} class="py-8 text-center text-sm text-muted-foreground">
                   No variants yet. Add a variant to start selling this product.
                 </TableCell>
               </TableRow>

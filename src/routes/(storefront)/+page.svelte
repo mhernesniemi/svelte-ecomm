@@ -54,7 +54,7 @@
                 or
                 <span
                   class="ml-1 inline-flex items-center overflow-hidden rounded-md border border-pink-200 transition-colors duration-300 {copied
-                    ? 'bg-pink-300'
+                    ? 'bg-pink-200'
                     : 'bg-white'}"
                 >
                   <code
