@@ -58,10 +58,10 @@
       {#each navItems as item}
         <a
           href={item.href}
-          class="flex items-center gap-3 px-6 py-3 text-gray-300 transition-colors hover:bg-gray-800 hover:text-white {isActive(
+          class="flex items-center gap-3 px-6 py-3 text-gray-300 transition-colors hover:bg-gray-800/60 hover:text-white {isActive(
             item.href
           )
-            ? 'border-l-4 border-blue-500 bg-gray-800 text-white'
+            ? 'border-l-4 border-blue-500 bg-gray-800/60 text-white'
             : ''}"
         >
           <span class="h-5 w-5">
