@@ -4,4 +4,4 @@
   let { ...restProps }: PopoverPrimitive.PortalProps = $props();
 </script>
 
-<PopoverPrimitive.Portal {...restProps} />
+<PopoverPrimitive.Portal to="[data-admin]" {...restProps} />

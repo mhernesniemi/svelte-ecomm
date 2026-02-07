@@ -10,7 +10,7 @@
   }: DialogPrimitive.ContentProps & { children?: import("svelte").Snippet } = $props();
 </script>
 
-<DialogPrimitive.Portal>
+<DialogPrimitive.Portal to="[data-admin]">
   <DialogOverlay />
   <DialogPrimitive.Content
     class={cn(
