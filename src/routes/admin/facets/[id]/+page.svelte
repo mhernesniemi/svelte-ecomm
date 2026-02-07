@@ -39,10 +39,10 @@
   <!-- Header -->
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <a href="/admin/facets" class="text-gray-500 hover:text-gray-700" aria-label="Back to facets">
+      <a href="/admin/facets" class="text-muted-foreground hover:text-foreground-secondary" aria-label="Back to facets">
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">{getName(data.facet.translations)}</h1>
+      <h1 class="text-2xl font-bold text-foreground">{getName(data.facet.translations)}</h1>
     </div>
     <Button type="submit" form="facet-form" disabled={isSubmitting}>
       {isSubmitting ? "Saving..." : "Save Changes"}
@@ -61,29 +61,29 @@
         await update({ reset: false });
       };
     }}
-    class="overflow-hidden rounded-lg bg-white shadow"
+    class="overflow-hidden rounded-lg bg-surface shadow"
   >
     <div class="p-6">
-      <h2 class="mb-4 text-lg font-medium text-gray-900">Facet Details</h2>
+      <h2 class="mb-4 text-lg font-medium text-foreground">Facet Details</h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label for="facet_name" class="mb-1 block text-sm font-medium text-gray-700">Name</label>
+          <label for="facet_name" class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label>
           <input
             type="text"
             id="facet_name"
             name="name_en"
             bind:value={facetName}
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
         <div>
-          <label for="facet_code" class="mb-1 block text-sm font-medium text-gray-700">Code</label>
+          <label for="facet_code" class="mb-1 block text-sm font-medium text-foreground-secondary">Code</label>
           <input
             type="text"
             id="facet_code"
             name="code"
             bind:value={facetCode}
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
       </div>
@@ -91,11 +91,11 @@
   </form>
 
   <!-- Values -->
-  <div class="overflow-hidden rounded-lg bg-white shadow">
-    <div class="flex items-center justify-between border-b border-gray-200 p-6">
+  <div class="overflow-hidden rounded-lg bg-surface shadow">
+    <div class="flex items-center justify-between border-b border-border p-6">
       <div>
-        <h2 class="text-lg font-medium text-gray-900">Values</h2>
-        <p class="mt-1 text-sm text-gray-600">
+        <h2 class="text-lg font-medium text-foreground">Values</h2>
+        <p class="mt-1 text-sm text-foreground-tertiary">
           {data.facet.values.length} value{data.facet.values.length !== 1 ? "s" : ""}
         </p>
       </div>
@@ -115,7 +115,7 @@
 
     <!-- Add Value Form -->
     {#if showAddValue}
-      <div class="border-b border-gray-200 bg-gray-50 p-6">
+      <div class="border-b border-border bg-background p-6">
         <form
           method="POST"
           action="?/createValue"
@@ -128,7 +128,7 @@
         >
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label for="new_value_name" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="new_value_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Name
               </label>
               <input
@@ -136,11 +136,11 @@
                 id="new_value_name"
                 name="name_en"
                 placeholder="e.g., Red"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label for="new_value_code" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="new_value_code" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Code
               </label>
               <input
@@ -148,7 +148,7 @@
                 id="new_value_code"
                 name="code"
                 placeholder="e.g., red"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
               />
             </div>
           </div>
@@ -170,32 +170,32 @@
     <!-- Values List -->
     {#if data.facet.values.length === 0 && !showAddValue}
       <div class="p-12 text-center">
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-muted-foreground">
           No values yet. Add values to use this facet for filtering.
         </p>
       </div>
     {:else}
       <div>
         {#each data.facet.values as value, i}
-          <div class={i > 0 ? "border-t border-gray-200" : ""}>
+          <div class={i > 0 ? "border-t border-border" : ""}>
             <!-- Value row -->
             <button
               type="button"
               class="group flex w-full cursor-pointer items-center justify-between px-6 py-3 text-left {editingValueId ===
               value.id
-                ? 'bg-gray-50'
-                : 'hover:bg-gray-50'}"
+                ? 'bg-background'
+                : 'hover:bg-hover'}"
               onclick={() => {
                 editingValueId = editingValueId === value.id ? null : value.id;
                 showAddValue = false;
               }}
             >
               <div class="flex items-center gap-3">
-                <span class="font-medium text-gray-900">{getName(value.translations)}</span>
-                <span class="text-sm text-gray-400">{value.code}</span>
+                <span class="font-medium text-foreground">{getName(value.translations)}</span>
+                <span class="text-sm text-placeholder">{value.code}</span>
               </div>
               <Pencil
-                class="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 {editingValueId ===
+                class="h-4 w-4 text-placeholder opacity-0 transition-opacity group-hover:opacity-100 {editingValueId ===
                 value.id
                   ? '!text-blue-600 !opacity-100'
                   : ''}"
@@ -204,7 +204,7 @@
 
             <!-- Value edit panel -->
             {#if editingValueId === value.id}
-              <div class="border-t border-gray-100 bg-gray-50 px-6 pt-3 pb-4">
+              <div class="border-t border-border bg-background px-6 pt-3 pb-4">
                 <form
                   method="POST"
                   action="?/updateValue"
@@ -220,7 +220,7 @@
                     <div>
                       <label
                         for="edit_value_name_{value.id}"
-                        class="mb-1 block text-sm font-medium text-gray-700"
+                        class="mb-1 block text-sm font-medium text-foreground-secondary"
                       >
                         Name
                       </label>
@@ -229,13 +229,13 @@
                         id="edit_value_name_{value.id}"
                         name="name_en"
                         value={getName(value.translations)}
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       />
                     </div>
                     <div>
                       <label
                         for="edit_value_code_{value.id}"
-                        class="mb-1 block text-sm font-medium text-gray-700"
+                        class="mb-1 block text-sm font-medium text-foreground-secondary"
                       >
                         Code
                       </label>
@@ -244,7 +244,7 @@
                         id="edit_value_code_{value.id}"
                         name="code"
                         value={value.code}
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       />
                     </div>
                   </div>
@@ -262,7 +262,7 @@
                     </div>
                   </div>
                 </form>
-                <div class="mt-3 border-t border-gray-200 pt-3">
+                <div class="mt-3 border-t border-border pt-3">
                   <form
                     method="POST"
                     action="?/deleteValue"

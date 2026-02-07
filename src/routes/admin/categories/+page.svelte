@@ -21,7 +21,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Categories</h1>
+      <h1 class="text-2xl font-bold text-foreground">Categories</h1>
     </div>
     <Button type="button" onclick={() => (showCreate = !showCreate)}
       ><PlusIcon class="h-4 w-4" /> Add Category</Button
@@ -30,8 +30,8 @@
 
   <!-- Create Category Form -->
   {#if showCreate}
-    <div class="mb-6 rounded-lg border border-gray-200 bg-white p-6">
-      <h2 class="mb-4 text-sm font-semibold text-gray-900">New Category</h2>
+    <div class="mb-6 rounded-lg border border-border bg-surface p-6">
+      <h2 class="mb-4 text-sm font-semibold text-foreground">New Category</h2>
       <form
         method="POST"
         action="?/create"
@@ -44,7 +44,7 @@
       >
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <label for="cat_name_en" class="mb-1 block text-sm font-medium text-gray-700">
+            <label for="cat_name_en" class="mb-1 block text-sm font-medium text-foreground-secondary">
               Name
             </label>
             <input
@@ -52,11 +52,11 @@
               id="cat_name_en"
               name="name_en"
               placeholder="e.g., Electronics"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label for="cat_slug" class="mb-1 block text-sm font-medium text-gray-700">
+            <label for="cat_slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
               Slug
             </label>
             <input
@@ -64,17 +64,17 @@
               id="cat_slug"
               name="slug"
               placeholder="e.g., electronics"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             />
           </div>
           <div>
-            <label for="cat_parent" class="mb-1 block text-sm font-medium text-gray-700">
+            <label for="cat_parent" class="mb-1 block text-sm font-medium text-foreground-secondary">
               Parent
             </label>
             <select
               id="cat_parent"
               name="parent_id"
-              class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             >
               <option value="">None (Root)</option>
               {#each data.categories as category}
@@ -95,17 +95,17 @@
 
   <!-- Categories Tree -->
   {#if data.tree.length === 0}
-    <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
-      <FolderOpen class="mx-auto h-12 w-12 text-gray-400" />
-      <h3 class="mt-2 text-sm font-medium text-gray-900">No categories</h3>
-      <p class="mt-1 text-sm text-gray-500">Get started by creating a root category.</p>
+    <div class="rounded-lg border border-dashed border-input-border p-12 text-center">
+      <FolderOpen class="mx-auto h-12 w-12 text-placeholder" />
+      <h3 class="mt-2 text-sm font-medium text-foreground">No categories</h3>
+      <p class="mt-1 text-sm text-muted-foreground">Get started by creating a root category.</p>
       <div class="mt-6">
         <Button type="button" onclick={() => (showCreate = true)}>Add Category</Button>
       </div>
     </div>
   {:else}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div class="overflow-hidden rounded-lg border border-gray-200 bg-white py-2">
+      <div class="overflow-hidden rounded-lg border border-border bg-surface py-2">
         {#snippet categoryNode(node: (typeof data.tree)[0], depth: number, parentPath: string)}
           {@const fullPath = `${parentPath}/${node.slug}`}
           <div>
@@ -114,19 +114,19 @@
               type="button"
               class="group flex w-full cursor-pointer items-center justify-between px-4 py-2 text-left {editingId ===
               node.id
-                ? 'bg-gray-50'
-                : 'hover:bg-gray-50'}"
+                ? 'bg-background'
+                : 'hover:bg-hover'}"
               onclick={() => (editingId = editingId === node.id ? null : node.id)}
             >
               <div class="flex items-center gap-2">
                 {#if depth > 0}
                   <span class="whitespace-pre text-gray-300">{"— ".repeat(depth)}</span>
                 {/if}
-                <span class="text-sm font-medium text-gray-900">{getName(node.translations)}</span>
-                <span class="text-sm text-gray-400">{fullPath}</span>
+                <span class="text-sm font-medium text-foreground">{getName(node.translations)}</span>
+                <span class="text-sm text-placeholder">{fullPath}</span>
               </div>
               <Pencil
-                class="h-4 w-4 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 {editingId ===
+                class="h-4 w-4 text-placeholder opacity-0 transition-opacity group-hover:opacity-100 {editingId ===
                 node.id
                   ? '!text-blue-600 !opacity-100'
                   : ''}"
@@ -134,7 +134,7 @@
             </button>
             <!-- Edit panel -->
             {#if editingId === node.id}
-              <div class="border-t border-gray-100 bg-gray-50 px-4 pt-3 pb-4">
+              <div class="border-t border-border bg-background px-4 pt-3 pb-4">
                 <form
                   method="POST"
                   action="?/update"
@@ -150,7 +150,7 @@
                     <div>
                       <label
                         for="edit_name_{node.id}"
-                        class="mb-1 block text-sm font-medium text-gray-700"
+                        class="mb-1 block text-sm font-medium text-foreground-secondary"
                       >
                         Name
                       </label>
@@ -159,13 +159,13 @@
                         id="edit_name_{node.id}"
                         name="name_en"
                         value={getName(node.translations)}
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       />
                     </div>
                     <div>
                       <label
                         for="edit_slug_{node.id}"
-                        class="mb-1 block text-sm font-medium text-gray-700"
+                        class="mb-1 block text-sm font-medium text-foreground-secondary"
                       >
                         Slug
                       </label>
@@ -174,20 +174,20 @@
                         id="edit_slug_{node.id}"
                         name="slug"
                         value={node.slug}
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       />
                     </div>
                     <div>
                       <label
                         for="edit_parent_{node.id}"
-                        class="mb-1 block text-sm font-medium text-gray-700"
+                        class="mb-1 block text-sm font-medium text-foreground-secondary"
                       >
                         Parent
                       </label>
                       <select
                         id="edit_parent_{node.id}"
                         name="parent_id"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       >
                         <option value="">None (Root)</option>
                         {#each data.categories.filter((c) => c.id !== node.id) as category}
@@ -212,7 +212,7 @@
                     </div>
                   </div>
                 </form>
-                <div class="mt-3 border-t border-gray-200 pt-3">
+                <div class="mt-3 border-t border-border pt-3">
                   <form
                     method="POST"
                     action="?/delete"

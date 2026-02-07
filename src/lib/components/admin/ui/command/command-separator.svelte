@@ -12,6 +12,6 @@
 <CommandPrimitive.Separator
   bind:ref
   data-slot="command-separator"
-  class={cn("-mx-1 h-px bg-gray-200", className)}
+  class={cn("-mx-1 h-px bg-border", className)}
   {...restProps}
 />

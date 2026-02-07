@@ -115,22 +115,22 @@
     <div class="flex items-center gap-4">
       <a
         href="/admin/collections"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground-secondary"
         aria-label="Back to collections"
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">Edit Collection</h1>
+      <h1 class="text-2xl font-bold text-foreground">Edit Collection</h1>
     </div>
     <div class="flex items-center gap-3">
-      <span class="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+      <span class="rounded-full bg-accent-subtle px-3 py-1 text-sm font-medium text-blue-800">
         {data.productCount} products
       </span>
       {#if slug}
         <a
           href="/collections/{data.collection.id}/{slug}"
           target="_blank"
-          class="text-sm text-gray-500 hover:text-gray-700"
+          class="text-sm text-muted-foreground hover:text-foreground-secondary"
         >
           View in store &rarr;
         </a>
@@ -155,14 +155,14 @@
     }}
     class="space-y-6"
   >
-    <div class="overflow-hidden rounded-lg bg-white shadow">
+    <div class="overflow-hidden rounded-lg bg-surface shadow">
       <div class="p-6">
-        <h2 class="mb-4 text-lg font-medium text-gray-900">Basic Information</h2>
+        <h2 class="mb-4 text-lg font-medium text-foreground">Basic Information</h2>
 
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="name" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Name <span class="text-red-500">*</span>
               </label>
               <input
@@ -171,11 +171,11 @@
                 name="name"
                 bind:value={name}
                 required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
               />
             </div>
             <div>
-              <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Slug <span class="text-red-500">*</span>
               </label>
               <input
@@ -184,12 +184,12 @@
                 name="slug"
                 bind:value={slug}
                 required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
               />
             </div>
           </div>
           <div>
-            <label for="description" class="mb-1 block text-sm font-medium text-gray-700">
+            <label for="description" class="mb-1 block text-sm font-medium text-foreground-secondary">
               Description
             </label>
             <RichTextEditor
@@ -208,9 +208,9 @@
               id="is_private"
               name="is_private"
               bind:checked={isPrivate}
-              class="h-4 w-4 rounded border-gray-300 text-blue-600"
+              class="h-4 w-4 rounded border-input-border text-blue-600"
             />
-            <label for="is_private" class="text-sm font-medium text-gray-700">
+            <label for="is_private" class="text-sm font-medium text-foreground-secondary">
               Private collection (hidden from storefront)
             </label>
           </div>
@@ -221,10 +221,10 @@
   </form>
 
   <!-- Collection Filters -->
-  <div class="overflow-hidden rounded-lg bg-white shadow">
+  <div class="overflow-hidden rounded-lg bg-surface shadow">
     <div class="p-6">
-      <h2 class="mb-4 text-lg font-medium text-gray-900">Collection Filters</h2>
-      <p class="mb-4 text-sm text-gray-600">
+      <h2 class="mb-4 text-lg font-medium text-foreground">Collection Filters</h2>
+      <p class="mb-4 text-sm text-foreground-tertiary">
         Products are included in this collection based on these filters. Multiple filters use AND
         logic.
       </p>
@@ -234,12 +234,12 @@
         <div class="mb-6 space-y-2">
           {#each data.collection.filters as filter}
             <div
-              class="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 p-3"
+              class="flex items-center justify-between rounded-lg border border-border bg-background p-3"
             >
               <div>
-                <span class="font-medium text-gray-900">{getFieldLabel(filter.field)}</span>
-                <span class="mx-2 text-gray-500">{getOperatorLabel(filter.operator)}</span>
-                <span class="text-gray-700">{formatFilterValue(filter.field, filter.value)}</span>
+                <span class="font-medium text-foreground">{getFieldLabel(filter.field)}</span>
+                <span class="mx-2 text-muted-foreground">{getOperatorLabel(filter.operator)}</span>
+                <span class="text-foreground-secondary">{formatFilterValue(filter.field, filter.value)}</span>
               </div>
               <form
                 method="POST"
@@ -255,7 +255,7 @@
                 <input type="hidden" name="filterId" value={filter.id} />
                 <button
                   type="submit"
-                  class="rounded p-1 text-red-600 hover:bg-red-50 hover:text-red-800"
+                  class="rounded p-1 text-red-600 hover:bg-destructive-subtle hover:text-red-800"
                   aria-label="Remove filter"
                 >
                   <X class="h-5 w-5" />
@@ -265,8 +265,8 @@
           {/each}
         </div>
       {:else}
-        <div class="mb-6 rounded-lg border border-dashed border-gray-300 p-6 text-center">
-          <p class="text-sm text-gray-500">
+        <div class="mb-6 rounded-lg border border-dashed border-input-border p-6 text-center">
+          <p class="text-sm text-muted-foreground">
             No filters defined. Add filters below to populate this collection.
           </p>
         </div>
@@ -288,20 +288,20 @@
             }
           };
         }}
-        class="rounded-lg border border-gray-200 bg-gray-50 p-4"
+        class="rounded-lg border border-border bg-background p-4"
       >
-        <h3 class="mb-3 text-sm font-medium text-gray-900">Add Filter</h3>
+        <h3 class="mb-3 text-sm font-medium text-foreground">Add Filter</h3>
 
         <div class="mb-4 grid grid-cols-3 gap-4">
           <div>
-            <label for="field" class="mb-1 block text-sm font-medium text-gray-700">
+            <label for="field" class="mb-1 block text-sm font-medium text-foreground-secondary">
               Filter Type
             </label>
             <select
               id="field"
               name="field"
               bind:value={newFilterField}
-              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+              class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
             >
               <option value="">Select type...</option>
               <option value="facet">Facet Values</option>
@@ -313,14 +313,14 @@
           </div>
 
           <div>
-            <label for="operator" class="mb-1 block text-sm font-medium text-gray-700">
+            <label for="operator" class="mb-1 block text-sm font-medium text-foreground-secondary">
               Operator
             </label>
             <select
               id="operator"
               name="operator"
               bind:value={newFilterOperator}
-              class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+              class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
             >
               {#if newFilterField === "facet" || newFilterField === "product" || newFilterField === "variant"}
                 <option value="in">in (matches any)</option>
@@ -342,19 +342,19 @@
           </div>
 
           <div>
-            <label for="value" class="mb-1 block text-sm font-medium text-gray-700">Value</label>
+            <label for="value" class="mb-1 block text-sm font-medium text-foreground-secondary">Value</label>
             {#if newFilterField === "facet"}
               <input type="hidden" name="value" value={selectedFacetValues.join(",")} />
-              <div class="text-sm text-gray-500">Select facet values below</div>
+              <div class="text-sm text-muted-foreground">Select facet values below</div>
             {:else if newFilterField === "product"}
               <input type="hidden" name="value" value={selectedProducts.join(",")} />
-              <div class="text-sm text-gray-500">Select products below</div>
+              <div class="text-sm text-muted-foreground">Select products below</div>
             {:else if newFilterField === "visibility"}
               <select
                 id="value"
                 name="value"
                 bind:value={newFilterValue}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
               >
                 <option value="public">Public</option>
                 <option value="private">Private (B2B only)</option>
@@ -367,7 +367,7 @@
                 name="value"
                 bind:value={newFilterValue}
                 placeholder="Price in cents (e.g., 1000 for 10.00)"
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
               />
             {:else if newFilterField === "stock"}
               <input
@@ -376,7 +376,7 @@
                 name="value"
                 bind:value={newFilterValue}
                 placeholder="Minimum stock (e.g., 0 for in stock)"
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
               />
             {:else}
               <input
@@ -384,7 +384,7 @@
                 id="value"
                 name="value"
                 bind:value={newFilterValue}
-                class="block w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
               />
             {/if}
           </div>
@@ -392,11 +392,11 @@
 
         <!-- Facet value selector -->
         {#if newFilterField === "facet"}
-          <div class="mb-4 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white p-3">
+          <div class="mb-4 max-h-48 overflow-y-auto rounded-lg border border-border bg-surface p-3">
             {#each data.facets as facet}
               {@const facetTrans = facet.translations.find((t) => t.languageCode === "en")}
               <div class="mb-3">
-                <div class="mb-1 text-sm font-medium text-gray-700">
+                <div class="mb-1 text-sm font-medium text-foreground-secondary">
                   {facetTrans?.name ?? facet.code}
                 </div>
                 <div class="flex flex-wrap gap-2">
@@ -406,8 +406,8 @@
                       class="inline-flex cursor-pointer items-center rounded-full border px-3 py-1 text-sm {selectedFacetValues.includes(
                         value.id
                       )
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'}"
+                        ? 'border-blue-500 bg-accent-subtle text-blue-700'
+                        : 'border-border bg-surface text-foreground-secondary hover:border-input-border'}"
                     >
                       <input
                         type="checkbox"
@@ -434,13 +434,13 @@
 
         <!-- Product selector -->
         {#if newFilterField === "product"}
-          <div class="mb-4 max-h-48 overflow-y-auto rounded-lg border border-gray-200 bg-white p-3">
+          <div class="mb-4 max-h-48 overflow-y-auto rounded-lg border border-border bg-surface p-3">
             <div class="space-y-1">
               {#each data.products as product}
-                <label class="flex cursor-pointer items-center gap-2 rounded p-2 hover:bg-gray-50">
+                <label class="flex cursor-pointer items-center gap-2 rounded p-2 hover:bg-hover">
                   <input
                     type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-blue-600"
+                    class="h-4 w-4 rounded border-input-border text-blue-600"
                     checked={selectedProducts.includes(product.id)}
                     onchange={() => {
                       if (selectedProducts.includes(product.id)) {
@@ -450,7 +450,7 @@
                       }
                     }}
                   />
-                  <span class="text-sm text-gray-700">{getProductName(product)}</span>
+                  <span class="text-sm text-foreground-secondary">{getProductName(product)}</span>
                 </label>
               {/each}
             </div>
@@ -474,15 +474,15 @@
 
   <!-- Preview -->
   {#if data.preview.length > 0}
-    <div class="overflow-hidden rounded-lg bg-white shadow">
+    <div class="overflow-hidden rounded-lg bg-surface shadow">
       <div class="p-6">
-        <h2 class="mb-4 text-lg font-medium text-gray-900">
+        <h2 class="mb-4 text-lg font-medium text-foreground">
           Preview ({data.productCount} products)
         </h2>
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
           {#each data.preview as product}
             {@const trans = product.translations.find((t) => t.languageCode === "en")}
-            <div class="rounded-lg border border-gray-200 p-2">
+            <div class="rounded-lg border border-border p-2">
               {#if product.featuredAsset}
                 <img
                   src="{product.featuredAsset.source}?tr=w-100,h-100,fo-auto"
@@ -491,12 +491,12 @@
                 />
               {:else}
                 <div
-                  class="mb-2 flex aspect-square w-full items-center justify-center rounded bg-gray-100"
+                  class="mb-2 flex aspect-square w-full items-center justify-center rounded bg-muted"
                 >
-                  <ImageIcon class="h-8 w-8 text-gray-400" />
+                  <ImageIcon class="h-8 w-8 text-placeholder" />
                 </div>
               {/if}
-              <p class="truncate text-xs text-gray-700">{trans?.name ?? "Untitled"}</p>
+              <p class="truncate text-xs text-foreground-secondary">{trans?.name ?? "Untitled"}</p>
             </div>
           {/each}
         </div>

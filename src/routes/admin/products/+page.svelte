@@ -77,12 +77,12 @@
     {#if image}
       <img src={image} alt="" class="mr-3 h-10 w-10 rounded object-cover" />
     {:else}
-      <div class="mr-3 flex h-10 w-10 items-center justify-center rounded bg-gray-200">
-        <ImageIcon class="h-5 w-5 text-gray-400" />
+      <div class="mr-3 flex h-10 w-10 items-center justify-center rounded bg-muted-strong">
+        <ImageIcon class="h-5 w-5 text-placeholder" />
       </div>
     {/if}
     <div>
-      <p class="font-medium text-gray-900 group-hover:text-blue-600">{name}</p>
+      <p class="font-medium text-foreground group-hover:text-blue-600">{name}</p>
     </div>
   </a>
 {/snippet}
@@ -104,7 +104,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Products</h1>
+      <h1 class="text-2xl font-bold text-foreground">Products</h1>
     </div>
     <a href="/admin/products/new" class={buttonVariants()}
       ><PlusIcon class="h-4 w-4" /> Add Product</a

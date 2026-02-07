@@ -103,12 +103,12 @@
             await update({ reset: false });
           };
         }}
-        class="rounded-lg bg-white shadow"
+        class="rounded-lg bg-surface shadow"
       >
         <div class="space-y-4 p-6">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="variant_name" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="variant_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Name
               </label>
               <input
@@ -116,11 +116,11 @@
                 id="variant_name"
                 name="variant_name"
                 value={variantName}
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
-              <label for="sku" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="sku" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 SKU <span class="text-red-500">*</span>
               </label>
               <input
@@ -129,7 +129,7 @@
                 name="sku"
                 value={data.variant.sku}
                 required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
@@ -137,12 +137,12 @@
       </form>
 
       <!-- Price and Stock -->
-      <div class="rounded-lg bg-white shadow">
+      <div class="rounded-lg bg-surface shadow">
         <div class="space-y-4 p-6">
           <h2 class="text-lg font-semibold">Price and stock</h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="price" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="price" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Price (EUR) <span class="text-red-500">*</span>
               </label>
               <input
@@ -154,11 +154,11 @@
                 min="0"
                 value={(data.variant.price / 100).toFixed(2)}
                 required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
-              <label for="stock" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="stock" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Stock
               </label>
               <input
@@ -168,7 +168,7 @@
                 form="variant-form"
                 min="0"
                 value={data.variant.stock}
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
@@ -179,24 +179,24 @@
     <!-- Sidebar (Right) -->
     <div class="w-80 shrink-0 space-y-6">
       <!-- Facet Values Section -->
-      <div class="rounded-lg bg-white shadow">
-        <div class="border-b border-gray-200 px-4 py-3">
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
           <h2 class="font-semibold">Facet Values</h2>
         </div>
 
         <div class="p-4">
           {#if data.facets.length === 0}
-            <p class="text-sm text-gray-500">No facets defined.</p>
+            <p class="text-sm text-muted-foreground">No facets defined.</p>
           {:else}
             <!-- Combobox -->
             <Popover.Root bind:open={facetComboboxOpen}>
               <Popover.Trigger
-                class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                 aria-expanded={facetComboboxOpen}
                 aria-controls="facet-listbox"
                 aria-haspopup="listbox"
               >
-                <span class="text-gray-500">Select facet values...</span>
+                <span class="text-muted-foreground">Select facet values...</span>
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Popover.Trigger>
               <Popover.Content class="w-72 p-0" align="start">
@@ -241,7 +241,7 @@
               <div class="mt-3 flex flex-wrap gap-1.5">
                 {#each getSelectedFacetValueObjects() as fv}
                   <span
-                    class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800"
+                    class="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs text-blue-800"
                   >
                     {fv.facetName}: {fv.name}
                     <button
@@ -266,8 +266,8 @@
       </div>
 
       <!-- Parent Product -->
-      <div class="rounded-lg bg-white shadow">
-        <div class="border-b border-gray-200 px-4 py-3">
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
           <h2 class="font-semibold">Parent Product</h2>
         </div>
         <div class="p-4">

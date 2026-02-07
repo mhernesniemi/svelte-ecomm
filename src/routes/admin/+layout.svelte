@@ -1,8 +1,11 @@
 <script lang="ts">
   import "./admin.css";
+  import { onMount } from "svelte";
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
   import { Toaster } from "$lib/components/admin/ui/sonner";
+  import ThemeToggle from "$lib/components/admin/ThemeToggle.svelte";
+  import { initTheme } from "$lib/stores/admin-theme.svelte";
   import type { LayoutData } from "./$types";
   import Package from "@lucide/svelte/icons/package";
   import LayoutGrid from "@lucide/svelte/icons/layout-grid";
@@ -15,6 +18,10 @@
   import FileText from "@lucide/svelte/icons/file-text";
 
   let { children, data }: { children: any; data: LayoutData } = $props();
+
+  onMount(() => {
+    return initTheme();
+  });
 
   interface NavItem {
     href: string;
@@ -39,7 +46,7 @@
   }
 </script>
 
-<div class="min-h-screen bg-gray-50 font-sans">
+<div class="min-h-screen bg-background font-sans text-foreground" data-admin>
   <!-- Sidebar -->
   <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
     <div class="p-6">
@@ -84,6 +91,9 @@
     </nav>
 
     <div class="absolute right-0 bottom-0 left-0 border-t border-gray-800 bg-gray-900 p-4">
+      <div class="mb-3 flex justify-center">
+        <ThemeToggle />
+      </div>
       <div class="flex items-center justify-between">
         <form method="POST" action="/admin/logout" use:enhance>
           <button type="submit" class="text-sm text-gray-400 hover:text-white">Logout</button>

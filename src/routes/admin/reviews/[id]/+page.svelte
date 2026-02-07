@@ -46,14 +46,14 @@
     <div class="flex items-center gap-4">
       <a
         href="/admin/reviews"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground-secondary"
         aria-label="Back to reviews"
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Review #{data.review.id}</h1>
-        <p class="mt-1 text-sm text-gray-600">
+        <h1 class="text-2xl font-bold text-foreground">Review #{data.review.id}</h1>
+        <p class="mt-1 text-sm text-foreground-tertiary">
           by {data.review.nickname} on {new Date(data.review.createdAt).toLocaleDateString()}
         </p>
       </div>
@@ -64,49 +64,49 @@
   </div>
 
   <!-- Review Content -->
-  <div class="overflow-hidden rounded-lg bg-white shadow">
+  <div class="overflow-hidden rounded-lg bg-surface shadow">
     <div class="p-6">
       <div class="mb-6">
-        <h2 class="mb-1 text-sm font-medium text-gray-500">Rating</h2>
+        <h2 class="mb-1 text-sm font-medium text-muted-foreground">Rating</h2>
         <span class="text-2xl text-yellow-500">{formatRating(data.review.rating)}</span>
       </div>
 
       <div class="mb-6">
-        <h2 class="mb-1 text-sm font-medium text-gray-500">Comment</h2>
+        <h2 class="mb-1 text-sm font-medium text-muted-foreground">Comment</h2>
         {#if data.review.comment}
-          <p class="whitespace-pre-wrap text-gray-900">{data.review.comment}</p>
+          <p class="whitespace-pre-wrap text-foreground">{data.review.comment}</p>
         {:else}
-          <p class="text-gray-400">No comment</p>
+          <p class="text-placeholder">No comment</p>
         {/if}
       </div>
 
-      <div class="grid grid-cols-1 gap-6 border-t border-gray-200 pt-6 sm:grid-cols-3">
+      <div class="grid grid-cols-1 gap-6 border-t border-border pt-6 sm:grid-cols-3">
         <div>
-          <h2 class="mb-1 text-sm font-medium text-gray-500">Product</h2>
+          <h2 class="mb-1 text-sm font-medium text-muted-foreground">Product</h2>
           {#if data.product}
             <a href="/admin/products/{data.product.id}" class="text-blue-600 hover:text-blue-800">
               {getProductName()}
             </a>
           {:else}
-            <span class="text-gray-400">Deleted product</span>
+            <span class="text-placeholder">Deleted product</span>
           {/if}
         </div>
 
         <div>
-          <h2 class="mb-1 text-sm font-medium text-gray-500">Customer</h2>
+          <h2 class="mb-1 text-sm font-medium text-muted-foreground">Customer</h2>
           {#if data.customer}
             <a href="/admin/customers/{data.customer.id}" class="text-blue-600 hover:text-blue-800">
               {data.customer.firstName}
               {data.customer.lastName}
             </a>
           {:else}
-            <span class="text-gray-400">Deleted customer</span>
+            <span class="text-placeholder">Deleted customer</span>
           {/if}
         </div>
 
         <div>
-          <h2 class="mb-1 text-sm font-medium text-gray-500">Verified Purchase</h2>
-          <span class={data.review.isVerifiedPurchase ? "text-green-600" : "text-gray-500"}>
+          <h2 class="mb-1 text-sm font-medium text-muted-foreground">Verified Purchase</h2>
+          <span class={data.review.isVerifiedPurchase ? "text-green-600" : "text-muted-foreground"}>
             {data.review.isVerifiedPurchase ? "Yes" : "No"}
           </span>
         </div>
@@ -115,9 +115,9 @@
   </div>
 
   <!-- Actions -->
-  <div class="overflow-hidden rounded-lg bg-white shadow">
+  <div class="overflow-hidden rounded-lg bg-surface shadow">
     <div class="p-6">
-      <h2 class="mb-4 text-lg font-medium text-gray-900">Actions</h2>
+      <h2 class="mb-4 text-lg font-medium text-foreground">Actions</h2>
       <div class="flex gap-3">
         {#if data.review.status !== "approved"}
           <form method="POST" action="?/approve" use:enhance>

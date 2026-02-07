@@ -38,12 +38,12 @@
     <div class="flex items-center gap-4">
       <a
         href="/admin/products"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground-secondary"
         aria-label="Back to products"
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">Create Product</h1>
+      <h1 class="text-2xl font-bold text-foreground">Create Product</h1>
     </div>
     <div class="flex items-center gap-3">
       <a href="/admin/products" class={buttonVariants({ variant: "outline" })}>Cancel</a>
@@ -59,11 +59,11 @@
         await update({ reset: false });
       };
     }}
-    class="rounded-lg bg-white shadow"
+    class="rounded-lg bg-surface shadow"
   >
     <div class="grid grid-cols-2 gap-4 p-10">
       <div>
-        <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+        <label for="name" class="mb-1 block text-sm font-medium text-foreground-secondary">
           Name <span class="text-red-500">*</span>
         </label>
         <input
@@ -72,12 +72,12 @@
           name="name"
           bind:value={name}
           required
-          class="w-full rounded-lg border border-gray-300 px-3 py-2"
+          class="w-full rounded-lg border border-input-border px-3 py-2"
         />
       </div>
 
       <div>
-        <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+        <label for="slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
           Slug <span class="text-red-500">*</span>
         </label>
         <div class="flex gap-2">
@@ -87,10 +87,10 @@
             name="slug"
             bind:value={slug}
             required
-            class="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+            class="flex-1 rounded-lg border border-input-border px-3 py-2"
           />
-          <label class="flex items-center gap-2 text-sm text-gray-500">
-            <input type="checkbox" bind:checked={autoSlug} class="rounded border-gray-300" />
+          <label class="flex items-center gap-2 text-sm text-muted-foreground">
+            <input type="checkbox" bind:checked={autoSlug} class="rounded border-input-border" />
             Auto
           </label>
         </div>

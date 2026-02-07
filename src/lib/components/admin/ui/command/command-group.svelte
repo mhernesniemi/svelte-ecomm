@@ -17,12 +17,12 @@
 <CommandPrimitive.Group
   bind:ref
   data-slot="command-group"
-  class={cn("overflow-hidden p-1 text-gray-900", className)}
+  class={cn("overflow-hidden p-1 text-foreground", className)}
   value={value ?? heading ?? `----${useId()}`}
   {...restProps}
 >
   {#if heading}
-    <CommandPrimitive.GroupHeading class="px-2 py-1.5 text-xs font-medium text-gray-500">
+    <CommandPrimitive.GroupHeading class="px-2 py-1.5 text-xs font-medium text-muted-foreground">
       {heading}
     </CommandPrimitive.GroupHeading>
   {/if}

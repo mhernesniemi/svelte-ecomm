@@ -205,14 +205,14 @@
       <!-- Review Stage: Add alt text -->
       <div class="max-h-[400px] space-y-4 overflow-y-auto py-4">
         {#each stagedImages as image, index}
-          <div class="flex gap-4 rounded-lg border border-gray-200 p-3">
+          <div class="flex gap-4 rounded-lg border border-border p-3">
             <img
               src="{image.url}?tr=w-100,h-100,fo-auto"
               alt={image.name}
               class="h-20 w-20 shrink-0 rounded object-cover"
             />
             <div class="flex-1">
-              <p class="mb-2 text-sm font-medium text-gray-700">{image.name}</p>
+              <p class="mb-2 text-sm font-medium text-foreground-secondary">{image.name}</p>
               <div>
                 <Label for="alt-{index}" class="text-xs">Alt text</Label>
                 <Input
@@ -239,7 +239,7 @@
       </Dialog.Footer>
     {:else}
       <!-- Selection Stage: Tabs -->
-      <div class="flex border-b border-gray-200" role="tablist">
+      <div class="flex border-b border-border" role="tablist">
         <div
           role="tab"
           tabindex="0"
@@ -248,7 +248,7 @@
           onkeydown={(e) => e.key === "Enter" && handleTabChange("upload")}
           class="cursor-pointer px-4 py-2 text-sm font-medium {activeTab === 'upload'
             ? 'border-b-2 border-blue-500 text-blue-600'
-            : 'text-gray-500 hover:text-gray-700'}"
+            : 'text-muted-foreground hover:text-foreground-secondary'}"
         >
           <Upload class="mr-1.5 inline-block h-4 w-4" />
           Upload New
@@ -261,7 +261,7 @@
           onkeydown={(e) => e.key === "Enter" && handleTabChange("existing")}
           class="cursor-pointer px-4 py-2 text-sm font-medium {activeTab === 'existing'
             ? 'border-b-2 border-blue-500 text-blue-600'
-            : 'text-gray-500 hover:text-gray-700'}"
+            : 'text-muted-foreground hover:text-foreground-secondary'}"
         >
           <ImageIcon class="mr-1.5 inline-block h-4 w-4" />
           Select Existing
@@ -278,7 +278,7 @@
             {/if}
 
             <label
-              class="flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 py-12 hover:border-blue-500 hover:bg-gray-50"
+              class="flex w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-input-border py-12 hover:border-blue-500 hover:bg-hover"
             >
               <input
                 type="file"
@@ -290,11 +290,11 @@
               />
               {#if isUploading}
                 <Loader2 class="mb-2 h-10 w-10 animate-spin text-blue-500" />
-                <span class="text-sm text-gray-600">Uploading...</span>
+                <span class="text-sm text-foreground-tertiary">Uploading...</span>
               {:else}
-                <Upload class="mb-2 h-10 w-10 text-gray-400" />
-                <span class="text-sm font-medium text-gray-600">Click to upload images</span>
-                <span class="mt-1 text-xs text-gray-400">PNG, JPG, WebP up to 10MB each</span>
+                <Upload class="mb-2 h-10 w-10 text-placeholder" />
+                <span class="text-sm font-medium text-foreground-tertiary">Click to upload images</span>
+                <span class="mt-1 text-xs text-placeholder">PNG, JPG, WebP up to 10MB each</span>
               {/if}
             </label>
           </div>
@@ -302,10 +302,10 @@
           <!-- Existing Images Tab -->
           {#if isLoadingImages}
             <div class="flex items-center justify-center py-12">
-              <Loader2 class="h-8 w-8 animate-spin text-gray-400" />
+              <Loader2 class="h-8 w-8 animate-spin text-placeholder" />
             </div>
           {:else if existingImages.length === 0}
-            <div class="flex flex-col items-center justify-center py-12 text-gray-500">
+            <div class="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <ImageIcon class="mb-2 h-10 w-10" />
               <p>No existing images found</p>
             </div>
@@ -322,7 +322,7 @@
                     image.fileId
                   )
                     ? 'border-blue-500 ring-2 ring-blue-200'
-                    : 'border-gray-200 hover:border-gray-300'}"
+                    : 'border-border hover:border-input-border'}"
                 >
                   <img
                     src="{image.url}?tr=w-150,h-150,fo-auto"

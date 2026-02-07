@@ -94,12 +94,12 @@
     <div class="flex items-center gap-4">
       <a
         href="/admin/promotions"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground-secondary"
         aria-label="Back to promotions"
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">
+      <h1 class="text-2xl font-bold text-foreground">
         {promo.method === "automatic" ? promo.title : promo.code}
       </h1>
       <Badge variant="outline">{promo.method === "code" ? "Discount code" : "Automatic"}</Badge>
@@ -113,7 +113,7 @@
   </div>
 
   {#if form?.error}
-    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+    <div class="rounded-lg border border-red-200 bg-destructive-subtle p-4 text-sm text-red-700">
       {form.error}
     </div>
   {/if}
@@ -135,32 +135,32 @@
       <!-- Left Column -->
       <div class="flex-1 space-y-6">
         <!-- Code / Title -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">
             {promo.method === "code" ? "Promotion Code" : "Automatic Discount"}
           </h2>
           {#if promo.method === "code"}
             <div>
-              <label for="code" class="mb-1 block text-sm font-medium text-gray-700">Code</label>
+              <label for="code" class="mb-1 block text-sm font-medium text-foreground-secondary">Code</label>
               <input
                 type="text"
                 id="code"
                 value={promo.code}
                 disabled
-                class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-500"
+                class="w-full rounded-lg border border-border bg-background px-3 py-2 text-muted-foreground"
               />
             </div>
           {:else}
             <div>
-              <label for="title" class="mb-1 block text-sm font-medium text-gray-700">Title</label>
+              <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary">Title</label>
               <input
                 type="text"
                 id="title"
                 name="title"
                 value={promo.title ?? ""}
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
-              <p class="mt-1 text-xs text-gray-500">
+              <p class="mt-1 text-xs text-muted-foreground">
                 Customers will see this in their cart and at checkout.
               </p>
             </div>
@@ -169,25 +169,25 @@
 
         <!-- Discount (hidden for free_shipping) -->
         {#if promo.promotionType !== "free_shipping"}
-          <div class="rounded-lg bg-white p-6 shadow">
+          <div class="rounded-lg bg-surface p-6 shadow">
             <h2 class="mb-4 text-lg font-semibold">Discount Value</h2>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="discountType" class="mb-1 block text-sm font-medium text-gray-700">
+                <label for="discountType" class="mb-1 block text-sm font-medium text-foreground-secondary">
                   Discount Type
                 </label>
                 <select
                   id="discountType"
                   name="discountType"
                   bind:value={discountType}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 >
                   <option value="percentage">Percentage (%)</option>
                   <option value="fixed_amount">Fixed Amount (EUR)</option>
                 </select>
               </div>
               <div>
-                <label for="discountValue" class="mb-1 block text-sm font-medium text-gray-700">
+                <label for="discountValue" class="mb-1 block text-sm font-medium text-foreground-secondary">
                   Value
                 </label>
                 <input
@@ -199,7 +199,7 @@
                     : promo.discountValue}
                   min="0"
                   step={discountType === "percentage" ? "1" : "0.01"}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               </div>
             </div>
@@ -211,7 +211,7 @@
 
         <!-- Applies To (only for product type) -->
         {#if promo.promotionType === "product"}
-          <div class="rounded-lg bg-white p-6 shadow">
+          <div class="rounded-lg bg-surface p-6 shadow">
             <h2 class="mb-4 text-lg font-semibold">Applies To</h2>
             <div class="space-y-3">
               <label class="flex items-center gap-2">
@@ -240,17 +240,17 @@
 
             {#if appliesTo === "specific_products"}
               <div class="mt-4">
-                <p class="mb-2 text-sm font-medium text-gray-700">Select Products</p>
+                <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Products</p>
                 <Popover.Root bind:open={productComboboxOpen}>
                   <Popover.Trigger
-                    class="flex h-9 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                    class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                   >
-                    <span class="text-gray-500">
+                    <span class="text-muted-foreground">
                       {selectedProductIds.length > 0
                         ? `${selectedProductIds.length} product(s) selected`
                         : "Search products..."}
                     </span>
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
                   </Popover.Trigger>
                   <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
                     <Command.Root>
@@ -282,7 +282,7 @@
                         <button
                           type="button"
                           onclick={() => toggleProduct(id)}
-                          class="ml-0.5 rounded-full hover:bg-gray-300"
+                          class="ml-0.5 rounded-full hover:bg-muted-strong"
                         >
                           <X class="h-3 w-3" />
                         </button>
@@ -295,17 +295,17 @@
 
             {#if appliesTo === "specific_collections"}
               <div class="mt-4">
-                <p class="mb-2 text-sm font-medium text-gray-700">Select Collections</p>
+                <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Collections</p>
                 <Popover.Root bind:open={collectionComboboxOpen}>
                   <Popover.Trigger
-                    class="flex h-9 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                    class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                   >
-                    <span class="text-gray-500">
+                    <span class="text-muted-foreground">
                       {selectedCollectionIds.length > 0
                         ? `${selectedCollectionIds.length} collection(s) selected`
                         : "Search collections..."}
                     </span>
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
                   </Popover.Trigger>
                   <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
                     <Command.Root>
@@ -337,7 +337,7 @@
                         <button
                           type="button"
                           onclick={() => toggleCollection(id)}
-                          class="ml-0.5 rounded-full hover:bg-gray-300"
+                          class="ml-0.5 rounded-full hover:bg-muted-strong"
                         >
                           <X class="h-3 w-3" />
                         </button>
@@ -353,11 +353,11 @@
         {/if}
 
         <!-- Conditions -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Conditions</h2>
           <div class="grid grid-cols-3 gap-4">
             <div>
-              <label for="minOrderAmount" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="minOrderAmount" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Min Order (EUR)
               </label>
               <input
@@ -368,11 +368,11 @@
                 placeholder="Optional"
                 min="0"
                 step="0.01"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
-              <label for="usageLimit" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="usageLimit" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Total Usage Limit
               </label>
               <input
@@ -382,13 +382,13 @@
                 value={promo.usageLimit ?? ""}
                 placeholder="Unlimited"
                 min="0"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
               <label
                 for="usageLimitPerCustomer"
-                class="mb-1 block text-sm font-medium text-gray-700"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
               >
                 Per Customer Limit
               </label>
@@ -399,18 +399,18 @@
                 value={promo.usageLimitPerCustomer ?? ""}
                 placeholder="Unlimited"
                 min="0"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
         </div>
 
         <!-- Active Dates -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Active Dates</h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="startsAt" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="startsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Starts At
               </label>
               <input
@@ -418,11 +418,11 @@
                 id="startsAt"
                 name="startsAt"
                 value={formatDateForInput(promo.startsAt)}
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
-              <label for="endsAt" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="endsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Ends At
               </label>
               <input
@@ -430,52 +430,52 @@
                 id="endsAt"
                 name="endsAt"
                 value={formatDateForInput(promo.endsAt)}
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
-          <p class="mt-2 text-xs text-gray-500">Leave empty for no start/end date restrictions.</p>
+          <p class="mt-2 text-xs text-muted-foreground">Leave empty for no start/end date restrictions.</p>
         </div>
       </div>
 
       <!-- Right Sidebar -->
       <div class="w-80 shrink-0 space-y-6">
         <!-- Status -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Status</h2>
           <label class="flex items-center gap-2">
             <input
               type="checkbox"
               name="enabled"
               checked={promo.enabled}
-              class="h-4 w-4 rounded border-gray-300"
+              class="h-4 w-4 rounded border-input-border"
             />
             <span class="text-sm">Enabled</span>
           </label>
         </div>
 
         <!-- Combination Settings -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Combinations</h2>
           <label class="flex items-center gap-2">
             <input
               type="checkbox"
               name="combinesWithOtherPromotions"
               checked={promo.combinesWithOtherPromotions}
-              class="h-4 w-4 rounded border-gray-300"
+              class="h-4 w-4 rounded border-input-border"
             />
             <span class="text-sm">Combines with other promotions</span>
           </label>
-          <p class="mt-2 text-xs text-gray-500">
+          <p class="mt-2 text-xs text-muted-foreground">
             When enabled, this promotion can be used alongside other promotions on the same order.
           </p>
         </div>
 
         <!-- Usage Info -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Usage</h2>
-          <p class="text-sm text-gray-600">
-            Used <span class="font-medium text-gray-900">{promo.usageCount}</span>
+          <p class="text-sm text-foreground-tertiary">
+            Used <span class="font-medium text-foreground">{promo.usageCount}</span>
             time{promo.usageCount !== 1 ? "s" : ""}
             {#if promo.usageLimit}
               out of {promo.usageLimit}

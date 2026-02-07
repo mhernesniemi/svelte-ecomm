@@ -3,6 +3,29 @@
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 
+/* Admin theme tokens — registered here so Tailwind generates the utilities.
+   Actual values are set via CSS variables in admin.css (:root / .dark). */
+@theme inline {
+	--color-background: var(--color-background);
+	--color-surface: var(--color-surface);
+	--color-muted: var(--color-muted);
+	--color-muted-strong: var(--color-muted-strong);
+
+	--color-foreground: var(--color-foreground);
+	--color-foreground-secondary: var(--color-foreground-secondary);
+	--color-foreground-tertiary: var(--color-foreground-tertiary);
+	--color-muted-foreground: var(--color-muted-foreground);
+	--color-placeholder: var(--color-placeholder);
+
+	--color-border: var(--color-border);
+	--color-input-border: var(--color-input-border);
+
+	--color-hover: var(--color-hover);
+
+	--color-destructive-subtle: var(--color-destructive-subtle);
+	--color-accent-subtle: var(--color-accent-subtle);
+}
+
 /* Cursor pointer for all clickable elements */
 button,
 [role="button"],

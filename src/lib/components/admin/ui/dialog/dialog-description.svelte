@@ -9,6 +9,6 @@
   }: DialogPrimitive.DescriptionProps & { children?: import("svelte").Snippet } = $props();
 </script>
 
-<DialogPrimitive.Description class={cn("text-sm text-gray-500", className)} {...restProps}>
+<DialogPrimitive.Description class={cn("text-sm text-muted-foreground", className)} {...restProps}>
   {@render children?.()}
 </DialogPrimitive.Description>

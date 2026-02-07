@@ -47,19 +47,19 @@
     <div class="flex items-center gap-4">
       <a
         href="/admin/content-pages"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground-secondary"
         aria-label="Back to content pages"
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">Edit Content Page</h1>
+      <h1 class="text-2xl font-bold text-foreground">Edit Content Page</h1>
     </div>
     <div class="flex items-center gap-3">
       {#if published && slug}
         <a
           href="/pages/{data.page.id}/{slug}"
           target="_blank"
-          class="text-sm text-gray-500 hover:text-gray-700"
+          class="text-sm text-muted-foreground hover:text-foreground-secondary"
         >
           View on storefront &rarr;
         </a>
@@ -83,14 +83,14 @@
     }}
     class="space-y-6"
   >
-    <div class="overflow-hidden rounded-lg bg-white shadow">
+    <div class="overflow-hidden rounded-lg bg-surface shadow">
       <div class="p-6">
-        <h2 class="mb-4 text-lg font-medium text-gray-900">Page Details</h2>
+        <h2 class="mb-4 text-lg font-medium text-foreground">Page Details</h2>
 
         <div class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="title" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Title <span class="text-red-500">*</span>
               </label>
               <input
@@ -99,12 +99,12 @@
                 name="title"
                 bind:value={title}
                 required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
               />
             </div>
 
             <div>
-              <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Slug <span class="text-red-500">*</span>
               </label>
               <input
@@ -113,13 +113,13 @@
                 name="slug"
                 bind:value={slug}
                 required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 shadow-sm"
+                class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
               />
             </div>
           </div>
 
           <div>
-            <label for="body" class="mb-1 block text-sm font-medium text-gray-700"> Body </label>
+            <label for="body" class="mb-1 block text-sm font-medium text-foreground-secondary"> Body </label>
             <RichTextEditor
               name="body"
               content={translation?.body ?? ""}
@@ -133,9 +133,9 @@
               id="published"
               name="published"
               bind:checked={published}
-              class="h-4 w-4 rounded border-gray-300 text-blue-600"
+              class="h-4 w-4 rounded border-input-border text-blue-600"
             />
-            <label for="published" class="text-sm font-medium text-gray-700"> Published </label>
+            <label for="published" class="text-sm font-medium text-foreground-secondary"> Published </label>
           </div>
         </div>
 

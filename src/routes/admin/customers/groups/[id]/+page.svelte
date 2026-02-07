@@ -53,12 +53,12 @@
     <div class="flex items-center gap-4">
       <a
         href="/admin/customers?tab=groups"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground-secondary"
         aria-label="Back to customer groups"
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">{data.group.name}</h1>
+      <h1 class="text-2xl font-bold text-foreground">{data.group.name}</h1>
     </div>
     <Button type="submit" form="group-form" disabled={isSubmitting}>
       {isSubmitting ? "Saving..." : "Save Changes"}
@@ -77,24 +77,24 @@
         await update({ reset: false });
       };
     }}
-    class="overflow-hidden rounded-lg bg-white shadow"
+    class="overflow-hidden rounded-lg bg-surface shadow"
   >
     <div class="p-6">
-      <h2 class="mb-4 text-lg font-medium text-gray-900">Group Details</h2>
+      <h2 class="mb-4 text-lg font-medium text-foreground">Group Details</h2>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label for="group_name" class="mb-1 block text-sm font-medium text-gray-700">Name</label>
+          <label for="group_name" class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label>
           <input
             type="text"
             id="group_name"
             name="name"
             bind:value={groupName}
             required
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
         <div>
-          <label for="group_description" class="mb-1 block text-sm font-medium text-gray-700">
+          <label for="group_description" class="mb-1 block text-sm font-medium text-foreground-secondary">
             Description
           </label>
           <input
@@ -103,7 +103,7 @@
             name="description"
             bind:value={groupDescription}
             placeholder="Optional"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
       </div>
@@ -111,31 +111,31 @@
   </form>
 
   <!-- Customers Section -->
-  <div class="overflow-hidden rounded-lg bg-white shadow">
-    <div class="border-b border-gray-200 p-6">
-      <h2 class="text-lg font-medium text-gray-900">Customers</h2>
-      <p class="mt-1 text-sm text-gray-600">
+  <div class="overflow-hidden rounded-lg bg-surface shadow">
+    <div class="border-b border-border p-6">
+      <h2 class="text-lg font-medium text-foreground">Customers</h2>
+      <p class="mt-1 text-sm text-foreground-tertiary">
         {data.groupCustomers.length} customer{data.groupCustomers.length !== 1 ? "s" : ""} in this group
       </p>
     </div>
 
     <!-- Add Customer -->
-    <div class="border-b border-gray-200 bg-gray-50 px-6 py-4">
-      <h3 class="mb-3 text-sm font-medium text-gray-700">Add Customer to Group</h3>
+    <div class="border-b border-border bg-background px-6 py-4">
+      <h3 class="mb-3 text-sm font-medium text-foreground-secondary">Add Customer to Group</h3>
       {#if availableCustomers.length === 0}
-        <p class="text-sm text-gray-500">All customers are already in this group</p>
+        <p class="text-sm text-muted-foreground">All customers are already in this group</p>
       {:else}
         <form method="POST" action="?/addCustomer" use:enhance class="flex items-end gap-4">
           <input type="hidden" name="customerId" value={selectedCustomerId ?? ""} />
           <div>
             <Popover.Root bind:open={comboboxOpen}>
               <Popover.Trigger
-                class="flex h-9 w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
               >
-                <span class={selectedCustomerId ? "text-gray-900" : "text-gray-500"}>
+                <span class={selectedCustomerId ? "text-foreground" : "text-muted-foreground"}>
                   {selectedCustomerLabel()}
                 </span>
-                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
               </Popover.Trigger>
               <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
                 <Command.Root>
@@ -158,7 +158,7 @@
                         <span>
                           {customer.firstName}
                           {customer.lastName}
-                          <span class="text-gray-500">({customer.email})</span>
+                          <span class="text-muted-foreground">({customer.email})</span>
                         </span>
                       </Command.Item>
                     {/each}
@@ -175,17 +175,17 @@
     <!-- Customers List -->
     <div class="px-6 py-4">
       {#if data.groupCustomers.length === 0}
-        <p class="text-sm text-gray-500">No customers in this group yet</p>
+        <p class="text-sm text-muted-foreground">No customers in this group yet</p>
       {:else}
         <div class="space-y-2">
           {#each data.groupCustomers as customer}
-            <div class="flex items-center justify-between rounded-lg bg-gray-100 px-3 py-2">
+            <div class="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
               <div>
                 <a href="/admin/customers/{customer.id}" class="font-medium hover:text-blue-600">
                   {customer.firstName}
                   {customer.lastName}
                 </a>
-                <span class="ml-2 text-sm text-gray-500">{customer.email}</span>
+                <span class="ml-2 text-sm text-muted-foreground">{customer.email}</span>
               </div>
               <form method="POST" action="?/removeCustomer" use:enhance>
                 <input type="hidden" name="customerId" value={customer.id} />

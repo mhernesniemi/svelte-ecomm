@@ -113,18 +113,18 @@
 
 <div
   class={cn(
-    "overflow-hidden rounded-lg border border-gray-300 bg-white focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500",
+    "overflow-hidden rounded-lg border border-input-border bg-surface focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500",
     className
   )}
 >
   <!-- Toolbar -->
-  <div class="flex flex-wrap gap-1 border-b border-gray-200 bg-gray-50 px-2 py-1.5">
+  <div class="flex flex-wrap gap-1 border-b border-border bg-background px-2 py-1.5">
     <button
       type="button"
       onclick={toggleBold}
       class={cn(
-        "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-gray-200",
-        isActive("bold") && "bg-gray-200"
+        "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-muted-strong",
+        isActive("bold") && "bg-muted-strong"
       )}
       title="Bold"
     >
@@ -135,22 +135,22 @@
       type="button"
       onclick={toggleItalic}
       class={cn(
-        "rounded px-2 py-1 text-sm italic transition-colors hover:bg-gray-200",
-        isActive("italic") && "bg-gray-200"
+        "rounded px-2 py-1 text-sm italic transition-colors hover:bg-muted-strong",
+        isActive("italic") && "bg-muted-strong"
       )}
       title="Italic"
     >
       I
     </button>
 
-    <span class="mx-1 w-px bg-gray-300"></span>
+    <span class="mx-1 w-px bg-input-border"></span>
 
     <button
       type="button"
       onclick={() => toggleHeading(2)}
       class={cn(
-        "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-gray-200",
-        isActive("heading", { level: 2 }) && "bg-gray-200"
+        "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-muted-strong",
+        isActive("heading", { level: 2 }) && "bg-muted-strong"
       )}
       title="Heading 2"
     >
@@ -161,22 +161,22 @@
       type="button"
       onclick={() => toggleHeading(3)}
       class={cn(
-        "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-gray-200",
-        isActive("heading", { level: 3 }) && "bg-gray-200"
+        "rounded px-2 py-1 text-sm font-medium transition-colors hover:bg-muted-strong",
+        isActive("heading", { level: 3 }) && "bg-muted-strong"
       )}
       title="Heading 3"
     >
       H3
     </button>
 
-    <span class="mx-1 w-px bg-gray-300"></span>
+    <span class="mx-1 w-px bg-input-border"></span>
 
     <button
       type="button"
       onclick={toggleBulletList}
       class={cn(
-        "rounded px-2 py-1 text-sm transition-colors hover:bg-gray-200",
-        isActive("bulletList") && "bg-gray-200"
+        "rounded px-2 py-1 text-sm transition-colors hover:bg-muted-strong",
+        isActive("bulletList") && "bg-muted-strong"
       )}
       title="Bullet List"
     >
@@ -187,21 +187,21 @@
       type="button"
       onclick={toggleOrderedList}
       class={cn(
-        "rounded px-2 py-1 text-sm transition-colors hover:bg-gray-200",
-        isActive("orderedList") && "bg-gray-200"
+        "rounded px-2 py-1 text-sm transition-colors hover:bg-muted-strong",
+        isActive("orderedList") && "bg-muted-strong"
       )}
       title="Numbered List"
     >
       1.
     </button>
 
-    <span class="mx-1 w-px bg-gray-300"></span>
+    <span class="mx-1 w-px bg-input-border"></span>
 
     {#if isActive("link")}
       <button
         type="button"
         onclick={unsetLink}
-        class="rounded px-2 py-1 text-sm text-red-600 transition-colors hover:bg-red-50"
+        class="rounded px-2 py-1 text-sm text-red-600 transition-colors hover:bg-destructive-subtle"
         title="Remove Link"
       >
         Unlink
@@ -210,7 +210,7 @@
       <button
         type="button"
         onclick={setLink}
-        class="rounded px-2 py-1 text-sm transition-colors hover:bg-gray-200"
+        class="rounded px-2 py-1 text-sm transition-colors hover:bg-muted-strong"
         title="Add Link"
       >
         Link

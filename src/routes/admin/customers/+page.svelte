@@ -128,14 +128,14 @@
   firstName: string;
   lastName: string;
 })}
-  <a href="/admin/customers/{id}" class="font-medium text-gray-900 hover:text-blue-600">
+  <a href="/admin/customers/{id}" class="font-medium text-foreground hover:text-blue-600">
     {firstName}
     {lastName}
   </a>
 {/snippet}
 
 {#snippet groupNameCell({ id, name }: { id: number; name: string })}
-  <a href="/admin/customers/groups/{id}" class="font-medium text-gray-900 hover:text-blue-600">
+  <a href="/admin/customers/groups/{id}" class="font-medium text-foreground hover:text-blue-600">
     {name}
   </a>
 {/snippet}
@@ -146,13 +146,13 @@
   <h1 class="mb-6 text-2xl font-bold">Customers</h1>
 
   <!-- Tabs -->
-  <div class="mb-6 border-b border-gray-200">
+  <div class="mb-6 border-b border-border">
     <div class="flex gap-8">
       <a
         href="/admin/customers"
         class="border-b-2 pb-3 text-sm font-medium transition-colors {activeTab === 'customers'
           ? 'border-blue-500 text-blue-600'
-          : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}"
+          : 'border-transparent text-muted-foreground hover:border-input-border hover:text-foreground-secondary'}"
       >
         All Customers
       </a>
@@ -160,7 +160,7 @@
         href="/admin/customers?tab=groups"
         class="border-b-2 pb-3 text-sm font-medium transition-colors {activeTab === 'groups'
           ? 'border-blue-500 text-blue-600'
-          : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'}"
+          : 'border-transparent text-muted-foreground hover:border-input-border hover:text-foreground-secondary'}"
       >
         Customer Groups
       </a>

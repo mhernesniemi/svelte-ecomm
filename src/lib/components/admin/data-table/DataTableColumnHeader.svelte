@@ -12,7 +12,7 @@
 {#if !header.isPlaceholder}
   {#if header.column.getCanSort()}
     <button
-      class="flex items-center gap-1 uppercase hover:text-gray-900"
+      class="flex items-center gap-1 uppercase hover:text-foreground"
       onclick={header.column.getToggleSortingHandler()}
     >
       <FlexRender content={header.column.columnDef.header} context={header.getContext()} />
@@ -21,7 +21,7 @@
       {:else if header.column.getIsSorted() === "desc"}
         <ArrowDown class="h-3.5 w-3.5" />
       {:else}
-        <ArrowUpDown class="h-3.5 w-3.5 text-gray-400" />
+        <ArrowUpDown class="h-3.5 w-3.5 text-placeholder" />
       {/if}
     </button>
   {:else}

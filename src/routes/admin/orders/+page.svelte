@@ -59,9 +59,9 @@
 </script>
 
 {#snippet orderCell({ code, itemCount, id }: { code: string; itemCount: number; id: number })}
-  <a href="/admin/orders/{id}" class="block font-medium text-gray-900 hover:text-blue-600">
+  <a href="/admin/orders/{id}" class="block font-medium text-foreground hover:text-blue-600">
     <p>{code}</p>
-    <p class="text-sm text-gray-500">{itemCount} items</p>
+    <p class="text-sm text-muted-foreground">{itemCount} items</p>
   </a>
 {/snippet}
 
@@ -82,7 +82,7 @@
       href="/admin/orders"
       class="rounded-full px-3 py-1 text-sm {!data.currentState
         ? 'bg-blue-600 text-white'
-        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+        : 'bg-muted-strong text-foreground-secondary hover:bg-muted'}"
     >
       All
     </a>
@@ -91,7 +91,7 @@
         href="/admin/orders?state={state}"
         class="rounded-full px-3 py-1 text-sm capitalize {data.currentState === state
           ? 'bg-blue-600 text-white'
-          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}"
+          : 'bg-muted-strong text-foreground-secondary hover:bg-muted'}"
       >
         {state.replace("_", " ")}
       </a>

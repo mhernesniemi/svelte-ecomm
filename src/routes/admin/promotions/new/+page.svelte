@@ -68,12 +68,12 @@
     <div class="flex items-center gap-4">
       <a
         href="/admin/promotions"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground-secondary"
         aria-label="Back to promotions"
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">Create Promotion</h1>
+      <h1 class="text-2xl font-bold text-foreground">Create Promotion</h1>
     </div>
     <div class="flex items-center gap-3">
       <a href="/admin/promotions" class={buttonVariants({ variant: "outline" })}>Cancel</a>
@@ -82,7 +82,7 @@
   </div>
 
   {#if form?.error}
-    <div class="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+    <div class="rounded-lg border border-red-200 bg-destructive-subtle p-4 text-sm text-red-700">
       {form.error}
     </div>
   {/if}
@@ -95,15 +95,15 @@
       <!-- Left Column -->
       <div class="flex-1 space-y-6">
         <!-- Type Selection -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Promotion Type</h2>
           <div class="grid grid-cols-3 gap-3">
             {#each typeOptions as option}
               <label
                 class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-colors {promotionType ===
                 option.value
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-gray-300'}"
+                  ? 'border-blue-500 bg-accent-subtle'
+                  : 'border-border hover:border-input-border'}"
               >
                 <input
                   type="radio"
@@ -115,7 +115,7 @@
                 <option.icon
                   class="h-6 w-6 {promotionType === option.value
                     ? 'text-blue-600'
-                    : 'text-gray-400'}"
+                    : 'text-placeholder'}"
                 />
                 <span class="text-sm font-medium">{option.label}</span>
               </label>
@@ -124,15 +124,15 @@
         </div>
 
         <!-- Method + Code/Title -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Discount Method</h2>
           <input type="hidden" name="method" value={method} />
-          <div class="mb-4 inline-flex rounded-lg border border-gray-200 p-0.5">
+          <div class="mb-4 inline-flex rounded-lg border border-border p-0.5">
             <button
               type="button"
               class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors {method === 'code'
                 ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'}"
+                : 'text-foreground-tertiary hover:text-foreground'}"
               onclick={() => (method = "code")}
             >
               Discount code
@@ -141,7 +141,7 @@
               type="button"
               class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors {method === 'automatic'
                 ? 'bg-gray-900 text-white'
-                : 'text-gray-600 hover:text-gray-900'}"
+                : 'text-foreground-tertiary hover:text-foreground'}"
               onclick={() => (method = "automatic")}
             >
               Automatic discount
@@ -150,31 +150,31 @@
 
           {#if method === "code"}
             <div>
-              <label for="code" class="mb-1 block text-sm font-medium text-gray-700">Code</label>
+              <label for="code" class="mb-1 block text-sm font-medium text-foreground-secondary">Code</label>
               <input
                 type="text"
                 id="code"
                 name="code"
                 placeholder="e.g., SUMMER20"
                 required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2 uppercase"
+                class="w-full rounded-lg border border-input-border px-3 py-2 uppercase"
               />
-              <p class="mt-1 text-xs text-gray-500">
+              <p class="mt-1 text-xs text-muted-foreground">
                 Customers will enter this code at checkout.
               </p>
             </div>
           {:else}
             <div>
-              <label for="title" class="mb-1 block text-sm font-medium text-gray-700">Title</label>
+              <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary">Title</label>
               <input
                 type="text"
                 id="title"
                 name="title"
                 placeholder="e.g., Summer Sale 20% Off"
                 required
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
-              <p class="mt-1 text-xs text-gray-500">
+              <p class="mt-1 text-xs text-muted-foreground">
                 Customers will see this in their cart and at checkout.
               </p>
             </div>
@@ -183,25 +183,25 @@
 
         <!-- Discount (hidden for free_shipping) -->
         {#if promotionType !== "free_shipping"}
-          <div class="rounded-lg bg-white p-6 shadow">
+          <div class="rounded-lg bg-surface p-6 shadow">
             <h2 class="mb-4 text-lg font-semibold">Discount Value</h2>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="discountType" class="mb-1 block text-sm font-medium text-gray-700">
+                <label for="discountType" class="mb-1 block text-sm font-medium text-foreground-secondary">
                   Discount Type
                 </label>
                 <select
                   id="discountType"
                   name="discountType"
                   bind:value={discountType}
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 >
                   <option value="percentage">Percentage (%)</option>
                   <option value="fixed_amount">Fixed Amount (EUR)</option>
                 </select>
               </div>
               <div>
-                <label for="discountValue" class="mb-1 block text-sm font-medium text-gray-700">
+                <label for="discountValue" class="mb-1 block text-sm font-medium text-foreground-secondary">
                   Value
                 </label>
                 <input
@@ -212,7 +212,7 @@
                   min="0"
                   step={discountType === "percentage" ? "1" : "0.01"}
                   required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               </div>
             </div>
@@ -224,7 +224,7 @@
 
         <!-- Applies To (only for product type) -->
         {#if promotionType === "product"}
-          <div class="rounded-lg bg-white p-6 shadow">
+          <div class="rounded-lg bg-surface p-6 shadow">
             <h2 class="mb-4 text-lg font-semibold">Applies To</h2>
             <div class="space-y-3">
               <label class="flex items-center gap-2">
@@ -253,17 +253,17 @@
 
             {#if appliesTo === "specific_products"}
               <div class="mt-4">
-                <p class="mb-2 text-sm font-medium text-gray-700">Select Products</p>
+                <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Products</p>
                 <Popover.Root bind:open={productComboboxOpen}>
                   <Popover.Trigger
-                    class="flex h-9 items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                    class="flex h-9 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                   >
-                    <span class="text-gray-500">
+                    <span class="text-muted-foreground">
                       {selectedProductIds.length > 0
                         ? `${selectedProductIds.length} product(s) selected`
                         : "Search products..."}
                     </span>
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
                   </Popover.Trigger>
                   <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
                     <Command.Root>
@@ -295,7 +295,7 @@
                         <button
                           type="button"
                           onclick={() => toggleProduct(id)}
-                          class="ml-0.5 rounded-full hover:bg-gray-300"
+                          class="ml-0.5 rounded-full hover:bg-muted-strong"
                         >
                           <X class="h-3 w-3" />
                         </button>
@@ -308,17 +308,17 @@
 
             {#if appliesTo === "specific_collections"}
               <div class="mt-4">
-                <p class="mb-2 text-sm font-medium text-gray-700">Select Collections</p>
+                <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Collections</p>
                 <Popover.Root bind:open={collectionComboboxOpen}>
                   <Popover.Trigger
-                    class="flex h-9 items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                    class="flex h-9 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                   >
-                    <span class="text-gray-500">
+                    <span class="text-muted-foreground">
                       {selectedCollectionIds.length > 0
                         ? `${selectedCollectionIds.length} collection(s) selected`
                         : "Search collections..."}
                     </span>
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-gray-400" />
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
                   </Popover.Trigger>
                   <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
                     <Command.Root>
@@ -350,7 +350,7 @@
                         <button
                           type="button"
                           onclick={() => toggleCollection(id)}
-                          class="ml-0.5 rounded-full hover:bg-gray-300"
+                          class="ml-0.5 rounded-full hover:bg-muted-strong"
                         >
                           <X class="h-3 w-3" />
                         </button>
@@ -366,11 +366,11 @@
         {/if}
 
         <!-- Conditions -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Conditions</h2>
           <div class="grid grid-cols-3 gap-4">
             <div>
-              <label for="minOrderAmount" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="minOrderAmount" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Min Order (EUR)
               </label>
               <input
@@ -380,11 +380,11 @@
                 placeholder="Optional"
                 min="0"
                 step="0.01"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
-              <label for="usageLimit" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="usageLimit" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Total Usage Limit
               </label>
               <input
@@ -393,13 +393,13 @@
                 name="usageLimit"
                 placeholder="Unlimited"
                 min="0"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
               <label
                 for="usageLimitPerCustomer"
-                class="mb-1 block text-sm font-medium text-gray-700"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
               >
                 Per Customer Limit
               </label>
@@ -409,82 +409,82 @@
                 name="usageLimitPerCustomer"
                 placeholder="Unlimited"
                 min="0"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
         </div>
 
         <!-- Active Dates -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Active Dates</h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="startsAt" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="startsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Starts At
               </label>
               <input
                 type="datetime-local"
                 id="startsAt"
                 name="startsAt"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
-              <label for="endsAt" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="endsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Ends At
               </label>
               <input
                 type="datetime-local"
                 id="endsAt"
                 name="endsAt"
-                class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
-          <p class="mt-2 text-xs text-gray-500">Leave empty for no start/end date restrictions.</p>
+          <p class="mt-2 text-xs text-muted-foreground">Leave empty for no start/end date restrictions.</p>
         </div>
       </div>
 
       <!-- Right Sidebar -->
       <div class="w-80 shrink-0 space-y-6">
         <!-- Combination Settings -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Combinations</h2>
           <label class="flex items-center gap-2">
             <input
               type="checkbox"
               name="combinesWithOtherPromotions"
-              class="h-4 w-4 rounded border-gray-300"
+              class="h-4 w-4 rounded border-input-border"
             />
             <span class="text-sm">Combines with other promotions</span>
           </label>
-          <p class="mt-2 text-xs text-gray-500">
+          <p class="mt-2 text-xs text-muted-foreground">
             When enabled, this promotion can be used alongside other promotions on the same order.
           </p>
         </div>
 
         <!-- Summary -->
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Summary</h2>
-          <div class="space-y-2 text-sm text-gray-600">
+          <div class="space-y-2 text-sm text-foreground-tertiary">
             <p>
-              <span class="font-medium text-gray-900">Method:</span>
+              <span class="font-medium text-foreground">Method:</span>
               <Badge variant="outline">{method === "code" ? "Discount code" : "Automatic"}</Badge>
             </p>
             <p>
-              <span class="font-medium text-gray-900">Type:</span>
+              <span class="font-medium text-foreground">Type:</span>
               <Badge variant="outline">{typeLabels[promotionType]}</Badge>
             </p>
             {#if promotionType !== "free_shipping"}
               <p>
-                <span class="font-medium text-gray-900">Discount:</span>
+                <span class="font-medium text-foreground">Discount:</span>
                 {discountType === "percentage" ? "Percentage off" : "Fixed amount off"}
               </p>
             {/if}
             {#if promotionType === "product"}
               <p>
-                <span class="font-medium text-gray-900">Applies to:</span>
+                <span class="font-medium text-foreground">Applies to:</span>
                 {appliesTo === "all"
                   ? "All products"
                   : appliesTo === "specific_products"

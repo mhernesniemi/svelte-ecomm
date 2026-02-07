@@ -76,7 +76,7 @@
 
 {#snippet collectionCell({ name, id }: { name: string; id: number })}
   <a href="/admin/collections/{id}" class="group block">
-    <div class="font-medium text-gray-900 group-hover:text-blue-600">{name}</div>
+    <div class="font-medium text-foreground group-hover:text-blue-600">{name}</div>
   </a>
 {/snippet}
 
@@ -93,7 +93,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Collections</h1>
+      <h1 class="text-2xl font-bold text-foreground">Collections</h1>
     </div>
     <a href="/admin/collections/new" class={buttonVariants()}>
       <PlusIcon class="h-4 w-4" /> Add Collection</a

@@ -25,12 +25,12 @@
     <div class="flex items-center gap-4">
       <a
         href="/admin/customers?tab=groups"
-        class="text-gray-500 hover:text-gray-700"
+        class="text-muted-foreground hover:text-foreground-secondary"
         aria-label="Back to customer groups"
       >
         <ChevronLeft class="h-5 w-5" />
       </a>
-      <h1 class="text-2xl font-bold text-gray-900">Create Customer Group</h1>
+      <h1 class="text-2xl font-bold text-foreground">Create Customer Group</h1>
     </div>
     <div class="flex items-center gap-3">
       <a href="/admin/customers?tab=groups" class={buttonVariants({ variant: "outline" })}>
@@ -48,11 +48,11 @@
         await update({ reset: false });
       };
     }}
-    class="rounded-lg bg-white shadow"
+    class="rounded-lg bg-surface shadow"
   >
     <div class="p-10">
       <div class="max-w-md">
-        <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+        <label for="name" class="mb-1 block text-sm font-medium text-foreground-secondary">
           Name <span class="text-red-500">*</span>
         </label>
         <input
@@ -62,7 +62,7 @@
           bind:value={name}
           required
           placeholder="e.g., Wholesale"
-          class="w-full rounded-lg border border-gray-300 px-3 py-2"
+          class="w-full rounded-lg border border-input-border px-3 py-2"
         />
       </div>
     </div>

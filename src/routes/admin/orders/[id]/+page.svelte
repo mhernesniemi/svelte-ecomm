@@ -35,7 +35,7 @@
     <!-- Order Details -->
     <div class="space-y-6 lg:col-span-2">
       <!-- Status -->
-      <div class="rounded-lg bg-white p-6 shadow">
+      <div class="rounded-lg bg-surface p-6 shadow">
         <h2 class="mb-4 font-semibold">Order Status</h2>
         <div class="flex items-center gap-4">
           <span
@@ -44,7 +44,7 @@
               ? 'bg-green-100 text-green-800'
               : data.order.state === 'cancelled'
                 ? 'bg-red-100 text-red-800'
-                : 'bg-gray-100 text-gray-800'}"
+                : 'bg-muted text-foreground'}"
           >
             {data.order.state.replace("_", " ")}
           </span>
@@ -65,22 +65,22 @@
       </div>
 
       <!-- Line Items -->
-      <div class="rounded-lg bg-white shadow">
-        <div class="border-b border-gray-200 px-6 py-4">
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-6 py-4">
           <h2 class="font-semibold">Items</h2>
         </div>
-        <div class="divide-y divide-gray-200">
+        <div class="divide-y divide-border">
           {#each data.order.lines as line}
             <div class="flex items-center justify-between px-6 py-4">
               <div>
                 <p class="font-medium">{line.productName}</p>
                 {#if line.variantName}
-                  <p class="text-sm text-gray-500">{line.variantName}</p>
+                  <p class="text-sm text-muted-foreground">{line.variantName}</p>
                 {/if}
-                <p class="text-sm text-gray-500">SKU: {line.sku}</p>
+                <p class="text-sm text-muted-foreground">SKU: {line.sku}</p>
               </div>
               <div class="text-right">
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-muted-foreground">
                   {(line.unitPrice / 100).toFixed(2)} x {line.quantity}
                 </p>
                 <p class="font-medium">{(line.lineTotal / 100).toFixed(2)} EUR</p>
@@ -93,15 +93,15 @@
 
     <!-- Order Summary -->
     <div class="space-y-6">
-      <div class="rounded-lg bg-white p-6 shadow">
+      <div class="rounded-lg bg-surface p-6 shadow">
         <h2 class="mb-4 font-semibold">Summary</h2>
         <dl class="space-y-2">
           <div class="flex justify-between">
-            <dt class="text-gray-500">Subtotal</dt>
+            <dt class="text-muted-foreground">Subtotal</dt>
             <dd>{(data.order.subtotal / 100).toFixed(2)} EUR</dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">Shipping</dt>
+            <dt class="text-muted-foreground">Shipping</dt>
             <dd>{(data.order.shipping / 100).toFixed(2)} EUR</dd>
           </div>
           {#if data.order.discount > 0}
@@ -110,7 +110,7 @@
               <dd>-{(data.order.discount / 100).toFixed(2)} EUR</dd>
             </div>
           {/if}
-          <div class="flex justify-between border-t border-gray-200 pt-2 font-bold">
+          <div class="flex justify-between border-t border-border pt-2 font-bold">
             <dt>Total</dt>
             <dd>{(data.order.total / 100).toFixed(2)} {data.order.currencyCode}</dd>
           </div>
@@ -118,10 +118,10 @@
       </div>
 
       {#if data.order.shippingFullName}
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 font-semibold">Shipping Address</h2>
-          <address class="text-sm text-gray-600 not-italic">
-            <p class="font-medium text-gray-900">{data.order.shippingFullName}</p>
+          <address class="text-sm text-foreground-tertiary not-italic">
+            <p class="font-medium text-foreground">{data.order.shippingFullName}</p>
             <p>{data.order.shippingStreetLine1}</p>
             {#if data.order.shippingStreetLine2}
               <p>{data.order.shippingStreetLine2}</p>
@@ -133,15 +133,15 @@
       {/if}
 
       {#if data.orderShipping && data.shippingMethod}
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 font-semibold">Shipping Information</h2>
           <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
-              <dt class="text-gray-500">Method</dt>
+              <dt class="text-muted-foreground">Method</dt>
               <dd class="font-medium">{data.shippingMethod.name}</dd>
             </div>
             <div class="flex justify-between">
-              <dt class="text-gray-500">Status</dt>
+              <dt class="text-muted-foreground">Status</dt>
               <dd>
                 <span
                   class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize
@@ -149,8 +149,8 @@
                     ? 'bg-green-100 text-green-800'
                     : data.orderShipping.status === 'shipped' ||
                         data.orderShipping.status === 'in_transit'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-gray-100 text-gray-800'}"
+                      ? 'bg-accent-subtle text-blue-800'
+                      : 'bg-muted text-foreground'}"
                 >
                   {data.orderShipping.status.replace("_", " ")}
                 </span>
@@ -158,12 +158,12 @@
             </div>
             {#if data.orderShipping.trackingNumber}
               <div class="flex justify-between">
-                <dt class="text-gray-500">Tracking</dt>
+                <dt class="text-muted-foreground">Tracking</dt>
                 <dd class="font-mono text-xs">{data.orderShipping.trackingNumber}</dd>
               </div>
             {/if}
             <div class="flex justify-between">
-              <dt class="text-gray-500">Cost</dt>
+              <dt class="text-muted-foreground">Cost</dt>
               <dd>{(data.orderShipping.price / 100).toFixed(2)} EUR</dd>
             </div>
           </dl>
@@ -186,15 +186,15 @@
       {/if}
 
       {#if data.payment && data.paymentMethod}
-        <div class="rounded-lg bg-white p-6 shadow">
+        <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 font-semibold">Payment Information</h2>
           <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
-              <dt class="text-gray-500">Method</dt>
+              <dt class="text-muted-foreground">Method</dt>
               <dd class="font-medium">{data.paymentMethod.name}</dd>
             </div>
             <div class="flex justify-between">
-              <dt class="text-gray-500">Status</dt>
+              <dt class="text-muted-foreground">Status</dt>
               <dd>
                 <span
                   class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize
@@ -204,25 +204,25 @@
                       ? 'bg-red-100 text-red-800'
                       : data.payment.state === 'refunded'
                         ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'}"
+                        : 'bg-muted text-foreground'}"
                 >
                   {data.payment.state}
                 </span>
               </dd>
             </div>
             <div class="flex justify-between">
-              <dt class="text-gray-500">Amount</dt>
+              <dt class="text-muted-foreground">Amount</dt>
               <dd>{(data.payment.amount / 100).toFixed(2)} EUR</dd>
             </div>
             {#if data.payment.transactionId}
               <div class="flex justify-between">
-                <dt class="text-gray-500">Transaction ID</dt>
+                <dt class="text-muted-foreground">Transaction ID</dt>
                 <dd class="font-mono text-xs break-all">{data.payment.transactionId}</dd>
               </div>
             {/if}
             {#if data.payment.errorMessage}
               <div class="flex justify-between">
-                <dt class="text-gray-500">Error</dt>
+                <dt class="text-muted-foreground">Error</dt>
                 <dd class="text-xs text-red-600">{data.payment.errorMessage}</dd>
               </div>
             {/if}
@@ -248,20 +248,20 @@
         </div>
       {/if}
 
-      <div class="rounded-lg bg-white p-6 shadow">
+      <div class="rounded-lg bg-surface p-6 shadow">
         <h2 class="mb-4 font-semibold">Details</h2>
         <dl class="space-y-2 text-sm">
           <div class="flex justify-between">
-            <dt class="text-gray-500">Order ID</dt>
+            <dt class="text-muted-foreground">Order ID</dt>
             <dd>{data.order.id}</dd>
           </div>
           <div class="flex justify-between">
-            <dt class="text-gray-500">Created</dt>
+            <dt class="text-muted-foreground">Created</dt>
             <dd>{new Date(data.order.createdAt).toLocaleString()}</dd>
           </div>
           {#if data.order.orderPlacedAt}
             <div class="flex justify-between">
-              <dt class="text-gray-500">Placed</dt>
+              <dt class="text-muted-foreground">Placed</dt>
               <dd>{new Date(data.order.orderPlacedAt).toLocaleString()}</dd>
             </div>
           {/if}

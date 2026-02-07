@@ -136,7 +136,7 @@
   method: string;
   id: number;
 })}
-  <a href="/admin/promotions/{id}" class="font-medium text-gray-900 hover:text-blue-600">
+  <a href="/admin/promotions/{id}" class="font-medium text-foreground hover:text-blue-600">
     {method === "automatic" ? title : code}
   </a>
 {/snippet}
@@ -166,7 +166,7 @@
 <div>
   <div class="mb-8 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Promotions</h1>
+      <h1 class="text-2xl font-bold text-foreground">Promotions</h1>
     </div>
     <a href="/admin/promotions/new" class={buttonVariants()}
       ><PlusIcon class="h-4 w-4" /> Add Promotion</a

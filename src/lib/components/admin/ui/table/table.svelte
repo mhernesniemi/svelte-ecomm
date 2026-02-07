@@ -12,12 +12,12 @@
 
 <div
   data-slot="table-container"
-  class={cn("overflow-hidden rounded-lg border border-gray-200 bg-white shadow", className)}
+  class={cn("overflow-hidden rounded-lg border border-border bg-surface shadow", className)}
 >
   <table
     bind:this={ref}
     data-slot="table"
-    class="min-w-full divide-y divide-gray-200"
+    class="min-w-full divide-y divide-border"
     {...restProps}
   >
     {@render children?.()}

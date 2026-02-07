@@ -7,11 +7,11 @@
       variant: {
         default: "bg-blue-600 text-white hover:bg-blue-700",
         destructive: "bg-red-600 text-white hover:bg-red-700",
-        "destructive-outline": "border border-red-300 text-red-600 hover:bg-red-50",
-        "destructive-ghost": "text-red-600 hover:text-red-800 hover:bg-red-50",
-        outline: "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-        ghost: "text-gray-700 hover:bg-gray-100",
+        "destructive-outline": "border border-red-300 text-red-600 hover:bg-destructive-subtle",
+        "destructive-ghost": "text-red-600 hover:text-red-800 hover:bg-destructive-subtle",
+        outline: "border border-input-border bg-surface text-foreground-secondary hover:bg-hover",
+        secondary: "bg-muted text-foreground hover:bg-muted-strong",
+        ghost: "text-foreground-secondary hover:bg-muted",
         link: "text-blue-600 underline-offset-4 hover:underline"
       },
       size: {

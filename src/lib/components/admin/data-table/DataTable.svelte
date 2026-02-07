@@ -111,14 +111,14 @@
 
 <!-- Table or empty state -->
 {#if data.length === 0 && emptyIcon}
-  <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
+  <div class="rounded-lg border border-dashed border-input-border p-12 text-center">
     {#if emptyIcon}
       {@const Icon = emptyIcon}
-      <Icon class="mx-auto h-12 w-12 text-gray-400" />
+      <Icon class="mx-auto h-12 w-12 text-placeholder" />
     {/if}
-    <h3 class="mt-2 text-sm font-medium text-gray-900">{emptyTitle}</h3>
+    <h3 class="mt-2 text-sm font-medium text-foreground">{emptyTitle}</h3>
     {#if emptyDescription}
-      <p class="mt-1 text-sm text-gray-500">{emptyDescription}</p>
+      <p class="mt-1 text-sm text-muted-foreground">{emptyDescription}</p>
     {/if}
     {#if emptyAction}
       <div class="mt-6">
@@ -130,7 +130,7 @@
   <!-- Toolbar: search + bulk actions -->
   <div class="flex items-center justify-between gap-4 py-4">
     <div class="relative max-w-sm flex-1">
-      <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-placeholder" />
       <Input
         placeholder={searchPlaceholder}
         value={globalFilter}
@@ -141,7 +141,7 @@
 
     {#if bulkActions && selectedCount > 0}
       <div class="flex items-center gap-2">
-        <span class="text-sm text-gray-500">{selectedCount} selected</span>
+        <span class="text-sm text-muted-foreground">{selectedCount} selected</span>
         {@render bulkActions({ selectedRows, table })}
       </div>
     {/if}
@@ -170,9 +170,10 @@
         </TableRow>
       {:else}
         <TableRow class="hover:bg-transparent">
-          <TableCell colspan={columns.length} class="py-12 text-center text-gray-500">
+          <TableCell colspan={columns.length} class="py-12 text-center text-muted-foreground">
             No results found
           </TableCell>
+
         </TableRow>
       {/each}
     </TableBody>
@@ -180,8 +181,8 @@
 
   <!-- Pagination -->
   {#if pageCount > 1}
-    <div class="mt-4 flex items-center justify-between rounded-lg bg-white px-6 py-3 shadow">
-      <div class="text-sm text-gray-500">
+    <div class="mt-4 flex items-center justify-between rounded-lg bg-surface px-6 py-3 shadow">
+      <div class="text-sm text-muted-foreground">
         Showing {showingFrom} to {showingTo} of {totalFiltered}
       </div>
       <div class="flex gap-2">
@@ -207,7 +208,7 @@
 
   <!-- Selection count (when row selection enabled) -->
   {#if enableRowSelection}
-    <div class="mt-2 text-sm text-gray-500">
+    <div class="mt-2 text-sm text-muted-foreground">
       {selectedCount} of {totalFiltered} row(s) selected
     </div>
   {/if}

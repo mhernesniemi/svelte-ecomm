@@ -5,11 +5,11 @@
     base: "relative w-full rounded-lg border p-4 [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg~*]:pl-7",
     variants: {
       variant: {
-        default: "border-gray-200 bg-gray-50 text-gray-700",
+        default: "border-border bg-background text-foreground-secondary",
         success: "border-green-200 bg-green-50 text-green-700",
         warning: "border-yellow-200 bg-yellow-50 text-yellow-700",
-        destructive: "border-red-200 bg-red-50 text-red-700",
-        info: "border-blue-200 bg-blue-50 text-blue-700"
+        destructive: "border-red-200 bg-destructive-subtle text-red-700",
+        info: "border-blue-200 bg-accent-subtle text-blue-700"
       }
     },
     defaultVariants: {

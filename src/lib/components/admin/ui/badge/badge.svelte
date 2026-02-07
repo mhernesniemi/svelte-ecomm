@@ -5,12 +5,12 @@
     base: "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
     variants: {
       variant: {
-        default: "bg-blue-100 text-blue-800",
-        secondary: "bg-gray-100 text-gray-800",
+        default: "bg-accent-subtle text-blue-800",
+        secondary: "bg-muted text-foreground",
         success: "bg-green-100 text-green-800",
         warning: "bg-yellow-100 text-yellow-800",
-        destructive: "bg-red-100 text-red-800",
-        outline: "border border-gray-300 text-gray-700"
+        destructive: "bg-destructive-subtle text-red-800",
+        outline: "border border-input-border text-foreground-secondary"
       }
     },
     defaultVariants: {

@@ -71,7 +71,7 @@
 </script>
 
 {#snippet titleCell({ id, title }: { id: number; title: string })}
-  <a href="/admin/content-pages/{id}" class="font-medium text-gray-900 hover:text-blue-600">
+  <a href="/admin/content-pages/{id}" class="font-medium text-foreground hover:text-blue-600">
     {title || "Untitled"}
   </a>
 {/snippet}
@@ -84,7 +84,7 @@
       Published
     </span>
   {:else}
-    <span class="inline-flex rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+    <span class="inline-flex rounded-full bg-muted px-2 py-1 text-xs font-medium text-foreground-tertiary">
       Draft
     </span>
   {/if}
@@ -95,7 +95,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Content Pages</h1>
+      <h1 class="text-2xl font-bold text-foreground">Content Pages</h1>
     </div>
     <a href="/admin/content-pages/new" class={buttonVariants()}
       ><PlusIcon class="h-4 w-4" /> Add Page</a

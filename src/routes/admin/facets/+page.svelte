@@ -63,7 +63,7 @@
 </script>
 
 {#snippet nameCell({ id, name }: { id: number; name: string })}
-  <a href="/admin/facets/{id}" class="font-medium text-gray-900 hover:text-blue-600">
+  <a href="/admin/facets/{id}" class="font-medium text-foreground hover:text-blue-600">
     {name}
   </a>
 {/snippet}
@@ -73,7 +73,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Facets</h1>
+      <h1 class="text-2xl font-bold text-foreground">Facets</h1>
     </div>
     <a href="/admin/facets/new" class={buttonVariants()}><PlusIcon class="h-4 w-4" /> Add Facet</a>
   </div>

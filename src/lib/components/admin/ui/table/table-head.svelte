@@ -14,7 +14,7 @@
   bind:this={ref}
   data-slot="table-head"
   class={cn(
-    "px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase [&:has([role=checkbox])]:pe-0",
+    "px-6 py-3 text-left text-xs font-medium text-foreground-tertiary uppercase [&:has([role=checkbox])]:pe-0",
     className
   )}
   {...restProps}

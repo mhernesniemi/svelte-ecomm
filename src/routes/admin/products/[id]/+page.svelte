@@ -212,7 +212,7 @@
         <a
           href="/products/{data.product.id}/{translation.slug}"
           target="_blank"
-          class="text-sm text-gray-500 hover:text-gray-700"
+          class="text-sm text-muted-foreground hover:text-foreground-secondary"
         >
           View in store &rarr;
         </a>
@@ -242,13 +242,13 @@
             isSavingProduct = false;
           };
         }}
-        class="rounded-lg bg-white shadow"
+        class="rounded-lg bg-surface shadow"
       >
         <div class="space-y-6 p-6">
           <div class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="name" class="mb-1 block text-sm font-medium text-gray-700">
+                <label for="name" class="mb-1 block text-sm font-medium text-foreground-secondary">
                   Name <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -257,12 +257,12 @@
                   name="name"
                   value={translation?.name ?? ""}
                   required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               </div>
 
               <div>
-                <label for="slug" class="mb-1 block text-sm font-medium text-gray-700">
+                <label for="slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
                   Slug <span class="text-red-500">*</span>
                 </label>
                 <input
@@ -271,13 +271,13 @@
                   name="slug"
                   value={translation?.slug ?? ""}
                   required
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2"
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               </div>
             </div>
 
             <div>
-              <label for="description" class="mb-1 block text-sm font-medium text-gray-700">
+              <label for="description" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Description
               </label>
               <RichTextEditor
@@ -291,8 +291,8 @@
           <!-- Common Fields -->
           <div class="grid grid-cols-2 gap-4">
             <label class="block">
-              <span class="text-sm font-medium text-gray-700">Product Type</span>
-              <select name="type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+              <span class="text-sm font-medium text-foreground-secondary">Product Type</span>
+              <select name="type" class="mt-1 block w-full rounded-md border-input-border shadow-sm">
                 <option value="physical" selected={data.product.type === "physical"}
                   >Physical</option
                 >
@@ -301,8 +301,8 @@
             </label>
 
             <label class="block">
-              <span class="text-sm font-medium text-gray-700">Tax Rate</span>
-              <select name="taxCode" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+              <span class="text-sm font-medium text-foreground-secondary">Tax Rate</span>
+              <select name="taxCode" class="mt-1 block w-full rounded-md border-input-border shadow-sm">
                 {#each data.taxRates as rate}
                   <option value={rate.code} selected={data.product.taxCode === rate.code}>
                     {rate.name} ({(rate.rate * 100).toFixed(0)}%)
@@ -315,8 +315,8 @@
       </form>
 
       <!-- Variants Section -->
-      <div class="rounded-lg bg-white pb-4 shadow">
-        <div class="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+      <div class="rounded-lg bg-surface pb-4 shadow">
+        <div class="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
           <a href="/admin/products/{data.product.id}/variants/new">
             <Button type="button" variant="outline" size="sm"
@@ -340,7 +340,7 @@
           <TableBody>
             {#if data.product.variants.length === 0}
               <TableRow class="hover:bg-transparent">
-                <TableCell colspan={6} class="py-8 text-center text-gray-500">
+                <TableCell colspan={6} class="py-8 text-center text-muted-foreground">
                   No variants yet. Add a variant to start selling this product.
                 </TableCell>
               </TableRow>
@@ -355,13 +355,13 @@
                   <TableCell class="text-sm">{variant.stock}</TableCell>
                   <TableCell class="text-sm">
                     {#if variant.facetValues.length === 0}
-                      <span class="text-gray-400">None</span>
+                      <span class="text-placeholder">None</span>
                     {:else}
                       <div class="flex flex-wrap gap-1">
                         {#each variant.facetValues as fv}
                           {@const name =
                             fv.translations.find((t) => t.languageCode === "en")?.name ?? fv.code}
-                          <span class="rounded bg-gray-100 px-2 py-0.5 text-xs">{name}</span>
+                          <span class="rounded bg-muted px-2 py-0.5 text-xs">{name}</span>
                         {/each}
                       </div>
                     {/if}
@@ -392,30 +392,30 @@
     <!-- Sidebar (Right) -->
     <div class="w-80 shrink-0 space-y-6">
       <!-- Visibility Section -->
-      <div class="rounded-lg bg-white shadow">
-        <div class="border-b border-gray-200 px-4 py-3">
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
           <h2 class="font-semibold">Visibility</h2>
         </div>
         <div class="p-4">
           <select
             form="product-form"
             name="visibility"
-            class="block w-full rounded-md border-gray-300 shadow-sm"
+            class="block w-full rounded-md border-input-border shadow-sm"
           >
             <option value="draft" selected={data.product.visibility === "draft"}>Draft</option>
             <option value="public" selected={data.product.visibility === "public"}>Public</option>
             <option value="private" selected={data.product.visibility === "private"}>Private</option
             >
           </select>
-          <p class="mt-3 text-xs text-gray-500">
+          <p class="mt-3 text-xs text-muted-foreground">
             Set this to Public to make it available in the store
           </p>
         </div>
       </div>
 
       <!-- Images Section -->
-      <div class="rounded-lg bg-white shadow">
-        <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+      <div class="rounded-lg bg-surface shadow">
+        <div class="flex items-center justify-between border-b border-border px-4 py-3">
           <h2 class="font-semibold">Images</h2>
           <Button
             type="button"
@@ -437,7 +437,7 @@
                   <img
                     src="{asset.source}?tr=w-100,h-100,fo-auto"
                     alt={asset.alt || asset.name}
-                    class="h-24 w-full rounded border border-gray-200 object-cover {data.product
+                    class="h-24 w-full rounded border border-border object-cover {data.product
                       .featuredAssetId === asset.id
                       ? 'ring-2 ring-blue-500'
                       : ''}"
@@ -476,30 +476,30 @@
               {/each}
             </div>
           {:else}
-            <p class="py-4 text-center text-sm text-gray-500">No images yet</p>
+            <p class="py-4 text-center text-sm text-muted-foreground">No images yet</p>
           {/if}
         </div>
       </div>
 
       <!-- Facet Values Section -->
-      <div class="rounded-lg bg-white shadow">
-        <div class="border-b border-gray-200 px-4 py-3">
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
           <h2 class="font-semibold">Facet Values</h2>
         </div>
 
         <div class="p-4">
           {#if data.facets.length === 0}
-            <p class="text-sm text-gray-500">No facets defined.</p>
+            <p class="text-sm text-muted-foreground">No facets defined.</p>
           {:else}
             <!-- Combobox -->
             <Popover.Root bind:open={facetComboboxOpen}>
               <Popover.Trigger
-                class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                 aria-expanded={facetComboboxOpen}
                 aria-controls="facet-listbox"
                 aria-haspopup="listbox"
               >
-                <span class="text-gray-500">Select facet values...</span>
+                <span class="text-muted-foreground">Select facet values...</span>
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Popover.Trigger>
               <Popover.Content class="w-72 p-0" align="start">
@@ -544,7 +544,7 @@
               <div class="mt-3 flex flex-wrap gap-1.5">
                 {#each getSelectedFacetValueObjects() as fv}
                   <span
-                    class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800"
+                    class="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs text-blue-800"
                   >
                     {fv.facetName}: {fv.name}
                     <button
@@ -565,24 +565,24 @@
       </div>
 
       <!-- Categories Section -->
-      <div class="rounded-lg bg-white shadow">
-        <div class="border-b border-gray-200 px-4 py-3">
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
           <h2 class="font-semibold">Categories</h2>
         </div>
 
         <div class="p-4">
           {#if data.categoryTree.length === 0}
-            <p class="text-sm text-gray-500">No categories defined.</p>
+            <p class="text-sm text-muted-foreground">No categories defined.</p>
           {:else}
             <!-- Combobox -->
             <Popover.Root bind:open={categoryComboboxOpen}>
               <Popover.Trigger
-                class="flex w-full items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+                class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                 aria-expanded={categoryComboboxOpen}
                 aria-controls="category-listbox"
                 aria-haspopup="listbox"
               >
-                <span class="text-gray-500">Select categories...</span>
+                <span class="text-muted-foreground">Select categories...</span>
                 <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Popover.Trigger>
               <Popover.Content class="w-72 p-0" align="start">
@@ -621,7 +621,7 @@
               <div class="mt-3 flex flex-wrap gap-1.5">
                 {#each getSelectedCategoryObjects() as category}
                   <span
-                    class="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800"
+                    class="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs text-blue-800"
                   >
                     {category.name}
                     <button
@@ -700,7 +700,7 @@
                   placeholder="Describe this image..."
                   class="mt-1"
                 />
-                <p class="mt-1 text-xs text-gray-500">
+                <p class="mt-1 text-xs text-muted-foreground">
                   Describes the image for screen readers and search engines.
                 </p>
               </div>
@@ -712,9 +712,9 @@
                   value="true"
                   checked={currentEditingImage.isFeatured}
                   disabled={currentEditingImage.isFeatured}
-                  class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  class="h-4 w-4 rounded border-input-border text-blue-600 focus:ring-blue-500"
                 />
-                <span class="text-sm text-gray-700">Featured image</span>
+                <span class="text-sm text-foreground-secondary">Featured image</span>
               </label>
             </div>
             <Dialog.Footer class="mt-4">
