@@ -5,11 +5,17 @@
   import { enhance } from "$app/forms";
   import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
   import CopyIcon from "@lucide/svelte/icons/copy";
+  import CheckIcon from "@lucide/svelte/icons/check";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
   const commandText = "bunx create-hoikka-app";
+  let copied = $state(false);
 
-  const copyCommand = () => navigator.clipboard?.writeText(commandText);
+  const copyCommand = () => {
+    navigator.clipboard?.writeText(commandText);
+    copied = true;
+    setTimeout(() => (copied = false), 100);
+  };
 </script>
 
 <svelte:head>
@@ -47,7 +53,9 @@
               <p class="pt-4 text-xs text-gray-600">
                 or
                 <span
-                  class="ml-1 inline-flex items-center overflow-hidden rounded-md border border-pink-200 bg-white"
+                  class="ml-1 inline-flex items-center overflow-hidden rounded-md border border-pink-200 transition-colors duration-300 {copied
+                    ? 'bg-pink-300'
+                    : 'bg-white'}"
                 >
                   <code
                     class="inline-flex items-center px-1.5 py-0.5 font-mono font-medium text-pink-700"
@@ -60,7 +68,11 @@
                     aria-label="Copy command"
                     onclick={copyCommand}
                   >
-                    <CopyIcon class="h-3.5 w-3.5" />
+                    {#if copied}
+                      <CheckIcon class="h-3.5 w-3.5 text-green-600" />
+                    {:else}
+                      <CopyIcon class="h-3.5 w-3.5" />
+                    {/if}
                   </button>
                 </span>
               </p>
