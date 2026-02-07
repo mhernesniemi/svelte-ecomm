@@ -378,8 +378,6 @@ export class OrderService {
 		// Create reservation for the new line
 		await reservationService.reserve(input.variantId, orderId, line.id, input.quantity);
 
-
-
 		await this.recalculateTotals(orderId);
 		return line;
 	}
@@ -518,8 +516,7 @@ export class OrderService {
 			const qualifyingLineTotal = linesWithProducts
 				.filter(
 					(l) =>
-						qualifyingProductIds === null ||
-						qualifyingProductIds.includes(l.productId)
+						qualifyingProductIds === null || qualifyingProductIds.includes(l.productId)
 				)
 				.reduce((sum, l) => sum + l.lineTotal, 0);
 
@@ -582,9 +579,7 @@ export class OrderService {
 	 * Remove all promotions from an order
 	 */
 	async removeAllPromotions(orderId: number): Promise<void> {
-		await db
-			.delete(orderPromotions)
-			.where(eq(orderPromotions.orderId, orderId));
+		await db.delete(orderPromotions).where(eq(orderPromotions.orderId, orderId));
 
 		await this.recalculateTotals(orderId);
 	}
@@ -892,7 +887,9 @@ export class OrderService {
 				discountAmount = shippingRecord?.price ?? 0;
 				orderPromotionType = "shipping";
 			} else if (promo.promotionType === "product") {
-				const qualifyingProductIds = await promotionService.getQualifyingProductIds(promo.id);
+				const qualifyingProductIds = await promotionService.getQualifyingProductIds(
+					promo.id
+				);
 				const linesWithProducts = await db
 					.select({
 						lineTotal: orderLines.lineTotal,

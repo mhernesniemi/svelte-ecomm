@@ -31,10 +31,10 @@
 	--color-foreground: oklch(0.96 0.004 265);
 	--color-foreground-secondary: oklch(0.86 0.006 265);
 	--color-foreground-tertiary: oklch(0.72 0.006 265);
-	--color-muted-foreground: oklch(0.60 0.006 265);
+	--color-muted-foreground: oklch(0.6 0.006 265);
 	--color-placeholder: oklch(0.48 0.006 265);
 
-	--color-border: oklch(0.30 0.012 265);
+	--color-border: oklch(0.3 0.012 265);
 	--color-input-border: oklch(0.36 0.012 265);
 
 	--color-hover: oklch(0.245 0.014 265);

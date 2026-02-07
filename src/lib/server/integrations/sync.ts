@@ -172,7 +172,6 @@ export function registerSyncJob<TExternal, TLocal>(job: SyncJob<TExternal, TLoca
 	registerHandler(`sync.${job.name}`, async () => {
 		await runSync(job);
 	});
-
 }
 
 /**
@@ -204,7 +203,6 @@ export async function scheduleSyncJob(name: string, intervalMs: number): Promise
 
 	// Start the recurring schedule
 	await scheduleRecurring(`sync.${name}.recurring`, {}, intervalMs);
-
 }
 
 /**

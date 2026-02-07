@@ -14,12 +14,7 @@
   data-slot="table-container"
   class={cn("overflow-hidden rounded-lg border border-border bg-surface shadow", className)}
 >
-  <table
-    bind:this={ref}
-    data-slot="table"
-    class="min-w-full divide-y divide-border"
-    {...restProps}
-  >
+  <table bind:this={ref} data-slot="table" class="min-w-full divide-y divide-border" {...restProps}>
     {@render children?.()}
   </table>
 </div>

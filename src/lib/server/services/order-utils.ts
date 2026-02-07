@@ -95,9 +95,7 @@ export function calculateOrderTotals(input: OrderTotalsInput): OrderTotals {
 
 	const total = Math.max(0, subtotal - discount + effectiveShipping);
 	// For tax-exempt orders, totalNet equals total (no tax). Otherwise use subtotalNet.
-	const totalNet = isTaxExempt
-		? total
-		: Math.max(0, subtotalNet - discount + effectiveShipping);
+	const totalNet = isTaxExempt ? total : Math.max(0, subtotalNet - discount + effectiveShipping);
 
 	return {
 		subtotal,

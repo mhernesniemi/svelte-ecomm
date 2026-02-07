@@ -246,9 +246,7 @@ export class PromotionService {
 
 		// Sync junction tables if provided
 		if (input.productIds !== undefined) {
-			await db
-				.delete(promotionProducts)
-				.where(eq(promotionProducts.promotionId, id));
+			await db.delete(promotionProducts).where(eq(promotionProducts.promotionId, id));
 			if (input.productIds.length > 0) {
 				await db.insert(promotionProducts).values(
 					input.productIds.map((productId) => ({
@@ -260,9 +258,7 @@ export class PromotionService {
 		}
 
 		if (input.collectionIds !== undefined) {
-			await db
-				.delete(promotionCollections)
-				.where(eq(promotionCollections.promotionId, id));
+			await db.delete(promotionCollections).where(eq(promotionCollections.promotionId, id));
 			if (input.collectionIds.length > 0) {
 				await db.insert(promotionCollections).values(
 					input.collectionIds.map((collectionId) => ({
@@ -336,10 +332,7 @@ export class PromotionService {
 
 		// Per-customer usage check
 		if (promotion.usageLimitPerCustomer && options?.customerId) {
-			const usageCount = await this.getCustomerUsageCount(
-				promotion.id,
-				options.customerId
-			);
+			const usageCount = await this.getCustomerUsageCount(promotion.id, options.customerId);
 			if (usageCount >= promotion.usageLimitPerCustomer) {
 				return { valid: false, error: "You have already used this promotion" };
 			}

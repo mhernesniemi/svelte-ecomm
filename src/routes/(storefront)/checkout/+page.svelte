@@ -25,8 +25,12 @@
   const contactInfoSet = $derived(
     form?.contactInfoSet || (isDigitalOnly && currentCart?.customerEmail)
   );
-  const currentAppliedPromotions = $derived(form?.appliedPromotions ?? data.appliedPromotions ?? []);
-  const hasShippingPromo = $derived(currentAppliedPromotions.some((p: any) => p.type === "shipping"));
+  const currentAppliedPromotions = $derived(
+    form?.appliedPromotions ?? data.appliedPromotions ?? []
+  );
+  const hasShippingPromo = $derived(
+    currentAppliedPromotions.some((p: any) => p.type === "shipping")
+  );
 
   // Initialize selected shipping rate if already set
   $effect(() => {
@@ -623,11 +627,15 @@
                       <span class="text-sm font-medium text-green-800">
                         {promo.method === "automatic" ? promo.title : promo.code}
                       </span>
-                      <span class="ml-1 text-xs text-green-600">-{formatPrice(promo.discountAmount)}</span>
+                      <span class="ml-1 text-xs text-green-600"
+                        >-{formatPrice(promo.discountAmount)}</span
+                      >
                     </div>
                     {#if promo.method === "code"}
                       <form method="POST" action="?/removePromotion" use:enhance>
-                        <button type="submit" class="text-xs text-red-600 hover:underline">Remove</button>
+                        <button type="submit" class="text-xs text-red-600 hover:underline"
+                          >Remove</button
+                        >
                       </form>
                     {:else}
                       <span class="text-xs text-green-600">Applied automatically</span>
@@ -686,10 +694,14 @@
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">Shipping</span>
                 {#if hasShippingPromo}
-                  {@const shippingPromo = currentAppliedPromotions.find((p: any) => p.type === "shipping")}
+                  {@const shippingPromo = currentAppliedPromotions.find(
+                    (p: any) => p.type === "shipping"
+                  )}
                   <span class="font-medium">
                     {#if shippingPromo}
-                      <span class="text-gray-400 line-through">{formatPrice(shippingPromo.discountAmount)}</span>
+                      <span class="text-gray-400 line-through"
+                        >{formatPrice(shippingPromo.discountAmount)}</span
+                      >
                     {/if}
                     <span class="ml-1 text-green-600">Free</span>
                   </span>

@@ -199,7 +199,6 @@ async function failJob(
 				runAt
 			})
 			.where(eq(jobs.id, jobId));
-
 	} else {
 		await db
 			.update(jobs)
@@ -400,7 +399,6 @@ export async function retryJob(jobId: number): Promise<void> {
 			completedAt: null
 		})
 		.where(eq(jobs.id, jobId));
-
 }
 
 /**

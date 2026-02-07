@@ -637,7 +637,9 @@ export const promotions = pgTable(
 	"promotions",
 	{
 		id: serial("id").primaryKey(),
-		method: text("method", { enum: ["code", "automatic"] }).default("code").notNull(),
+		method: text("method", { enum: ["code", "automatic"] })
+			.default("code")
+			.notNull(),
 		code: varchar("code", { length: 50 }).unique(),
 		title: varchar("title", { length: 255 }),
 		promotionType: text("promotion_type", { enum: ["order", "product", "free_shipping"] })
@@ -725,20 +727,17 @@ export const orderPromotions = pgTable(
 // COLLECTIONS (Smart Collections - Vendure/Shopify style)
 // ============================================================================
 
-export const collections = pgTable(
-	"collections",
-	{
-		id: serial("id").primaryKey(),
-		isPrivate: boolean("is_private").default(false).notNull(),
-		featuredAssetId: integer("featured_asset_id").references(() => assets.id),
-		position: integer("position").default(0).notNull(),
-		createdAt: timestamp("created_at").defaultNow().notNull(),
-		updatedAt: timestamp("updated_at")
-			.defaultNow()
-			.$onUpdate(() => new Date())
-			.notNull()
-	}
-);
+export const collections = pgTable("collections", {
+	id: serial("id").primaryKey(),
+	isPrivate: boolean("is_private").default(false).notNull(),
+	featuredAssetId: integer("featured_asset_id").references(() => assets.id),
+	position: integer("position").default(0).notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.$onUpdate(() => new Date())
+		.notNull()
+});
 
 export const collectionTranslations = pgTable(
 	"collection_translations",

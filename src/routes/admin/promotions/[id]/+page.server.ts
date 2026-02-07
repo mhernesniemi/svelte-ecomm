@@ -56,9 +56,7 @@ export const actions: Actions = {
 			? Number(data.get("usageLimitPerCustomer"))
 			: null;
 		const combinesWithOtherPromotions = data.get("combinesWithOtherPromotions") === "on";
-		const startsAt = data.get("startsAt")
-			? new Date(data.get("startsAt") as string)
-			: null;
+		const startsAt = data.get("startsAt") ? new Date(data.get("startsAt") as string) : null;
 		const endsAt = data.get("endsAt") ? new Date(data.get("endsAt") as string) : null;
 		const enabled = data.get("enabled") === "on";
 

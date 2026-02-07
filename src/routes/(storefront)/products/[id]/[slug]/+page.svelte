@@ -55,9 +55,7 @@
   );
 
   const discountedVariantPrice = $derived(
-    bestDiscount && selectedVariant
-      ? getDiscountedPrice(bestDiscount, selectedVariant.price)
-      : null
+    bestDiscount && selectedVariant ? getDiscountedPrice(bestDiscount, selectedVariant.price) : null
   );
 
   function getVariantName(variant: (typeof product.variants)[0]): string {
@@ -281,8 +279,12 @@
         <div class="mb-8">
           {#if discountedVariantPrice !== null && bestDiscount}
             <div class="flex items-center gap-3">
-              <span class="text-lg text-gray-400 line-through">{formatPrice(selectedVariant.price)}</span>
-              <span class="text-xl font-semibold text-red-600">{formatPrice(discountedVariantPrice)}</span>
+              <span class="text-lg text-gray-400 line-through"
+                >{formatPrice(selectedVariant.price)}</span
+              >
+              <span class="text-xl font-semibold text-red-600"
+                >{formatPrice(discountedVariantPrice)}</span
+              >
               <span class="rounded bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
                 {bestDiscount.discountType === "percentage"
                   ? `-${bestDiscount.discountValue}%`
