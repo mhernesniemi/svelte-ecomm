@@ -20,7 +20,20 @@
   let { children, data }: { children: any; data: LayoutData } = $props();
 
   onMount(() => {
-    return initTheme();
+    const cleanup = initTheme();
+    // Reset html background when leaving admin (e.g. navigating to storefront)
+    return () => {
+      cleanup();
+      document.documentElement.style.backgroundColor = "";
+    };
+  });
+
+  // Set <html> background so macOS overscroll bounce matches the admin theme.
+  // Without this the body's default bg-gray-50 shows through as a white flash.
+  $effect(() => {
+    document.documentElement.style.backgroundColor = isDark()
+      ? "oklch(0.175 0.014 265)"
+      : "";
   });
 
   interface NavItem {
