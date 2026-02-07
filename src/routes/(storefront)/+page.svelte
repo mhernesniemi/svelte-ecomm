@@ -63,16 +63,12 @@
                   >
                   <button
                     type="button"
-                    class="inline-flex items-center justify-center border-l border-pink-200 px-1.5 py-0.5 text-pink-600 transition-colors hover:bg-pink-50 focus-visible:ring-2 focus-visible:ring-pink-300 focus-visible:ring-offset-2 focus-visible:outline-none"
+                    class="group inline-flex items-center justify-center border-l border-pink-200 px-1.5 py-0.5 text-pink-600"
                     title="Copy command"
                     aria-label="Copy command"
                     onclick={copyCommand}
                   >
-                    {#if copied}
-                      <CheckIcon class="h-3.5 w-3.5 text-green-600" />
-                    {:else}
-                      <CopyIcon class="h-3.5 w-3.5" />
-                    {/if}
+                    <CopyIcon class="h-3.5 w-3.5 group-hover:text-pink-700" />
                   </button>
                 </span>
               </p>
