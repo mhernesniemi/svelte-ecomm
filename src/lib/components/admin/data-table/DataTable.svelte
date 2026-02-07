@@ -109,26 +109,6 @@
   );
 </script>
 
-<!-- Toolbar: search + bulk actions -->
-<div class="flex items-center justify-between gap-4 py-4">
-  <div class="relative max-w-sm flex-1">
-    <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
-    <Input
-      placeholder={searchPlaceholder}
-      value={globalFilter}
-      oninput={(e: Event) => table.setGlobalFilter((e.target as HTMLInputElement).value)}
-      class="pl-9"
-    />
-  </div>
-
-  {#if bulkActions && selectedCount > 0}
-    <div class="flex items-center gap-2">
-      <span class="text-sm text-gray-500">{selectedCount} selected</span>
-      {@render bulkActions({ selectedRows, table })}
-    </div>
-  {/if}
-</div>
-
 <!-- Table or empty state -->
 {#if data.length === 0 && emptyIcon}
   <div class="rounded-lg border border-dashed border-gray-300 p-12 text-center">
@@ -147,6 +127,26 @@
     {/if}
   </div>
 {:else}
+  <!-- Toolbar: search + bulk actions -->
+  <div class="flex items-center justify-between gap-4 py-4">
+    <div class="relative max-w-sm flex-1">
+      <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <Input
+        placeholder={searchPlaceholder}
+        value={globalFilter}
+        oninput={(e: Event) => table.setGlobalFilter((e.target as HTMLInputElement).value)}
+        class="pl-9"
+      />
+    </div>
+
+    {#if bulkActions && selectedCount > 0}
+      <div class="flex items-center gap-2">
+        <span class="text-sm text-gray-500">{selectedCount} selected</span>
+        {@render bulkActions({ selectedRows, table })}
+      </div>
+    {/if}
+  </div>
+
   <TableRoot>
     <TableHeader>
       {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}

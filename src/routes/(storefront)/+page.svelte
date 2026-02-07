@@ -47,7 +47,7 @@
               <p class="pt-4 text-xs text-gray-600">
                 or
                 <span
-                  class="ml-1 inline-flex items-center overflow-hidden rounded-md border border-pink-200"
+                  class="ml-1 inline-flex items-center overflow-hidden rounded-md border border-pink-200 bg-white"
                 >
                   <code
                     class="inline-flex items-center px-1.5 py-0.5 font-mono text-[11px] font-medium text-pink-700"
