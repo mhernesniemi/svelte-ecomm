@@ -4,8 +4,12 @@
   import ProductCard from "$lib/components/storefront/ProductCard.svelte";
   import { enhance } from "$app/forms";
   import ArrowRightIcon from "@lucide/svelte/icons/arrow-right";
+  import CopyIcon from "@lucide/svelte/icons/copy";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
+  const commandText = "bunx create-hoikka-app";
+
+  const copyCommand = () => navigator.clipboard?.writeText(commandText);
 </script>
 
 <svelte:head>
@@ -31,14 +35,36 @@
             It's 100% customizable and owned by you.
             <span class="text-gray-900 italic">Built with SvelteKit.</span>
           </p>
-          <div class="flex items-center gap-4">
+          <div class="flex items-start gap-4">
             <img src="/kuvitus2.png" alt="Svelte" class="h-20 w-20" />
-            <a
-              href="/docs"
-              class="h inline-block rounded-lg border bg-white px-8 py-3 font-semibold text-gray-900 transition-colors hover:bg-[#f7d0dd]/50"
-            >
-              Get Started: Docs
-            </a>
+            <div class="pt-2">
+              <a
+                href="/docs"
+                class="h inline-block rounded-lg border bg-white px-8 py-3 font-semibold text-gray-900 transition-colors hover:bg-[#f7d0dd]/50"
+              >
+                Get Started: Docs
+              </a>
+              <p class="pt-4 text-xs text-gray-600">
+                or
+                <span
+                  class="ml-1 inline-flex items-center overflow-hidden rounded-md border border-pink-200"
+                >
+                  <code
+                    class="inline-flex items-center px-1.5 py-0.5 font-mono text-[11px] font-medium text-pink-700"
+                    >{commandText}</code
+                  >
+                  <button
+                    type="button"
+                    class="inline-flex items-center justify-center border-l border-pink-200 px-1.5 py-0.5 text-pink-600 transition-colors hover:bg-pink-50 focus-visible:ring-2 focus-visible:ring-pink-300 focus-visible:ring-offset-2 focus-visible:outline-none"
+                    title="Copy command"
+                    aria-label="Copy command"
+                    onclick={copyCommand}
+                  >
+                    <CopyIcon class="h-3.5 w-3.5" />
+                  </button>
+                </span>
+              </p>
+            </div>
           </div>
         </div>
         <div class="max-w-[300px]">
