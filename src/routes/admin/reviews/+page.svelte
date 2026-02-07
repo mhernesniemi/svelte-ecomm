@@ -116,8 +116,8 @@
     <a
       href="/admin/reviews"
       class="rounded-full px-3 py-1 text-sm {!data.currentStatus
-        ? 'bg-blue-800 text-white'
-        : 'bg-muted-strong text-foreground-secondary hover:text-white'}"
+        ? 'bg-blue-600 text-white dark:bg-blue-800'
+        : 'bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white'}"
     >
       All
     </a>
@@ -125,8 +125,8 @@
       <a
         href="/admin/reviews?status={status}"
         class="rounded-full px-3 py-1 text-sm capitalize {data.currentStatus === status
-          ? 'bg-blue-800 text-white'
-          : 'bg-muted-strong text-foreground-secondary hover:text-white'}"
+          ? 'bg-blue-600 text-white dark:bg-blue-800'
+          : 'bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white'}"
       >
         {status}
       </a>
