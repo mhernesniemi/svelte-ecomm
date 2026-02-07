@@ -31,9 +31,7 @@
   // Set <html> background so macOS overscroll bounce matches the admin theme.
   // Without this the body's default bg-gray-50 shows through as a white flash.
   $effect(() => {
-    document.documentElement.style.backgroundColor = isDark()
-      ? "oklch(0.175 0.014 265)"
-      : "";
+    document.documentElement.style.backgroundColor = isDark() ? "oklch(0.175 0.014 265)" : "";
   });
 
   interface NavItem {
@@ -77,7 +75,7 @@
             ? 'border-l-4 border-blue-500 bg-gray-800/60 text-white'
             : ''}"
         >
-          <span class="h-5 w-5">
+          <span class="h-5 w-5 opacity-60">
             {#if item.icon === "package"}
               <Package class="h-5 w-5" />
             {:else if item.icon === "shopping-cart"}
