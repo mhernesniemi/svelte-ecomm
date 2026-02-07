@@ -14,9 +14,9 @@
       actionButton: "group-[.toast]:bg-foreground group-[.toast]:text-surface",
       cancelButton: "group-[.toast]:bg-muted group-[.toast]:text-muted-foreground",
       error:
-        "group-[.toaster]:!bg-destructive-subtle group-[.toaster]:!text-red-700 group-[.toaster]:!border-red-300 [&>svg]:!text-red-500",
+        "group-[.toaster]:!bg-destructive-subtle group-[.toaster]:!text-red-700 group-[.toaster]:!border-red-300 [&>svg]:!text-red-500 dark:group-[.toaster]:!text-red-300 dark:group-[.toaster]:!border-red-500/25",
       success:
-        "group-[.toaster]:!bg-green-50 group-[.toaster]:!text-green-700 group-[.toaster]:!border-green-300 [&>svg]:!text-green-500"
+        "group-[.toaster]:!bg-green-50 group-[.toaster]:!text-green-700 group-[.toaster]:!border-green-300 [&>svg]:!text-green-500 dark:group-[.toaster]:!bg-green-500/10 dark:group-[.toaster]:!text-green-300 dark:group-[.toaster]:!border-green-500/25"
     }
   }}
   {...props}

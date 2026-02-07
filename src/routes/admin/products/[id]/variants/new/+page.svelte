@@ -230,13 +230,13 @@
               <div class="mt-3 flex flex-wrap gap-1.5">
                 {#each getSelectedFacetValueObjects() as fv}
                   <span
-                    class="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs text-blue-800"
+                    class="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs text-blue-800 dark:text-blue-300"
                   >
                     {fv.facetName}: {fv.name}
                     <button
                       type="button"
                       onclick={() => removeFacetValue(fv.id)}
-                      class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200"
+                      class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-500/20"
                       aria-label="Remove {fv.name}"
                     >
                       <X class="h-3 w-3" />

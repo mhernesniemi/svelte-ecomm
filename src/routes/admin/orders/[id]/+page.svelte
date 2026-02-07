@@ -41,9 +41,9 @@
           <span
             class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium capitalize
 						{data.order.state === 'paid'
-              ? 'bg-green-100 text-green-800'
+              ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300'
               : data.order.state === 'cancelled'
-                ? 'bg-red-100 text-red-800'
+                ? 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300'
                 : 'bg-muted text-foreground'}"
           >
             {data.order.state.replace("_", " ")}
@@ -146,10 +146,10 @@
                 <span
                   class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize
 									{data.orderShipping.status === 'delivered'
-                    ? 'bg-green-100 text-green-800'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300'
                     : data.orderShipping.status === 'shipped' ||
                         data.orderShipping.status === 'in_transit'
-                      ? 'bg-accent-subtle text-blue-800'
+                      ? 'bg-accent-subtle text-blue-800 dark:text-blue-300'
                       : 'bg-muted text-foreground'}"
                 >
                   {data.orderShipping.status.replace("_", " ")}
@@ -199,11 +199,11 @@
                 <span
                   class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize
 									{data.payment.state === 'settled'
-                    ? 'bg-green-100 text-green-800'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300'
                     : data.payment.state === 'declined'
-                      ? 'bg-red-100 text-red-800'
+                      ? 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300'
                       : data.payment.state === 'refunded'
-                        ? 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300'
                         : 'bg-muted text-foreground'}"
                 >
                   {data.payment.state}

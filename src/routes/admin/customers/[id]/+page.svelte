@@ -26,13 +26,13 @@
   function getStateColor(state: string): string {
     switch (state) {
       case "delivered":
-        return "bg-green-100 text-green-800";
+        return "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300";
       case "shipped":
-        return "bg-accent-subtle text-blue-800";
+        return "bg-accent-subtle text-blue-800 dark:text-blue-300";
       case "paid":
-        return "bg-indigo-100 text-indigo-800";
+        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300";
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300";
       default:
         return "bg-muted text-foreground";
     }
@@ -91,7 +91,7 @@
               <div class="relative rounded-lg border border-border p-4">
                 {#if address.isDefault}
                   <span
-                    class="absolute top-2 right-2 rounded-full bg-accent-subtle px-2 py-0.5 text-xs font-medium text-blue-800"
+                    class="absolute top-2 right-2 rounded-full bg-accent-subtle px-2 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300"
                   >
                     Default
                   </span>

@@ -79,7 +79,7 @@
 {#snippet publishedCell({ published }: { published: boolean })}
   {#if published}
     <span
-      class="inline-flex rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800"
+      class="inline-flex rounded-full bg-green-100 dark:bg-green-500/15 px-2 py-1 text-xs font-medium text-green-800 dark:text-green-300"
     >
       Published
     </span>

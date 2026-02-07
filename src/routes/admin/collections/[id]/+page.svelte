@@ -123,7 +123,7 @@
       <h1 class="text-2xl font-bold text-foreground">Edit Collection</h1>
     </div>
     <div class="flex items-center gap-3">
-      <span class="rounded-full bg-accent-subtle px-3 py-1 text-sm font-medium text-blue-800">
+      <span class="rounded-full bg-accent-subtle px-3 py-1 text-sm font-medium text-blue-800 dark:text-blue-300">
         {data.productCount} products
       </span>
       {#if slug}
