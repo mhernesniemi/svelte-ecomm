@@ -75,8 +75,8 @@
 </script>
 
 {#snippet collectionCell({ name, id }: { name: string; id: number })}
-  <a href="/admin/collections/{id}" class="group block">
-    <div class="font-medium text-foreground group-hover:text-blue-600">{name}</div>
+  <a href="/admin/collections/{id}" class="font-medium text-foreground hover:underline">
+    {name}
   </a>
 {/snippet}
 

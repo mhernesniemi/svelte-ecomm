@@ -63,7 +63,7 @@
 </script>
 
 {#snippet nameCell({ id, name }: { id: number; name: string })}
-  <a href="/admin/facets/{id}" class="font-medium text-foreground hover:text-blue-600">
+  <a href="/admin/facets/{id}" class="font-medium text-foreground hover:underline">
     {name}
   </a>
 {/snippet}

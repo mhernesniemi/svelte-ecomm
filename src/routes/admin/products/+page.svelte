@@ -73,7 +73,7 @@
 </script>
 
 {#snippet productCell({ name, id, image }: { name: string; id: number; image: string | null })}
-  <a href="/admin/products/{id}" class="group flex items-center">
+  <a href="/admin/products/{id}" class="group inline-flex items-center">
     {#if image}
       <img src={image} alt="" class="mr-3 h-10 w-10 rounded object-cover" />
     {:else}
@@ -81,9 +81,9 @@
         <ImageIcon class="h-5 w-5 text-placeholder" />
       </div>
     {/if}
-    <div>
-      <p class="font-medium text-foreground group-hover:text-blue-600">{name}</p>
-    </div>
+    <span class="font-medium text-foreground group-hover:underline">
+      {name}
+    </span>
   </a>
 {/snippet}
 
