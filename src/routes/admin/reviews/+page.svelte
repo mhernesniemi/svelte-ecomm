@@ -94,7 +94,7 @@
 {#snippet commentCell({ id, comment }: { id: number; comment: string | null })}
   <a
     href="/admin/reviews/{id}"
-    class="block max-w-xs truncate font-medium text-foreground hover:text-blue-600"
+    class="block max-w-xs truncate font-medium text-foreground hover:text-blue-600 dark:text-blue-400"
   >
     {comment ?? "-"}
   </a>
@@ -116,7 +116,7 @@
     <a
       href="/admin/reviews"
       class="rounded-full px-3 py-1 text-sm {!data.currentStatus
-        ? 'bg-blue-600 text-white'
+        ? 'bg-blue-800 text-white'
         : 'bg-muted-strong text-foreground-secondary hover:bg-muted'}"
     >
       All
@@ -125,7 +125,7 @@
       <a
         href="/admin/reviews?status={status}"
         class="rounded-full px-3 py-1 text-sm capitalize {data.currentStatus === status
-          ? 'bg-blue-600 text-white'
+          ? 'bg-blue-800 text-white'
           : 'bg-muted-strong text-foreground-secondary hover:bg-muted'}"
       >
         {status}

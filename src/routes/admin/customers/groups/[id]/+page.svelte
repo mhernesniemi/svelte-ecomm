@@ -186,7 +186,10 @@
           {#each data.groupCustomers as customer}
             <div class="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
               <div>
-                <a href="/admin/customers/{customer.id}" class="font-medium hover:text-blue-600">
+                <a
+                  href="/admin/customers/{customer.id}"
+                  class="font-medium hover:text-blue-600 dark:text-blue-400"
+                >
                   {customer.firstName}
                   {customer.lastName}
                 </a>

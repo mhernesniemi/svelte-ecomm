@@ -43,7 +43,7 @@
 
 <div>
   <div class="mb-8">
-    <a href="/admin/customers" class="text-sm text-blue-600 hover:underline"
+    <a href="/admin/customers" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
       >&larr; Back to Customers</a
     >
     <h1 class="mt-2 text-2xl font-bold">
@@ -103,7 +103,10 @@
                   {#if address.streetLine2}
                     <p class="text-sm text-foreground-tertiary">{address.streetLine2}</p>
                   {/if}
-                  <p class="text-sm text-foreground-tertiary">{address.postalCode} {address.city}</p>
+                  <p class="text-sm text-foreground-tertiary">
+                    {address.postalCode}
+                    {address.city}
+                  </p>
                   <p class="text-sm text-foreground-tertiary">{address.country}</p>
                   {#if address.phoneNumber}
                     <p class="mt-1 text-sm text-muted-foreground">{address.phoneNumber}</p>
@@ -137,7 +140,7 @@
                   <TableCell class="px-4 py-3 text-sm">
                     <a
                       href="/admin/orders/{order.id}"
-                      class="font-medium text-blue-600 hover:text-blue-800"
+                      class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400"
                     >
                       #{order.code}
                     </a>

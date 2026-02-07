@@ -72,7 +72,10 @@
 </script>
 
 {#snippet titleCell({ id, title }: { id: number; title: string })}
-  <a href="/admin/content-pages/{id}" class="font-medium text-foreground hover:text-blue-600">
+  <a
+    href="/admin/content-pages/{id}"
+    class="font-medium text-foreground hover:text-blue-600 dark:text-blue-400"
+  >
     {title || "Untitled"}
   </a>
 {/snippet}

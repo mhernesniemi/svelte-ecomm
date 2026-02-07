@@ -62,7 +62,10 @@
 <div>
   <div class="mb-6">
     <div class="mb-4">
-      <a href="/admin/products/{data.product.id}" class="text-sm text-blue-600 hover:underline">
+      <a
+        href="/admin/products/{data.product.id}"
+        class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >
         &larr; Back to {data.product.name}
       </a>
     </div>
@@ -99,7 +102,10 @@
         <div class="space-y-4 p-6">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="variant_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              <label
+                for="variant_name"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
                 Name
               </label>
               <input
@@ -259,7 +265,10 @@
           <h2 class="font-semibold">Parent Product</h2>
         </div>
         <div class="p-4">
-          <a href="/admin/products/{data.product.id}" class="text-sm text-blue-600 hover:underline">
+          <a
+            href="/admin/products/{data.product.id}"
+            class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+          >
             {data.product.name} &rarr;
           </a>
         </div>

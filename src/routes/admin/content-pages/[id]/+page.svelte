@@ -135,7 +135,7 @@
               id="published"
               name="published"
               bind:checked={published}
-              class="h-4 w-4 rounded border-input-border text-blue-600"
+              class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
             />
             <label for="published" class="text-sm font-medium text-foreground-secondary">
               Published

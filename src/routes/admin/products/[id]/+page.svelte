@@ -206,7 +206,7 @@
 <div>
   <div class="mb-6">
     <div class="mb-4 flex items-center justify-between">
-      <a href="/admin/products" class="text-sm text-blue-600 hover:underline"
+      <a href="/admin/products" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
         >&larr; Back to Products</a
       >
       {#if translation?.slug}
@@ -379,7 +379,7 @@
                   <TableCell class="text-right text-sm">
                     <a
                       href="/admin/products/{data.product.id}/variants/{variant.id}"
-                      class="text-blue-600 hover:underline"
+                      class="text-blue-600 hover:underline dark:text-blue-400"
                     >
                       Edit
                     </a>
@@ -718,7 +718,7 @@
                   value="true"
                   checked={currentEditingImage.isFeatured}
                   disabled={currentEditingImage.isFeatured}
-                  class="h-4 w-4 rounded border-input-border text-blue-600 focus:ring-blue-500"
+                  class="h-4 w-4 rounded border-input-border text-blue-600 focus:ring-blue-500 dark:text-blue-400"
                 />
                 <span class="text-sm text-foreground-secondary">Featured image</span>
               </label>

@@ -247,7 +247,7 @@
           onclick={() => handleTabChange("upload")}
           onkeydown={(e) => e.key === "Enter" && handleTabChange("upload")}
           class="cursor-pointer px-4 py-2 text-sm font-medium {activeTab === 'upload'
-            ? 'border-b-2 border-blue-500 text-blue-600'
+            ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
             : 'text-muted-foreground hover:text-foreground-secondary'}"
         >
           <Upload class="mr-1.5 inline-block h-4 w-4" />
@@ -260,7 +260,7 @@
           onclick={() => handleTabChange("existing")}
           onkeydown={(e) => e.key === "Enter" && handleTabChange("existing")}
           class="cursor-pointer px-4 py-2 text-sm font-medium {activeTab === 'existing'
-            ? 'border-b-2 border-blue-500 text-blue-600'
+            ? 'border-b-2 border-blue-500 text-blue-600 dark:text-blue-400'
             : 'text-muted-foreground hover:text-foreground-secondary'}"
         >
           <ImageIcon class="mr-1.5 inline-block h-4 w-4" />
@@ -293,7 +293,9 @@
                 <span class="text-sm text-foreground-tertiary">Uploading...</span>
               {:else}
                 <Upload class="mb-2 h-10 w-10 text-placeholder" />
-                <span class="text-sm font-medium text-foreground-tertiary">Click to upload images</span>
+                <span class="text-sm font-medium text-foreground-tertiary"
+                  >Click to upload images</span
+                >
                 <span class="mt-1 text-xs text-placeholder">PNG, JPG, WebP up to 10MB each</span>
               {/if}
             </label>

@@ -135,7 +135,10 @@
 {/snippet}
 
 {#snippet groupNameCell({ id, name }: { id: number; name: string })}
-  <a href="/admin/customers/groups/{id}" class="font-medium text-foreground hover:text-blue-600">
+  <a
+    href="/admin/customers/groups/{id}"
+    class="font-medium text-foreground hover:text-blue-600 dark:text-blue-400"
+  >
     {name}
   </a>
 {/snippet}
@@ -151,7 +154,7 @@
       <a
         href="/admin/customers"
         class="border-b-2 pb-3 text-sm font-medium transition-colors {activeTab === 'customers'
-          ? 'border-blue-500 text-blue-600'
+          ? 'border-blue-500 text-blue-600 dark:text-blue-400'
           : 'border-transparent text-muted-foreground hover:border-input-border hover:text-foreground-secondary'}"
       >
         All Customers
@@ -159,7 +162,7 @@
       <a
         href="/admin/customers?tab=groups"
         class="border-b-2 pb-3 text-sm font-medium transition-colors {activeTab === 'groups'
-          ? 'border-blue-500 text-blue-600'
+          ? 'border-blue-500 text-blue-600 dark:text-blue-400'
           : 'border-transparent text-muted-foreground hover:border-input-border hover:text-foreground-secondary'}"
       >
         Customer Groups

@@ -28,7 +28,9 @@
 
 <div>
   <div class="mb-8">
-    <a href="/admin/orders" class="text-sm text-blue-600 hover:underline">&larr; Back to Orders</a>
+    <a href="/admin/orders" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Orders</a
+    >
     <h1 class="mt-2 text-2xl font-bold">Order {data.order.code}</h1>
   </div>
 
@@ -39,7 +41,14 @@
       <div class="rounded-lg bg-surface p-6 shadow">
         <h2 class="mb-4 font-semibold">Order Status</h2>
         <div class="flex items-center gap-4">
-          <Badge variant={data.order.state === 'paid' ? 'success' : data.order.state === 'cancelled' ? 'destructive' : 'secondary'} class="capitalize">
+          <Badge
+            variant={data.order.state === "paid"
+              ? "success"
+              : data.order.state === "cancelled"
+                ? "destructive"
+                : "secondary"}
+            class="capitalize"
+          >
             {data.order.state.replace("_", " ")}
           </Badge>
 
@@ -137,7 +146,15 @@
             <div class="flex justify-between">
               <dt class="text-muted-foreground">Status</dt>
               <dd>
-                <Badge variant={data.orderShipping.status === 'delivered' ? 'success' : data.orderShipping.status === 'shipped' || data.orderShipping.status === 'in_transit' ? 'default' : 'secondary'} class="capitalize">
+                <Badge
+                  variant={data.orderShipping.status === "delivered"
+                    ? "success"
+                    : data.orderShipping.status === "shipped" ||
+                        data.orderShipping.status === "in_transit"
+                      ? "default"
+                      : "secondary"}
+                  class="capitalize"
+                >
                   {data.orderShipping.status.replace("_", " ")}
                 </Badge>
               </dd>
@@ -182,7 +199,16 @@
             <div class="flex justify-between">
               <dt class="text-muted-foreground">Status</dt>
               <dd>
-                <Badge variant={data.payment.state === 'settled' ? 'success' : data.payment.state === 'declined' ? 'destructive' : data.payment.state === 'refunded' ? 'warning' : 'secondary'} class="capitalize">
+                <Badge
+                  variant={data.payment.state === "settled"
+                    ? "success"
+                    : data.payment.state === "declined"
+                      ? "destructive"
+                      : data.payment.state === "refunded"
+                        ? "warning"
+                        : "secondary"}
+                  class="capitalize"
+                >
                   {data.payment.state}
                 </Badge>
               </dd>

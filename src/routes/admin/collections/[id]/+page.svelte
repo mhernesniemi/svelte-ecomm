@@ -210,7 +210,7 @@
               id="is_private"
               name="is_private"
               bind:checked={isPrivate}
-              class="h-4 w-4 rounded border-input-border text-blue-600"
+              class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
             />
             <label for="is_private" class="text-sm font-medium text-foreground-secondary">
               Private collection (hidden from storefront)
@@ -445,7 +445,7 @@
                 <label class="flex cursor-pointer items-center gap-2 rounded p-2 hover:bg-hover">
                   <input
                     type="checkbox"
-                    class="h-4 w-4 rounded border-input-border text-blue-600"
+                    class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
                     checked={selectedProducts.includes(product.id)}
                     onchange={() => {
                       if (selectedProducts.includes(product.id)) {

@@ -14,7 +14,7 @@
         outline: "border border-input-border bg-surface text-foreground-secondary hover:bg-hover",
         secondary: "bg-muted text-foreground hover:bg-muted-strong",
         ghost: "text-foreground-secondary hover:bg-muted",
-        link: "text-blue-600 underline-offset-4 hover:underline"
+        link: "text-blue-600 dark:text-blue-400 underline-offset-4 hover:underline"
       },
       size: {
         default: "h-10 px-4 py-2",

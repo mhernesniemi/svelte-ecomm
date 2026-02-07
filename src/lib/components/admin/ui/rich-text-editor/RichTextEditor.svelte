@@ -39,7 +39,7 @@
         Link.configure({
           openOnClick: false,
           HTMLAttributes: {
-            class: "text-blue-600 underline"
+            class: "text-blue-600 dark:text-blue-400 underline"
           }
         }),
         Placeholder.configure({

@@ -135,7 +135,7 @@
               <Pencil
                 class="h-4 w-4 text-placeholder opacity-0 transition-opacity group-hover:opacity-100 {editingId ===
                 node.id
-                  ? '!text-blue-600 !opacity-100'
+                  ? '!text-blue-600 !opacity-100 dark:text-blue-400'
                   : ''}"
               />
             </button>

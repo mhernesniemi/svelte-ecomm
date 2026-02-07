@@ -84,7 +84,10 @@
         <div>
           <h2 class="mb-1 text-sm font-medium text-muted-foreground">Product</h2>
           {#if data.product}
-            <a href="/admin/products/{data.product.id}" class="text-blue-600 hover:text-blue-800">
+            <a
+              href="/admin/products/{data.product.id}"
+              class="text-blue-600 hover:text-blue-800 dark:text-blue-400"
+            >
               {getProductName()}
             </a>
           {:else}
@@ -95,7 +98,10 @@
         <div>
           <h2 class="mb-1 text-sm font-medium text-muted-foreground">Customer</h2>
           {#if data.customer}
-            <a href="/admin/customers/{data.customer.id}" class="text-blue-600 hover:text-blue-800">
+            <a
+              href="/admin/customers/{data.customer.id}"
+              class="text-blue-600 hover:text-blue-800 dark:text-blue-400"
+            >
               {data.customer.firstName}
               {data.customer.lastName}
             </a>

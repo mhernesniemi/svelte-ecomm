@@ -101,7 +101,11 @@
                   class="flex-1 rounded-lg border border-input-border px-3 py-2 shadow-sm"
                 />
                 <label class="flex items-center gap-2 text-sm text-muted-foreground">
-                  <input type="checkbox" bind:checked={autoSlug} class="rounded border-input-border" />
+                  <input
+                    type="checkbox"
+                    bind:checked={autoSlug}
+                    class="rounded border-input-border"
+                  />
                   Auto
                 </label>
               </div>
@@ -109,7 +113,9 @@
           </div>
 
           <div>
-            <label for="body" class="mb-1 block text-sm font-medium text-foreground-secondary"> Body </label>
+            <label for="body" class="mb-1 block text-sm font-medium text-foreground-secondary">
+              Body
+            </label>
             <RichTextEditor
               name="body"
               content={body}
@@ -124,13 +130,14 @@
               id="published"
               name="published"
               checked
-              class="h-4 w-4 rounded border-input-border text-blue-600"
+              class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
             />
-            <label for="published" class="text-sm font-medium text-foreground-secondary"> Published </label>
+            <label for="published" class="text-sm font-medium text-foreground-secondary">
+              Published
+            </label>
           </div>
         </div>
       </div>
     </div>
-
   </form>
 </div>

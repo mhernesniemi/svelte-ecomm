@@ -93,8 +93,7 @@
       id: "method",
       header: "Method",
       accessorFn: (row) => (row.method === "automatic" ? "Auto" : "Code"),
-      cell: ({ row }) =>
-        renderSnippet(methodCell, { method: row.original.method })
+      cell: ({ row }) => renderSnippet(methodCell, { method: row.original.method })
     },
     {
       accessorKey: "promotionType",
@@ -136,7 +135,10 @@
   method: string;
   id: number;
 })}
-  <a href="/admin/promotions/{id}" class="font-medium text-foreground hover:text-blue-600">
+  <a
+    href="/admin/promotions/{id}"
+    class="font-medium text-foreground hover:text-blue-600 dark:text-blue-400"
+  >
     {method === "automatic" ? title : code}
   </a>
 {/snippet}
