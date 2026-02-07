@@ -113,3 +113,21 @@
 [data-admin] *:focus-visible {
 	@apply ring-2 ring-blue-500 ring-offset-2 outline-none;
 }
+
+/* ── Strip all form plugin / focus styles from command input ──────── */
+[data-admin] [data-slot="command-input"] {
+	border: none;
+	background: transparent;
+	padding: 0;
+	box-shadow: none;
+	outline: none;
+}
+
+[data-admin] [data-slot="command-input"]:focus,
+[data-admin] [data-slot="command-input"]:focus-visible {
+	border: none;
+	box-shadow: none;
+	outline: none;
+	--tw-ring-shadow: none;
+	--tw-ring-offset-shadow: none;
+}

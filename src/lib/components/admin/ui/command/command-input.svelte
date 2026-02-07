@@ -18,10 +18,7 @@
   <SearchIcon class="size-4 shrink-0 opacity-50" />
   <CommandPrimitive.Input
     data-slot="command-input"
-    class={cn(
-      "flex h-10 w-full rounded-md !border-transparent bg-transparent py-3 text-sm !shadow-none !ring-0 !outline-none placeholder:text-placeholder disabled:cursor-not-allowed disabled:opacity-50",
-      className
-    )}
+    class="text-sm"
     bind:ref
     {...restProps}
     bind:value
