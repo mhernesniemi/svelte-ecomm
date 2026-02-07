@@ -23,9 +23,11 @@
     <div>
       <h1 class="text-2xl font-bold text-foreground">Categories</h1>
     </div>
-    <Button type="button" onclick={() => (showCreate = !showCreate)}
-      ><PlusIcon class="h-4 w-4" /> Add Category</Button
-    >
+    {#if data.tree.length > 0}
+      <Button type="button" onclick={() => (showCreate = !showCreate)}
+        ><PlusIcon class="h-4 w-4" /> Add Category</Button
+      >
+    {/if}
   </div>
 
   <!-- Create Category Form -->

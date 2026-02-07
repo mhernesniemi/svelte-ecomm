@@ -167,9 +167,11 @@
     <div>
       <h1 class="text-2xl font-bold text-foreground">Promotions</h1>
     </div>
-    <a href="/admin/promotions/new" class={buttonVariants()}
-      ><PlusIcon class="h-4 w-4" /> Add Promotion</a
-    >
+    {#if data.promotions.length > 0}
+      <a href="/admin/promotions/new" class={buttonVariants()}
+        ><PlusIcon class="h-4 w-4" /> Add Promotion</a
+      >
+    {/if}
   </div>
 
   <DataTable

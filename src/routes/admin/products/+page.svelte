@@ -106,9 +106,11 @@
     <div>
       <h1 class="text-2xl font-bold text-foreground">Products</h1>
     </div>
-    <a href="/admin/products/new" class={buttonVariants()}
-      ><PlusIcon class="h-4 w-4" /> Add Product</a
-    >
+    {#if data.products.length > 0}
+      <a href="/admin/products/new" class={buttonVariants()}
+        ><PlusIcon class="h-4 w-4" /> Add Product</a
+      >
+    {/if}
   </div>
 
   <DataTable

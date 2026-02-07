@@ -95,9 +95,11 @@
     <div>
       <h1 class="text-2xl font-bold text-foreground">Collections</h1>
     </div>
-    <a href="/admin/collections/new" class={buttonVariants()}>
-      <PlusIcon class="h-4 w-4" /> Add Collection</a
-    >
+    {#if data.collections.length > 0}
+      <a href="/admin/collections/new" class={buttonVariants()}>
+        <PlusIcon class="h-4 w-4" /> Add Collection</a
+      >
+    {/if}
   </div>
 
   <DataTable

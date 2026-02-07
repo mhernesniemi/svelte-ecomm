@@ -75,7 +75,9 @@
     <div>
       <h1 class="text-2xl font-bold text-foreground">Facets</h1>
     </div>
-    <a href="/admin/facets/new" class={buttonVariants()}><PlusIcon class="h-4 w-4" /> Add Facet</a>
+    {#if data.facets.length > 0}
+      <a href="/admin/facets/new" class={buttonVariants()}><PlusIcon class="h-4 w-4" /> Add Facet</a>
+    {/if}
   </div>
 
   <DataTable

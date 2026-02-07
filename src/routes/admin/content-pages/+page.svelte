@@ -92,9 +92,11 @@
     <div>
       <h1 class="text-2xl font-bold text-foreground">Content Pages</h1>
     </div>
-    <a href="/admin/content-pages/new" class={buttonVariants()}
-      ><PlusIcon class="h-4 w-4" /> Add Page</a
-    >
+    {#if data.pages.length > 0}
+      <a href="/admin/content-pages/new" class={buttonVariants()}
+        ><PlusIcon class="h-4 w-4" /> Add Page</a
+      >
+    {/if}
   </div>
 
   <DataTable
