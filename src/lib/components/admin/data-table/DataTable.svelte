@@ -162,8 +162,9 @@
     <TableBody>
       {#each table.getRowModel().rows as row (row.id)}
         <TableRow data-state={row.getIsSelected() ? "selected" : undefined}>
-          {#each row.getVisibleCells() as cell (cell.id)}
-            <TableCell>
+          {#each row.getVisibleCells() as cell, i (cell.id)}
+            {@const isFirstDataCol = cell.column.id !== "select" && (i === 0 || (i === 1 && row.getVisibleCells()[0]?.column.id === "select"))}
+            <TableCell class={isFirstDataCol || cell.column.id === "select" ? "" : "text-foreground-secondary"}>
               <FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
             </TableCell>
           {/each}
