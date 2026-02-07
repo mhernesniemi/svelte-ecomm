@@ -7,6 +7,7 @@
     TableHead,
     TableCell
   } from "$lib/components/admin/ui/table";
+  import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -23,18 +24,17 @@
     return (cents / 100).toFixed(2);
   }
 
-  function getStateColor(state: string): string {
+  function getStateVariant(state: string): BadgeVariant {
     switch (state) {
       case "delivered":
-        return "bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300";
+        return "success";
       case "shipped":
-        return "bg-accent-subtle text-blue-800 dark:text-blue-300";
       case "paid":
-        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-500/15 dark:text-indigo-300";
+        return "default";
       case "cancelled":
-        return "bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300";
+        return "destructive";
       default:
-        return "bg-muted text-foreground";
+        return "secondary";
     }
   }
 </script>
@@ -90,11 +90,7 @@
             {#each data.customer.addresses as address}
               <div class="relative rounded-lg border border-border p-4">
                 {#if address.isDefault}
-                  <span
-                    class="absolute top-2 right-2 rounded-full bg-accent-subtle px-2 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300"
-                  >
-                    Default
-                  </span>
+                  <Badge class="absolute top-2 right-2">Default</Badge>
                 {/if}
                 <div class="pr-16">
                   {#if address.fullName}
@@ -150,13 +146,9 @@
                     {formatDate(order.createdAt)}
                   </TableCell>
                   <TableCell class="px-4 py-3 text-sm">
-                    <span
-                      class="rounded-full px-2 py-0.5 text-xs font-medium {getStateColor(
-                        order.state
-                      )}"
-                    >
+                    <Badge variant={getStateVariant(order.state)}>
                       {order.state}
-                    </span>
+                    </Badge>
                   </TableCell>
                   <TableCell class="px-4 py-3 text-right text-sm font-medium">
                     {formatPrice(order.total)} EUR

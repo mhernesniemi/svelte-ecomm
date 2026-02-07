@@ -17,6 +17,7 @@
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
+  import { Badge } from "$lib/components/admin/ui/badge";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import Check from "@lucide/svelte/icons/check";
@@ -552,9 +553,7 @@
             {#if selectedProductFacets.length > 0}
               <div class="mt-3 flex flex-wrap gap-1.5">
                 {#each getSelectedFacetValueObjects() as fv}
-                  <span
-                    class="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs text-blue-800 dark:text-blue-300"
-                  >
+                  <Badge class="gap-1">
                     {fv.facetName}: {fv.name}
                     <button
                       type="button"
@@ -564,7 +563,7 @@
                     >
                       <X class="h-3 w-3" />
                     </button>
-                  </span>
+                  </Badge>
                   <input form="product-form" type="hidden" name="facetValueIds" value={fv.id} />
                 {/each}
               </div>
@@ -629,9 +628,7 @@
             {#if selectedCategories.length > 0}
               <div class="mt-3 flex flex-wrap gap-1.5">
                 {#each getSelectedCategoryObjects() as category}
-                  <span
-                    class="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs text-blue-800 dark:text-blue-300"
-                  >
+                  <Badge class="gap-1">
                     {category.name}
                     <button
                       type="button"
@@ -641,7 +638,7 @@
                     >
                       <X class="h-3 w-3" />
                     </button>
-                  </span>
+                  </Badge>
                   <input form="product-form" type="hidden" name="categoryIds" value={category.id} />
                 {/each}
               </div>

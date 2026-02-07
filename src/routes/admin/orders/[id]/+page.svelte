@@ -1,6 +1,7 @@
 <script lang="ts">
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -38,16 +39,9 @@
       <div class="rounded-lg bg-surface p-6 shadow">
         <h2 class="mb-4 font-semibold">Order Status</h2>
         <div class="flex items-center gap-4">
-          <span
-            class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium capitalize
-						{data.order.state === 'paid'
-              ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300'
-              : data.order.state === 'cancelled'
-                ? 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300'
-                : 'bg-muted text-foreground'}"
-          >
+          <Badge variant={data.order.state === 'paid' ? 'success' : data.order.state === 'cancelled' ? 'destructive' : 'secondary'} class="capitalize">
             {data.order.state.replace("_", " ")}
-          </span>
+          </Badge>
 
           {#if nextStates.length > 0}
             <div class="flex gap-2">
@@ -143,17 +137,9 @@
             <div class="flex justify-between">
               <dt class="text-muted-foreground">Status</dt>
               <dd>
-                <span
-                  class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize
-									{data.orderShipping.status === 'delivered'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300'
-                    : data.orderShipping.status === 'shipped' ||
-                        data.orderShipping.status === 'in_transit'
-                      ? 'bg-accent-subtle text-blue-800 dark:text-blue-300'
-                      : 'bg-muted text-foreground'}"
-                >
+                <Badge variant={data.orderShipping.status === 'delivered' ? 'success' : data.orderShipping.status === 'shipped' || data.orderShipping.status === 'in_transit' ? 'default' : 'secondary'} class="capitalize">
                   {data.orderShipping.status.replace("_", " ")}
-                </span>
+                </Badge>
               </dd>
             </div>
             {#if data.orderShipping.trackingNumber}
@@ -196,18 +182,9 @@
             <div class="flex justify-between">
               <dt class="text-muted-foreground">Status</dt>
               <dd>
-                <span
-                  class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium capitalize
-									{data.payment.state === 'settled'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-500/15 dark:text-green-300'
-                    : data.payment.state === 'declined'
-                      ? 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-300'
-                      : data.payment.state === 'refunded'
-                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300'
-                        : 'bg-muted text-foreground'}"
-                >
+                <Badge variant={data.payment.state === 'settled' ? 'success' : data.payment.state === 'declined' ? 'destructive' : data.payment.state === 'refunded' ? 'warning' : 'secondary'} class="capitalize">
                   {data.payment.state}
-                </span>
+                </Badge>
               </dd>
             </div>
             <div class="flex justify-between">

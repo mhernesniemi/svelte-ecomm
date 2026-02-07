@@ -7,6 +7,7 @@
   import FileText from "@lucide/svelte/icons/file-text";
   import type { PageData } from "./$types";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { Badge } from "$lib/components/admin/ui/badge";
 
   let { data }: { data: PageData } = $props();
 
@@ -78,15 +79,9 @@
 
 {#snippet publishedCell({ published }: { published: boolean })}
   {#if published}
-    <span
-      class="inline-flex rounded-full bg-green-100 dark:bg-green-500/15 px-2 py-1 text-xs font-medium text-green-800 dark:text-green-300"
-    >
-      Published
-    </span>
+    <Badge variant="success">Published</Badge>
   {:else}
-    <span class="inline-flex rounded-full bg-muted px-2 py-1 text-xs font-medium text-foreground-tertiary">
-      Draft
-    </span>
+    <Badge variant="secondary">Draft</Badge>
   {/if}
 {/snippet}
 

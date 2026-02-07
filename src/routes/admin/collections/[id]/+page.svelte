@@ -3,6 +3,7 @@
   import { invalidateAll } from "$app/navigation";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Badge } from "$lib/components/admin/ui/badge";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -123,9 +124,7 @@
       <h1 class="text-2xl font-bold text-foreground">Edit Collection</h1>
     </div>
     <div class="flex items-center gap-3">
-      <span class="rounded-full bg-accent-subtle px-3 py-1 text-sm font-medium text-blue-800 dark:text-blue-300">
-        {data.productCount} products
-      </span>
+      <Badge>{data.productCount} products</Badge>
       {#if slug}
         <a
           href="/collections/{data.collection.id}/{slug}"

@@ -5,8 +5,10 @@
     base: "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
     variants: {
       variant: {
-        default: "bg-blue-600 text-white hover:bg-blue-700",
-        destructive: "bg-red-600 text-white hover:bg-red-700",
+        default:
+          "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600/60 dark:hover:bg-blue-600/50",
+        destructive:
+          "bg-red-600 text-white hover:bg-red-700 dark:bg-red-600/60 dark:hover:bg-red-600/50",
         "destructive-outline": "border border-red-300 text-red-600 hover:bg-destructive-subtle",
         "destructive-ghost": "text-red-600 hover:text-red-800 hover:bg-destructive-subtle",
         outline: "border border-input-border bg-surface text-foreground-secondary hover:bg-hover",

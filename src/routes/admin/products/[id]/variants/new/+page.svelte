@@ -6,6 +6,7 @@
   import * as Command from "$lib/components/admin/ui/command";
   import Check from "@lucide/svelte/icons/check";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
+  import { Badge } from "$lib/components/admin/ui/badge";
   import X from "@lucide/svelte/icons/x";
   import type { ActionData, PageData } from "./$types";
 
@@ -229,9 +230,7 @@
             {#if selectedFacetValues.length > 0}
               <div class="mt-3 flex flex-wrap gap-1.5">
                 {#each getSelectedFacetValueObjects() as fv}
-                  <span
-                    class="inline-flex items-center gap-1 rounded-full bg-accent-subtle px-2 py-0.5 text-xs text-blue-800 dark:text-blue-300"
-                  >
+                  <Badge class="gap-1">
                     {fv.facetName}: {fv.name}
                     <button
                       type="button"
@@ -241,7 +240,7 @@
                     >
                       <X class="h-3 w-3" />
                     </button>
-                  </span>
+                  </Badge>
                 {/each}
               </div>
             {/if}
