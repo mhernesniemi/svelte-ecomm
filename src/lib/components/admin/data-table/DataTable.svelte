@@ -54,7 +54,10 @@
   let sorting = $state<SortingState>([]);
   let globalFilter = $state("");
   let rowSelection = $state<RowSelectionState>({});
-  let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: pageSize });
+  let pagination = $state<PaginationState>({ pageIndex: 0, pageSize: 20 });
+  $effect(() => {
+    pagination.pageSize = pageSize;
+  });
 
   const table = createSvelteTable({
     get data() {
