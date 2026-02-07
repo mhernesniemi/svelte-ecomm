@@ -3,6 +3,9 @@
 @plugin "@tailwindcss/forms";
 @plugin "@tailwindcss/typography";
 
+/* Use .dark class on <html> instead of prefers-color-scheme media query */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Admin theme tokens — registered here so Tailwind generates the utilities.
    Actual values are set via CSS variables in admin.css (:root / .dark). */
 @theme inline {

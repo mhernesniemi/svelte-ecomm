@@ -48,7 +48,7 @@
 
 <div class="min-h-screen bg-background font-sans text-foreground" data-admin>
   <!-- Sidebar -->
-  <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
+  <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white dark:bg-gray-900/70">
     <div class="p-6">
       <h1 class="text-xl font-bold">Hoikka</h1>
       <p class="text-sm text-gray-400">Admin Dashboard</p>
