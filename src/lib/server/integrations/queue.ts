@@ -32,11 +32,7 @@ let workerStopRequested = false;
  * Register a handler for a job type
  */
 export function registerHandler<T extends JobPayload>(type: string, handler: JobHandler<T>): void {
-	if (handlers.has(type)) {
-		console.warn(`[Queue] Handler for "${type}" already registered, replacing`);
-	}
 	handlers.set(type, handler as JobHandler);
-	console.log(`[Queue] Registered handler for "${type}"`);
 }
 
 /**
@@ -70,7 +66,7 @@ export async function enqueue<T extends JobPayload>(
 		})
 		.returning({ id: jobs.id });
 
-	console.log(`[Queue] Enqueued job ${job.id} (${type})`);
+	console.debug(`[Queue] Enqueued job ${job.id} (${type})`);
 	return job.id;
 }
 
@@ -204,7 +200,6 @@ async function failJob(
 			})
 			.where(eq(jobs.id, jobId));
 
-		console.log(`[Queue] Job ${jobId} will retry at ${runAt.toISOString()}`);
 	} else {
 		await db
 			.update(jobs)
@@ -215,7 +210,7 @@ async function failJob(
 			})
 			.where(eq(jobs.id, jobId));
 
-		console.log(`[Queue] Job ${jobId} permanently failed after ${attempts} attempts`);
+		console.error(`[Queue] Job ${jobId} permanently failed after ${attempts} attempts`);
 	}
 }
 
@@ -245,9 +240,8 @@ async function processOne(queue: string): Promise<boolean> {
 	try {
 		await handler(job.payload as JobPayload);
 		await completeJob(job.id);
-
 		const duration = performance.now() - startTime;
-		console.log(`[Queue] Job ${job.id} (${job.type}) completed in ${duration.toFixed(0)}ms`);
+		console.debug(`[Queue] Job ${job.id} (${job.type}) completed in ${duration.toFixed(0)}ms`);
 	} catch (e) {
 		const error = e instanceof Error ? e.message : String(e);
 		console.error(`[Queue] Job ${job.id} (${job.type}) failed:`, error);
@@ -275,17 +269,12 @@ export function startWorker(options: WorkerOptions = {}): () => void {
 	const queue = options.queue ?? "default";
 	const pollInterval = options.pollInterval ?? 1000;
 
-	if (workerRunning) {
-		console.warn("[Queue] Worker already running");
-		return () => {};
-	}
+	if (workerRunning) return () => {};
 
 	workerRunning = true;
 	workerStopRequested = false;
 
 	const work = async () => {
-		console.log(`[Queue] Worker started for queue: ${queue}`);
-
 		while (!workerStopRequested) {
 			try {
 				const processed = await processOne(queue);
@@ -301,7 +290,6 @@ export function startWorker(options: WorkerOptions = {}): () => void {
 		}
 
 		workerRunning = false;
-		console.log(`[Queue] Worker stopped for queue: ${queue}`);
 	};
 
 	// Start worker in background
@@ -340,10 +328,7 @@ export async function processJobs(options: ProcessJobsOptions = {}): Promise<num
 
 	while (processed < maxJobs) {
 		// Check timeout
-		if (Date.now() - startTime > timeoutMs) {
-			console.log(`[Queue] Timeout reached after ${processed} jobs`);
-			break;
-		}
+		if (Date.now() - startTime > timeoutMs) break;
 
 		const hadJob = await processOne(queue);
 		if (!hadJob) {
@@ -353,7 +338,6 @@ export async function processJobs(options: ProcessJobsOptions = {}): Promise<num
 		processed++;
 	}
 
-	console.log(`[Queue] Processed ${processed} jobs in ${Date.now() - startTime}ms`);
 	return processed;
 }
 
@@ -417,7 +401,6 @@ export async function retryJob(jobId: number): Promise<void> {
 		})
 		.where(eq(jobs.id, jobId));
 
-	console.log(`[Queue] Job ${jobId} queued for retry`);
 }
 
 /**

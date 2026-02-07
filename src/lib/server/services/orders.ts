@@ -111,12 +111,6 @@ export class OrderService {
 			cartToken: newCartToken ?? undefined
 		});
 
-		console.log("[cart] created", {
-			orderId: newOrder.id,
-			customerId: customerId ?? null,
-			isGuest: !customerId
-		});
-
 		return {
 			order: await this.loadOrderRelations(newOrder),
 			cartToken: newCartToken,
@@ -187,13 +181,6 @@ export class OrderService {
 			// Delete the guest cart
 			await db.delete(orders).where(eq(orders.id, guestCart.id));
 
-			console.log("[cart] merged", {
-				guestCartId: guestCart.id,
-				targetCartId: existingCart.id,
-				customerId,
-				itemsMerged: guestLines.length
-			});
-
 			return existingCart;
 		} else {
 			// Transfer ownership of guest cart to customer
@@ -205,8 +192,6 @@ export class OrderService {
 				})
 				.where(eq(orders.id, guestCart.id))
 				.returning();
-
-			console.log("[cart] transferred", { orderId: guestCart.id, customerId });
 
 			return updated;
 		}
@@ -393,12 +378,7 @@ export class OrderService {
 		// Create reservation for the new line
 		await reservationService.reserve(input.variantId, orderId, line.id, input.quantity);
 
-		console.log("[cart] item_added", {
-			orderId,
-			variantId: input.variantId,
-			quantity: input.quantity,
-			unitPrice: variant.price
-		});
+
 
 		await this.recalculateTotals(orderId);
 		return line;

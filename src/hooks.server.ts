@@ -139,7 +139,6 @@ const shippingInit: Handle = async ({ event, resolve }) => {
 		try {
 			await shippingService.initializeDefaultMethods();
 			shippingMethodsInitialized = true;
-			console.log("[hooks] Shipping methods initialized");
 		} catch (error) {
 			console.error("[hooks] Failed to initialize shipping methods:", error);
 			// Don't block requests if initialization fails
@@ -158,7 +157,6 @@ const paymentInit: Handle = async ({ event, resolve }) => {
 		try {
 			await paymentService.initializeDefaultMethods();
 			paymentMethodsInitialized = true;
-			console.log("[hooks] Payment methods initialized");
 		} catch (error) {
 			console.error("[hooks] Failed to initialize payment methods:", error);
 			// Don't block requests if initialization fails

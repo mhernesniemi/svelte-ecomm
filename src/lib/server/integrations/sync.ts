@@ -75,13 +75,11 @@ export async function runSync<TExternal, TLocal>(
 		completedAt: new Date()
 	};
 
-	console.log(`[Sync:${job.name}] Starting`);
-
 	try {
 		await job.onStart?.();
 
 		const externalItems = await job.fetchExternal();
-		console.log(`[Sync:${job.name}] Fetched ${externalItems.length} items`);
+		console.debug(`[Sync:${job.name}] Fetched ${externalItems.length} items`);
 
 		for (const item of externalItems) {
 			const externalId = job.getExternalId(item);
@@ -154,11 +152,9 @@ export async function syncSingleItem<TExternal, TLocal>(
 
 	if (local) {
 		await job.update(item, local);
-		console.log(`[Sync:${job.name}] Updated ${externalId}`);
 		return { action: "updated", externalId };
 	} else {
 		await job.create(item);
-		console.log(`[Sync:${job.name}] Created ${externalId}`);
 		return { action: "created", externalId };
 	}
 }
@@ -177,7 +173,6 @@ export function registerSyncJob<TExternal, TLocal>(job: SyncJob<TExternal, TLoca
 		await runSync(job);
 	});
 
-	console.log(`[Sync] Registered sync job: ${job.name}`);
 }
 
 /**
@@ -210,7 +205,6 @@ export async function scheduleSyncJob(name: string, intervalMs: number): Promise
 	// Start the recurring schedule
 	await scheduleRecurring(`sync.${name}.recurring`, {}, intervalMs);
 
-	console.log(`[Sync] Scheduled ${name} to run every ${intervalMs}ms`);
 }
 
 /**
