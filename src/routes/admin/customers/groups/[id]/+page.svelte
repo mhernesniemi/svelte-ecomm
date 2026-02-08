@@ -5,7 +5,6 @@
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import Check from "@lucide/svelte/icons/check";
   import type { PageData, ActionData } from "./$types";
@@ -48,18 +47,13 @@
 <svelte:head><title>{data.group.name} | Customer Groups | Admin</title></svelte:head>
 
 <div class="space-y-6">
-  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/customers?tab=groups" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Customer Groups</a
+    >
+  </div>
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <a
-        href="/admin/customers?tab=groups"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to customer groups"
-      >
-        <ChevronLeft class="h-5 w-5" />
-      </a>
-      <h1 class="text-2xl font-bold text-foreground">{data.group.name}</h1>
-    </div>
+    <h1 class="text-2xl font-bold">{data.group.name}</h1>
     <Button type="submit" form="group-form" disabled={isSubmitting}>
       {isSubmitting ? "Saving..." : "Save Changes"}
     </Button>

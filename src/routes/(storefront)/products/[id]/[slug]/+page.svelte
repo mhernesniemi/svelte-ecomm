@@ -7,7 +7,7 @@
   import { wishlistStore } from "$lib/stores/wishlist.svelte";
   import { formatPrice, stripHtml } from "$lib/utils";
   import { findBestDiscount, getDiscountedPrice } from "$lib/promotion-utils";
-  import { Button } from "$lib/components/storefront/ui/button";
+  import { Button, buttonVariants } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { Badge } from "$lib/components/storefront/ui/badge";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -208,9 +208,7 @@
       </ol>
     </nav>
     {#if data.isAdmin}
-      <a href="/admin/products/{product.id}">
-        <Button variant="outline" size="sm">Edit</Button>
-      </a>
+      <a href="/admin/products/{product.id}" class={buttonVariants({ variant: "outline", size: "sm" })}>Edit</a>
     {/if}
   </div>
 

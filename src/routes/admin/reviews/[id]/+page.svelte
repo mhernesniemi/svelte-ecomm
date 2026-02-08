@@ -4,7 +4,6 @@
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -41,22 +40,17 @@
 <svelte:head><title>Review #{data.review.id} | Admin</title></svelte:head>
 
 <div class="space-y-6">
-  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/reviews" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Reviews</a
+    >
+  </div>
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <a
-        href="/admin/reviews"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to reviews"
-      >
-        <ChevronLeft class="h-5 w-5" />
-      </a>
-      <div>
-        <h1 class="text-2xl font-bold text-foreground">Review #{data.review.id}</h1>
-        <p class="mt-1 text-sm text-foreground-tertiary">
-          by {data.review.nickname} on {new Date(data.review.createdAt).toLocaleDateString()}
-        </p>
-      </div>
+    <div>
+      <h1 class="text-2xl font-bold">Review #{data.review.id}</h1>
+      <p class="mt-1 text-sm text-foreground-tertiary">
+        by {data.review.nickname} on {new Date(data.review.createdAt).toLocaleDateString()}
+      </p>
     </div>
     <Badge variant={getStatusVariant(data.review.status)} class="capitalize">
       {data.review.status}

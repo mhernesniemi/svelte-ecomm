@@ -5,7 +5,6 @@
   import { Button } from "$lib/components/admin/ui/button";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import { onMount } from "svelte";
 
   let { data, form } = $props();
@@ -43,17 +42,13 @@
 <svelte:head><title>Edit Content Page | Admin</title></svelte:head>
 
 <div class="space-y-6">
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/content-pages" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Pages</a
+    >
+  </div>
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <a
-        href="/admin/content-pages"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to content pages"
-      >
-        <ChevronLeft class="h-5 w-5" />
-      </a>
-      <h1 class="text-2xl font-bold text-foreground">Edit Content Page</h1>
-    </div>
+    <h1 class="text-2xl font-bold">Edit Content Page</h1>
     <div class="flex items-center gap-3">
       {#if published && slug}
         <a

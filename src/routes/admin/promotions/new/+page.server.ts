@@ -105,7 +105,7 @@ export const actions: Actions = {
 				collectionIds: appliesTo === "specific_collections" ? collectionIds : []
 			});
 
-			throw redirect(303, `/admin/promotions/${promotion.id}`);
+			throw redirect(303, `/admin/promotions/${promotion.id}?created`);
 		} catch (err) {
 			if (isRedirect(err)) throw err;
 			return fail(500, { error: "Failed to create promotion" });

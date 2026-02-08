@@ -6,7 +6,6 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
 
@@ -112,28 +111,23 @@
 <svelte:head><title>Edit Collection | Admin</title></svelte:head>
 
 <div class="space-y-6">
-  <div class="flex items-center justify-between">
-    <div class="flex items-center gap-4">
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/collections" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Collections</a
+    >
+    {#if slug}
       <a
-        href="/admin/collections"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to collections"
+        href="/collections/{data.collection.id}/{slug}"
+        target="_blank"
+        class="text-sm text-blue-600 hover:underline dark:text-blue-400"
       >
-        <ChevronLeft class="h-5 w-5" />
+        View in store &rarr;
       </a>
-      <h1 class="text-2xl font-bold text-foreground">Edit Collection</h1>
-    </div>
+    {/if}
+  </div>
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold">Edit Collection</h1>
     <div class="flex items-center gap-3">
-      <Badge>{data.productCount} products</Badge>
-      {#if slug}
-        <a
-          href="/collections/{data.collection.id}/{slug}"
-          target="_blank"
-          class="text-sm text-muted-foreground hover:text-foreground-secondary"
-        >
-          View in store &rarr;
-        </a>
-      {/if}
       <Button type="submit" form="collection-form" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Changes"}
       </Button>

@@ -5,7 +5,6 @@
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import type { PageData, ActionData } from "./$types";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
   import Tag from "@lucide/svelte/icons/tag";
   import Truck from "@lucide/svelte/icons/truck";
@@ -64,17 +63,13 @@
 <svelte:head><title>Create Promotion | Admin</title></svelte:head>
 
 <div class="space-y-6">
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/promotions" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Promotions</a
+    >
+  </div>
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <a
-        href="/admin/promotions"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to promotions"
-      >
-        <ChevronLeft class="h-5 w-5" />
-      </a>
-      <h1 class="text-2xl font-bold text-foreground">Create Promotion</h1>
-    </div>
+    <h1 class="text-2xl font-bold">Create Promotion</h1>
     <div class="flex items-center gap-3">
       <a href="/admin/promotions" class={buttonVariants({ variant: "outline" })}>Cancel</a>
       <Button type="submit" form="create-form">Create Promotion</Button>

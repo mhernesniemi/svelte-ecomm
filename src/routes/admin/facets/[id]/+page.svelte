@@ -3,7 +3,6 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
   import type { PageData, ActionData } from "./$types";
@@ -36,18 +35,13 @@
 <svelte:head><title>{getName(data.facet.translations)} | Facets | Admin</title></svelte:head>
 
 <div class="space-y-6">
-  <!-- Header -->
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/facets" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Facets</a
+    >
+  </div>
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <a
-        href="/admin/facets"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to facets"
-      >
-        <ChevronLeft class="h-5 w-5" />
-      </a>
-      <h1 class="text-2xl font-bold text-foreground">{getName(data.facet.translations)}</h1>
-    </div>
+    <h1 class="text-2xl font-bold">{getName(data.facet.translations)}</h1>
     <Button type="submit" form="facet-form" disabled={isSubmitting}>
       {isSubmitting ? "Saving..." : "Save Changes"}
     </Button>

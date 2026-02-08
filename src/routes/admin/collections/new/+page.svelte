@@ -2,7 +2,6 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import { slugify } from "$lib/utils";
 
   let { form } = $props();
@@ -30,17 +29,13 @@
 <svelte:head><title>New Collection | Admin</title></svelte:head>
 
 <div class="space-y-6">
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/collections" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Collections</a
+    >
+  </div>
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <a
-        href="/admin/collections"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to collections"
-      >
-        <ChevronLeft class="h-5 w-5" />
-      </a>
-      <h1 class="text-2xl font-bold text-foreground">Create Collection</h1>
-    </div>
+    <h1 class="text-2xl font-bold">Create Collection</h1>
     <div class="flex items-center gap-3">
       <a href="/admin/collections" class={buttonVariants({ variant: "outline" })}>Cancel</a>
       <Button type="submit" form="create-collection-form">Create Collection</Button>

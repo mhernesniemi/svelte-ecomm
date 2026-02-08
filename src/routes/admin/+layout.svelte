@@ -192,7 +192,7 @@
   </aside>
 
   <!-- Main content -->
-  <main class="ml-64 p-8">
+  <main class="ml-64 pt-6 pr-8 pb-8 pl-8">
     {@render children()}
   </main>
 

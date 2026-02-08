@@ -2,7 +2,7 @@
   import { enhance } from "$app/forms";
   import { page } from "$app/stores";
   import { toast } from "svelte-sonner";
-  import { Button } from "$lib/components/admin/ui/button";
+  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
@@ -208,7 +208,7 @@
 
 <div>
   <div class="mb-6">
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-6 flex items-center justify-between">
       <a href="/admin/products" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
         >&larr; Back to Products</a
       >
@@ -216,7 +216,7 @@
         <a
           href="/products/{data.product.id}/{translation.slug}"
           target="_blank"
-          class="text-sm text-muted-foreground hover:text-foreground-secondary"
+          class="text-sm text-blue-600 hover:underline dark:text-blue-400"
         >
           View in store &rarr;
         </a>
@@ -331,11 +331,9 @@
       <div class="rounded-lg bg-surface pb-4 shadow">
         <div class="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
-          <a href="/admin/products/{data.product.id}/variants/new">
-            <Button type="button" variant="outline" size="sm"
-              ><Plus class="h-4 w-4" /> Add Variant</Button
-            >
-          </a>
+          <a href="/admin/products/{data.product.id}/variants/new" class={buttonVariants({ variant: "outline", size: "sm" })}
+            ><Plus class="h-4 w-4" /> Add Variant</a
+          >
         </div>
 
         <!-- Variants Table -->

@@ -1,5 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Badge } from "$lib/components/admin/ui/badge";
@@ -7,7 +9,6 @@
   import * as Command from "$lib/components/admin/ui/command";
   import type { PageData, ActionData } from "./$types";
   import { toast } from "svelte-sonner";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import Check from "@lucide/svelte/icons/check";
   import X from "@lucide/svelte/icons/x";
@@ -80,6 +81,13 @@
     return { label: "Active", variant: "success" as const };
   });
 
+  onMount(() => {
+    if ($page.url.searchParams.has("created")) {
+      toast.success("Promotion created successfully");
+      history.replaceState({}, "", $page.url.pathname);
+    }
+  });
+
   $effect(() => {
     if (form?.success) {
       toast.success("Promotion updated");
@@ -90,16 +98,14 @@
 <svelte:head><title>Edit {promo.code} | Admin</title></svelte:head>
 
 <div class="space-y-6">
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/promotions" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Promotions</a
+    >
+  </div>
   <div class="flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <a
-        href="/admin/promotions"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to promotions"
-      >
-        <ChevronLeft class="h-5 w-5" />
-      </a>
-      <h1 class="text-2xl font-bold text-foreground">
+      <h1 class="text-2xl font-bold">
         {promo.method === "automatic" ? promo.title : promo.code}
       </h1>
       <Badge variant="outline">{promo.method === "code" ? "Discount code" : "Automatic"}</Badge>

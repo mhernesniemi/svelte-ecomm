@@ -2,7 +2,6 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { ActionData } from "./$types";
 
   let { form }: { form: ActionData } = $props();
@@ -21,17 +20,13 @@
 <svelte:head><title>New Customer Group | Admin</title></svelte:head>
 
 <div class="space-y-6">
+  <div class="mb-6 flex items-center justify-between">
+    <a href="/admin/customers?tab=groups" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >&larr; Back to Customer Groups</a
+    >
+  </div>
   <div class="flex items-center justify-between">
-    <div class="flex items-center gap-4">
-      <a
-        href="/admin/customers?tab=groups"
-        class="text-muted-foreground hover:text-foreground-secondary"
-        aria-label="Back to customer groups"
-      >
-        <ChevronLeft class="h-5 w-5" />
-      </a>
-      <h1 class="text-2xl font-bold text-foreground">Create Customer Group</h1>
-    </div>
+    <h1 class="text-2xl font-bold">Create Customer Group</h1>
     <div class="flex items-center gap-3">
       <a href="/admin/customers?tab=groups" class={buttonVariants({ variant: "outline" })}>
         Cancel
