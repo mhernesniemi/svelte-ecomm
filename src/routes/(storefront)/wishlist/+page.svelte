@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
+  import { cn } from "$lib/utils";
   import { cartStore } from "$lib/stores/cart.svelte";
   import type { PageData, ActionData } from "./$types";
   import Heart from "@lucide/svelte/icons/heart";
@@ -112,7 +113,7 @@
             </div>
 
             <div class="mt-auto flex items-center justify-between pt-4">
-              <span class="text-sm {stock > 0 ? 'text-green-600' : 'text-red-600'}">
+              <span class={cn("text-sm", stock > 0 ? "text-green-600" : "text-red-600")}>
                 {stock > 0 ? "In stock" : "Out of stock"}
               </span>
 

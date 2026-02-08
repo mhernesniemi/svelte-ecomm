@@ -4,7 +4,7 @@
   import { Input } from "$lib/components/storefront/ui/input";
   import { Label } from "$lib/components/storefront/ui/label";
   import { Alert } from "$lib/components/storefront/ui/alert";
-  import { formatPrice } from "$lib/utils.js";
+  import { formatPrice, cn } from "$lib/utils.js";
   import type { PageData } from "./$types.js";
 
   let { data, form }: { data: PageData; form: any } = $props();
@@ -438,10 +438,12 @@
                 <div class="space-y-3">
                   {#each currentShippingRates as rate}
                     <label
-                      class="flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50 {selectedShippingRate?.id ===
-                      rate.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-300'}"
+                      class={cn(
+                        "flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50",
+                        selectedShippingRate?.id === rate.id
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-300"
+                      )}
                     >
                       <input
                         type="radio"
@@ -539,10 +541,12 @@
             <div class="space-y-3">
               {#each currentPaymentMethods as method}
                 <label
-                  class="flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50 {selectedPaymentMethod?.id ===
-                  method.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-300'}"
+                  class={cn(
+                    "flex cursor-pointer items-start rounded-lg border p-4 transition-colors hover:bg-gray-50",
+                    selectedPaymentMethod?.id === method.id
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-300"
+                  )}
                 >
                   <input
                     type="radio"
@@ -655,7 +659,7 @@
                     await update({ reset: false });
                   };
                 }}
-                class="flex gap-2 {currentAppliedPromotions.length > 0 ? 'mt-2' : ''}"
+                class={cn("flex gap-2", currentAppliedPromotions.length > 0 && "mt-2")}
               >
                 <input
                   type="text"

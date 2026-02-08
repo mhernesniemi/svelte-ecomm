@@ -2,6 +2,7 @@
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet } from "$lib/components/admin/data-table";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
+  import { cn } from "$lib/utils";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -80,18 +81,24 @@
   <div class="mb-6 flex flex-wrap gap-2">
     <a
       href="/admin/orders"
-      class="rounded-full px-3 py-1 text-sm {!data.currentState
-        ? 'bg-blue-600 text-white dark:bg-blue-800'
-        : 'bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white'}"
+      class={cn(
+        "rounded-full px-3 py-1 text-sm",
+        !data.currentState
+          ? "bg-blue-600 text-white dark:bg-blue-800"
+          : "bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white"
+      )}
     >
       All
     </a>
     {#each states as state}
       <a
         href="/admin/orders?state={state}"
-        class="rounded-full px-3 py-1 text-sm capitalize {data.currentState === state
-          ? 'bg-blue-600 text-white dark:bg-blue-800'
-          : 'bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white'}"
+        class={cn(
+          "rounded-full px-3 py-1 text-sm capitalize",
+          data.currentState === state
+            ? "bg-blue-600 text-white dark:bg-blue-800"
+            : "bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white"
+        )}
       >
         {state.replace("_", " ")}
       </a>
