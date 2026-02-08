@@ -2,6 +2,7 @@ import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { assetService } from "$lib/server/services/assets.js";
 import { categoryService } from "$lib/server/services/categories.js";
+import { collectionService } from "$lib/server/services/collections.js";
 import { taxService } from "$lib/server/services/tax.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
@@ -19,19 +20,22 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Product not found");
 	}
 
-	const [facets, categoryTree, productCategories, taxRates] = await Promise.all([
-		facetService.list("en"),
-		categoryService.getTree(),
-		categoryService.getProductCategories(id),
-		taxService.getAllTaxRates()
-	]);
+	const [facets, categoryTree, productCategories, taxRates, productCollections] =
+		await Promise.all([
+			facetService.list("en"),
+			categoryService.getTree(),
+			categoryService.getProductCategories(id),
+			taxService.getAllTaxRates(),
+			collectionService.getCollectionsForProduct(id, "en")
+		]);
 
 	return {
 		product,
 		facets,
 		categoryTree,
 		productCategories,
-		taxRates
+		taxRates,
+		productCollections
 	};
 };
 

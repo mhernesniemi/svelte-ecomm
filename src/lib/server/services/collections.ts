@@ -614,6 +614,54 @@ export class CollectionService {
 		return result.pagination.total;
 	}
 
+	/**
+	 * Get all collections that contain a given product
+	 */
+	async getCollectionsForProduct(
+		productId: number,
+		language?: string
+	): Promise<CollectionWithTranslations[]> {
+		const allCollections = await db
+			.select()
+			.from(collections)
+			.orderBy(collections.position, desc(collections.createdAt));
+
+		const matched: CollectionWithTranslations[] = [];
+
+		for (const collection of allCollections) {
+			const filters = await db
+				.select()
+				.from(collectionFilters)
+				.where(eq(collectionFilters.collectionId, collection.id));
+
+			if (filters.length === 0) continue;
+
+			let matchingProductIds: Set<number> | null = null;
+
+			for (const filter of filters) {
+				const handler = this.filterHandlers[filter.field as CollectionFilterField];
+				if (handler) {
+					const filterResults = await handler(matchingProductIds, filter);
+					if (matchingProductIds === null) {
+						matchingProductIds = filterResults;
+					} else {
+						const currentIds = matchingProductIds;
+						matchingProductIds = new Set(
+							[...currentIds].filter((id) => filterResults.has(id))
+						);
+					}
+					if (matchingProductIds.size === 0) break;
+				}
+			}
+
+			if (matchingProductIds?.has(productId)) {
+				matched.push(await this.loadCollectionTranslations(collection, language));
+			}
+		}
+
+		return matched;
+	}
+
 	// =========================================================================
 	// PRIVATE HELPER METHODS
 	// =========================================================================

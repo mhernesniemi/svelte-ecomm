@@ -661,6 +661,30 @@
           {/if}
         </div>
       </div>
+
+      <!-- Collections Section -->
+      {#if data.productCollections.length > 0}
+        <div class="rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-4 py-3">
+            <h2 class="font-semibold">Collections</h2>
+          </div>
+          <div class="p-4">
+            <div class="space-y-1.5">
+              {#each data.productCollections as collection}
+                {@const collectionName =
+                  collection.translations.find((t) => t.languageCode === "en")?.name ??
+                  `Collection #${collection.id}`}
+                <a
+                  href="/admin/collections/{collection.id}"
+                  class="block text-sm text-blue-600 hover:underline dark:text-blue-400"
+                >
+                  {collectionName}
+                </a>
+              {/each}
+            </div>
+          </div>
+        </div>
+      {/if}
     </div>
   </div>
 
