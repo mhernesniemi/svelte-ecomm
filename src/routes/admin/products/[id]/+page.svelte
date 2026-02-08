@@ -233,7 +233,7 @@
   </div>
 
   <!-- Two Column Layout -->
-  <div class="flex gap-6">
+  <div class="flex flex-col lg:flex-row gap-6">
     <!-- Main Content (Left) -->
     <div class="flex-1 space-y-6">
       <!-- Product Form -->
@@ -403,7 +403,7 @@
     </div>
 
     <!-- Sidebar (Right) -->
-    <div class="w-80 shrink-0 space-y-6">
+    <div class="w-full lg:w-80 lg:shrink-0 space-y-6">
       <!-- Visibility Section -->
       <div class="rounded-lg bg-surface shadow">
         <div class="border-b border-border px-4 py-3">

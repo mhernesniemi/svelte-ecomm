@@ -138,7 +138,7 @@
     <input type="hidden" name="productIds" value={JSON.stringify(selectedProductIds)} />
     <input type="hidden" name="collectionIds" value={JSON.stringify(selectedCollectionIds)} />
 
-    <div class="flex gap-6">
+    <div class="flex flex-col lg:flex-row gap-6">
       <!-- Left Column -->
       <div class="flex-1 space-y-6">
         <!-- Code / Title -->
@@ -467,7 +467,7 @@
       </div>
 
       <!-- Right Sidebar -->
-      <div class="w-80 shrink-0 space-y-6">
+      <div class="w-full lg:w-80 lg:shrink-0 space-y-6">
         <!-- Status -->
         <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Status</h2>
