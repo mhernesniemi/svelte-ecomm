@@ -22,7 +22,7 @@
   import Tag from "@lucide/svelte/icons/tag";
   import FileText from "@lucide/svelte/icons/file-text";
   import Percent from "@lucide/svelte/icons/percent";
-  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import ExternalLink from "@lucide/svelte/icons/external-link";
   import Ellipsis from "@lucide/svelte/icons/ellipsis";
   import LogOut from "@lucide/svelte/icons/log-out";
   import Sun from "@lucide/svelte/icons/sun";
@@ -119,12 +119,19 @@
     </nav>
 
     <div class="absolute right-0 bottom-0 left-0">
-      <div class="flex items-center gap-2 border-t border-gray-800 p-4">
-        <ChevronLeft class="h-5 w-5 text-gray-400" strokeWidth={1.6} />
-        <a href="/" class="text-sm text-gray-400 hover:text-white">Storefront</a>
+      <div class="border-t border-gray-800 p-4">
+        <a
+          href="/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="group inline-flex items-center gap-2 text-sm"
+        >
+          <ExternalLink class="h-4 w-4 text-gray-300" strokeWidth={1.6} />
+          <span class="text-gray-300 group-hover:text-white">Storefront</span>
+        </a>
       </div>
       <div class="flex items-center justify-between border-t border-gray-800 p-4">
-        <span class="truncate text-sm text-gray-400">{data.adminUser?.email ?? "Admin"}</span>
+        <span class="truncate text-sm text-gray-300">{data.adminUser?.email ?? "Admin"}</span>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger
             class="rounded p-1 text-gray-400 hover:bg-gray-800 hover:text-white"
