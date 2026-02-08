@@ -130,7 +130,7 @@
           <span class="text-gray-300 group-hover:text-white">Storefront</span>
         </a>
       </div>
-      <div class="border-t border-gray-800">
+      <div class="mb-1 border-t border-gray-800">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger
             class="flex w-full items-center justify-between p-4 text-gray-300 hover:bg-gray-800/60 hover:text-white"
