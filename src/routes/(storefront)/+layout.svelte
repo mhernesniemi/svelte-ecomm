@@ -112,7 +112,7 @@
   <footer class="mt-auto border-t border-gray-300">
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between">
-        <p class="text-sm text-gray-500">Hoikka - Opinionated Commerce for SvelteKit</p>
+        <p class="text-sm text-gray-500">Hoikka - DX-first ecommerce platform</p>
         <div class="flex items-center gap-2">
           <a href="/privacy-policy" class="text-sm text-gray-500 hover:text-gray-900"
             >Privacy Policy</a
