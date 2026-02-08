@@ -16,9 +16,10 @@
   import Dot from "@lucide/svelte/icons/dot";
   import UserIcon from "@lucide/svelte/icons/user";
 
-  // Enable view transitions for navigation
+  // Enable view transition only when navigating to admin
   onNavigate((navigation) => {
     if (!document.startViewTransition) return;
+    if (!navigation.to?.url.pathname.startsWith("/admin")) return;
 
     return new Promise((resolve) => {
       document.startViewTransition(async () => {

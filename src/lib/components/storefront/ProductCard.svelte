@@ -38,10 +38,7 @@
       </span>
     </div>
   {/if}
-  <div
-    class="aspect-square overflow-hidden bg-gray-100"
-    style="view-transition-name: product-image-{product.id}"
-  >
+  <div class="aspect-square overflow-hidden bg-gray-100">
     {#if product.featuredAsset}
       <img
         src="{product.featuredAsset.source}?tr=w-400,h-400,fo-auto,e-grayscale"
