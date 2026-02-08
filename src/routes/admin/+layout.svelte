@@ -81,23 +81,23 @@
         >
           <span class="h-5 w-5 opacity-60">
             {#if item.icon === "package"}
-              <Package class="h-5 w-5" />
+              <Package class="h-5 w-5" strokeWidth={1.5} />
             {:else if item.icon === "shopping-cart"}
-              <ShoppingCart class="h-5 w-5" />
+              <ShoppingCart class="h-5 w-5" strokeWidth={1.5} />
             {:else if item.icon === "users"}
-              <Users class="h-5 w-5" />
+              <Users class="h-5 w-5" strokeWidth={1.5} />
             {:else if item.icon === "category"}
-              <LayoutGrid class="h-5 w-5" />
+              <LayoutGrid class="h-5 w-5" strokeWidth={1.5} />
             {:else if item.icon === "filter"}
-              <Filter class="h-5 w-5" />
+              <Filter class="h-5 w-5" strokeWidth={1.5} />
             {:else if item.icon === "tag"}
-              <Tag class="h-5 w-5" />
+              <Tag class="h-5 w-5" strokeWidth={1.5} />
             {:else if item.icon === "folder"}
-              <FolderOpen class="h-5 w-5" />
+              <FolderOpen class="h-5 w-5" strokeWidth={1.5} />
             {:else if item.icon === "star"}
-              <Star class="h-5 w-5" />
+              <Star class="h-5 w-5" strokeWidth={1.5} />
             {:else if item.icon === "file-text"}
-              <FileText class="h-5 w-5" />
+              <FileText class="h-5 w-5" strokeWidth={1.5} />
             {/if}
           </span>
           {item.label}
