@@ -57,7 +57,11 @@
   }
 </script>
 
-<div class="min-h-screen bg-background font-sans text-foreground" data-admin class:dark={isDark()}>
+<div
+  class="min-h-screen bg-background font-sans text-foreground antialiased"
+  data-admin
+  class:dark={isDark()}
+>
   <!-- Sidebar -->
   <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white dark:bg-gray-900/70">
     <div class="p-6">

@@ -12,7 +12,7 @@
 {#if !header.isPlaceholder}
   {#if header.column.getCanSort()}
     <button
-      class="flex items-center gap-1 uppercase hover:text-foreground"
+      class="flex items-center gap-1 font-medium uppercase hover:text-foreground"
       onclick={header.column.getToggleSortingHandler()}
     >
       <FlexRender content={header.column.columnDef.header} context={header.getContext()} />
