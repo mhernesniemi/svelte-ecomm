@@ -61,7 +61,9 @@
 
   // Serialized filters for the hidden form input
   const filtersJson = $derived(
-    JSON.stringify(localFilters.map((f) => ({ field: f.field, operator: f.operator, value: f.value })))
+    JSON.stringify(
+      localFilters.map((f) => ({ field: f.field, operator: f.operator, value: f.value }))
+    )
   );
 
   // Unsaved changes detection
@@ -187,8 +189,7 @@
   type FlatFacetValue = { id: number; name: string; facetName: string };
   const flatFacetValues: FlatFacetValue[] = $derived(
     data.facets.flatMap((facet) => {
-      const facetName =
-        facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+      const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
       return facet.values.map((value) => ({
         id: value.id,
         name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
@@ -476,7 +477,6 @@
                       {/each}
                     </div>
                   {/if}
-
                 {:else if filter.field === "product"}
                   {@const selected = Array.isArray(filter.value) ? (filter.value as number[]) : []}
                   <Popover.Root
@@ -522,7 +522,7 @@
                   {#if selected.length > 0}
                     <div class="mt-3 flex flex-wrap gap-1.5">
                       {#each selected as id}
-                        <Badge variant="secondary" class="gap-1">
+                        <Badge variant="secondary" class="gap-1 text-sm">
                           {getProductNameById(id)}
                           <button
                             type="button"
@@ -536,14 +536,16 @@
                       {/each}
                     </div>
                   {/if}
-
                 {:else if filter.field === "price"}
                   <div class="flex items-center gap-3">
                     <select
                       class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
                       value={filter.operator}
                       onchange={(e) => {
-                        localFilters[index] = { ...filter, operator: (e.target as HTMLSelectElement).value };
+                        localFilters[index] = {
+                          ...filter,
+                          operator: (e.target as HTMLSelectElement).value
+                        };
                       }}
                     >
                       <option value="gte">{"≥"}</option>
@@ -555,19 +557,24 @@
                       value={filter.value}
                       placeholder="Price in cents"
                       onchange={(e) => {
-                        localFilters[index] = { ...filter, value: Number((e.target as HTMLInputElement).value) };
+                        localFilters[index] = {
+                          ...filter,
+                          value: Number((e.target as HTMLInputElement).value)
+                        };
                       }}
                     />
                     <span class="text-sm text-muted-foreground">cents</span>
                   </div>
-
                 {:else if filter.field === "stock"}
                   <div class="flex items-center gap-3">
                     <select
                       class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
                       value={filter.operator}
                       onchange={(e) => {
-                        localFilters[index] = { ...filter, operator: (e.target as HTMLSelectElement).value };
+                        localFilters[index] = {
+                          ...filter,
+                          operator: (e.target as HTMLSelectElement).value
+                        };
                       }}
                     >
                       <option value="gt">{">"}</option>
@@ -579,17 +586,22 @@
                       value={filter.value}
                       placeholder="Stock level"
                       onchange={(e) => {
-                        localFilters[index] = { ...filter, value: Number((e.target as HTMLInputElement).value) };
+                        localFilters[index] = {
+                          ...filter,
+                          value: Number((e.target as HTMLInputElement).value)
+                        };
                       }}
                     />
                   </div>
-
                 {:else if filter.field === "visibility"}
                   <select
                     class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
                     value={filter.value}
                     onchange={(e) => {
-                      localFilters[index] = { ...filter, value: (e.target as HTMLSelectElement).value };
+                      localFilters[index] = {
+                        ...filter,
+                        value: (e.target as HTMLSelectElement).value
+                      };
                     }}
                   >
                     <option value="public">Public</option>
@@ -638,8 +650,10 @@
   <!-- Products -->
   <div class="overflow-hidden rounded-lg bg-surface shadow">
     <div class="p-6">
-      <h2 class="mb-4 text-lg font-medium text-foreground">
-        Products ({previewCount ?? data.productCount})
+      <h2 class="mb-1 text-lg font-medium text-foreground">
+        Preview Products <span class="text-base font-normal text-foreground-secondary"
+          >({previewCount ?? data.productCount})</span
+        >
       </h2>
       <DataTable
         data={previewProducts ?? data.preview}
