@@ -8,10 +8,16 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Package from "@lucide/svelte/icons/package";
   import ImageIcon from "@lucide/svelte/icons/image";
-  import type { PageData } from "./$types";
+  import { toast } from "svelte-sonner";
+  import type { PageData, ActionData } from "./$types";
   import PlusIcon from "@lucide/svelte/icons/plus";
 
-  let { data }: { data: PageData } = $props();
+  let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  $effect(() => {
+    if (form?.success) toast.success(form.message || "Success");
+    if (form?.error) toast.error(form.error);
+  });
 
   let showBulkDelete = $state(false);
   let pendingDeleteIds = $state<number[]>([]);
@@ -123,17 +129,36 @@
     emptyDescription="Get started by creating a new product."
   >
     {#snippet bulkActions({ selectedRows, table })}
-      <Button
-        variant="destructive"
-        size="sm"
-        onclick={() => {
-          pendingDeleteIds = selectedRows.map((r) => r.id);
-          bulkDeleteTable = table;
-          showBulkDelete = true;
-        }}
-      >
-        Delete ({selectedRows.length})
-      </Button>
+      <div class="flex gap-2">
+        <form
+          method="POST"
+          action="?/publish"
+          use:enhance={() => {
+            return async ({ update }) => {
+              table.resetRowSelection();
+              await update();
+            };
+          }}
+        >
+          {#each selectedRows as row}
+            <input type="hidden" name="ids" value={row.id} />
+          {/each}
+          <Button type="submit" variant="outline" size="sm">
+            Publish ({selectedRows.length})
+          </Button>
+        </form>
+        <Button
+          variant="destructive"
+          size="sm"
+          onclick={() => {
+            pendingDeleteIds = selectedRows.map((r) => r.id);
+            bulkDeleteTable = table;
+            showBulkDelete = true;
+          }}
+        >
+          Delete ({selectedRows.length})
+        </Button>
+      </div>
     {/snippet}
     {#snippet emptyAction()}
       <a href="/admin/products/new" class={buttonVariants()}>Add Product</a>
