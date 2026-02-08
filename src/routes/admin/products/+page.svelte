@@ -92,8 +92,8 @@
     variant={visibility === "public"
       ? "success"
       : visibility === "private"
-        ? "outline"
-        : "secondary"}
+        ? "warning"
+        : "outline"}
   >
     {visibility === "public" ? "Public" : visibility === "private" ? "Private" : "Draft"}
   </Badge>

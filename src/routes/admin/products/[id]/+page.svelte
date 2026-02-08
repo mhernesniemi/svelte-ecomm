@@ -26,9 +26,12 @@
   import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash2 from "@lucide/svelte/icons/trash-2";
+  import { cn } from "$lib/utils";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  let visibility = $state(data.product.visibility);
 
   // Show toast from URL params (variant created/deleted redirects)
   $effect(() => {
@@ -407,17 +410,29 @@
           <h2 class="font-semibold">Visibility</h2>
         </div>
         <div class="p-4">
-          <select
-            form="product-form"
-            name="visibility"
-            class="block w-full rounded-md border-input-border shadow-sm"
-          >
-            <option value="draft" selected={data.product.visibility === "draft"}>Draft</option>
-            <option value="public" selected={data.product.visibility === "public"}>Public</option>
-            <option value="private" selected={data.product.visibility === "private"}>Private</option
+          <div class="relative">
+            <span
+              class={cn(
+                "pointer-events-none absolute top-1/2 left-3 h-2 w-2 -translate-y-1/2 rounded-full",
+                visibility === "public"
+                  ? "bg-green-500"
+                  : visibility === "private"
+                    ? "bg-yellow-500"
+                    : "bg-gray-400"
+              )}
+            ></span>
+            <select
+              form="product-form"
+              name="visibility"
+              class="block w-full rounded-md border-input-border pl-7 shadow-sm"
+              bind:value={visibility}
             >
-          </select>
-          <p class="mt-3 text-xs text-muted-foreground">
+              <option value="draft">Draft</option>
+              <option value="public">Public</option>
+              <option value="private">Private</option>
+            </select>
+          </div>
+          <p class="mt-3 text-xs text-foreground-secondary">
             Set this to Public to make it available in the store
           </p>
         </div>

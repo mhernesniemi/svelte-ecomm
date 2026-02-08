@@ -28,6 +28,7 @@ This is a **full-stack e-commerce platform** built with:
 - Use shadcn/svelte for UI components where they provide value and install a new shadcn/svelte component if it's not available.
 - Prefer to use existing UI components if possible, for example `<Button>` instead of `<button>`.
 - Use global focus styles for all interactive elements
+- Use cn utility function always for conditional tailwind classes
 
 ## Key Structure
 
