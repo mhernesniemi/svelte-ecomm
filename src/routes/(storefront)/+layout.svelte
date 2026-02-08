@@ -1,4 +1,8 @@
 <script lang="ts">
+  import "@fontsource/ibm-plex-mono/400.css";
+  import "@fontsource/ibm-plex-mono/500.css";
+  import "@fontsource/ibm-plex-mono/600.css";
+  import "@fontsource/ibm-plex-mono/700.css";
   import { SignedIn, SignedOut, SignInButton, useClerkContext } from "svelte-clerk";
   import { invalidateAll, onNavigate } from "$app/navigation";
   import { page } from "$app/stores";

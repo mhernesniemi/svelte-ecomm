@@ -76,7 +76,7 @@
   class:dark={isDark()}
 >
   <!-- Sidebar -->
-  <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white dark:bg-gray-900/70">
+  <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
     <div class="p-6">
       <h1 class="text-xl font-bold">Hoikka</h1>
       <p class="text-sm text-gray-400">Admin Dashboard</p>
@@ -118,7 +118,7 @@
       {/each}
     </nav>
 
-    <div class="absolute right-0 bottom-0 left-0">
+    <div class="absolute right-0 bottom-0 left-0 bg-gray-900 dark:bg-gray-900/50">
       <div class="border-t border-gray-800 p-4">
         <a
           href="/"
