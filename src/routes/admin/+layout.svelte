@@ -23,7 +23,7 @@
   import FileText from "@lucide/svelte/icons/file-text";
   import Percent from "@lucide/svelte/icons/percent";
   import ExternalLink from "@lucide/svelte/icons/external-link";
-  import Ellipsis from "@lucide/svelte/icons/ellipsis";
+  import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import LogOut from "@lucide/svelte/icons/log-out";
   import Sun from "@lucide/svelte/icons/sun";
   import Moon from "@lucide/svelte/icons/moon";
@@ -118,25 +118,25 @@
       {/each}
     </nav>
 
-    <div class="absolute right-0 bottom-0 left-0 bg-gray-900 dark:bg-gray-900/50">
-      <div class="border-t border-gray-800 p-4">
+    <div class="absolute right-0 bottom-0 left-0 bg-gray-900">
+      <div class="border-t border-gray-800">
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          class="group inline-flex items-center gap-2 text-sm"
+          class="group flex items-center gap-2 p-4 text-sm hover:bg-gray-800/60"
         >
           <ExternalLink class="h-4 w-4 text-gray-300" strokeWidth={1.6} />
           <span class="text-gray-300 group-hover:text-white">Storefront</span>
         </a>
       </div>
-      <div class="flex items-center justify-between border-t border-gray-800 p-4">
-        <span class="truncate text-sm text-gray-300">{data.adminUser?.email ?? "Admin"}</span>
+      <div class="border-t border-gray-800">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger
-            class="rounded p-1 text-gray-400 hover:bg-gray-800 hover:text-white"
+            class="flex w-full items-center justify-between p-4 text-gray-300 hover:bg-gray-800/60 hover:text-white"
           >
-            <Ellipsis class="h-5 w-5" strokeWidth={1.6} />
+            <span class="truncate text-sm">{data.adminUser?.email ?? "Admin"}</span>
+            <ChevronsUpDown class="h-5 w-5 shrink-0 text-gray-400" strokeWidth={1.6} />
           </DropdownMenu.Trigger>
           <DropdownMenu.Content side="right" align="end" class="w-48">
             <DropdownMenu.Sub>
