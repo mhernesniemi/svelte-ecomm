@@ -79,28 +79,18 @@
 
   <!-- State Filter -->
   <div class="mb-6 flex flex-wrap gap-2">
-    <a
-      href="/admin/orders"
-      class={cn(
-        "rounded-full px-3 py-1 text-sm",
-        !data.currentState
-          ? "bg-blue-600 text-white dark:bg-blue-800"
-          : "bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white"
-      )}
-    >
-      All
-    </a>
-    {#each states as state}
+    {#each [null, ...states] as state}
+      {@const active = data.currentState === state}
       <a
-        href="/admin/orders?state={state}"
+        href="/admin/orders{state ? `?state=${state}` : ''}"
         class={cn(
           "rounded-full px-3 py-1 text-sm capitalize",
-          data.currentState === state
+          active
             ? "bg-blue-600 text-white dark:bg-blue-800"
-            : "bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white"
+            : "bg-muted-strong/50 text-foreground-secondary hover:text-black dark:hover:text-white"
         )}
       >
-        {state.replace("_", " ")}
+        {state?.replace("_", " ") ?? "All"}
       </a>
     {/each}
   </div>

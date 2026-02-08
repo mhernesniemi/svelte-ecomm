@@ -6,7 +6,7 @@
     variants: {
       variant: {
         default:
-          "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600/60 dark:hover:bg-blue-600/50",
+          "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-800 dark:hover:bg-blue-800/90",
         destructive:
           "bg-red-600 text-white hover:bg-red-700 dark:bg-red-600/60 dark:hover:bg-red-600/50",
         "destructive-outline": "border border-red-300 text-red-600 hover:bg-destructive-subtle",

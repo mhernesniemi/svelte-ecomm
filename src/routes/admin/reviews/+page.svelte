@@ -8,6 +8,7 @@
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import type { PageData, ActionData } from "./$types";
+  import { cn } from "$lib/utils";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -113,22 +114,18 @@
 
   <!-- Status Filter -->
   <div class="mb-6 flex flex-wrap gap-2">
-    <a
-      href="/admin/reviews"
-      class="rounded-full px-3 py-1 text-sm {!data.currentStatus
-        ? 'bg-blue-600 text-white dark:bg-blue-800'
-        : 'bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white'}"
-    >
-      All
-    </a>
-    {#each statuses as status}
+    {#each [null, ...statuses] as status}
+      {@const active = data.currentStatus === status}
       <a
-        href="/admin/reviews?status={status}"
-        class="rounded-full px-3 py-1 text-sm capitalize {data.currentStatus === status
-          ? 'bg-blue-600 text-white dark:bg-blue-800'
-          : 'bg-muted-strong text-foreground-secondary hover:text-black dark:hover:text-white'}"
+        href="/admin/reviews{status ? `?status=${status}` : ''}"
+        class={cn(
+          "rounded-full px-3 py-1 text-sm capitalize",
+          active
+            ? "bg-blue-600 text-white dark:bg-blue-800"
+            : "bg-muted-strong/50 text-foreground-secondary hover:text-black dark:hover:text-white"
+        )}
       >
-        {status}
+        {status ?? "All"}
       </a>
     {/each}
   </div>
