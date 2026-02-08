@@ -7,6 +7,7 @@
   import { DataTable, renderSnippet } from "$lib/components/admin/data-table";
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge } from "$lib/components/admin/ui/badge";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
@@ -737,14 +738,15 @@
           <h2 class="font-semibold">Visibility</h2>
         </div>
         <div class="p-4">
-          <label class="flex items-center gap-2">
-            <input
-              type="checkbox"
+          <div class="flex items-center gap-2">
+            <Checkbox
+              id="is_private"
               bind:checked={isPrivate}
-              class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
             />
-            <span class="text-sm font-medium text-foreground-secondary">Private collection</span>
-          </label>
+            <label for="is_private" class="text-sm font-medium text-foreground-secondary">
+              Private collection
+            </label>
+          </div>
           <p class="mt-3 text-xs text-foreground-secondary">
             Private collections are not visible in the shop
           </p>
