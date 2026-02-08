@@ -1,5 +1,6 @@
 <script lang="ts">
   import { deserialize, enhance } from "$app/forms";
+  import { beforeNavigate } from "$app/navigation";
   import { invalidateAll } from "$app/navigation";
   import { toast } from "svelte-sonner";
   import type { ColumnDef } from "@tanstack/table-core";
@@ -62,6 +63,44 @@
   const filtersJson = $derived(
     JSON.stringify(localFilters.map((f) => ({ field: f.field, operator: f.operator, value: f.value })))
   );
+
+  // Unsaved changes detection
+  const hasUnsavedChanges = $derived.by(() => {
+    const trans =
+      data.collection.translations.find((t) => t.languageCode === "en") ??
+      data.collection.translations[0];
+    const savedName = trans?.name ?? "";
+    const savedSlug = trans?.slug ?? "";
+    const savedDescription = trans?.description ?? "";
+    const savedIsPrivate = data.collection.isPrivate;
+    const savedFilters = JSON.stringify(
+      data.collection.filters.map((f) => ({ field: f.field, operator: f.operator, value: f.value }))
+    );
+
+    return (
+      name !== savedName ||
+      slug !== savedSlug ||
+      description !== savedDescription ||
+      isPrivate !== savedIsPrivate ||
+      filtersJson !== savedFilters
+    );
+  });
+
+  // Warn on browser refresh / tab close
+  $effect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) e.preventDefault();
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  });
+
+  // Warn on in-app navigation
+  beforeNavigate(({ cancel }) => {
+    if (hasUnsavedChanges && !confirm("You have unsaved changes. Leave anyway?")) {
+      cancel();
+    }
+  });
 
   // Live preview — debounce-fetch matching products when filters change
   let previewProducts = $state<PreviewProduct[] | null>(null);
