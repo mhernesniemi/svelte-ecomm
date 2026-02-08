@@ -70,20 +70,25 @@
   $effect(() => {
     const current = filtersJson;
 
-    const timeout = setTimeout(async () => {
-      const formData = new FormData();
-      formData.set("filters", current);
+    const formData = new FormData();
+    formData.set("filters", current);
 
-      const response = await fetch("?/preview", { method: "POST", body: formData });
-      const result = deserialize(await response.text());
+    let cancelled = false;
 
-      if (result.type === "success" && result.data) {
-        previewProducts = result.data.preview as PreviewProduct[];
-        previewCount = result.data.productCount as number;
-      }
-    }, 300);
+    fetch("?/preview", { method: "POST", body: formData })
+      .then((response) => response.text())
+      .then((text) => {
+        if (cancelled) return;
+        const result = deserialize(text);
+        if (result.type === "success" && result.data) {
+          previewProducts = result.data.preview as PreviewProduct[];
+          previewCount = result.data.productCount as number;
+        }
+      });
 
-    return () => clearTimeout(timeout);
+    return () => {
+      cancelled = true;
+    };
   });
 
   // ── Filter helpers ───────────────────────────────────────────────────
