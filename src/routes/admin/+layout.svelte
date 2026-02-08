@@ -4,8 +4,14 @@
   import { page } from "$app/stores";
   import { enhance } from "$app/forms";
   import { Toaster } from "$lib/components/admin/ui/sonner";
-  import ThemeToggle from "$lib/components/admin/ThemeToggle.svelte";
-  import { initTheme, isDark } from "$lib/stores/admin-theme.svelte";
+  import * as DropdownMenu from "$lib/components/admin/ui/dropdown-menu";
+  import {
+    initTheme,
+    isDark,
+    setTheme,
+    getTheme,
+    type Theme
+  } from "$lib/stores/admin-theme.svelte";
   import type { LayoutData } from "./$types";
   import LayoutGrid from "@lucide/svelte/icons/layout-grid";
   import Filter from "@lucide/svelte/icons/filter";
@@ -16,6 +22,13 @@
   import Tag from "@lucide/svelte/icons/tag";
   import FileText from "@lucide/svelte/icons/file-text";
   import Percent from "@lucide/svelte/icons/percent";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import Ellipsis from "@lucide/svelte/icons/ellipsis";
+  import LogOut from "@lucide/svelte/icons/log-out";
+  import Sun from "@lucide/svelte/icons/sun";
+  import Moon from "@lucide/svelte/icons/moon";
+  import Monitor from "@lucide/svelte/icons/monitor";
+  import Check from "@lucide/svelte/icons/check";
 
   let { children, data }: { children: any; data: LayoutData } = $props();
 
@@ -105,15 +118,68 @@
       {/each}
     </nav>
 
-    <div class="absolute right-0 bottom-0 left-0 border-t border-gray-800 bg-gray-900 p-4">
-      <div class="mb-3 flex justify-center">
-        <ThemeToggle />
-      </div>
-      <div class="flex items-center justify-between">
-        <form method="POST" action="/admin/logout" use:enhance>
-          <button type="submit" class="text-sm text-gray-400 hover:text-white">Logout</button>
-        </form>
+    <div class="absolute right-0 bottom-0 left-0">
+      <div class="flex items-center gap-2 border-t border-gray-800 p-4">
+        <ChevronLeft class="h-5 w-5 text-gray-400" strokeWidth={1.6} />
         <a href="/" class="text-sm text-gray-400 hover:text-white">Storefront</a>
+      </div>
+      <div class="flex items-center justify-between border-t border-gray-800 p-4">
+        <span class="truncate text-sm text-gray-400">{data.adminUser?.email ?? "Admin"}</span>
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger
+            class="rounded p-1 text-gray-400 hover:bg-gray-800 hover:text-white"
+          >
+            <Ellipsis class="h-5 w-5" strokeWidth={1.6} />
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content side="right" align="end" class="w-48">
+            <DropdownMenu.Sub>
+              <DropdownMenu.SubTrigger>
+                <Sun class="h-4 w-4" strokeWidth={1.6} />
+                Theme
+              </DropdownMenu.SubTrigger>
+              <DropdownMenu.SubContent>
+                <DropdownMenu.Item onclick={() => setTheme("light")}>
+                  <Sun class="h-4 w-4" strokeWidth={1.6} />
+                  Light
+                  {#if getTheme() === "light"}
+                    <Check class="ml-auto h-4 w-4" />
+                  {/if}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => setTheme("dark")}>
+                  <Moon class="h-4 w-4" strokeWidth={1.6} />
+                  Dark
+                  {#if getTheme() === "dark"}
+                    <Check class="ml-auto h-4 w-4" />
+                  {/if}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onclick={() => setTheme("system")}>
+                  <Monitor class="h-4 w-4" strokeWidth={1.6} />
+                  System
+                  {#if getTheme() === "system"}
+                    <Check class="ml-auto h-4 w-4" />
+                  {/if}
+                </DropdownMenu.Item>
+              </DropdownMenu.SubContent>
+            </DropdownMenu.Sub>
+            <DropdownMenu.Separator />
+            <DropdownMenu.Item
+              onclick={() => {
+                const form = document.getElementById("logout-form") as HTMLFormElement;
+                form?.requestSubmit();
+              }}
+            >
+              <LogOut class="h-4 w-4" strokeWidth={1.6} />
+              Log out
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+        <form
+          id="logout-form"
+          method="POST"
+          action="/admin/logout"
+          use:enhance
+          class="hidden"
+        ></form>
       </div>
     </div>
   </aside>

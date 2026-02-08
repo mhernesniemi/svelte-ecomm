@@ -135,10 +135,7 @@
 {/snippet}
 
 {#snippet groupNameCell({ id, name }: { id: number; name: string })}
-  <a
-    href="/admin/customers/groups/{id}"
-    class="font-medium text-foreground hover:text-blue-600 dark:text-blue-400"
-  >
+  <a href="/admin/customers/groups/{id}" class="font-medium text-foreground hover:underline">
     {name}
   </a>
 {/snippet}
