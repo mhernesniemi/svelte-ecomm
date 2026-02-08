@@ -2,6 +2,7 @@ import type { PageServerLoad, Actions } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
+import { assetService } from "$lib/server/services/assets.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import { slugify } from "$lib/utils.js";
 
@@ -103,6 +104,68 @@ export const actions: Actions = {
 		} catch (err) {
 			if (isRedirect(err)) throw err;
 			return fail(500, { error: "Failed to delete collection" });
+		}
+	},
+
+	addImage: async ({ params, request }) => {
+		const collectionId = Number(params.id);
+		const formData = await request.formData();
+
+		const url = formData.get("url") as string;
+		const name = formData.get("name") as string;
+		const fileId = formData.get("fileId") as string;
+		const width = Number(formData.get("width")) || 0;
+		const height = Number(formData.get("height")) || 0;
+		const fileSize = Number(formData.get("fileSize")) || 0;
+		const alt = formData.get("alt") as string;
+
+		if (!url || !name) {
+			return fail(400, { error: "Image data is required" });
+		}
+
+		try {
+			const asset = await assetService.create({ name, url, fileId, width, height, fileSize });
+			if (alt) {
+				await assetService.updateAlt(asset.id, alt);
+			}
+			await assetService.addToCollection(collectionId, asset.id);
+			return { success: true, message: "Image added" };
+		} catch {
+			return fail(500, { error: "Failed to add image" });
+		}
+	},
+
+	removeImage: async ({ params, request }) => {
+		const collectionId = Number(params.id);
+		const formData = await request.formData();
+		const assetId = Number(formData.get("assetId"));
+
+		if (isNaN(assetId)) {
+			return fail(400, { error: "Invalid asset ID" });
+		}
+
+		try {
+			await assetService.removeFromCollection(collectionId, assetId);
+			return { success: true, message: "Image removed" };
+		} catch {
+			return fail(500, { error: "Failed to remove image" });
+		}
+	},
+
+	updateImageAlt: async ({ params, request }) => {
+		const formData = await request.formData();
+		const assetId = Number(formData.get("assetId"));
+		const alt = formData.get("alt") as string;
+
+		if (isNaN(assetId)) {
+			return fail(400, { error: "Invalid asset ID" });
+		}
+
+		try {
+			await assetService.updateAlt(assetId, alt || "");
+			return { success: true, message: "Image updated" };
+		} catch {
+			return fail(500, { error: "Failed to update image" });
 		}
 	}
 };

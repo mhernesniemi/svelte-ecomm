@@ -3,7 +3,7 @@
  * Handles image storage with ImageKit.io
  */
 import { db } from "$lib/server/db/index.js";
-import { assets, productAssets, products } from "$lib/server/db/schema.js";
+import { assets, productAssets, products, collections } from "$lib/server/db/schema.js";
 import { eq, asc } from "drizzle-orm";
 import { env } from "$env/dynamic/private";
 import crypto from "crypto";
@@ -182,6 +182,28 @@ class AssetService {
 			.update(products)
 			.set({ featuredAssetId: assetId })
 			.where(eq(products.id, productId));
+	}
+
+	/**
+	 * Set featured asset for collection
+	 */
+	async addToCollection(collectionId: number, assetId: number) {
+		await db
+			.update(collections)
+			.set({ featuredAssetId: assetId })
+			.where(eq(collections.id, collectionId));
+	}
+
+	/**
+	 * Remove featured asset from collection and delete the asset
+	 */
+	async removeFromCollection(collectionId: number, assetId: number) {
+		await db
+			.update(collections)
+			.set({ featuredAssetId: null })
+			.where(eq(collections.id, collectionId));
+
+		await this.delete(assetId);
 	}
 
 	/**
