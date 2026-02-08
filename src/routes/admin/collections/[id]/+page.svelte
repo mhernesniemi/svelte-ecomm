@@ -2,14 +2,21 @@
   import { enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
   import { toast } from "svelte-sonner";
+  import type { ColumnDef } from "@tanstack/table-core";
+  import { DataTable, renderSnippet } from "$lib/components/admin/data-table";
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge } from "$lib/components/admin/ui/badge";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import * as Popover from "$lib/components/admin/ui/popover";
+  import * as Command from "$lib/components/admin/ui/command";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
+  import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
+  import Check from "@lucide/svelte/icons/check";
+  import Package from "@lucide/svelte/icons/package";
 
   let { data, form } = $props();
 
@@ -45,6 +52,7 @@
   let newFilterValue = $state<string>("");
   let selectedFacetValues = $state<number[]>([]);
   let selectedProducts = $state<number[]>([]);
+  let productComboboxOpen = $state(false);
 
   function getFieldLabel(field: string): string {
     const labels: Record<string, string> = {
@@ -108,13 +116,88 @@
     const trans = product.translations.find((t) => t.languageCode === "en");
     return trans?.name ?? `Product #${product.id}`;
   }
+
+  function getProductNameById(id: number): string {
+    const product = data.products.find((p) => p.id === id);
+    return product ? getProductName(product) : `Product #${id}`;
+  }
+
+  function toggleProduct(id: number) {
+    if (selectedProducts.includes(id)) {
+      selectedProducts = selectedProducts.filter((p) => p !== id);
+    } else {
+      selectedProducts = [...selectedProducts, id];
+    }
+  }
+
+  type PreviewProduct = (typeof data.preview)[0];
+
+  function getPreviewProductName(product: PreviewProduct): string {
+    const trans = product.translations.find((t) => t.languageCode === "en");
+    return trans?.name ?? `Product #${product.id}`;
+  }
+
+  const previewColumns: ColumnDef<PreviewProduct>[] = [
+    {
+      accessorFn: (row) => getPreviewProductName(row),
+      id: "name",
+      header: "Product",
+      cell: ({ row }) =>
+        renderSnippet(productCell, {
+          name: getPreviewProductName(row.original),
+          id: row.original.id,
+          image: row.original.featuredAsset?.preview ?? row.original.featuredAsset?.source ?? null
+        })
+    },
+    {
+      accessorFn: (row) => row.variants.length,
+      id: "variants",
+      header: "Variants",
+      cell: ({ row }) =>
+        `${row.original.variants.length} variant${row.original.variants.length !== 1 ? "s" : ""}`
+    },
+    {
+      accessorKey: "visibility",
+      header: "Status",
+      cell: ({ row }) => renderSnippet(statusCell, { visibility: row.original.visibility })
+    }
+  ];
 </script>
+
+{#snippet productCell({ name, id, image }: { name: string; id: number; image: string | null })}
+  <a href="/admin/products/{id}" class="group inline-flex items-center">
+    {#if image}
+      <img src={image} alt="" class="mr-3 h-10 w-10 rounded object-cover" />
+    {:else}
+      <div class="mr-3 flex h-10 w-10 items-center justify-center rounded bg-muted-strong">
+        <ImageIcon class="h-5 w-5 text-placeholder" />
+      </div>
+    {/if}
+    <span class="font-medium text-foreground group-hover:underline">
+      {name}
+    </span>
+  </a>
+{/snippet}
+
+{#snippet statusCell({ visibility }: { visibility: string })}
+  <Badge
+    variant={visibility === "public"
+      ? "success"
+      : visibility === "private"
+        ? "warning"
+        : "outline"}
+  >
+    {visibility === "public" ? "Public" : visibility === "private" ? "Private" : "Draft"}
+  </Badge>
+{/snippet}
 
 <svelte:head><title>Edit Collection | Admin</title></svelte:head>
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/collections" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+    <a
+      href="/admin/collections"
+      class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Collections</a
     >
     {#if slug}
@@ -208,8 +291,8 @@
               bind:checked={isPrivate}
               class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
             />
-            <label for="is_private" class="text-sm font-medium text-foreground-secondary">
-              Private collection (hidden from storefront)
+            <label for="is_private" class="text-sm text-foreground-secondary">
+              <span class="font-medium">Private collection</span> (hidden from storefront)
             </label>
           </div>
         </div>
@@ -435,26 +518,56 @@
 
         <!-- Product selector -->
         {#if newFilterField === "product"}
-          <div class="mb-4 max-h-48 overflow-y-auto rounded-lg border border-border bg-surface p-3">
-            <div class="space-y-1">
-              {#each data.products as product}
-                <label class="flex cursor-pointer items-center gap-2 rounded p-2 hover:bg-hover">
-                  <input
-                    type="checkbox"
-                    class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
-                    checked={selectedProducts.includes(product.id)}
-                    onchange={() => {
-                      if (selectedProducts.includes(product.id)) {
-                        selectedProducts = selectedProducts.filter((id) => id !== product.id);
-                      } else {
-                        selectedProducts = [...selectedProducts, product.id];
-                      }
-                    }}
-                  />
-                  <span class="text-sm text-foreground-secondary">{getProductName(product)}</span>
-                </label>
-              {/each}
-            </div>
+          <div class="mb-4">
+            <Popover.Root bind:open={productComboboxOpen}>
+              <Popover.Trigger
+                class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+              >
+                <span class="text-muted-foreground">
+                  {selectedProducts.length > 0
+                    ? `${selectedProducts.length} product(s) selected`
+                    : "Search products..."}
+                </span>
+                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
+              </Popover.Trigger>
+              <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+                <Command.Root>
+                  <Command.Input placeholder="Search products..." />
+                  <Command.List class="max-h-60">
+                    <Command.Empty>No products found.</Command.Empty>
+                    {#each data.products as product}
+                      <Command.Item
+                        value={getProductName(product)}
+                        onSelect={() => toggleProduct(product.id)}
+                      >
+                        <Check
+                          class="mr-2 h-4 w-4 {selectedProducts.includes(product.id)
+                            ? 'opacity-100'
+                            : 'opacity-0'}"
+                        />
+                        {getProductName(product)}
+                      </Command.Item>
+                    {/each}
+                  </Command.List>
+                </Command.Root>
+              </Popover.Content>
+            </Popover.Root>
+            {#if selectedProducts.length > 0}
+              <div class="mt-2 flex flex-wrap gap-1">
+                {#each selectedProducts as id}
+                  <Badge variant="secondary" class="gap-1">
+                    {getProductNameById(id)}
+                    <button
+                      type="button"
+                      onclick={() => toggleProduct(id)}
+                      class="ml-0.5 rounded-full hover:bg-muted-strong"
+                    >
+                      <X class="h-3 w-3" />
+                    </button>
+                  </Badge>
+                {/each}
+              </div>
+            {/if}
           </div>
         {/if}
 
@@ -473,37 +586,22 @@
     </div>
   </div>
 
-  <!-- Preview -->
-  {#if data.preview.length > 0}
-    <div class="overflow-hidden rounded-lg bg-surface shadow">
-      <div class="p-6">
-        <h2 class="mb-4 text-lg font-medium text-foreground">
-          Preview ({data.productCount} products)
-        </h2>
-        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
-          {#each data.preview as product}
-            {@const trans = product.translations.find((t) => t.languageCode === "en")}
-            <div class="rounded-lg border border-border p-2">
-              {#if product.featuredAsset}
-                <img
-                  src="{product.featuredAsset.source}?tr=w-100,h-100,fo-auto"
-                  alt={trans?.name ?? "Product"}
-                  class="mb-2 aspect-square w-full rounded object-cover"
-                />
-              {:else}
-                <div
-                  class="mb-2 flex aspect-square w-full items-center justify-center rounded bg-muted"
-                >
-                  <ImageIcon class="h-8 w-8 text-placeholder" />
-                </div>
-              {/if}
-              <p class="truncate text-xs text-foreground-secondary">{trans?.name ?? "Untitled"}</p>
-            </div>
-          {/each}
-        </div>
-      </div>
+  <!-- Products -->
+  <div class="overflow-hidden rounded-lg bg-surface shadow">
+    <div class="p-6">
+      <h2 class="mb-4 text-lg font-medium text-foreground">
+        Products ({data.productCount})
+      </h2>
+      <DataTable
+        data={data.preview}
+        columns={previewColumns}
+        searchPlaceholder="Filter products..."
+        emptyIcon={Package}
+        emptyTitle="No products"
+        emptyDescription="Add filters above to populate this collection."
+      />
     </div>
-  {/if}
+  </div>
 
   <button
     type="button"

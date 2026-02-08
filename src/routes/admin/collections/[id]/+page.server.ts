@@ -30,10 +30,10 @@ export const load: PageServerLoad = async ({ params }) => {
 	// Get product count
 	const productCount = await collectionService.getProductCount(id);
 
-	// Get preview of matching products
+	// Get matching products for the data table
 	const preview = await collectionService.getProductsForCollection(id, {
 		language: "en",
-		limit: 6
+		limit: 100
 	});
 
 	return { collection, facets, products, productCount, preview: preview.items };
