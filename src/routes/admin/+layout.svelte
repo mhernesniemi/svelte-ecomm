@@ -7,7 +7,6 @@
   import ThemeToggle from "$lib/components/admin/ThemeToggle.svelte";
   import { initTheme, isDark } from "$lib/stores/admin-theme.svelte";
   import type { LayoutData } from "./$types";
-  import Package from "@lucide/svelte/icons/package";
   import LayoutGrid from "@lucide/svelte/icons/layout-grid";
   import Filter from "@lucide/svelte/icons/filter";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
@@ -16,6 +15,7 @@
   import Star from "@lucide/svelte/icons/star";
   import Tag from "@lucide/svelte/icons/tag";
   import FileText from "@lucide/svelte/icons/file-text";
+  import Percent from "@lucide/svelte/icons/percent";
 
   let { children, data }: { children: any; data: LayoutData } = $props();
 
@@ -42,13 +42,13 @@
 
   const navItems: NavItem[] = [
     { href: "/admin/orders", label: "Orders", icon: "shopping-cart" },
-    { href: "/admin/products", label: "Products", icon: "package" },
+    { href: "/admin/products", label: "Products", icon: "tag" },
     { href: "/admin/collections", label: "Collections", icon: "folder" },
     { href: "/admin/facets", label: "Facets", icon: "filter" },
     { href: "/admin/categories", label: "Categories", icon: "category" },
     { href: "/admin/customers", label: "Customers", icon: "users" },
     { href: "/admin/reviews", label: "Reviews", icon: "star" },
-    { href: "/admin/promotions", label: "Promotions", icon: "tag" },
+    { href: "/admin/promotions", label: "Promotions", icon: "percent" },
     { href: "/admin/content-pages", label: "Pages", icon: "file-text" }
   ];
 
@@ -80,24 +80,24 @@
             : ''}"
         >
           <span class="h-5 w-5 opacity-60">
-            {#if item.icon === "package"}
-              <Package class="h-5 w-5" strokeWidth={1.5} />
-            {:else if item.icon === "shopping-cart"}
-              <ShoppingCart class="h-5 w-5" strokeWidth={1.5} />
+            {#if item.icon === "shopping-cart"}
+              <ShoppingCart class="h-5 w-5" strokeWidth={1.6} />
             {:else if item.icon === "users"}
-              <Users class="h-5 w-5" strokeWidth={1.5} />
+              <Users class="h-5 w-5" strokeWidth={1.6} />
             {:else if item.icon === "category"}
-              <LayoutGrid class="h-5 w-5" strokeWidth={1.5} />
+              <LayoutGrid class="h-5 w-5" strokeWidth={1.6} />
             {:else if item.icon === "filter"}
-              <Filter class="h-5 w-5" strokeWidth={1.5} />
+              <Filter class="h-5 w-5" strokeWidth={1.6} />
             {:else if item.icon === "tag"}
-              <Tag class="h-5 w-5" strokeWidth={1.5} />
+              <Tag class="h-5 w-5" strokeWidth={1.6} />
             {:else if item.icon === "folder"}
-              <FolderOpen class="h-5 w-5" strokeWidth={1.5} />
+              <FolderOpen class="h-5 w-5" strokeWidth={1.6} />
             {:else if item.icon === "star"}
-              <Star class="h-5 w-5" strokeWidth={1.5} />
+              <Star class="h-5 w-5" strokeWidth={1.6} />
+            {:else if item.icon === "percent"}
+              <Percent class="h-5 w-5" strokeWidth={1.6} />
             {:else if item.icon === "file-text"}
-              <FileText class="h-5 w-5" strokeWidth={1.5} />
+              <FileText class="h-5 w-5" strokeWidth={1.6} />
             {/if}
           </span>
           {item.label}
