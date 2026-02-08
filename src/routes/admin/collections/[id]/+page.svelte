@@ -326,7 +326,7 @@
   </Badge>
 {/snippet}
 
-<svelte:head><title>Edit Collection | Admin</title></svelte:head>
+<svelte:head><title>{name || "Edit Collection"} | Admin</title></svelte:head>
 
 <div>
   <div class="mb-6">
@@ -347,7 +347,7 @@
       {/if}
     </div>
     <div class="mt-2 flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Edit Collection</h1>
+      <h1 class="text-2xl font-bold">{name || "Edit Collection"}</h1>
       <Button type="submit" form="collection-form" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Changes"}
       </Button>

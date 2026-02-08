@@ -166,6 +166,12 @@
     data.product.translations.find((t) => t.languageCode === "en") ?? data.product.translations[0]
   );
 
+  let productName = $state("");
+
+  $effect(() => {
+    productName = translation?.name ?? "";
+  });
+
   async function handleImagesSelected(
     files: {
       url: string;
@@ -206,7 +212,7 @@
   }
 </script>
 
-<svelte:head><title>Edit Product | Admin</title></svelte:head>
+<svelte:head><title>{productName || "Edit Product"} | Admin</title></svelte:head>
 
 <div>
   <div class="mb-6">
@@ -225,7 +231,7 @@
       {/if}
     </div>
     <div class="mt-2 flex items-center justify-between">
-      <h1 class="text-2xl font-bold">Edit Product</h1>
+      <h1 class="text-2xl font-bold">{productName || "Edit Product"}</h1>
       <Button type="submit" form="product-form" disabled={isSavingProduct}>
         {isSavingProduct ? "Saving..." : "Save Changes"}
       </Button>
@@ -261,7 +267,7 @@
                   type="text"
                   id="name"
                   name="name"
-                  value={translation?.name ?? ""}
+                  bind:value={productName}
                   required
                   class="w-full rounded-lg border border-input-border px-3 py-2"
                 />

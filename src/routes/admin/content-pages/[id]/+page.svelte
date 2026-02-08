@@ -41,7 +41,7 @@
   });
 </script>
 
-<svelte:head><title>Edit Content Page | Admin</title></svelte:head>
+<svelte:head><title>{title || "Edit Content Page"} | Admin</title></svelte:head>
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
@@ -50,7 +50,7 @@
     >
   </div>
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold">Edit Content Page</h1>
+    <h1 class="text-2xl font-bold">{title || "Edit Content Page"}</h1>
     <div class="flex items-center gap-3">
       {#if published && slug}
         <a
