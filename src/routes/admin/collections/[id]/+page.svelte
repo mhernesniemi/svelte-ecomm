@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
+  import { deserialize, enhance } from "$app/forms";
   import { invalidateAll } from "$app/navigation";
   import { toast } from "svelte-sonner";
   import type { ColumnDef } from "@tanstack/table-core";
@@ -10,6 +10,7 @@
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
+  import * as DropdownMenu from "$lib/components/admin/ui/dropdown-menu";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -17,10 +18,10 @@
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import Check from "@lucide/svelte/icons/check";
   import Package from "@lucide/svelte/icons/package";
+  import Plus from "@lucide/svelte/icons/plus";
 
   let { data, form } = $props();
 
-  // Show toast notifications based on form results
   $effect(() => {
     if (form?.success) toast.success(form.message || "Collection updated");
     if (form?.error) toast.error(form.error);
@@ -29,13 +30,17 @@
   let isSubmitting = $state(false);
   let showDelete = $state(false);
 
-  // Form values - reset when collection changes
+  // ── Form state (reset from server data) ──────────────────────────────
   let name = $state("");
   let slug = $state("");
   let description = $state("");
   let isPrivate = $state(false);
 
-  // Initialize/reset form values when collection data changes
+  type LocalFilter = { key: number; field: string; operator: string; value: unknown };
+  type PreviewProduct = (typeof data.preview)[0];
+  let filterKey = 0;
+  let localFilters = $state<LocalFilter[]>([]);
+
   $effect(() => {
     const trans =
       data.collection.translations.find((t) => t.languageCode === "en") ??
@@ -44,15 +49,62 @@
     slug = trans?.slug ?? "";
     description = trans?.description ?? "";
     isPrivate = data.collection.isPrivate;
+
+    localFilters = data.collection.filters.map((f) => ({
+      key: filterKey++,
+      field: f.field,
+      operator: f.operator,
+      value: structuredClone(f.value)
+    }));
   });
 
-  // Filter builder state
-  let newFilterField = $state<string>("");
-  let newFilterOperator = $state<string>("in");
-  let newFilterValue = $state<string>("");
-  let selectedFacetValues = $state<number[]>([]);
-  let selectedProducts = $state<number[]>([]);
-  let productComboboxOpen = $state(false);
+  // Serialized filters for the hidden form input
+  const filtersJson = $derived(
+    JSON.stringify(localFilters.map((f) => ({ field: f.field, operator: f.operator, value: f.value })))
+  );
+
+  // Live preview — debounce-fetch matching products when filters change
+  let previewProducts = $state<PreviewProduct[] | null>(null);
+  let previewCount = $state<number | null>(null);
+
+  $effect(() => {
+    const current = filtersJson;
+
+    const timeout = setTimeout(async () => {
+      const formData = new FormData();
+      formData.set("filters", current);
+
+      const response = await fetch("?/preview", { method: "POST", body: formData });
+      const result = deserialize(await response.text());
+
+      if (result.type === "success" && result.data) {
+        previewProducts = result.data.preview as PreviewProduct[];
+        previewCount = result.data.productCount as number;
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  });
+
+  // ── Filter helpers ───────────────────────────────────────────────────
+  let openPopover = $state<number | null>(null);
+  let addFilterOpen = $state(false);
+
+  const filterTypes = [
+    { field: "facet", operator: "in", label: "Facet Values" },
+    { field: "product", operator: "in", label: "Products" },
+    { field: "price", operator: "gte", label: "Price" },
+    { field: "stock", operator: "gt", label: "Stock" },
+    { field: "visibility", operator: "eq", label: "Visibility" }
+  ] as const;
+
+  const defaultValues: Record<string, unknown> = {
+    facet: [],
+    product: [],
+    price: 0,
+    stock: 0,
+    visibility: "public"
+  };
 
   function getFieldLabel(field: string): string {
     const labels: Record<string, string> = {
@@ -66,50 +118,44 @@
     return labels[field] ?? field;
   }
 
-  function getOperatorLabel(operator: string): string {
-    const labels: Record<string, string> = {
-      eq: "equals",
-      in: "in",
-      gte: ">=",
-      lte: "<=",
-      gt: ">"
-    };
-    return labels[operator] ?? operator;
+  function addFilter(field: string, operator: string) {
+    localFilters = [
+      ...localFilters,
+      { key: filterKey++, field, operator, value: structuredClone(defaultValues[field] ?? "") }
+    ];
   }
 
-  function formatFilterValue(field: string, value: unknown): string {
-    if (Array.isArray(value)) {
-      if (field === "facet") {
-        return value
-          .map((id) => {
-            for (const facet of data.facets) {
-              const fv = facet.values.find((v) => v.id === id);
-              if (fv) {
-                const trans = fv.translations.find((t) => t.languageCode === "en");
-                return trans?.name ?? fv.code;
-              }
-            }
-            return `ID: ${id}`;
-          })
-          .join(", ");
-      } else if (field === "product") {
-        return value
-          .map((id) => {
-            const p = data.products.find((p) => p.id === id);
-            if (p) {
-              const trans = p.translations.find((t) => t.languageCode === "en");
-              return trans?.name ?? `Product #${id}`;
-            }
-            return `ID: ${id}`;
-          })
-          .join(", ");
-      }
-      return value.join(", ");
-    }
-    if (field === "price") {
-      return `${((value as number) / 100).toFixed(2)} EUR`;
-    }
-    return String(value);
+  function removeFilter(index: number) {
+    openPopover = null;
+    localFilters = localFilters.filter((_, i) => i !== index);
+  }
+
+  function toggleArrayValue(index: number, toggleId: number) {
+    const filter = localFilters[index];
+    const arr = Array.isArray(filter.value) ? (filter.value as number[]) : [];
+    localFilters[index] = {
+      ...filter,
+      value: arr.includes(toggleId) ? arr.filter((id) => id !== toggleId) : [...arr, toggleId]
+    };
+  }
+
+  // ── Display helpers ──────────────────────────────────────────────────
+  type FlatFacetValue = { id: number; name: string; facetName: string };
+  const flatFacetValues: FlatFacetValue[] = $derived(
+    data.facets.flatMap((facet) => {
+      const facetName =
+        facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+      return facet.values.map((value) => ({
+        id: value.id,
+        name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
+        facetName
+      }));
+    })
+  );
+
+  function getFacetValueName(id: number): string {
+    const fv = flatFacetValues.find((v) => v.id === id);
+    return fv ? `${fv.facetName}: ${fv.name}` : `ID: ${id}`;
   }
 
   function getProductName(product: (typeof data.products)[0]): string {
@@ -122,15 +168,7 @@
     return product ? getProductName(product) : `Product #${id}`;
   }
 
-  function toggleProduct(id: number) {
-    if (selectedProducts.includes(id)) {
-      selectedProducts = selectedProducts.filter((p) => p !== id);
-    } else {
-      selectedProducts = [...selectedProducts, id];
-    }
-  }
-
-  type PreviewProduct = (typeof data.preview)[0];
+  // ── Preview table ────────────────────────────────────────────────────
 
   function getPreviewProductName(product: PreviewProduct): string {
     const trans = product.translations.find((t) => t.languageCode === "en");
@@ -181,11 +219,7 @@
 
 {#snippet statusCell({ visibility }: { visibility: string })}
   <Badge
-    variant={visibility === "public"
-      ? "success"
-      : visibility === "private"
-        ? "warning"
-        : "outline"}
+    variant={visibility === "public" ? "success" : visibility === "private" ? "warning" : "outline"}
   >
     {visibility === "public" ? "Public" : visibility === "private" ? "Private" : "Draft"}
   </Badge>
@@ -219,20 +253,23 @@
     </div>
   </div>
 
-  <!-- Basic Info Form -->
+  <!-- Main form (basic info + filters submitted together) -->
   <form
     id="collection-form"
     method="POST"
     action="?/update"
     use:enhance={() => {
       isSubmitting = true;
-      return async ({ update }) => {
+      return async ({ result, update }) => {
         isSubmitting = false;
         await update({ reset: false });
+        if (result.type === "success") await invalidateAll();
       };
     }}
     class="space-y-6"
   >
+    <input type="hidden" name="filters" value={filtersJson} />
+
     <div class="overflow-hidden rounded-lg bg-surface shadow">
       <div class="p-6">
         <h2 class="mb-4 text-lg font-medium text-foreground">Basic Information</h2>
@@ -305,284 +342,252 @@
     <div class="p-6">
       <h2 class="mb-4 text-lg font-medium text-foreground">Collection Filters</h2>
       <p class="mb-4 text-sm text-foreground-tertiary">
-        Products are included in this collection based on these filters. Multiple filters use AND
-        logic.
+        Products are included based on these filters (AND logic).
       </p>
 
-      <!-- Existing filters -->
-      {#if data.collection.filters.length > 0}
-        <div class="mb-6 space-y-2">
-          {#each data.collection.filters as filter}
-            <div
-              class="flex items-center justify-between rounded-lg border border-border bg-background p-3"
-            >
-              <div>
-                <span class="font-medium text-foreground">{getFieldLabel(filter.field)}</span>
-                <span class="mx-2 text-muted-foreground">{getOperatorLabel(filter.operator)}</span>
-                <span class="text-foreground-secondary"
-                  >{formatFilterValue(filter.field, filter.value)}</span
+      {#if localFilters.length > 0}
+        <div class="mb-4 space-y-3">
+          {#each localFilters as filter, index (filter.key)}
+            <div class="rounded-lg border border-border">
+              <!-- Card header -->
+              <div class="flex items-center justify-between border-b border-border px-4 py-2.5">
+                <span class="text-sm font-medium text-foreground"
+                  >{getFieldLabel(filter.field)}</span
                 >
-              </div>
-              <form
-                method="POST"
-                action="?/removeFilter"
-                use:enhance={() => {
-                  return async ({ result, update }) => {
-                    if (result.type === "success") {
-                      await invalidateAll();
-                    }
-                  };
-                }}
-              >
-                <input type="hidden" name="filterId" value={filter.id} />
                 <button
-                  type="submit"
-                  class="rounded p-1 text-red-600 hover:bg-destructive-subtle hover:text-red-800"
+                  type="button"
+                  onclick={() => removeFilter(index)}
+                  class="rounded p-1 text-muted-foreground hover:bg-destructive-subtle hover:text-red-600"
                   aria-label="Remove filter"
                 >
-                  <X class="h-5 w-5" />
+                  <X class="h-4 w-4" />
                 </button>
-              </form>
+              </div>
+
+              <!-- Card body -->
+              <div class="p-4">
+                {#if filter.field === "facet"}
+                  {@const selected = Array.isArray(filter.value) ? (filter.value as number[]) : []}
+                  <Popover.Root
+                    open={openPopover === filter.key}
+                    onOpenChange={(open) => (openPopover = open ? filter.key : null)}
+                  >
+                    <Popover.Trigger
+                      class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                      aria-expanded={openPopover === filter.key}
+                      aria-haspopup="listbox"
+                    >
+                      <span class="text-muted-foreground">Search facet values...</span>
+                      <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Popover.Trigger>
+                    <Popover.Content class="w-72 p-0" align="start">
+                      <Command.Root>
+                        <Command.Input placeholder="Search facet values..." />
+                        <Command.List class="max-h-64">
+                          <Command.Empty>No facet values found.</Command.Empty>
+                          {#each data.facets as facet}
+                            {@const facetName =
+                              facet.translations.find((t) => t.languageCode === "en")?.name ??
+                              facet.code}
+                            <Command.Group heading={facetName}>
+                              {#each facet.values as value}
+                                {@const valueName =
+                                  value.translations.find((t) => t.languageCode === "en")?.name ??
+                                  value.code}
+                                <Command.Item
+                                  value="{facetName} {valueName}"
+                                  onSelect={() => toggleArrayValue(index, value.id)}
+                                  class="cursor-pointer"
+                                >
+                                  <div class="flex w-full items-center gap-2">
+                                    <div class="flex h-4 w-4 items-center justify-center">
+                                      {#if selected.includes(value.id)}
+                                        <Check class="h-4 w-4" />
+                                      {/if}
+                                    </div>
+                                    <span>{valueName}</span>
+                                  </div>
+                                </Command.Item>
+                              {/each}
+                            </Command.Group>
+                          {/each}
+                        </Command.List>
+                      </Command.Root>
+                    </Popover.Content>
+                  </Popover.Root>
+                  {#if selected.length > 0}
+                    <div class="mt-3 flex flex-wrap gap-1.5">
+                      {#each selected as id}
+                        <Badge class="gap-1">
+                          {getFacetValueName(id)}
+                          <button
+                            type="button"
+                            onclick={() => toggleArrayValue(index, id)}
+                            class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-500/20"
+                            aria-label="Remove {getFacetValueName(id)}"
+                          >
+                            <X class="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      {/each}
+                    </div>
+                  {/if}
+
+                {:else if filter.field === "product"}
+                  {@const selected = Array.isArray(filter.value) ? (filter.value as number[]) : []}
+                  <Popover.Root
+                    open={openPopover === filter.key}
+                    onOpenChange={(open) => (openPopover = open ? filter.key : null)}
+                  >
+                    <Popover.Trigger
+                      class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                      aria-expanded={openPopover === filter.key}
+                      aria-haspopup="listbox"
+                    >
+                      <span class="text-muted-foreground">Search products...</span>
+                      <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Popover.Trigger>
+                    <Popover.Content
+                      class="w-[var(--bits-popover-trigger-width)] p-0"
+                      align="start"
+                    >
+                      <Command.Root>
+                        <Command.Input placeholder="Search products..." />
+                        <Command.List class="max-h-60">
+                          <Command.Empty>No products found.</Command.Empty>
+                          {#each data.products as product}
+                            <Command.Item
+                              value={getProductName(product)}
+                              onSelect={() => toggleArrayValue(index, product.id)}
+                              class="cursor-pointer"
+                            >
+                              <div class="flex w-full items-center gap-2">
+                                <div class="flex h-4 w-4 items-center justify-center">
+                                  {#if selected.includes(product.id)}
+                                    <Check class="h-4 w-4" />
+                                  {/if}
+                                </div>
+                                <span>{getProductName(product)}</span>
+                              </div>
+                            </Command.Item>
+                          {/each}
+                        </Command.List>
+                      </Command.Root>
+                    </Popover.Content>
+                  </Popover.Root>
+                  {#if selected.length > 0}
+                    <div class="mt-3 flex flex-wrap gap-1.5">
+                      {#each selected as id}
+                        <Badge variant="secondary" class="gap-1">
+                          {getProductNameById(id)}
+                          <button
+                            type="button"
+                            onclick={() => toggleArrayValue(index, id)}
+                            class="ml-0.5 rounded-full p-0.5 hover:bg-muted-strong"
+                            aria-label="Remove {getProductNameById(id)}"
+                          >
+                            <X class="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      {/each}
+                    </div>
+                  {/if}
+
+                {:else if filter.field === "price"}
+                  <div class="flex items-center gap-3">
+                    <select
+                      class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                      value={filter.operator}
+                      onchange={(e) => {
+                        localFilters[index] = { ...filter, operator: (e.target as HTMLSelectElement).value };
+                      }}
+                    >
+                      <option value="gte">{"≥"}</option>
+                      <option value="lte">{"≤"}</option>
+                    </select>
+                    <input
+                      type="number"
+                      class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                      value={filter.value}
+                      placeholder="Price in cents"
+                      onchange={(e) => {
+                        localFilters[index] = { ...filter, value: Number((e.target as HTMLInputElement).value) };
+                      }}
+                    />
+                    <span class="text-sm text-muted-foreground">cents</span>
+                  </div>
+
+                {:else if filter.field === "stock"}
+                  <div class="flex items-center gap-3">
+                    <select
+                      class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                      value={filter.operator}
+                      onchange={(e) => {
+                        localFilters[index] = { ...filter, operator: (e.target as HTMLSelectElement).value };
+                      }}
+                    >
+                      <option value="gt">{">"}</option>
+                      <option value="gte">{"≥"}</option>
+                    </select>
+                    <input
+                      type="number"
+                      class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                      value={filter.value}
+                      placeholder="Stock level"
+                      onchange={(e) => {
+                        localFilters[index] = { ...filter, value: Number((e.target as HTMLInputElement).value) };
+                      }}
+                    />
+                  </div>
+
+                {:else if filter.field === "visibility"}
+                  <select
+                    class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                    value={filter.value}
+                    onchange={(e) => {
+                      localFilters[index] = { ...filter, value: (e.target as HTMLSelectElement).value };
+                    }}
+                  >
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                    <option value="draft">Draft</option>
+                  </select>
+                {/if}
+              </div>
             </div>
           {/each}
         </div>
       {:else}
-        <div class="mb-6 rounded-lg border border-dashed border-input-border p-6 text-center">
+        <div class="mb-4 rounded-lg border border-dashed border-input-border p-6 text-center">
           <p class="text-sm text-muted-foreground">
-            No filters defined. Add filters below to populate this collection.
+            No filters defined. Add a filter to populate this collection.
           </p>
         </div>
       {/if}
 
-      <!-- Add new filter -->
-      <form
-        method="POST"
-        action="?/addFilter"
-        use:enhance={() => {
-          return async ({ result, update }) => {
-            if (result.type === "success") {
-              newFilterField = "";
-              newFilterOperator = "in";
-              newFilterValue = "";
-              selectedFacetValues = [];
-              selectedProducts = [];
-              await invalidateAll();
-            }
-          };
-        }}
-        class="rounded-lg border border-border bg-background p-4"
-      >
-        <h3 class="mb-3 text-sm font-medium text-foreground">Add Filter</h3>
-
-        <div class="mb-4 grid grid-cols-3 gap-4">
-          <div>
-            <label for="field" class="mb-1 block text-sm font-medium text-foreground-secondary">
-              Filter Type
-            </label>
-            <select
-              id="field"
-              name="field"
-              bind:value={newFilterField}
-              class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+      <!-- Add filter dropdown -->
+      <DropdownMenu.Root bind:open={addFilterOpen}>
+        <DropdownMenu.Trigger>
+          {#snippet child({ props })}
+            <Button variant="outline" size="sm" {...props}>
+              <Plus class="mr-2 h-4 w-4" />
+              Add filter
+            </Button>
+          {/snippet}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content align="start">
+          {#each filterTypes as ft}
+            <DropdownMenu.Item
+              onclick={() => {
+                addFilterOpen = false;
+                addFilter(ft.field, ft.operator);
+              }}
             >
-              <option value="">Select type...</option>
-              <option value="facet">Facet Values</option>
-              <option value="price">Price Range</option>
-              <option value="stock">Stock Level</option>
-              <option value="product">Select Products</option>
-              <option value="visibility">Visibility</option>
-            </select>
-          </div>
-
-          <div>
-            <label for="operator" class="mb-1 block text-sm font-medium text-foreground-secondary">
-              Operator
-            </label>
-            <select
-              id="operator"
-              name="operator"
-              bind:value={newFilterOperator}
-              class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-            >
-              {#if newFilterField === "facet" || newFilterField === "product" || newFilterField === "variant"}
-                <option value="in">in (matches any)</option>
-              {:else if newFilterField === "price"}
-                <option value="gte">greater than or equal</option>
-                <option value="lte">less than or equal</option>
-              {:else if newFilterField === "stock"}
-                <option value="gt">greater than</option>
-              {:else if newFilterField === "visibility"}
-                <option value="eq">equals</option>
-              {:else}
-                <option value="in">in</option>
-                <option value="eq">equals</option>
-                <option value="gte">greater than or equal</option>
-                <option value="lte">less than or equal</option>
-                <option value="gt">greater than</option>
-              {/if}
-            </select>
-          </div>
-
-          <div>
-            <label for="value" class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >Value</label
-            >
-            {#if newFilterField === "facet"}
-              <input type="hidden" name="value" value={selectedFacetValues.join(",")} />
-              <div class="text-sm text-muted-foreground">Select facet values below</div>
-            {:else if newFilterField === "product"}
-              <input type="hidden" name="value" value={selectedProducts.join(",")} />
-              <div class="text-sm text-muted-foreground">Select products below</div>
-            {:else if newFilterField === "visibility"}
-              <select
-                id="value"
-                name="value"
-                bind:value={newFilterValue}
-                class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-              >
-                <option value="public">Public</option>
-                <option value="private">Private (B2B only)</option>
-                <option value="hidden">Hidden</option>
-              </select>
-            {:else if newFilterField === "price"}
-              <input
-                type="number"
-                id="value"
-                name="value"
-                bind:value={newFilterValue}
-                placeholder="Price in cents (e.g., 1000 for 10.00)"
-                class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-              />
-            {:else if newFilterField === "stock"}
-              <input
-                type="number"
-                id="value"
-                name="value"
-                bind:value={newFilterValue}
-                placeholder="Minimum stock (e.g., 0 for in stock)"
-                class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-              />
-            {:else}
-              <input
-                type="text"
-                id="value"
-                name="value"
-                bind:value={newFilterValue}
-                class="block w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-              />
-            {/if}
-          </div>
-        </div>
-
-        <!-- Facet value selector -->
-        {#if newFilterField === "facet"}
-          <div class="mb-4 max-h-48 overflow-y-auto rounded-lg border border-border bg-surface p-3">
-            {#each data.facets as facet}
-              {@const facetTrans = facet.translations.find((t) => t.languageCode === "en")}
-              <div class="mb-3">
-                <div class="mb-1 text-sm font-medium text-foreground-secondary">
-                  {facetTrans?.name ?? facet.code}
-                </div>
-                <div class="flex flex-wrap gap-2">
-                  {#each facet.values as value}
-                    {@const valueTrans = value.translations.find((t) => t.languageCode === "en")}
-                    <label
-                      class="inline-flex cursor-pointer items-center rounded-full border px-3 py-1 text-sm {selectedFacetValues.includes(
-                        value.id
-                      )
-                        ? 'border-blue-500 bg-accent-subtle text-blue-700'
-                        : 'border-border bg-surface text-foreground-secondary hover:border-input-border'}"
-                    >
-                      <input
-                        type="checkbox"
-                        class="sr-only"
-                        checked={selectedFacetValues.includes(value.id)}
-                        onchange={() => {
-                          if (selectedFacetValues.includes(value.id)) {
-                            selectedFacetValues = selectedFacetValues.filter(
-                              (id) => id !== value.id
-                            );
-                          } else {
-                            selectedFacetValues = [...selectedFacetValues, value.id];
-                          }
-                        }}
-                      />
-                      {valueTrans?.name ?? value.code}
-                    </label>
-                  {/each}
-                </div>
-              </div>
-            {/each}
-          </div>
-        {/if}
-
-        <!-- Product selector -->
-        {#if newFilterField === "product"}
-          <div class="mb-4">
-            <Popover.Root bind:open={productComboboxOpen}>
-              <Popover.Trigger
-                class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-              >
-                <span class="text-muted-foreground">
-                  {selectedProducts.length > 0
-                    ? `${selectedProducts.length} product(s) selected`
-                    : "Search products..."}
-                </span>
-                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
-              </Popover.Trigger>
-              <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
-                <Command.Root>
-                  <Command.Input placeholder="Search products..." />
-                  <Command.List class="max-h-60">
-                    <Command.Empty>No products found.</Command.Empty>
-                    {#each data.products as product}
-                      <Command.Item
-                        value={getProductName(product)}
-                        onSelect={() => toggleProduct(product.id)}
-                      >
-                        <Check
-                          class="mr-2 h-4 w-4 {selectedProducts.includes(product.id)
-                            ? 'opacity-100'
-                            : 'opacity-0'}"
-                        />
-                        {getProductName(product)}
-                      </Command.Item>
-                    {/each}
-                  </Command.List>
-                </Command.Root>
-              </Popover.Content>
-            </Popover.Root>
-            {#if selectedProducts.length > 0}
-              <div class="mt-2 flex flex-wrap gap-1">
-                {#each selectedProducts as id}
-                  <Badge variant="secondary" class="gap-1">
-                    {getProductNameById(id)}
-                    <button
-                      type="button"
-                      onclick={() => toggleProduct(id)}
-                      class="ml-0.5 rounded-full hover:bg-muted-strong"
-                    >
-                      <X class="h-3 w-3" />
-                    </button>
-                  </Badge>
-                {/each}
-              </div>
-            {/if}
-          </div>
-        {/if}
-
-        <div class="flex justify-end">
-          <Button
-            type="submit"
-            disabled={!newFilterField ||
-              (newFilterField === "facet" && selectedFacetValues.length === 0) ||
-              (newFilterField === "product" && selectedProducts.length === 0) ||
-              (newFilterField !== "facet" && newFilterField !== "product" && !newFilterValue)}
-          >
-            Add Filter
-          </Button>
-        </div>
-      </form>
+              {ft.label}
+            </DropdownMenu.Item>
+          {/each}
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
     </div>
   </div>
 
@@ -590,10 +595,10 @@
   <div class="overflow-hidden rounded-lg bg-surface shadow">
     <div class="p-6">
       <h2 class="mb-4 text-lg font-medium text-foreground">
-        Products ({data.productCount})
+        Products ({previewCount ?? data.productCount})
       </h2>
       <DataTable
-        data={data.preview}
+        data={previewProducts ?? data.preview}
         columns={previewColumns}
         searchPlaceholder="Filter products..."
         emptyIcon={Package}

@@ -3,7 +3,6 @@ import { collectionService } from "$lib/server/services/collections.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
-import type { CollectionFilterField, CollectionFilterOperator } from "$lib/types.js";
 import { slugify } from "$lib/utils.js";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -48,6 +47,7 @@ export const actions: Actions = {
 		const slug = data.get("slug") as string;
 		const description = data.get("description") as string;
 		const isPrivate = data.get("is_private") === "on";
+		const filtersJson = data.get("filters") as string | null;
 
 		if (!name || !slug) {
 			return fail(400, { error: "Name and slug are required" });
@@ -66,65 +66,31 @@ export const actions: Actions = {
 				]
 			});
 
+			// Replace filters if provided
+			if (filtersJson) {
+				const filters = JSON.parse(filtersJson);
+				await collectionService.replaceFilters(id, filters);
+			}
+
 			return { success: true, message: "Collection updated successfully" };
 		} catch (err) {
 			return fail(500, { error: "Failed to update collection" });
 		}
 	},
 
-	addFilter: async ({ params, request }) => {
-		const id = Number(params.id);
+	preview: async ({ request }) => {
 		const data = await request.formData();
+		const filtersJson = data.get("filters") as string;
 
-		const field = data.get("field") as CollectionFilterField;
-		const operator = data.get("operator") as CollectionFilterOperator;
-		const valueStr = data.get("value") as string;
-
-		if (!field || !operator || !valueStr) {
-			return fail(400, { error: "Field, operator, and value are required" });
-		}
-
-		// Parse value based on field type
-		let value: unknown;
 		try {
-			if (field === "facet" || field === "product" || field === "variant") {
-				// Array of IDs
-				value = valueStr
-					.split(",")
-					.map((v) => Number(v.trim()))
-					.filter((v) => !isNaN(v));
-			} else if (field === "visibility") {
-				value = valueStr; // "public", "private", or "draft"
-			} else if (field === "price" || field === "stock") {
-				value = Number(valueStr);
-			} else {
-				value = valueStr;
-			}
+			const filters = JSON.parse(filtersJson);
+			const result = await collectionService.previewFilters(filters, {
+				language: "en",
+				limit: 100
+			});
+			return { preview: result.products, productCount: result.total };
 		} catch {
-			return fail(400, { error: "Invalid value format" });
-		}
-
-		try {
-			await collectionService.addFilter(id, { field, operator, value });
-			return { success: true, message: "Filter added" };
-		} catch (err) {
-			return fail(500, { error: "Failed to add filter" });
-		}
-	},
-
-	removeFilter: async ({ request }) => {
-		const data = await request.formData();
-		const filterId = Number(data.get("filterId"));
-
-		if (!filterId) {
-			return fail(400, { error: "Filter ID is required" });
-		}
-
-		try {
-			await collectionService.removeFilter(filterId);
-			return { success: true, message: "Filter removed" };
-		} catch (err) {
-			return fail(500, { error: "Failed to remove filter" });
+			return fail(400, { error: "Invalid filters" });
 		}
 	},
 

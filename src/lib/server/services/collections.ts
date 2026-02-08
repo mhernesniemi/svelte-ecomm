@@ -431,6 +431,27 @@ export class CollectionService {
 		return updated ?? null;
 	}
 
+	/**
+	 * Replace all filters for a collection (bulk delete + insert)
+	 */
+	async replaceFilters(
+		collectionId: number,
+		filters: { field: CollectionFilterField; operator: CollectionFilterOperator; value: unknown }[]
+	): Promise<void> {
+		await db.delete(collectionFilters).where(eq(collectionFilters.collectionId, collectionId));
+
+		if (filters.length > 0) {
+			await db.insert(collectionFilters).values(
+				filters.map((f) => ({
+					collectionId,
+					field: f.field,
+					operator: f.operator,
+					value: f.value
+				}))
+			);
+		}
+	}
+
 	// =========================================================================
 	// DYNAMIC PRODUCT RESOLUTION (THE KEY METHOD)
 	// =========================================================================
