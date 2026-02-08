@@ -78,8 +78,8 @@
   <!-- Sidebar -->
   <aside class="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white">
     <div class="p-6">
-      <h1 class="text-xl font-bold">Hoikka</h1>
-      <p class="text-sm text-gray-400">Admin Dashboard</p>
+      <h1 class="font-italic font-mono text-xl font-bold text-blue-300">Hoikka</h1>
+      <p class="text-sm text-gray-400">Store Dashboard</p>
     </div>
 
     <nav class="mt-6">

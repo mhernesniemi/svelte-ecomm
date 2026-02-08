@@ -9,6 +9,8 @@
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import { Badge } from "$lib/components/admin/ui/badge";
   import X from "@lucide/svelte/icons/x";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -78,9 +80,9 @@
     <div class="mb-4">
       <a
         href="/admin/products/{data.product.id}"
-        class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+        class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       >
-        &larr; Back to {data.product.name}
+        <ChevronLeft class="h-4 w-4" /> Back to {data.product.name}
       </a>
     </div>
     <div class="mt-2 flex items-center justify-between">
@@ -278,9 +280,9 @@
         <div class="p-4">
           <a
             href="/admin/products/{data.product.id}"
-            class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+            class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
           >
-            {data.product.name} &rarr;
+            {data.product.name} <ChevronRight class="h-4 w-4" />
           </a>
         </div>
       </div>

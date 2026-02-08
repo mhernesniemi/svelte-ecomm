@@ -3,6 +3,7 @@
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { slugify } from "$lib/utils";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
 
   let { form } = $props();
 
@@ -30,8 +31,8 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/collections" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Collections</a
+    <a href="/admin/collections" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Collections</a
     >
   </div>
   <div class="flex items-center justify-between">

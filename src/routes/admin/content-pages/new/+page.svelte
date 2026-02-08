@@ -3,6 +3,7 @@
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
 
   let { form } = $props();
 
@@ -36,8 +37,8 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/content-pages" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Pages</a
+    <a href="/admin/content-pages" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Pages</a
     >
   </div>
   <div class="flex items-center justify-between">

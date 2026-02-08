@@ -6,6 +6,8 @@
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { onMount } from "svelte";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import ExternalLink from "@lucide/svelte/icons/external-link";
 
   let { data, form } = $props();
 
@@ -43,8 +45,8 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/content-pages" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Pages</a
+    <a href="/admin/content-pages" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Pages</a
     >
   </div>
   <div class="flex items-center justify-between">
@@ -54,9 +56,9 @@
         <a
           href="/pages/{data.page.id}/{slug}"
           target="_blank"
-          class="text-sm text-muted-foreground hover:text-foreground-secondary"
+          class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground-secondary"
         >
-          View on storefront &rarr;
+          View on storefront <ExternalLink class="h-3.5 w-3.5" />
         </a>
       {/if}
       <Button type="submit" form="content-page-form" disabled={isSubmitting}>

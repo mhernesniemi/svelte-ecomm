@@ -4,6 +4,7 @@
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -41,8 +42,8 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/reviews" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Reviews</a
+    <a href="/admin/reviews" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Reviews</a
     >
   </div>
   <div class="flex items-center justify-between">

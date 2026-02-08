@@ -2,6 +2,7 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -28,8 +29,8 @@
 
 <div>
   <div class="mb-8">
-    <a href="/admin/orders" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Orders</a
+    <a href="/admin/orders" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Orders</a
     >
     <h1 class="mt-2 text-2xl font-bold">Order {data.order.code}</h1>
   </div>

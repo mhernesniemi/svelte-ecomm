@@ -8,6 +8,7 @@
     TableCell
   } from "$lib/components/admin/ui/table";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -43,8 +44,8 @@
 
 <div>
   <div class="mb-8">
-    <a href="/admin/customers" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Customers</a
+    <a href="/admin/customers" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Customers</a
     >
     <h1 class="mt-2 text-2xl font-bold">
       {data.customer.firstName}

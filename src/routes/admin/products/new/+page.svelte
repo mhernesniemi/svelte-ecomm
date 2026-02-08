@@ -5,6 +5,7 @@
   import type { ActionData } from "./$types";
 
   import { slugify } from "$lib/utils";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
 
   let { form }: { form: ActionData } = $props();
 
@@ -34,8 +35,8 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/products" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Products</a
+    <a href="/admin/products" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Products</a
     >
   </div>
   <div class="flex items-center justify-between">

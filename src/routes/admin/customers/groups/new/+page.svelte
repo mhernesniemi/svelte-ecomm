@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { ActionData } from "./$types";
 
   let { form }: { form: ActionData } = $props();
@@ -21,8 +22,8 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/customers?tab=groups" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Customer Groups</a
+    <a href="/admin/customers?tab=groups" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Customer Groups</a
     >
   </div>
   <div class="flex items-center justify-between">

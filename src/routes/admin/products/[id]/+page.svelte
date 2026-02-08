@@ -26,6 +26,8 @@
   import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash2 from "@lucide/svelte/icons/trash-2";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import ExternalLink from "@lucide/svelte/icons/external-link";
   import { cn } from "$lib/utils";
   import type { ActionData, PageData } from "./$types";
 
@@ -209,16 +211,16 @@
 <div>
   <div class="mb-6">
     <div class="mb-6 flex items-center justify-between">
-      <a href="/admin/products" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-        >&larr; Back to Products</a
+      <a href="/admin/products" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+        ><ChevronLeft class="h-4 w-4" /> Back to Products</a
       >
       {#if translation?.slug}
         <a
           href="/products/{data.product.id}/{translation.slug}"
           target="_blank"
-          class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+          class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         >
-          View in store &rarr;
+          View in store <ExternalLink class="h-3.5 w-3.5" />
         </a>
       {/if}
     </div>

@@ -8,6 +8,8 @@
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import X from "@lucide/svelte/icons/x";
   import ImageIcon from "@lucide/svelte/icons/image";
+  import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import ExternalLink from "@lucide/svelte/icons/external-link";
 
   let { data, form } = $props();
 
@@ -112,16 +114,16 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/collections" class="text-sm text-blue-600 hover:underline dark:text-blue-400"
-      >&larr; Back to Collections</a
+    <a href="/admin/collections" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      ><ChevronLeft class="h-4 w-4" /> Back to Collections</a
     >
     {#if slug}
       <a
         href="/collections/{data.collection.id}/{slug}"
         target="_blank"
-        class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+        class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       >
-        View in store &rarr;
+        View in store <ExternalLink class="h-3.5 w-3.5" />
       </a>
     {/if}
   </div>
