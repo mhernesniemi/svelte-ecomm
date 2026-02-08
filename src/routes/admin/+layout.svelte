@@ -122,6 +122,6 @@
   <main class="ml-64 p-8">
     {@render children()}
   </main>
-</div>
 
-<Toaster />
+  <Toaster />
+</div>
