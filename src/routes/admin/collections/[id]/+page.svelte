@@ -165,10 +165,17 @@
   }
 
   function addFilter(field: string, operator: string) {
+    const key = filterKey++;
     localFilters = [
       ...localFilters,
-      { key: filterKey++, field, operator, value: structuredClone(defaultValues[field] ?? "") }
+      { key, field, operator, value: structuredClone(defaultValues[field] ?? "") }
     ];
+    if (field === "facet" || field === "product") {
+      // Wait a tick for the DOM to render, then open the popover
+      requestAnimationFrame(() => {
+        openPopover = key;
+      });
+    }
   }
 
   function removeFilter(index: number) {
@@ -463,7 +470,7 @@
                   {#if selected.length > 0}
                     <div class="mt-3 flex flex-wrap gap-1.5">
                       {#each selected as id}
-                        <Badge class="gap-1">
+                        <Badge class="gap-1 text-sm">
                           {getFacetValueName(id)}
                           <button
                             type="button"

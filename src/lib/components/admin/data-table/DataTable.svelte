@@ -114,7 +114,7 @@
 
 <!-- Table or empty state -->
 {#if data.length === 0 && emptyIcon}
-  <div class="rounded-lg border border-dashed border-input-border p-12 text-center">
+  <div class="mt-6 rounded-lg border border-dashed border-input-border p-12 text-center">
     {#if emptyIcon}
       {@const Icon = emptyIcon}
       <Icon class="mx-auto h-12 w-12 text-placeholder" />
