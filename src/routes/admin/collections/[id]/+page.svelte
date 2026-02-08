@@ -429,7 +429,7 @@
                       aria-expanded={openPopover === filter.key}
                       aria-haspopup="listbox"
                     >
-                      <span class="text-muted-foreground">Search facet values...</span>
+                      <span class="text-muted-foreground">Select facet values</span>
                       <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Popover.Trigger>
                     <Popover.Content class="w-72 p-0" align="start">
@@ -495,7 +495,7 @@
                       aria-expanded={openPopover === filter.key}
                       aria-haspopup="listbox"
                     >
-                      <span class="text-muted-foreground">Search products...</span>
+                      <span class="text-muted-foreground">Select products</span>
                       <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Popover.Trigger>
                     <Popover.Content
@@ -633,7 +633,7 @@
         <DropdownMenu.Trigger>
           {#snippet child({ props })}
             <Button variant="outline" size="sm" {...props}>
-              <Plus class="mr-2 h-4 w-4" />
+              <Plus class="h-4 w-4" />
               Add filter
             </Button>
           {/snippet}
