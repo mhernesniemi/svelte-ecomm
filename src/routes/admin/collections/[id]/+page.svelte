@@ -364,10 +364,9 @@
         action="?/update"
         use:enhance={() => {
           isSubmitting = true;
-          return async ({ result, update }) => {
-            isSubmitting = false;
+          return async ({ update }) => {
             await update({ reset: false });
-            if (result.type === "success") await invalidateAll();
+            isSubmitting = false;
           };
         }}
         class="space-y-6"
@@ -438,7 +437,7 @@
         <div class="p-6">
           <h2 class="mb-4 text-lg font-medium text-foreground">Collection Filters</h2>
           <p class="mb-4 text-sm text-foreground-tertiary">
-            Products are included based on these filters (AND logic).
+            Products are included based on these filters (AND logic)
           </p>
 
           {#if localFilters.length > 0}
