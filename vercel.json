@@ -2,7 +2,7 @@
 	"rewrites": [
 		{
 			"source": "/docs/:path*",
-			"destination": "https://hoikka-docs.vercel.app/docs/:path*"
+			"destination": "https://hoikka-docs.vercel.app/:path*"
 		}
 	],
 	"crons": [
