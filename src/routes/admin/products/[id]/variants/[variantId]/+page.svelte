@@ -7,6 +7,7 @@
   import * as Command from "$lib/components/admin/ui/command";
   import Check from "@lucide/svelte/icons/check";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Badge } from "$lib/components/admin/ui/badge";
   import X from "@lucide/svelte/icons/x";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -21,6 +22,7 @@
   });
 
   let isSubmitting = $state(false);
+  let trackInventory = $state(data.variant.trackInventory);
   let showDelete = $state(false);
   let facetComboboxOpen = $state(false);
 
@@ -94,7 +96,7 @@
   </div>
 
   <!-- Two Column Layout -->
-  <div class="flex flex-col lg:flex-row gap-6">
+  <div class="flex flex-col gap-6 lg:flex-row">
     <!-- Main Content (Left) -->
     <div class="flex-1 space-y-6">
       <!-- Variant Details -->
@@ -148,8 +150,32 @@
       <!-- Price and Stock -->
       <div class="rounded-lg bg-surface shadow">
         <div class="space-y-4 p-6">
-          <h2 class="text-lg font-semibold">Price and stock</h2>
+          <h2 class="text-lg font-semibold">Stock and price</h2>
           <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="stock" class="mb-1 block text-sm font-medium text-foreground-secondary">
+                Stock
+              </label>
+              {#if trackInventory}
+                <input
+                  type="number"
+                  id="stock"
+                  name="stock"
+                  form="variant-form"
+                  min="0"
+                  value={data.variant.stock}
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
+                />
+              {:else}
+                <input
+                  type="text"
+                  id="stock"
+                  disabled
+                  placeholder="Unlimited"
+                  class="w-full rounded-lg border border-input-border bg-muted px-3 py-2 text-muted-foreground placeholder:text-muted-foreground"
+                />
+              {/if}
+            </div>
             <div>
               <label for="price" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Price (EUR) <span class="text-red-500">*</span>
@@ -166,27 +192,22 @@
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
-            <div>
-              <label for="stock" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                Stock
-              </label>
-              <input
-                type="number"
-                id="stock"
-                name="stock"
-                form="variant-form"
-                min="0"
-                value={data.variant.stock}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
-            </div>
           </div>
+          <div class="flex items-center gap-2">
+            <Checkbox id="trackInventory" bind:checked={trackInventory} />
+            <label for="trackInventory" class="text-sm text-foreground-secondary">
+              Track inventory
+            </label>
+          </div>
+          {#if trackInventory}
+            <input type="hidden" name="trackInventory" value="on" form="variant-form" />
+          {/if}
         </div>
       </div>
     </div>
 
     <!-- Sidebar (Right) -->
-    <div class="w-full lg:w-80 lg:shrink-0 space-y-6">
+    <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
       <!-- Facet Values Section -->
       <div class="rounded-lg bg-surface shadow">
         <div class="border-b border-border px-4 py-3">
@@ -282,7 +303,8 @@
             href="/admin/products/{data.product.id}"
             class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
           >
-            {data.product.name} <ChevronRight class="h-4 w-4" />
+            {data.product.name}
+            <ChevronRight class="h-4 w-4" />
           </a>
         </div>
       </div>

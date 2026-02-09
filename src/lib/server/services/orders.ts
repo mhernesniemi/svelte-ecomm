@@ -277,19 +277,21 @@ export class OrderService {
 
 		if (!variant) throw new Error("Variant not found");
 
-		// Check stock availability using reservations (excludes this order's existing reservations)
-		const availableStock = await reservationService.getAvailableStockExcludingOrder(
-			input.variantId,
-			orderId
-		);
-		const existingLine = order.lines.find((l) => l.variantId === input.variantId);
-		const existingQuantity = existingLine?.quantity ?? 0;
-		const totalQuantity = existingQuantity + input.quantity;
-
-		if (totalQuantity > availableStock) {
-			throw new Error(
-				`Only ${availableStock} items available${existingQuantity > 0 ? ` (${existingQuantity} already in cart)` : ""}`
+		// Check stock availability using reservations (only for tracked variants)
+		if (variant.trackInventory) {
+			const availableStock = await reservationService.getAvailableStockExcludingOrder(
+				input.variantId,
+				orderId
 			);
+			const existingLine = order.lines.find((l) => l.variantId === input.variantId);
+			const existingQuantity = existingLine?.quantity ?? 0;
+			const totalQuantity = existingQuantity + input.quantity;
+
+			if (totalQuantity > availableStock) {
+				throw new Error(
+					`Only ${availableStock} items available${existingQuantity > 0 ? ` (${existingQuantity} already in cart)` : ""}`
+				);
+			}
 		}
 
 		// Get product with taxCode
@@ -403,14 +405,21 @@ export class OrderService {
 
 		if (!line) throw new Error("Line not found");
 
-		// Check stock availability using reservations (excludes this order's existing reservations)
-		const availableStock = await reservationService.getAvailableStockExcludingOrder(
-			line.variantId,
-			orderId
-		);
+		// Check stock availability using reservations (only for tracked variants)
+		const [lineVariant] = await db
+			.select({ trackInventory: productVariants.trackInventory })
+			.from(productVariants)
+			.where(eq(productVariants.id, line.variantId));
 
-		if (quantity > availableStock) {
-			throw new Error(`Only ${availableStock} items available`);
+		if (lineVariant?.trackInventory) {
+			const availableStock = await reservationService.getAvailableStockExcludingOrder(
+				line.variantId,
+				orderId
+			);
+
+			if (quantity > availableStock) {
+				throw new Error(`Only ${availableStock} items available`);
+			}
 		}
 
 		// Recalculate tax for new quantity
@@ -668,12 +677,18 @@ export class OrderService {
 					.where(eq(promotions.id, op.promotionId));
 			}
 
-			// Decrease stock for variants
+			// Decrease stock for tracked variants
 			for (const line of order.lines) {
-				await db
-					.update(productVariants)
-					.set({ stock: sql`${productVariants.stock} - ${line.quantity}` })
+				const [v] = await db
+					.select({ trackInventory: productVariants.trackInventory })
+					.from(productVariants)
 					.where(eq(productVariants.id, line.variantId));
+				if (v?.trackInventory) {
+					await db
+						.update(productVariants)
+						.set({ stock: sql`${productVariants.stock} - ${line.quantity}` })
+						.where(eq(productVariants.id, line.variantId));
+				}
 			}
 
 			console.log("[inventory] stock_deducted", { orderId, lineCount: order.lines.length });
@@ -684,13 +699,19 @@ export class OrderService {
 
 		// Handle cancellation
 		if (newState === "cancelled") {
-			// If order was paid, restore stock
+			// If order was paid, restore stock for tracked variants
 			if (currentState === "paid" || currentState === "shipped") {
 				for (const line of order.lines) {
-					await db
-						.update(productVariants)
-						.set({ stock: sql`${productVariants.stock} + ${line.quantity}` })
+					const [v] = await db
+						.select({ trackInventory: productVariants.trackInventory })
+						.from(productVariants)
 						.where(eq(productVariants.id, line.variantId));
+					if (v?.trackInventory) {
+						await db
+							.update(productVariants)
+							.set({ stock: sql`${productVariants.stock} + ${line.quantity}` })
+							.where(eq(productVariants.id, line.variantId));
+					}
 				}
 				console.log("[inventory] stock_restored", {
 					orderId,
@@ -771,8 +792,8 @@ export class OrderService {
 
 			if (!variant) {
 				errors.push(`${line.productName} is no longer available`);
-			} else {
-				// Check available stock excluding this order's reservations
+			} else if (variant.trackInventory) {
+				// Check available stock excluding this order's reservations (only for tracked variants)
 				const availableStock = await reservationService.getAvailableStockExcludingOrder(
 					line.variantId,
 					orderId

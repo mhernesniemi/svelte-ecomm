@@ -39,7 +39,8 @@ export const actions: Actions = {
 
 		const sku = formData.get("sku") as string;
 		const price = Number(formData.get("price")) * 100; // Convert to cents
-		const stock = Number(formData.get("stock")) || 0;
+		const trackInventory = formData.get("trackInventory") === "on";
+		const stock = trackInventory ? Number(formData.get("stock")) || 0 : 0;
 		const name = formData.get("variant_name") as string;
 		const facetValueIds = formData
 			.getAll("facetValueIds")
@@ -55,6 +56,7 @@ export const actions: Actions = {
 				sku,
 				price,
 				stock,
+				trackInventory,
 				translations: [{ languageCode: "en", name: name || undefined }]
 			});
 
@@ -76,6 +78,7 @@ export const actions: Actions = {
 
 			return { success: true };
 		} catch (e) {
+			console.error("Failed to update variant:", e);
 			return fail(500, { error: "Failed to update variant" });
 		}
 	},

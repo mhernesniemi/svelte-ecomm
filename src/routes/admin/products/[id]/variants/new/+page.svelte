@@ -6,6 +6,7 @@
   import * as Command from "$lib/components/admin/ui/command";
   import Check from "@lucide/svelte/icons/check";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Badge } from "$lib/components/admin/ui/badge";
   import X from "@lucide/svelte/icons/x";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -19,6 +20,7 @@
   });
 
   let isSubmitting = $state(false);
+  let trackInventory = $state(true);
   let facetComboboxOpen = $state(false);
 
   // Facet value selections
@@ -159,17 +161,36 @@
               <label for="stock" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Stock
               </label>
-              <input
-                type="number"
-                id="stock"
-                name="stock"
-                form="variant-form"
-                min="0"
-                value={form?.stock ?? 0}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              {#if trackInventory}
+                <input
+                  type="number"
+                  id="stock"
+                  name="stock"
+                  form="variant-form"
+                  min="0"
+                  value={form?.stock ?? 0}
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
+                />
+              {:else}
+                <input
+                  type="text"
+                  id="stock"
+                  disabled
+                  value="Unlimited"
+                  class="w-full rounded-lg border border-input-border bg-muted px-3 py-2 text-muted-foreground"
+                />
+              {/if}
             </div>
           </div>
+          <div class="flex items-center gap-2">
+            <Checkbox id="trackInventory" bind:checked={trackInventory} />
+            <label for="trackInventory" class="text-sm text-foreground-secondary">
+              Track inventory
+            </label>
+          </div>
+          {#if trackInventory}
+            <input type="hidden" name="trackInventory" value="on" form="variant-form" />
+          {/if}
         </div>
       </div>
     </div>

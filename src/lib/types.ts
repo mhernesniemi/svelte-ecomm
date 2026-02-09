@@ -430,6 +430,7 @@ export interface CreateVariantInput {
 	sku: string;
 	price: number;
 	stock?: number;
+	trackInventory?: boolean;
 	translations?: {
 		languageCode: string;
 		name?: string;
@@ -440,6 +441,7 @@ export interface UpdateVariantInput {
 	sku?: string;
 	price?: number;
 	stock?: number;
+	trackInventory?: boolean;
 	translations?: {
 		languageCode: string;
 		name?: string;

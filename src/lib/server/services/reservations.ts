@@ -20,13 +20,16 @@ export class ReservationService {
 	 * Get available stock for a variant (total stock minus active reservations)
 	 */
 	async getAvailableStock(variantId: number): Promise<number> {
-		// Get variant's total stock
+		// Get variant's total stock and tracking setting
 		const [variant] = await db
-			.select({ stock: productVariants.stock })
+			.select({ stock: productVariants.stock, trackInventory: productVariants.trackInventory })
 			.from(productVariants)
 			.where(eq(productVariants.id, variantId));
 
 		if (!variant) return 0;
+
+		// If inventory tracking is disabled, stock is unlimited
+		if (!variant.trackInventory) return Infinity;
 
 		// Get sum of active (non-expired) reservations
 		const [result] = await db
@@ -49,13 +52,16 @@ export class ReservationService {
 	 * Used when checking stock for existing cart items
 	 */
 	async getAvailableStockExcludingOrder(variantId: number, orderId: number): Promise<number> {
-		// Get variant's total stock
+		// Get variant's total stock and tracking setting
 		const [variant] = await db
-			.select({ stock: productVariants.stock })
+			.select({ stock: productVariants.stock, trackInventory: productVariants.trackInventory })
 			.from(productVariants)
 			.where(eq(productVariants.id, variantId));
 
 		if (!variant) return 0;
+
+		// If inventory tracking is disabled, stock is unlimited
+		if (!variant.trackInventory) return Infinity;
 
 		// Get sum of active (non-expired) reservations excluding this order
 		const [result] = await db

@@ -93,6 +93,7 @@ export const productVariants = pgTable(
 		sku: varchar("sku", { length: 255 }).notNull(),
 		price: integer("price").notNull(), // Price in cents
 		stock: integer("stock").default(0).notNull(),
+		trackInventory: boolean("track_inventory").default(true).notNull(),
 		featuredAssetId: integer("featured_asset_id"),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),

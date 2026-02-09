@@ -322,7 +322,8 @@ export class ProductService {
 				productId: input.productId,
 				sku: input.sku,
 				price: input.price,
-				stock: input.stock ?? 0
+				stock: input.stock ?? 0,
+				trackInventory: input.trackInventory ?? true
 			})
 			.returning();
 
@@ -352,6 +353,7 @@ export class ProductService {
 		if (input.sku !== undefined) updateData.sku = input.sku;
 		if (input.price !== undefined) updateData.price = input.price;
 		if (input.stock !== undefined) updateData.stock = input.stock;
+		if (input.trackInventory !== undefined) updateData.trackInventory = input.trackInventory;
 
 		const [updated] = await db
 			.update(productVariants)
@@ -362,20 +364,22 @@ export class ProductService {
 		// Update translations
 		if (input.translations) {
 			for (const t of input.translations) {
-				await db
-					.insert(productVariantTranslations)
-					.values({
-						variantId: id,
-						languageCode: t.languageCode,
-						name: t.name
-					})
-					.onConflictDoUpdate({
-						target: [
-							productVariantTranslations.variantId,
-							productVariantTranslations.languageCode
-						],
-						set: { name: t.name }
-					});
+				if (t.name !== undefined) {
+					await db
+						.insert(productVariantTranslations)
+						.values({
+							variantId: id,
+							languageCode: t.languageCode,
+							name: t.name
+						})
+						.onConflictDoUpdate({
+							target: [
+								productVariantTranslations.variantId,
+								productVariantTranslations.languageCode
+							],
+							set: { name: t.name }
+						});
+				}
 			}
 		}
 
