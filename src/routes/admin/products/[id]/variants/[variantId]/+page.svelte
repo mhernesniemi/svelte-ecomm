@@ -149,7 +149,7 @@
 
       <!-- Price and Stock -->
       <div class="rounded-lg bg-surface shadow">
-        <div class="space-y-4 p-6">
+        <div class="flex flex-col gap-6 p-6">
           <h2 class="text-lg font-semibold">Stock and price</h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
