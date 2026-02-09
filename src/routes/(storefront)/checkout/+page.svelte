@@ -5,6 +5,7 @@
   import { Label } from "$lib/components/storefront/ui/label";
   import { Alert } from "$lib/components/storefront/ui/alert";
   import { formatPrice, cn } from "$lib/utils.js";
+  import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
   import type { PageData } from "./$types.js";
 
   let { data, form }: { data: PageData; form: any } = $props();
@@ -94,16 +95,16 @@
   <meta name="robots" content="noindex" />
 </svelte:head>
 
-<div class="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+<div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
   <h1 class="mb-8 text-3xl font-bold">Checkout</h1>
 
   {#if !currentCart || currentCart.lines.length === 0}
     <p class="mb-4 text-gray-500">Your cart is empty</p>
     <a href="/products" class="text-blue-600 underline hover:text-blue-700">Browse products</a>
   {:else}
-    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-5">
       <!-- Main Content -->
-      <div class="space-y-10 lg:col-span-2">
+      <div class="space-y-10 lg:col-span-3">
         {#if form?.error}
           <Alert variant="destructive">
             <p>{form.error}</p>
@@ -602,87 +603,87 @@
       </div>
 
       <!-- Order Summary -->
-      <div class="lg:col-span-1">
-        <div class="sticky top-4 rounded-lg bg-white p-6 shadow">
-          <h2 class="mb-4 text-xl font-semibold">Order Summary</h2>
+      <div class="lg:col-span-2">
+        <div class="sticky top-4 rounded-lg border border-gray-200 bg-gray-50 p-6">
+          <h2 class="text-lg font-semibold">Order Summary</h2>
 
-          <div class="mb-4 space-y-4">
+          <!-- Line Items -->
+          <div class="mt-5 divide-y divide-gray-200">
             {#each currentCart.lines as line}
-              <div class="flex justify-between text-sm">
-                <div>
-                  <p class="font-medium">{line.productName}</p>
-                  {#if line.variantName}
-                    <p class="text-xs text-gray-500">{line.variantName}</p>
-                  {/if}
-                  <p class="text-xs text-gray-500">Qty: {line.quantity}</p>
+              <div class="flex gap-4 py-4 first:pt-0 last:pb-0">
+                <div class="relative shrink-0">
+                  <div class="h-16 w-16 overflow-hidden rounded-lg border border-gray-200 bg-white">
+                    {#if line.imageUrl}
+                      <img
+                        src="{line.imageUrl}?tr=w-128,h-128,fo-auto"
+                        alt={line.productName}
+                        class="h-full w-full object-cover"
+                      />
+                    {:else}
+                      <div class="flex h-full w-full items-center justify-center">
+                        <ShoppingCart class="h-5 w-5 text-gray-300" />
+                      </div>
+                    {/if}
+                  </div>
+                  <span
+                    class="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-600 text-[11px] font-medium text-white shadow-sm"
+                  >
+                    {line.quantity}
+                  </span>
                 </div>
-                <p class="font-medium">{formatPrice(line.lineTotal)}</p>
+                <div class="flex min-w-0 flex-1 items-center justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-medium text-gray-900">{line.productName}</p>
+                    {#if line.variantName}
+                      <p class="text-sm text-gray-500">{line.variantName}</p>
+                    {/if}
+                  </div>
+                  <p class="shrink-0 text-sm font-medium text-gray-900">
+                    {formatPrice(line.lineTotal)}
+                  </p>
+                </div>
               </div>
             {/each}
           </div>
 
           <!-- Promotions -->
-          <div class="border-t pt-4">
-            {#if currentAppliedPromotions.length > 0}
-              <div class="space-y-2">
-                {#each currentAppliedPromotions as promo}
-                  <div class="flex items-center justify-between rounded bg-green-50 px-3 py-2">
-                    <div>
-                      <span class="text-sm font-medium text-green-800">
-                        {promo.method === "automatic" ? promo.title : promo.code}
-                      </span>
-                      <span class="ml-1 text-xs text-green-600"
-                        >-{formatPrice(promo.discountAmount)}</span
-                      >
-                    </div>
-                    {#if promo.method === "code"}
-                      <form method="POST" action="?/removePromotion" use:enhance>
-                        <button type="submit" class="text-xs text-red-600 hover:underline"
-                          >Remove</button
-                        >
-                      </form>
-                    {:else}
-                      <span class="text-xs text-green-600">Applied automatically</span>
-                    {/if}
-                  </div>
-                {/each}
-              </div>
-            {/if}
-
-            <!-- Promo code input (show if no code-based promotions applied) -->
-            {#if !currentAppliedPromotions.some((p: any) => p.method === "code")}
-              <form
-                method="POST"
-                action="?/applyPromotion"
-                use:enhance={() => {
-                  return async ({ update }) => {
-                    await update({ reset: false });
-                  };
-                }}
-                class={cn("flex gap-2", currentAppliedPromotions.length > 0 && "mt-2")}
-              >
-                <input
-                  type="text"
-                  name="promoCode"
-                  bind:value={promoCode}
-                  placeholder="Promo code"
-                  class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm uppercase"
-                />
-                <Button type="submit" variant="outline" class="shrink-0">Apply</Button>
-              </form>
-              {#if form?.promoError}
-                <p class="mt-1 text-xs text-red-600">{form.promoError}</p>
+          {#if currentAppliedPromotions.length > 0 || !currentAppliedPromotions.some((p: any) => p.method === "code")}
+            <div class="mt-5 border-t border-gray-200 pt-5">
+              {#if !currentAppliedPromotions.some((p: any) => p.method === "code")}
+                <form
+                  method="POST"
+                  action="?/applyPromotion"
+                  use:enhance={() => {
+                    return async ({ update }) => {
+                      await update({ reset: false });
+                    };
+                  }}
+                  class="flex w-full gap-2"
+                >
+                  <input
+                    type="text"
+                    name="promoCode"
+                    bind:value={promoCode}
+                    placeholder="Promo code"
+                    class="min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm uppercase"
+                  />
+                  <Button type="submit" variant="outline" class="shrink-0">Apply</Button>
+                </form>
+                {#if form?.promoError}
+                  <p class="text-xs text-red-600">{form.promoError}</p>
+                {/if}
+                {#if form?.promoSuccess}
+                  <p class="text-xs text-green-600">{form.promoSuccess}</p>
+                {/if}
               {/if}
-              {#if form?.promoSuccess}
-                <p class="mt-1 text-xs text-green-600">{form.promoSuccess}</p>
-              {/if}
-            {/if}
-          </div>
+            </div>
+          {/if}
 
-          <div class="space-y-2 border-t pt-4">
+          <!-- Price Breakdown -->
+          <div class="mt-5 space-y-2 border-t border-gray-200 pt-5">
             <div class="flex justify-between text-sm">
               <span class="text-gray-600">Subtotal</span>
-              <span class="font-medium">{formatPrice(currentCart.subtotal)}</span>
+              <span class="text-gray-900">{formatPrice(currentCart.subtotal)}</span>
             </div>
 
             {#if currentCart.discount > 0}
@@ -701,16 +702,16 @@
                   {@const shippingPromo = currentAppliedPromotions.find(
                     (p: any) => p.type === "shipping"
                   )}
-                  <span class="font-medium">
+                  <span>
                     {#if shippingPromo}
                       <span class="text-gray-400 line-through"
                         >{formatPrice(shippingPromo.discountAmount)}</span
                       >
                     {/if}
-                    <span class="ml-1 text-green-600">Free</span>
+                    <span class="ml-1 font-medium text-green-600">Free</span>
                   </span>
                 {:else}
-                  <span class="font-medium">{formatPrice(currentCart.shipping)}</span>
+                  <span class="text-gray-900">{formatPrice(currentCart.shipping)}</span>
                 {/if}
               </div>
             {/if}
@@ -718,7 +719,7 @@
             {#if currentCart.taxTotal > 0}
               <div class="flex justify-between text-sm">
                 <span class="text-gray-600">VAT (included)</span>
-                <span class="font-medium">{formatPrice(currentCart.taxTotal)}</span>
+                <span class="text-gray-900">{formatPrice(currentCart.taxTotal)}</span>
               </div>
             {:else if currentCart.isTaxExempt}
               <div class="flex justify-between text-sm">
@@ -726,21 +727,26 @@
                 <span class="font-medium text-green-600">Tax exempt (B2B)</span>
               </div>
             {/if}
+          </div>
 
-            <div class="flex justify-between border-t pt-2 text-lg font-bold">
-              <span>Total</span>
-              <span>{formatPrice(currentCart.total)}</span>
+          <!-- Total -->
+          <div class="mt-4 border-t border-gray-300 pt-4">
+            <div class="flex items-center justify-between">
+              <span class="text-base font-semibold text-gray-900">Total</span>
+              <span class="text-lg font-semibold text-gray-900">
+                {formatPrice(currentCart.total)}
+              </span>
             </div>
-
             {#if currentCart.isTaxExempt}
-              <p class="text-xs text-gray-500">
+              <p class="mt-1 text-xs text-gray-500">
                 Net amount: {formatPrice(currentCart.totalNet)} (VAT 0%)
               </p>
             {/if}
           </div>
 
+          <!-- CTA -->
           {#if currentPaymentInfo}
-            <div class="mt-6 border-t pt-6">
+            <div class="mt-6">
               {#if form?.stockErrors?.length}
                 <Alert variant="destructive" class="mb-4">
                   <p class="mb-2 font-medium">Stock Issue</p>
@@ -783,8 +789,8 @@
               </form>
             </div>
           {:else}
-            <div class="mt-6 border-t pt-6">
-              <p class="mb-4 text-sm text-gray-500">
+            <div class="mt-6">
+              <p class="text-sm text-gray-500">
                 {#if isDigitalOnly}
                   {#if !contactInfoSet}
                     Enter your contact information to proceed.
