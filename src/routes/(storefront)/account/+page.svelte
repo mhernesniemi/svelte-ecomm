@@ -91,6 +91,20 @@
         />
       </div>
 
+      <div>
+        <label for="vatId" class="mb-1 block text-sm font-medium text-gray-700">
+          VAT ID (optional)
+        </label>
+        <input
+          type="text"
+          id="vatId"
+          name="vatId"
+          value={data.customer.vatId ?? ""}
+          placeholder="e.g. FI12345678"
+          class="w-full rounded-lg border border-gray-300 px-3 py-2"
+        />
+      </div>
+
       <div class="pt-2">
         <Button type="submit">Save Changes</Button>
       </div>

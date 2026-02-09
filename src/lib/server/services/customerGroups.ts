@@ -97,7 +97,7 @@ export class CustomerGroupService {
 	 */
 	async update(
 		id: number,
-		input: { name?: string; description?: string }
+		input: { name?: string; description?: string; isTaxExempt?: boolean }
 	): Promise<CustomerGroup | null> {
 		const [group] = await db.select().from(customerGroups).where(eq(customerGroups.id, id));
 
@@ -111,6 +111,9 @@ export class CustomerGroupService {
 		}
 		if (input.description !== undefined) {
 			updateData.description = input.description;
+		}
+		if (input.isTaxExempt !== undefined) {
+			updateData.isTaxExempt = input.isTaxExempt;
 		}
 
 		const [updated] = await db

@@ -317,6 +317,7 @@ export const customerGroups = pgTable(
 		code: varchar("code", { length: 100 }).notNull().unique(),
 		name: varchar("name", { length: 255 }).notNull(),
 		description: text("description"),
+		isTaxExempt: boolean("is_tax_exempt").default(false).notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
 			.defaultNow()
@@ -360,11 +361,6 @@ export const customers = pgTable(
 		phone: varchar("phone", { length: 50 }),
 		vatId: varchar("vat_id", { length: 50 }), // B2B VAT ID for tax exemption
 		isAdmin: boolean("is_admin").default(false).notNull(),
-		b2bStatus: text("b2b_status", {
-			enum: ["retail", "pending", "approved", "rejected"]
-		})
-			.default("retail")
-			.notNull(),
 		deletedAt: timestamp("deleted_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
@@ -375,8 +371,7 @@ export const customers = pgTable(
 	(table) => [
 		uniqueIndex("customers_email_idx").on(table.email),
 		uniqueIndex("customers_clerk_user_id_idx").on(table.clerkUserId),
-		index("customers_name_idx").on(table.firstName, table.lastName),
-		index("customers_b2b_status_idx").on(table.b2bStatus)
+		index("customers_name_idx").on(table.firstName, table.lastName)
 	]
 );
 

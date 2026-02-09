@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
+  import { toast } from "svelte-sonner";
   import {
     Table,
     TableHeader,
@@ -8,10 +10,22 @@
     TableCell
   } from "$lib/components/admin/ui/table";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
+  import { Button } from "$lib/components/admin/ui/button";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import type { PageData } from "./$types";
+  import type { PageData, ActionData } from "./$types";
 
-  let { data }: { data: PageData } = $props();
+  let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  let vatId = $state(data.customer.vatId ?? "");
+
+  $effect(() => {
+    vatId = data.customer.vatId ?? "";
+  });
+
+  $effect(() => {
+    if (form?.success) toast.success(form.message || "Saved");
+    if (form?.error) toast.error(form.error);
+  });
 
   function formatDate(date: Date | string): string {
     return new Date(date).toLocaleDateString("en-US", {
@@ -76,6 +90,34 @@
           </div>
         </div>
       </div>
+
+      <!-- VAT ID -->
+      <form
+        method="POST"
+        action="?/updateVatId"
+        use:enhance={() => {
+          return async ({ update }) => {
+            await update({ reset: false });
+          };
+        }}
+        class="rounded-lg bg-surface p-6 shadow"
+      >
+        <h2 class="mb-4 text-lg font-semibold">VAT ID</h2>
+        <div class="flex items-end gap-3">
+          <div class="flex-1">
+            <label for="vatId" class="mb-1 block text-sm text-muted-foreground">VAT ID</label>
+            <input
+              type="text"
+              id="vatId"
+              name="vatId"
+              bind:value={vatId}
+              placeholder="e.g. FI12345678"
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+            />
+          </div>
+          <Button type="submit" size="sm">Save</Button>
+        </div>
+      </form>
     </div>
 
     <!-- Addresses and Orders -->

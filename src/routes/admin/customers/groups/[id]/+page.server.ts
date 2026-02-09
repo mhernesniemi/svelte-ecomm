@@ -32,6 +32,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const name = formData.get("name") as string;
 		const description = formData.get("description") as string;
+		const isTaxExempt = formData.get("isTaxExempt") === "true";
 
 		if (!name) {
 			return fail(400, { error: "Name is required" });
@@ -40,7 +41,8 @@ export const actions: Actions = {
 		try {
 			await customerGroupService.update(id, {
 				name,
-				description: description || undefined
+				description: description || undefined,
+				isTaxExempt
 			});
 			return { success: true, message: "Group updated" };
 		} catch {

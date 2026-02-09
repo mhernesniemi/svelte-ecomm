@@ -1,8 +1,8 @@
 /**
  * Admin Customer Detail Page Server
  */
-import { error } from "@sveltejs/kit";
-import type { PageServerLoad } from "./$types";
+import { error, fail } from "@sveltejs/kit";
+import type { PageServerLoad, Actions } from "./$types";
 import { customerService } from "$lib/server/services/customers";
 import { orderService } from "$lib/server/services/orders";
 
@@ -27,4 +27,19 @@ export const load: PageServerLoad = async ({ params }) => {
 		customer,
 		orders
 	};
+};
+
+export const actions: Actions = {
+	updateVatId: async ({ params, request }) => {
+		const customerId = Number(params.id);
+		const formData = await request.formData();
+		const vatId = formData.get("vatId")?.toString().trim() ?? "";
+
+		try {
+			await customerService.update(customerId, { vatId });
+			return { success: true, message: "VAT ID updated" };
+		} catch {
+			return fail(500, { error: "Failed to update VAT ID" });
+		}
+	}
 };

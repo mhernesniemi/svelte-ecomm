@@ -7,9 +7,9 @@
  * - Tax is back-calculated from gross price
  * - B2B customers with valid VAT ID are tax-exempt
  */
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../db/index.js";
-import { taxRates, customers } from "../db/schema.js";
+import { taxRates, customerGroupMembers, customerGroups } from "../db/schema.js";
 import {
 	calculateTax,
 	calculateTaxExemptPrice,
@@ -95,17 +95,24 @@ export class TaxService {
 
 	/**
 	 * Check if a customer is tax-exempt
-	 * B2B customers with approved status and valid VAT ID are exempt
+	 * A customer is exempt if they belong to any group with isTaxExempt = true
 	 */
 	async isCustomerTaxExempt(customerId: number | null | undefined): Promise<boolean> {
 		if (!customerId) return false;
 
-		const [customer] = await db.select().from(customers).where(eq(customers.id, customerId));
+		const [result] = await db
+			.select({ id: customerGroups.id })
+			.from(customerGroupMembers)
+			.innerJoin(customerGroups, eq(customerGroupMembers.groupId, customerGroups.id))
+			.where(
+				and(
+					eq(customerGroupMembers.customerId, customerId),
+					eq(customerGroups.isTaxExempt, true)
+				)
+			)
+			.limit(1);
 
-		if (!customer) return false;
-
-		// Customer must be approved B2B AND have a VAT ID
-		return customer.b2bStatus === "approved" && !!customer.vatId;
+		return !!result;
 	}
 
 	/**

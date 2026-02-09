@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -27,10 +28,12 @@
 
   let groupName = $state("");
   let groupDescription = $state("");
+  let isTaxExempt = $state(false);
 
   $effect(() => {
     groupName = data.group.name;
     groupDescription = data.group.description ?? "";
+    isTaxExempt = data.group.isTaxExempt;
   });
 
   const customerIdsInGroup = $derived(new Set(data.groupCustomers.map((c) => c.id)));
@@ -60,149 +63,177 @@
     </Button>
   </div>
 
-  <!-- Edit Group -->
-  <form
-    id="group-form"
-    method="POST"
-    action="?/update"
-    use:enhance={() => {
-      isSubmitting = true;
-      return async ({ update }) => {
-        isSubmitting = false;
-        await update({ reset: false });
-      };
-    }}
-    class="overflow-hidden rounded-lg bg-surface shadow"
-  >
-    <div class="p-6">
-      <h2 class="mb-4 text-lg font-medium text-foreground">Group Details</h2>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label for="group_name" class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >Name</label
-          >
-          <input
-            type="text"
-            id="group_name"
-            name="name"
-            bind:value={groupName}
-            required
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-          />
+  <div class="flex flex-col gap-6 lg:flex-row">
+    <!-- Main Content -->
+    <div class="flex-1 space-y-6">
+      <!-- Edit Group -->
+      <form
+        id="group-form"
+        method="POST"
+        action="?/update"
+        use:enhance={() => {
+          isSubmitting = true;
+          return async ({ update }) => {
+            isSubmitting = false;
+            await update({ reset: false });
+          };
+        }}
+        class="overflow-hidden rounded-lg bg-surface shadow"
+      >
+        <div class="p-6">
+          <h2 class="mb-4 text-lg font-medium text-foreground">Group Details</h2>
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label for="group_name" class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >Name</label
+              >
+              <input
+                type="text"
+                id="group_name"
+                name="name"
+                bind:value={groupName}
+                required
+                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="group_description"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
+                Description
+              </label>
+              <input
+                type="text"
+                id="group_description"
+                name="description"
+                bind:value={groupDescription}
+                placeholder="Optional"
+                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+              />
+            </div>
+          </div>
+          <input type="hidden" name="isTaxExempt" value={isTaxExempt ? "true" : "false"} />
         </div>
-        <div>
-          <label
-            for="group_description"
-            class="mb-1 block text-sm font-medium text-foreground-secondary"
-          >
-            Description
-          </label>
-          <input
-            type="text"
-            id="group_description"
-            name="description"
-            bind:value={groupDescription}
-            placeholder="Optional"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-          />
+      </form>
+
+      <!-- Customers Section -->
+      <div class="overflow-hidden rounded-lg bg-surface shadow">
+        <div class="border-b border-border p-6">
+          <h2 class="text-lg font-medium text-foreground">Customers</h2>
+          <p class="mt-1 text-sm text-foreground-tertiary">
+            {data.groupCustomers.length} customer{data.groupCustomers.length !== 1 ? "s" : ""} in this group
+          </p>
+        </div>
+
+        <!-- Add Customer -->
+        <div class="border-b border-border bg-background px-6 py-4">
+          <h3 class="mb-3 text-sm font-medium text-foreground-secondary">Add Customer to Group</h3>
+          {#if availableCustomers.length === 0}
+            <p class="text-sm text-muted-foreground">All customers are already in this group</p>
+          {:else}
+            <form method="POST" action="?/addCustomer" use:enhance class="flex items-end gap-4">
+              <input type="hidden" name="customerId" value={selectedCustomerId ?? ""} />
+              <div>
+                <Popover.Root bind:open={comboboxOpen}>
+                  <Popover.Trigger
+                    class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                  >
+                    <span class={selectedCustomerId ? "text-foreground" : "text-muted-foreground"}>
+                      {selectedCustomerLabel()}
+                    </span>
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
+                  </Popover.Trigger>
+                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+                    <Command.Root>
+                      <Command.Input placeholder="Search customers..." />
+                      <Command.List class="max-h-60">
+                        <Command.Empty>No customers found.</Command.Empty>
+                        {#each availableCustomers as customer}
+                          <Command.Item
+                            value="{customer.firstName} {customer.lastName} {customer.email}"
+                            onSelect={() => {
+                              selectedCustomerId = customer.id;
+                              comboboxOpen = false;
+                            }}
+                          >
+                            <Check
+                              class="mr-2 h-4 w-4 {selectedCustomerId === customer.id
+                                ? 'opacity-100'
+                                : 'opacity-0'}"
+                            />
+                            <span>
+                              {customer.firstName}
+                              {customer.lastName}
+                              <span class="text-muted-foreground">({customer.email})</span>
+                            </span>
+                          </Command.Item>
+                        {/each}
+                      </Command.List>
+                    </Command.Root>
+                  </Popover.Content>
+                </Popover.Root>
+              </div>
+              <Button type="submit" size="sm" disabled={!selectedCustomerId}>Add</Button>
+            </form>
+          {/if}
+        </div>
+
+        <!-- Customers List -->
+        <div class="px-6 py-4">
+          {#if data.groupCustomers.length === 0}
+            <p class="text-sm text-muted-foreground">No customers in this group yet</p>
+          {:else}
+            <div class="space-y-2">
+              {#each data.groupCustomers as customer}
+                <div class="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
+                  <div>
+                    <a
+                      href="/admin/customers/{customer.id}"
+                      class="font-medium hover:text-blue-600 dark:text-blue-400"
+                    >
+                      {customer.firstName}
+                      {customer.lastName}
+                    </a>
+                    <span class="ml-2 text-sm text-muted-foreground">{customer.email}</span>
+                  </div>
+                  <form method="POST" action="?/removeCustomer" use:enhance>
+                    <input type="hidden" name="customerId" value={customer.id} />
+                    <button
+                      type="submit"
+                      class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </form>
+                </div>
+              {/each}
+            </div>
+          {/if}
         </div>
       </div>
     </div>
-  </form>
 
-  <!-- Customers Section -->
-  <div class="overflow-hidden rounded-lg bg-surface shadow">
-    <div class="border-b border-border p-6">
-      <h2 class="text-lg font-medium text-foreground">Customers</h2>
-      <p class="mt-1 text-sm text-foreground-tertiary">
-        {data.groupCustomers.length} customer{data.groupCustomers.length !== 1 ? "s" : ""} in this group
-      </p>
-    </div>
-
-    <!-- Add Customer -->
-    <div class="border-b border-border bg-background px-6 py-4">
-      <h3 class="mb-3 text-sm font-medium text-foreground-secondary">Add Customer to Group</h3>
-      {#if availableCustomers.length === 0}
-        <p class="text-sm text-muted-foreground">All customers are already in this group</p>
-      {:else}
-        <form method="POST" action="?/addCustomer" use:enhance class="flex items-end gap-4">
-          <input type="hidden" name="customerId" value={selectedCustomerId ?? ""} />
-          <div>
-            <Popover.Root bind:open={comboboxOpen}>
-              <Popover.Trigger
-                class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-              >
-                <span class={selectedCustomerId ? "text-foreground" : "text-muted-foreground"}>
-                  {selectedCustomerLabel()}
-                </span>
-                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
-              </Popover.Trigger>
-              <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
-                <Command.Root>
-                  <Command.Input placeholder="Search customers..." />
-                  <Command.List class="max-h-60">
-                    <Command.Empty>No customers found.</Command.Empty>
-                    {#each availableCustomers as customer}
-                      <Command.Item
-                        value="{customer.firstName} {customer.lastName} {customer.email}"
-                        onSelect={() => {
-                          selectedCustomerId = customer.id;
-                          comboboxOpen = false;
-                        }}
-                      >
-                        <Check
-                          class="mr-2 h-4 w-4 {selectedCustomerId === customer.id
-                            ? 'opacity-100'
-                            : 'opacity-0'}"
-                        />
-                        <span>
-                          {customer.firstName}
-                          {customer.lastName}
-                          <span class="text-muted-foreground">({customer.email})</span>
-                        </span>
-                      </Command.Item>
-                    {/each}
-                  </Command.List>
-                </Command.Root>
-              </Popover.Content>
-            </Popover.Root>
-          </div>
-          <Button type="submit" size="sm" disabled={!selectedCustomerId}>Add</Button>
-        </form>
-      {/if}
-    </div>
-
-    <!-- Customers List -->
-    <div class="px-6 py-4">
-      {#if data.groupCustomers.length === 0}
-        <p class="text-sm text-muted-foreground">No customers in this group yet</p>
-      {:else}
-        <div class="space-y-2">
-          {#each data.groupCustomers as customer}
-            <div class="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
-              <div>
-                <a
-                  href="/admin/customers/{customer.id}"
-                  class="font-medium hover:text-blue-600 dark:text-blue-400"
-                >
-                  {customer.firstName}
-                  {customer.lastName}
-                </a>
-                <span class="ml-2 text-sm text-muted-foreground">{customer.email}</span>
-              </div>
-              <form method="POST" action="?/removeCustomer" use:enhance>
-                <input type="hidden" name="customerId" value={customer.id} />
-                <button
-                  type="submit"
-                  class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
-                >
-                  Remove
-                </button>
-              </form>
-            </div>
-          {/each}
+    <!-- Sidebar -->
+    <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
+      <!-- Tax Exempt -->
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
+          <h2 class="font-semibold">Tax</h2>
         </div>
-      {/if}
+        <div class="p-4">
+          <div class="flex items-center gap-2">
+            <Checkbox id="is_tax_exempt" bind:checked={isTaxExempt} />
+            <label for="is_tax_exempt" class="text-sm font-medium text-foreground">
+              Tax exempt
+            </label>
+          </div>
+          <p class="mt-2 text-xs text-muted-foreground">
+            Customers in this group will not be charged VAT
+          </p>
+        </div>
+      </div>
+
     </div>
   </div>
 

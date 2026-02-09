@@ -13,6 +13,7 @@ export const actions: Actions = {
 		const firstName = formData.get("firstName")?.toString().trim();
 		const lastName = formData.get("lastName")?.toString().trim();
 		const phone = formData.get("phone")?.toString().trim() || undefined;
+		const vatId = formData.get("vatId")?.toString().trim() ?? "";
 
 		if (!firstName || !lastName) {
 			return fail(400, { error: "First name and last name are required" });
@@ -22,7 +23,8 @@ export const actions: Actions = {
 			const updatedCustomer = await customerService.update(customer.id, {
 				firstName,
 				lastName,
-				phone
+				phone,
+				vatId
 			});
 
 			return { success: true, customer: updatedCustomer };

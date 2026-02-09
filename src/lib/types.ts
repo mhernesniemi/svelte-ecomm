@@ -148,8 +148,6 @@ export type NewCustomer = InferInsertModel<typeof customers>;
 export type Address = InferSelectModel<typeof addresses>;
 export type NewAddress = InferInsertModel<typeof addresses>;
 
-/** B2B status - derived from schema enum */
-export type B2bStatus = Customer["b2bStatus"];
 
 /** Customer with addresses */
 export interface CustomerWithAddresses extends Customer {

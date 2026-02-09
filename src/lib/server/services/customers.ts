@@ -100,7 +100,10 @@ export class CustomerService {
 	/**
 	 * Update customer
 	 */
-	async update(id: number, input: Partial<CreateCustomerInput>): Promise<Customer | null> {
+	async update(
+		id: number,
+		input: Partial<CreateCustomerInput> & { vatId?: string }
+	): Promise<Customer | null> {
 		const [customer] = await db.select().from(customers).where(eq(customers.id, id));
 
 		if (!customer) return null;
@@ -111,7 +114,8 @@ export class CustomerService {
 				...(input.email && { email: input.email }),
 				...(input.firstName && { firstName: input.firstName }),
 				...(input.lastName && { lastName: input.lastName }),
-				...(input.phone !== undefined && { phone: input.phone })
+				...(input.phone !== undefined && { phone: input.phone }),
+				...(input.vatId !== undefined && { vatId: input.vatId || null })
 			})
 			.where(eq(customers.id, id))
 			.returning();

@@ -2,6 +2,7 @@ import { productService } from "$lib/server/services/products.js";
 import { wishlistService } from "$lib/server/services/wishlist.js";
 import { reviewService } from "$lib/server/services/reviews.js";
 import { categoryService } from "$lib/server/services/categories.js";
+import { taxService } from "$lib/server/services/tax.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
@@ -18,9 +19,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		throw error(404, "Product not found");
 	}
 
-	// Private products require approved B2B status
-	if (product.visibility === "private" && locals.customer?.b2bStatus !== "approved") {
-		throw error(404, "Product not found");
+	// Private products require membership in a tax-exempt group
+	if (product.visibility === "private") {
+		const isTaxExempt = await taxService.isCustomerTaxExempt(locals.customer?.id);
+		if (!isTaxExempt) {
+			throw error(404, "Product not found");
+		}
 	}
 
 	// Redirect if slug doesn't match (for SEO and correct URLs)
