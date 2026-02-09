@@ -567,7 +567,7 @@
               {/each}
             </div>
 
-            {#if selectedPaymentMethod && !currentPaymentInfo}
+            {#if !currentPaymentInfo}
               <form
                 method="POST"
                 action="?/createPayment"
@@ -580,12 +580,12 @@
                 }}
                 class="mt-4"
               >
-                <input type="hidden" name="paymentMethodId" value={selectedPaymentMethod.id} />
-                <Button type="submit" disabled={isProcessingPayment} class="w-full">
+                <input type="hidden" name="paymentMethodId" value={selectedPaymentMethod?.id ?? ""} />
+                <Button type="submit" disabled={!selectedPaymentMethod || isProcessingPayment} class="w-full">
                   {isProcessingPayment ? "Processing..." : "Create Payment"}
                 </Button>
               </form>
-            {:else if currentPaymentInfo}
+            {:else}
               <Alert variant="success" class="mt-4">
                 <p class="text-sm font-medium">Payment created successfully</p>
               </Alert>
@@ -599,6 +599,52 @@
           <Alert variant="default">
             <p class="text-sm">Please enter your contact information to see payment options.</p>
           </Alert>
+        {/if}
+
+        <!-- Complete Order -->
+        {#if currentPaymentInfo}
+          <div>
+            {#if form?.stockErrors?.length}
+              <Alert variant="destructive" class="mb-4">
+                <p class="mb-2 font-medium">Stock Issue</p>
+                <ul class="list-inside list-disc text-sm">
+                  {#each form.stockErrors as stockError}
+                    <li>{stockError}</li>
+                  {/each}
+                </ul>
+                <p class="mt-2 text-sm">Please adjust quantities in your cart.</p>
+              </Alert>
+            {:else}
+              <Alert variant="success" class="mb-4">
+                <p class="mb-2 font-medium">Payment Ready</p>
+                <p class="text-sm">
+                  Transaction ID: {currentPaymentInfo.providerTransactionId}
+                </p>
+              </Alert>
+            {/if}
+            <form
+              method="POST"
+              action="?/completeOrder"
+              use:enhance={() => {
+                isCompletingOrder = true;
+                return async ({ update }) => {
+                  isCompletingOrder = false;
+                  await update();
+                };
+              }}
+            >
+              {#if saveAddressForFuture}
+                <input type="hidden" name="saveToAddressBook" value="on" />
+              {/if}
+              <Button
+                type="submit"
+                disabled={isCompletingOrder}
+                class="w-full bg-green-600 hover:bg-green-700"
+              >
+                {isCompletingOrder ? "Completing Order..." : "Complete Order"}
+              </Button>
+            </form>
+          </div>
         {/if}
       </div>
 
@@ -743,70 +789,6 @@
               </p>
             {/if}
           </div>
-
-          <!-- CTA -->
-          {#if currentPaymentInfo}
-            <div class="mt-6">
-              {#if form?.stockErrors?.length}
-                <Alert variant="destructive" class="mb-4">
-                  <p class="mb-2 font-medium">Stock Issue</p>
-                  <ul class="list-inside list-disc text-sm">
-                    {#each form.stockErrors as stockError}
-                      <li>{stockError}</li>
-                    {/each}
-                  </ul>
-                  <p class="mt-2 text-sm">Please adjust quantities in your cart.</p>
-                </Alert>
-              {:else}
-                <Alert variant="success" class="mb-4">
-                  <p class="mb-2 font-medium">Payment Ready</p>
-                  <p class="text-sm">
-                    Transaction ID: {currentPaymentInfo.providerTransactionId}
-                  </p>
-                </Alert>
-              {/if}
-              <form
-                method="POST"
-                action="?/completeOrder"
-                use:enhance={() => {
-                  isCompletingOrder = true;
-                  return async ({ update }) => {
-                    isCompletingOrder = false;
-                    await update();
-                  };
-                }}
-              >
-                {#if saveAddressForFuture}
-                  <input type="hidden" name="saveToAddressBook" value="on" />
-                {/if}
-                <Button
-                  type="submit"
-                  disabled={isCompletingOrder}
-                  class="w-full bg-green-600 hover:bg-green-700"
-                >
-                  {isCompletingOrder ? "Completing Order..." : "Complete Order"}
-                </Button>
-              </form>
-            </div>
-          {:else}
-            <div class="mt-6">
-              <p class="text-sm text-gray-500">
-                {#if isDigitalOnly}
-                  {#if !contactInfoSet}
-                    Enter your contact information to proceed.
-                  {:else}
-                    Select payment method to proceed.
-                  {/if}
-                {:else if !currentCart?.shippingPostalCode}
-                  Enter shipping address to proceed.
-                {:else if !currentOrderShipping}
-                  Select shipping method to proceed.
-                {:else}
-                  Select payment method to proceed.
-                {/if}
-              </p>
-            </div>
-          {/if}
         </div>
       </div>
     </div>
