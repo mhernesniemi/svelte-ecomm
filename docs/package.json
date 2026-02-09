@@ -2,8 +2,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
-		"build": "next build && pagefind --site out --output-path out/_pagefind",
-		"start": "npx serve out"
+		"build": "next build",
+		"start": "next start"
 	},
 	"dependencies": {
 		"next": "^15",
@@ -14,7 +14,6 @@
 	},
 	"devDependencies": {
 		"@types/react": "^19",
-		"pagefind": "^1",
 		"typescript": "^5"
 	}
 }

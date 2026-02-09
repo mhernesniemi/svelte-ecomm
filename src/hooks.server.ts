@@ -180,46 +180,16 @@ const adminAuth: Handle = async ({ event, resolve }) => {
 	return resolve(event);
 };
 
-// Combine handlers in sequence NOTE DON'T DELETE THIS
-// export const handle = sequence(
-// 	clerkHandler,
-// 	customerSync,
-// 	cartHandler,
-// 	wishlistHandler,
-// 	shippingInit,
-// 	paymentInit,
-// 	adminAuth
-// );
-
-// Serve static docs pages directly, bypassing SvelteKit's router
-const serveDocs: Handle = async ({ event, resolve }) => {
-	if (event.url.pathname.startsWith("/docs")) {
-		const path = event.url.pathname.replace(/\/$/, "") || "/docs";
-		const filePath = `static${path}/index.html`;
-		try {
-			const file = Bun.file(filePath);
-			if (await file.exists()) {
-				return new Response(file, {
-					headers: { "content-type": "text/html; charset=utf-8" }
-				});
-			}
-		} catch {
-			// Fall through to SvelteKit
-		}
-		return resolve(event);
-	}
-	return sequence(
-		clerkHandler,
-		customerSync,
-		cartHandler,
-		wishlistHandler,
-		shippingInit,
-		paymentInit,
-		adminAuth
-	)({ event, resolve });
-};
-
-export const handle = serveDocs;
+// Combine handlers in sequence
+export const handle = sequence(
+	clerkHandler,
+	customerSync,
+	cartHandler,
+	wishlistHandler,
+	shippingInit,
+	paymentInit,
+	adminAuth
+);
 
 // Handle uncaught server errors
 export const handleError: HandleServerError = async ({ error, event, status, message }) => {

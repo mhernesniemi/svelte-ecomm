@@ -1,4 +1,10 @@
 {
+	"rewrites": [
+		{
+			"source": "/docs/:path*",
+			"destination": "https://hoikka-docs.vercel.app/docs/:path*"
+		}
+	],
 	"crons": [
 		{
 			"path": "/api/cron/jobs",
