@@ -661,6 +661,9 @@ export const promotions = pgTable(
 			.default(false)
 			.notNull(),
 		enabled: boolean("enabled").default(true).notNull(),
+		customerGroupId: integer("customer_group_id").references(() => customerGroups.id, {
+			onDelete: "set null"
+		}),
 		startsAt: timestamp("starts_at"),
 		endsAt: timestamp("ends_at"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -1146,10 +1149,14 @@ export const paymentsRelations = relations(payments, ({ one }) => ({
 	})
 }));
 
-export const promotionsRelations = relations(promotions, ({ many }) => ({
+export const promotionsRelations = relations(promotions, ({ one, many }) => ({
 	orderPromotions: many(orderPromotions),
 	promotionProducts: many(promotionProducts),
-	promotionCollections: many(promotionCollections)
+	promotionCollections: many(promotionCollections),
+	customerGroup: one(customerGroups, {
+		fields: [promotions.customerGroupId],
+		references: [customerGroups.id]
+	})
 }));
 
 export const promotionProductsRelations = relations(promotionProducts, ({ one }) => ({

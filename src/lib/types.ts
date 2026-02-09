@@ -479,6 +479,7 @@ export interface CreatePromotionInput {
 	usageLimit?: number;
 	usageLimitPerCustomer?: number;
 	combinesWithOtherPromotions?: boolean;
+	customerGroupId?: number | null;
 	startsAt?: Date;
 	endsAt?: Date;
 	productIds?: number[];
@@ -494,6 +495,7 @@ export interface UpdatePromotionInput {
 	usageLimit?: number | null;
 	usageLimitPerCustomer?: number | null;
 	combinesWithOtherPromotions?: boolean;
+	customerGroupId?: number | null;
 	enabled?: boolean;
 	startsAt?: Date | null;
 	endsAt?: Date | null;

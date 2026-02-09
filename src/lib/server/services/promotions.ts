@@ -13,7 +13,8 @@ import {
 	productTranslations,
 	collectionTranslations,
 	collectionFilters,
-	productFacetValues
+	productFacetValues,
+	customerGroupMembers
 } from "../db/schema.js";
 import type {
 	Promotion,
@@ -45,6 +46,7 @@ export class PromotionService {
 				usageLimit: input.usageLimit,
 				usageLimitPerCustomer: input.usageLimitPerCustomer,
 				combinesWithOtherPromotions: input.combinesWithOtherPromotions ?? false,
+				customerGroupId: input.customerGroupId ?? null,
 				startsAt: input.startsAt,
 				endsAt: input.endsAt,
 				enabled: true,
@@ -237,6 +239,9 @@ export class PromotionService {
 				...(input.combinesWithOtherPromotions !== undefined && {
 					combinesWithOtherPromotions: input.combinesWithOtherPromotions
 				}),
+				...(input.customerGroupId !== undefined && {
+					customerGroupId: input.customerGroupId
+				}),
 				...(input.startsAt !== undefined && { startsAt: input.startsAt }),
 				...(input.endsAt !== undefined && { endsAt: input.endsAt }),
 				...(input.enabled !== undefined && { enabled: input.enabled })
@@ -351,6 +356,25 @@ export class PromotionService {
 					valid: false,
 					error: "This promotion cannot be combined with other promotions"
 				};
+			}
+		}
+
+		// Customer group restriction check
+		if (promotion.customerGroupId) {
+			if (!options?.customerId) {
+				return { valid: false, error: "This promotion is restricted to specific customers" };
+			}
+			const [membership] = await db
+				.select()
+				.from(customerGroupMembers)
+				.where(
+					and(
+						eq(customerGroupMembers.customerId, options.customerId),
+						eq(customerGroupMembers.groupId, promotion.customerGroupId)
+					)
+				);
+			if (!membership) {
+				return { valid: false, error: "This promotion is restricted to specific customers" };
 			}
 		}
 
@@ -495,6 +519,25 @@ export class PromotionService {
 			const { canCombinePromotions } = await import("./promotion-utils.js");
 			if (!canCombinePromotions(existingPromos, promotion)) {
 				return { valid: false, error: "Cannot combine with existing promotions" };
+			}
+		}
+
+		// Customer group restriction check
+		if (promotion.customerGroupId) {
+			if (!options?.customerId) {
+				return { valid: false, error: "Restricted to specific customers" };
+			}
+			const [membership] = await db
+				.select()
+				.from(customerGroupMembers)
+				.where(
+					and(
+						eq(customerGroupMembers.customerId, options.customerId),
+						eq(customerGroupMembers.groupId, promotion.customerGroupId)
+					)
+				);
+			if (!membership) {
+				return { valid: false, error: "Restricted to specific customers" };
 			}
 		}
 

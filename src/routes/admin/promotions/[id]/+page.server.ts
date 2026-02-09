@@ -2,6 +2,7 @@ import type { PageServerLoad, Actions } from "./$types";
 import { promotionService } from "$lib/server/services/promotions.js";
 import { productService } from "$lib/server/services/products.js";
 import { collectionService } from "$lib/server/services/collections.js";
+import { customerGroupService } from "$lib/server/services/customerGroups.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -19,6 +20,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	});
 
 	const collections = await collectionService.list({ language: "fi" });
+	const customerGroups = await customerGroupService.list();
 
 	return {
 		promotion,
@@ -29,6 +31,10 @@ export const load: PageServerLoad = async ({ params }) => {
 		collections: collections.map((c) => ({
 			id: c.id,
 			name: c.translations[0]?.name ?? `Collection #${c.id}`
+		})),
+		customerGroups: customerGroups.map((g) => ({
+			id: g.id,
+			name: g.name
 		}))
 	};
 };
@@ -56,6 +62,9 @@ export const actions: Actions = {
 			? Number(data.get("usageLimitPerCustomer"))
 			: null;
 		const combinesWithOtherPromotions = data.get("combinesWithOtherPromotions") === "on";
+		const customerGroupId = data.get("customerGroupId")
+			? Number(data.get("customerGroupId"))
+			: null;
 		const startsAt = data.get("startsAt") ? new Date(data.get("startsAt") as string) : null;
 		const endsAt = data.get("endsAt") ? new Date(data.get("endsAt") as string) : null;
 		const enabled = data.get("enabled") === "on";
@@ -85,6 +94,7 @@ export const actions: Actions = {
 				usageLimit,
 				usageLimitPerCustomer,
 				combinesWithOtherPromotions,
+				customerGroupId,
 				startsAt,
 				endsAt,
 				enabled,

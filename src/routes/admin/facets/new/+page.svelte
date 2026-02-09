@@ -2,9 +2,14 @@
   import { enhance } from "$app/forms";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import { toast } from "svelte-sonner";
   import type { ActionData } from "./$types";
 
   let { form }: { form: ActionData } = $props();
+
+  $effect(() => {
+    if (form?.error) toast.error(form.error);
+  });
 
   let isSubmitting = $state(false);
 </script>
@@ -26,12 +31,6 @@
       </Button>
     </div>
   </div>
-
-  {#if form?.error}
-    <div class="rounded-lg border border-red-200 bg-destructive-subtle p-4 text-sm text-red-700">
-      {form.error}
-    </div>
-  {/if}
 
   <!-- Facet Details -->
   <form

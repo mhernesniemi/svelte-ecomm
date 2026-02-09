@@ -90,9 +90,8 @@
   });
 
   $effect(() => {
-    if (form?.success) {
-      toast.success("Promotion updated");
-    }
+    if (form?.success) toast.success("Promotion updated");
+    if (form?.error) toast.error(form.error);
   });
 </script>
 
@@ -100,7 +99,9 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/promotions" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+    <a
+      href="/admin/promotions"
+      class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Promotions</a
     >
   </div>
@@ -119,12 +120,6 @@
     </div>
   </div>
 
-  {#if form?.error}
-    <div class="rounded-lg border border-red-200 bg-destructive-subtle p-4 text-sm text-red-700">
-      {form.error}
-    </div>
-  {/if}
-
   <form
     method="POST"
     action="?/update"
@@ -138,7 +133,7 @@
     <input type="hidden" name="productIds" value={JSON.stringify(selectedProductIds)} />
     <input type="hidden" name="collectionIds" value={JSON.stringify(selectedCollectionIds)} />
 
-    <div class="flex flex-col lg:flex-row gap-6">
+    <div class="flex flex-col gap-6 lg:flex-row">
       <!-- Left Column -->
       <div class="flex-1 space-y-6">
         <!-- Code / Title -->
@@ -467,7 +462,7 @@
       </div>
 
       <!-- Right Sidebar -->
-      <div class="w-full lg:w-80 lg:shrink-0 space-y-6">
+      <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
         <!-- Status -->
         <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Status</h2>
@@ -496,6 +491,24 @@
           </label>
           <p class="mt-2 text-xs text-muted-foreground">
             When enabled, this promotion can be used alongside other promotions on the same order.
+          </p>
+        </div>
+
+        <!-- Customer Group -->
+        <div class="rounded-lg bg-surface p-6 shadow">
+          <h2 class="mb-4 text-lg font-semibold">Customer Group</h2>
+          <select
+            name="customerGroupId"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+            value={promo.customerGroupId ?? ""}
+          >
+            <option value="">Not restricted</option>
+            {#each data.customerGroups as group}
+              <option value={group.id}>{group.name}</option>
+            {/each}
+          </select>
+          <p class="mt-2 text-xs text-muted-foreground">
+            Restrict this promotion to customers in a specific group.
           </p>
         </div>
 

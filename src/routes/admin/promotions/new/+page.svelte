@@ -12,8 +12,13 @@
   import Check from "@lucide/svelte/icons/check";
   import X from "@lucide/svelte/icons/x";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import { toast } from "svelte-sonner";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
+
+  $effect(() => {
+    if (form?.error) toast.error(form.error);
+  });
 
   let method = $state<"code" | "automatic">("code");
   let promotionType = $state<"order" | "product" | "free_shipping">("order");
@@ -76,12 +81,6 @@
       <Button type="submit" form="create-form">Create Promotion</Button>
     </div>
   </div>
-
-  {#if form?.error}
-    <div class="rounded-lg border border-red-200 bg-destructive-subtle p-4 text-sm text-red-700">
-      {form.error}
-    </div>
-  {/if}
 
   <form method="POST" use:enhance id="create-form">
     <input type="hidden" name="productIds" value={JSON.stringify(selectedProductIds)} />
@@ -479,6 +478,23 @@
           </label>
           <p class="mt-2 text-xs text-muted-foreground">
             When enabled, this promotion can be used alongside other promotions on the same order.
+          </p>
+        </div>
+
+        <!-- Customer Group -->
+        <div class="rounded-lg bg-surface p-6 shadow">
+          <h2 class="mb-4 text-lg font-semibold">Customer Group</h2>
+          <select
+            name="customerGroupId"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+          >
+            <option value="">Not restricted</option>
+            {#each data.customerGroups as group}
+              <option value={group.id}>{group.name}</option>
+            {/each}
+          </select>
+          <p class="mt-2 text-xs text-muted-foreground">
+            Restrict this promotion to customers in a specific group.
           </p>
         </div>
 
