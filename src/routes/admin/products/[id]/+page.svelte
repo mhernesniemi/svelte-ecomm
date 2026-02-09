@@ -217,7 +217,9 @@
 <div>
   <div class="mb-6">
     <div class="mb-6 flex items-center justify-between">
-      <a href="/admin/products" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      <a
+        href="/admin/products"
+        class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         ><ChevronLeft class="h-4 w-4" /> Back to Products</a
       >
       {#if translation?.slug}
@@ -239,7 +241,7 @@
   </div>
 
   <!-- Two Column Layout -->
-  <div class="flex flex-col lg:flex-row gap-6">
+  <div class="flex flex-col gap-6 lg:flex-row">
     <!-- Main Content (Left) -->
     <div class="flex-1 space-y-6">
       <!-- Product Form -->
@@ -339,7 +341,9 @@
       <div class="rounded-lg bg-surface pb-4 shadow">
         <div class="flex items-center justify-between border-b border-border px-6 py-4">
           <h2 class="text-lg font-semibold">Variants</h2>
-          <a href="/admin/products/{data.product.id}/variants/new" class={buttonVariants({ variant: "outline", size: "sm" })}
+          <a
+            href="/admin/products/{data.product.id}/variants/new"
+            class={buttonVariants({ variant: "outline", size: "sm" })}
             ><Plus class="h-4 w-4" /> Add Variant</a
           >
         </div>
@@ -409,7 +413,7 @@
     </div>
 
     <!-- Sidebar (Right) -->
-    <div class="w-full lg:w-80 lg:shrink-0 space-y-6">
+    <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
       <!-- Visibility Section -->
       <div class="rounded-lg bg-surface shadow">
         <div class="border-b border-border px-4 py-3">
@@ -626,16 +630,13 @@
                           onSelect={() => toggleCategory(category.id)}
                           class="cursor-pointer"
                         >
-                          <div
-                            class="flex w-full items-center gap-2"
-                            style="padding-left: {category.depth * 12}px"
-                          >
+                          <div class="flex w-full items-center gap-2">
                             <div class="flex h-4 w-4 items-center justify-center">
                               {#if selectedCategories.includes(category.id)}
                                 <Check class="h-4 w-4" />
                               {/if}
                             </div>
-                            <span>{category.name}</span>
+                            <span>{"— ".repeat(category.depth)}{category.name}</span>
                           </div>
                         </Command.Item>
                       {/each}

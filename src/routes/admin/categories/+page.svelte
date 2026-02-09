@@ -14,6 +14,17 @@
   function getName(translations: { languageCode: string; name: string }[]): string {
     return translations.find((t) => t.languageCode === "en")?.name ?? "";
   }
+
+  type FlatCategory = { id: number; name: string; depth: number };
+
+  function flattenTree(nodes: typeof data.tree, depth = 0): FlatCategory[] {
+    return nodes.flatMap((node) => [
+      { id: node.id, name: getName(node.translations), depth },
+      ...flattenTree(node.children, depth + 1)
+    ]);
+  }
+
+  const flatCategories = $derived(flattenTree(data.tree));
 </script>
 
 <svelte:head><title>Categories | Admin</title></svelte:head>
@@ -85,8 +96,8 @@
               class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             >
               <option value="">None (Root)</option>
-              {#each data.categories as category}
-                <option value={category.id}>{getName(category.translations)}</option>
+              {#each flatCategories as category}
+                <option value={category.id}>{"— ".repeat(category.depth)}{category.name}</option>
               {/each}
             </select>
           </div>
@@ -199,9 +210,9 @@
                         class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       >
                         <option value="">None (Root)</option>
-                        {#each data.categories.filter((c) => c.id !== node.id) as category}
+                        {#each flatCategories.filter((c) => c.id !== node.id) as category}
                           <option value={category.id} selected={category.id === node.parentId}>
-                            {getName(category.translations)}
+                            {"— ".repeat(category.depth)}{category.name}
                           </option>
                         {/each}
                       </select>
