@@ -78,7 +78,6 @@ export const actions: Actions = {
 
 			return { success: true };
 		} catch (e) {
-			console.error("Failed to update variant:", e);
 			return fail(500, { error: "Failed to update variant" });
 		}
 	},
