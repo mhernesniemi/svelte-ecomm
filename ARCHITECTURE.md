@@ -27,7 +27,7 @@ src/
 └── routes/
     ├── (storefront)/          # Customer-facing pages
     │   ├── +layout.svelte     # Header, cart sheet, footer
-    │   ├── products/[slug]/   # Product detail page
+    │   ├── products/[id]/[slug]/  # Product detail page
     │   ├── checkout/          # Checkout flow
     │   └── ...
     └── admin/                 # Admin dashboard

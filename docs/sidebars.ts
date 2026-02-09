@@ -50,11 +50,6 @@ const sidebars: SidebarsConfig = {
 				"integrations/erp-example"
 			]
 		},
-		{
-			type: "category",
-			label: "API Reference",
-			items: ["api/endpoints", "api/form-actions"]
-		}
 	]
 };
 

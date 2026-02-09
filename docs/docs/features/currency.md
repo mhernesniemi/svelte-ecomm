@@ -144,62 +144,6 @@ const exchangeRate = 1.08;
 const usdPrice = convertPrice(eurPrice, exchangeRate); // 3239
 ```
 
-## Adding Multi-Currency Support
-
-The codebase is ready for multi-currency. To enable:
-
-### 1. Add Exchange Rate Service
-
-```typescript
-// src/lib/server/services/currency.ts
-export async function getExchangeRate(from: string, to: string): Promise<number> {
-	if (from === to) return 1;
-
-	// Fetch from API (e.g., exchangerate-api.com)
-	const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${from}`);
-	const data = await response.json();
-	return data.rates[to];
-}
-```
-
-### 2. Store Rate at Order Creation
-
-```typescript
-// In order service
-const exchangeRate = await getExchangeRate("EUR", customerCurrency);
-
-await db.insert(orders).values({
-	currencyCode: customerCurrency,
-	exchangeRate: exchangeRate.toString()
-	// ... totals converted to customer currency
-});
-```
-
-### 3. Add Currency Selector
-
-```svelte
-<!-- Currency selector component -->
-<select bind:value={selectedCurrency}>
-	<option value="EUR">EUR (€)</option>
-	<option value="USD">USD ($)</option>
-	<option value="GBP">GBP (£)</option>
-</select>
-```
-
-### 4. Display Converted Prices
-
-```svelte
-<script>
-	import { formatPrice, convertPrice } from "$lib/utils";
-
-	let { price, baseCurrency, targetCurrency, exchangeRate } = $props();
-
-	const displayPrice = convertPrice(price, exchangeRate);
-</script>
-
-<span>{formatPrice(displayPrice, targetCurrency)}</span>
-```
-
 ## Best Practices
 
 1. **Always use `formatPrice()`** - never format manually with `.toFixed(2)`

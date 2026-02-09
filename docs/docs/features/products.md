@@ -71,7 +71,6 @@ Products and variants can have facet values assigned for:
 Full-text search using PostgreSQL:
 
 ```typescript
-// API endpoint: GET /api/search?q=shirt&lang=en
 const results = await productService.search("shirt", "en");
 ```
 
@@ -84,14 +83,6 @@ await productService.create({
 	translations: [{ languageCode: "en", name: "Blue Shirt", description: "..." }]
 });
 
-// Add variant
-await variantService.create({
-	productId: 123,
-	sku: "BLUE-SHIRT-M",
-	price: 4999,
-	stock: 100
-});
-
-// Update stock
-await variantService.updateStock(variantId, 50);
+// Variant operations are handled through productService
+// See src/lib/server/services/products.ts for variant management
 ```

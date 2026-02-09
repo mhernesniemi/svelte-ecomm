@@ -125,16 +125,23 @@ export const POST = createWebhookHandler({
 
 	handlers: {
 		"inventory.updated": async (payload: { sku: string; quantity: number }) => {
-			const variant = await variantService.getBySku(payload.sku);
+			// Look up variant by SKU and update stock
+			const [variant] = await db
+				.select()
+				.from(productVariants)
+				.where(eq(productVariants.sku, payload.sku));
 			if (variant) {
-				await variantService.updateStock(variant.id, payload.quantity);
+				await db
+					.update(productVariants)
+					.set({ stock: payload.quantity })
+					.where(eq(productVariants.id, variant.id));
 			}
 		},
 
 		"order.shipped": async (payload: { reference: string; trackingNumber: string }) => {
 			const order = await orderService.getByCode(payload.reference);
 			if (order) {
-				await orderService.ship(order.id, payload.trackingNumber);
+				await orderService.transitionState(order.id, "shipped");
 			}
 		}
 	},

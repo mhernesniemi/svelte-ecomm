@@ -8,76 +8,60 @@ All business logic lives in `src/lib/server/services/`. Each service is a single
 
 ## Product Service
 
+Manages products and their variants.
+
 ```typescript
-import { productService } from '$lib/server/services/products';
+import { productService } from "$lib/server/services/products";
 
 // Get by ID or slug
 const product = await productService.getById(123);
-const product = await productService.getBySlug('blue-shirt');
+const product = await productService.getBySlug("blue-shirt");
 
 // List with pagination
 const { items, total } = await productService.list({
-  page: 1,
-  limit: 20,
-  languageCode: 'en'
+	page: 1,
+	limit: 20,
+	languageCode: "en"
 });
 
 // Search
-const results = await productService.search('shirt', 'en');
+const results = await productService.search("shirt", "en");
 
 // CRUD
-await productService.create({ slug: 'new-product', ... });
-await productService.update(123, { ... });
+await productService.create({ slug: "new-product" /* ... */ });
+await productService.update(123, { /* ... */ });
 await productService.delete(123);
 ```
 
+Variant operations (stock, pricing, SKU management) are also handled through `productService`.
+
 ## Order Service
 
+Manages the full order lifecycle, including cart operations.
+
 ```typescript
-import { orderService } from '$lib/server/services/orders';
+import { orderService } from "$lib/server/services/orders";
 
-// Create from cart
-const order = await orderService.createFromCart(cartId, {
-  customerId: 123,
-  shippingAddress: { ... },
-  billingAddress: { ... }
-});
+// Cart operations (orders in "created" state act as carts)
+const cart = await orderService.getOrCreateActiveCart({ cartToken, customerId });
+await orderService.addLine(orderId, { variantId, quantity });
+await orderService.updateLineQuantity(orderId, lineId, quantity);
+await orderService.removeLine(orderId, lineId);
 
-// State transitions
-await orderService.confirm(orderId);
-await orderService.ship(orderId, trackingNumber);
-await orderService.deliver(orderId);
-await orderService.cancel(orderId, reason);
+// State transitions (all go through transitionState)
+await orderService.transitionState(orderId, "payment_pending");
+await orderService.transitionState(orderId, "paid");
+await orderService.transitionState(orderId, "shipped");
+await orderService.transitionState(orderId, "delivered");
+await orderService.transitionState(orderId, "cancelled");
+
+// Checkout
+await orderService.setShippingAddress(orderId, address);
+await orderService.setCustomerEmail(orderId, email);
+await orderService.updateTotals(orderId);
 
 // Query
-const order = await orderService.getByCode('ORD-2024-001');
-```
-
-## Cart Service
-
-```typescript
-import { cartService } from "$lib/server/services/cart";
-
-// Get or create by token
-const cart = await cartService.getOrCreate(token);
-
-// Modify cart
-await cartService.addItem(cartId, variantId, quantity);
-await cartService.updateQuantity(cartId, lineId, quantity);
-await cartService.removeItem(cartId, lineId);
-```
-
-## Variant Service
-
-```typescript
-import { variantService } from "$lib/server/services/variants";
-
-// Stock management
-await variantService.updateStock(variantId, newStock);
-await variantService.decrementStock(variantId, quantity);
-
-// Get by SKU
-const variant = await variantService.getBySku("SKU-001");
+const order = await orderService.getByCode("ORD-2024-001");
 ```
 
 ## Customer Service
@@ -91,3 +75,19 @@ const customer = await customerService.getOrCreateFromClerk(clerkUser);
 // Query
 const customer = await customerService.getByEmail("user@example.com");
 ```
+
+## Other Services
+
+See `src/lib/server/services/` for all available services including:
+
+- `taxService` — Tax rate lookups and calculations
+- `paymentService` — Payment provider orchestration
+- `shippingService` — Shipping provider orchestration
+- `collectionService` — Product collections
+- `promotionService` — Discount and promotion rules
+- `reservationService` — Stock reservations
+- `customerGroupService` — Customer group management
+- `contentPageService` — CMS content pages
+- `assetService` — Image/file management
+- `wishlistService` — Customer wishlists
+- `reviewService` — Product reviews

@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Cart
 
-Hoikka uses cookie-based cart tokens for guest-friendly shopping.
+Hoikka uses cookie-based cart tokens for guest-friendly shopping. Carts are orders in `"created"` state, managed through `orderService`.
 
 ## Cart Tokens
 
@@ -13,13 +13,12 @@ Hoikka uses cookie-based cart tokens for guest-friendly shopping.
 export const load = async ({ cookies }) => {
 	const token = cookies.get("cart_token") ?? crypto.randomUUID();
 
-	// Set cookie if new
 	cookies.set("cart_token", token, {
 		path: "/",
 		maxAge: 60 * 60 * 24 * 30 // 30 days
 	});
 
-	const cart = await cartService.getOrCreate(token);
+	const cart = await orderService.getOrCreateActiveCart({ cartToken: token });
 	return { cart };
 };
 ```
@@ -29,7 +28,7 @@ export const load = async ({ cookies }) => {
 ### Add Item
 
 ```typescript
-await cartService.addItem(cartId, variantId, quantity);
+await orderService.addLine(cartId, { variantId, quantity });
 
 // If item exists, quantity is increased
 ```
@@ -37,21 +36,13 @@ await cartService.addItem(cartId, variantId, quantity);
 ### Update Quantity
 
 ```typescript
-await cartService.updateQuantity(cartId, lineId, newQuantity);
-
-// Quantity 0 removes the item
+await orderService.updateLineQuantity(cartId, lineId, newQuantity);
 ```
 
 ### Remove Item
 
 ```typescript
-await cartService.removeItem(cartId, lineId);
-```
-
-### Clear Cart
-
-```typescript
-await cartService.clear(cartId);
+await orderService.removeLine(cartId, lineId);
 ```
 
 ## Cart Structure
@@ -75,26 +66,6 @@ interface CartLine {
 }
 ```
 
-## Converting to Order
-
-```typescript
-// At checkout
-const order = await orderService.createFromCart(cart.id, {
-	shippingAddress: formData.shippingAddress,
-	billingAddress: formData.billingAddress
-});
-
-// Cart is cleared after successful order creation
-```
-
 ## Stock Validation
 
-Stock is validated when adding items:
-
-```typescript
-// Throws if insufficient stock
-await cartService.addItem(cartId, variantId, 100);
-// Error: Insufficient stock for variant SKU-001
-```
-
-Stock is reserved when the order is created and decremented when confirmed.
+Stock is validated when adding items. Stock reservations are created with a 15-minute expiry. See `ARCHITECTURE.md` for the full reservation lifecycle.
