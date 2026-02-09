@@ -52,7 +52,9 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/customers?tab=groups" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+    <a
+      href="/admin/customers?tab=groups"
+      class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Customer Groups</a
     >
   </div>
@@ -84,8 +86,9 @@
           <h2 class="mb-4 text-lg font-medium text-foreground">Group Details</h2>
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label for="group_name" class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >Name</label
+              <label
+                for="group_name"
+                class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label
               >
               <input
                 type="text"
@@ -122,7 +125,8 @@
         <div class="border-b border-border p-6">
           <h2 class="text-lg font-medium text-foreground">Customers</h2>
           <p class="mt-1 text-sm text-foreground-tertiary">
-            {data.groupCustomers.length} customer{data.groupCustomers.length !== 1 ? "s" : ""} in this group
+            {data.groupCustomers.length} customer{data.groupCustomers.length !== 1 ? "s" : ""} in this
+            group
           </p>
         </div>
 
@@ -233,7 +237,6 @@
           </p>
         </div>
       </div>
-
     </div>
   </div>
 

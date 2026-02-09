@@ -36,7 +36,9 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/products" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+    <a
+      href="/admin/products"
+      class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Products</a
     >
   </div>

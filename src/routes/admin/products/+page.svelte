@@ -95,11 +95,7 @@
 
 {#snippet statusCell({ visibility }: { visibility: string })}
   <Badge
-    variant={visibility === "public"
-      ? "success"
-      : visibility === "private"
-        ? "warning"
-        : "outline"}
+    variant={visibility === "public" ? "success" : visibility === "private" ? "warning" : "outline"}
   >
     {visibility === "public" ? "Public" : visibility === "private" ? "Private" : "Draft"}
   </Badge>

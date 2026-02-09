@@ -58,7 +58,9 @@
 
 <div>
   <div class="mb-8">
-    <a href="/admin/customers" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+    <a
+      href="/admin/customers"
+      class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Customers</a
     >
     <h1 class="mt-2 text-2xl font-bold">

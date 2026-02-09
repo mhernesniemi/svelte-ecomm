@@ -87,7 +87,7 @@
   </div>
 
   <!-- Two Column Layout -->
-  <div class="flex flex-col lg:flex-row gap-6">
+  <div class="flex flex-col gap-6 lg:flex-row">
     <!-- Main Content (Left) -->
     <div class="flex-1 space-y-6">
       <!-- Variant Details -->
@@ -196,7 +196,7 @@
     </div>
 
     <!-- Sidebar (Right) -->
-    <div class="w-full lg:w-80 lg:shrink-0 space-y-6">
+    <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
       <!-- Facet Values Section -->
       <div class="rounded-lg bg-surface shadow">
         <div class="border-b border-border px-4 py-3">
@@ -292,7 +292,8 @@
             href="/admin/products/{data.product.id}"
             class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
           >
-            {data.product.name} <ChevronRight class="h-4 w-4" />
+            {data.product.name}
+            <ChevronRight class="h-4 w-4" />
           </a>
         </div>
       </div>

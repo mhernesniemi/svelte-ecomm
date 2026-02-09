@@ -29,7 +29,9 @@ const results = await productService.search("shirt", "en");
 
 // CRUD
 await productService.create({ slug: "new-product" /* ... */ });
-await productService.update(123, { /* ... */ });
+await productService.update(123, {
+	/* ... */
+});
 await productService.delete(123);
 ```
 

@@ -362,7 +362,10 @@ export class PromotionService {
 		// Customer group restriction check
 		if (promotion.customerGroupId) {
 			if (!options?.customerId) {
-				return { valid: false, error: "This promotion is restricted to specific customers" };
+				return {
+					valid: false,
+					error: "This promotion is restricted to specific customers"
+				};
 			}
 			const [membership] = await db
 				.select()
@@ -374,7 +377,10 @@ export class PromotionService {
 					)
 				);
 			if (!membership) {
-				return { valid: false, error: "This promotion is restricted to specific customers" };
+				return {
+					valid: false,
+					error: "This promotion is restricted to specific customers"
+				};
 			}
 		}
 

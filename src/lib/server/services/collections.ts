@@ -436,7 +436,11 @@ export class CollectionService {
 	 */
 	async replaceFilters(
 		collectionId: number,
-		filters: { field: CollectionFilterField; operator: CollectionFilterOperator; value: unknown }[]
+		filters: {
+			field: CollectionFilterField;
+			operator: CollectionFilterOperator;
+			value: unknown;
+		}[]
 	): Promise<void> {
 		await db.delete(collectionFilters).where(eq(collectionFilters.collectionId, collectionId));
 

@@ -580,8 +580,16 @@
                 }}
                 class="mt-4"
               >
-                <input type="hidden" name="paymentMethodId" value={selectedPaymentMethod?.id ?? ""} />
-                <Button type="submit" disabled={!selectedPaymentMethod || isProcessingPayment} class="w-full">
+                <input
+                  type="hidden"
+                  name="paymentMethodId"
+                  value={selectedPaymentMethod?.id ?? ""}
+                />
+                <Button
+                  type="submit"
+                  disabled={!selectedPaymentMethod || isProcessingPayment}
+                  class="w-full"
+                >
                   {isProcessingPayment ? "Processing..." : "Create Payment"}
                 </Button>
               </form>

@@ -208,7 +208,10 @@
       </ol>
     </nav>
     {#if data.isAdmin}
-      <a href="/admin/products/{product.id}" class={buttonVariants({ variant: "outline", size: "sm" })}>Edit</a>
+      <a
+        href="/admin/products/{product.id}"
+        class={buttonVariants({ variant: "outline", size: "sm" })}>Edit</a
+      >
     {/if}
   </div>
 

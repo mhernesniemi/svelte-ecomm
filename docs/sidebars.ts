@@ -49,7 +49,7 @@ const sidebars: SidebarsConfig = {
 				"integrations/webhooks",
 				"integrations/erp-example"
 			]
-		},
+		}
 	]
 };
 

@@ -72,7 +72,9 @@
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
-    <a href="/admin/promotions" class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+    <a
+      href="/admin/promotions"
+      class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Promotions</a
     >
   </div>
@@ -88,7 +90,7 @@
     <input type="hidden" name="productIds" value={JSON.stringify(selectedProductIds)} />
     <input type="hidden" name="collectionIds" value={JSON.stringify(selectedCollectionIds)} />
 
-    <div class="flex flex-col lg:flex-row gap-6">
+    <div class="flex flex-col gap-6 lg:flex-row">
       <!-- Left Column -->
       <div class="flex-1 space-y-6">
         <!-- Type Selection -->
@@ -466,7 +468,7 @@
       </div>
 
       <!-- Right Sidebar -->
-      <div class="w-full lg:w-80 lg:shrink-0 space-y-6">
+      <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
         <!-- Combination Settings -->
         <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Combinations</h2>

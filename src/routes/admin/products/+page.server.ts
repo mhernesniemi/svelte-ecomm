@@ -26,7 +26,10 @@ export const actions: Actions = {
 
 		try {
 			await Promise.all(ids.map((id) => productService.update(id, { visibility: "public" })));
-			return { success: true, message: `${ids.length} product${ids.length !== 1 ? "s" : ""} published` };
+			return {
+				success: true,
+				message: `${ids.length} product${ids.length !== 1 ? "s" : ""} published`
+			};
 		} catch {
 			return fail(500, { error: "Failed to publish products" });
 		}

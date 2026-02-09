@@ -85,7 +85,9 @@
 >
   <!-- Sidebar -->
   <aside
-    class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transition-transform duration-200 lg:translate-x-0 {sidebarOpen ? 'translate-x-0' : 'max-lg:-translate-x-full'}"
+    class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transition-transform duration-200 lg:translate-x-0 {sidebarOpen
+      ? 'translate-x-0'
+      : 'max-lg:-translate-x-full'}"
   >
     <div class="p-6">
       <h1 class="font-italic font-mono text-xl font-bold text-blue-300">Hoikka</h1>
@@ -211,7 +213,7 @@
   {/if}
 
   <!-- Main content -->
-  <main class="lg:ml-64 px-4 pt-4 pb-6 lg:pt-6 lg:pr-8 lg:pb-8 lg:pl-8">
+  <main class="px-4 pt-4 pb-6 lg:ml-64 lg:pt-6 lg:pr-8 lg:pb-8 lg:pl-8">
     <!-- Mobile hamburger -->
     <button
       class="mb-4 rounded-lg p-2 hover:bg-hover lg:hidden"

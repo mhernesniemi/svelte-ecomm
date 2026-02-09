@@ -22,7 +22,10 @@ export class ReservationService {
 	async getAvailableStock(variantId: number): Promise<number> {
 		// Get variant's total stock and tracking setting
 		const [variant] = await db
-			.select({ stock: productVariants.stock, trackInventory: productVariants.trackInventory })
+			.select({
+				stock: productVariants.stock,
+				trackInventory: productVariants.trackInventory
+			})
 			.from(productVariants)
 			.where(eq(productVariants.id, variantId));
 
@@ -54,7 +57,10 @@ export class ReservationService {
 	async getAvailableStockExcludingOrder(variantId: number, orderId: number): Promise<number> {
 		// Get variant's total stock and tracking setting
 		const [variant] = await db
-			.select({ stock: productVariants.stock, trackInventory: productVariants.trackInventory })
+			.select({
+				stock: productVariants.stock,
+				trackInventory: productVariants.trackInventory
+			})
 			.from(productVariants)
 			.where(eq(productVariants.id, variantId));
 
