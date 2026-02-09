@@ -14,15 +14,36 @@ This also makes Hoikka well-suited for AI-assisted development - the codebase is
 
 ## What's Included
 
-**Products & catalog** — Variants with per-variant pricing and stock, faceted attributes, multi-language translations, smart collections with rule-based filtering, and hierarchical categories.
+### Products & Catalog
 
-**Orders & checkout** — State-machine order lifecycle, guest checkout with cookie-based cart tokens, stock reservations that prevent overselling, and a promotions engine with percentage/fixed discounts, usage limits, and customer group targeting.
+- Variants with per-variant pricing and stock tracking
+- Faceted attributes for filtering and search refinement
+- Multi-language translations for products, categories, and collections
+- Smart collections with rule-based filtering
+- Hierarchical categories with breadcrumb navigation
 
-**Payments & shipping** — Provider pattern that lets you swap implementations. Ships with Stripe for payments and Posti/Matkahuolto for shipping.
+### Orders & Checkout
 
-**Integrations** — PostgreSQL-backed job queue with retry and backoff, transactional events, sync runner for external systems, and webhook handlers — all without Redis or external dependencies.
+- State-machine order lifecycle from cart to delivery
+- Guest checkout with cookie-based cart tokens
+- Stock reservations that prevent overselling
+- Promotions engine with percentage/fixed discounts, usage limits, and customer group targeting
 
-**Admin & content** — Full dashboard for managing products, orders, customers, collections, promotions, content pages and reviews.
+### Payments & Shipping
+
+- Provider pattern that lets you swap implementations
+- Ships with Stripe for payments and Posti/Matkahuolto for shipping
+
+### Integrations
+
+- PostgreSQL-backed job queue with retry and exponential backoff
+- Transactional events for reliable side effects
+- Sync runner and webhook handlers for external systems
+- No Redis or external dependencies needed
+
+### Admin & Content
+
+- Full dashboard for managing products, orders, customers, collections, promotions, content pages, and reviews
 
 ## Quick Start
 
