@@ -40,8 +40,7 @@ const payment = await paymentService.createPayment(orderId, stripeMethodId);
 
 ### Webhook Handler
 
-```typescript
-// src/routes/api/webhooks/stripe/+server.ts
+```typescript filename="src/routes/api/webhooks/stripe/+server.ts"
 export const POST = async ({ request }) => {
 	const sig = request.headers.get("stripe-signature");
 	const body = await request.text();

@@ -5,8 +5,7 @@ Handle incoming webhooks from external systems with signature verification.
 
 ## Creating a Webhook Handler
 
-```typescript
-// src/routes/api/webhooks/erp/+server.ts
+```typescript filename="src/routes/api/webhooks/erp/+server.ts"
 import { createWebhookHandler, signatureVerifiers } from "$lib/server/integrations";
 
 export const POST = createWebhookHandler({

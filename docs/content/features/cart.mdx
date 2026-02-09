@@ -5,8 +5,7 @@ Hoikka uses cookie-based cart tokens for guest-friendly shopping. Carts are orde
 
 ## Cart Tokens
 
-```typescript
-// In +page.server.ts
+```typescript filename="+page.server.ts"
 export const load = async ({ cookies }) => {
 	const token = cookies.get("cart_token") ?? crypto.randomUUID();
 

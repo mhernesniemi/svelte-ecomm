@@ -18,8 +18,7 @@ interface PaymentProvider {
 
 ### Adding a Provider
 
-```typescript
-// src/lib/server/services/payments/providers/klarna.ts
+```typescript filename="src/lib/server/services/payments/providers/klarna.ts"
 export class KlarnaProvider implements PaymentProvider {
 	code = "klarna";
 
@@ -47,8 +46,7 @@ export class KlarnaProvider implements PaymentProvider {
 
 Register it:
 
-```typescript
-// src/lib/server/services/payments/index.ts
+```typescript filename="src/lib/server/services/payments/index.ts"
 import { KlarnaProvider } from "./providers/klarna";
 
 PROVIDERS.set("klarna", new KlarnaProvider());
@@ -69,8 +67,7 @@ interface ShippingProvider {
 
 ### Adding a Provider
 
-```typescript
-// src/lib/server/services/shipping/providers/dhl.ts
+```typescript filename="src/lib/server/services/shipping/providers/dhl.ts"
 export class DhlProvider implements ShippingProvider {
 	code = "dhl";
 

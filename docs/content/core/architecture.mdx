@@ -7,8 +7,7 @@ Hoikka follows a service-oriented architecture with clear separation of concerns
 
 Business logic lives in singleton services:
 
-```typescript
-// src/lib/server/services/products.ts
+```typescript filename="src/lib/server/services/products.ts"
 class ProductService {
   async getById(id: number) { ... }
   async create(data: NewProduct) { ... }
@@ -20,8 +19,7 @@ export const productService = new ProductService();
 
 Usage in routes:
 
-```typescript
-// src/routes/admin/products/[id]/+page.server.ts
+```typescript filename="src/routes/admin/products/[id]/+page.server.ts"
 import { productService } from "$lib/server/services/products";
 
 export const load = async ({ params }) => {
@@ -62,8 +60,7 @@ Database (Drizzle ORM)
 
 Most mutations use SvelteKit form actions with progressive enhancement:
 
-```typescript
-// +page.server.ts
+```typescript filename="+page.server.ts"
 export const actions = {
 	update: async ({ request, params }) => {
 		const formData = await request.formData();

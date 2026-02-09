@@ -23,8 +23,7 @@ IMAGEKIT_URL_ENDPOINT="https://ik.imagekit.io/your_id"
 
 ### Client Setup
 
-```typescript
-// src/lib/server/imagekit.ts
+```typescript filename="src/lib/server/imagekit.ts"
 import ImageKit from "imagekit";
 
 export const imagekit = new ImageKit({
@@ -52,8 +51,7 @@ const result = await imagekit.upload({
 
 Generate authentication parameters server-side:
 
-```typescript
-// +server.ts
+```typescript filename="+server.ts"
 export const GET = async () => {
 	const authParams = imagekit.getAuthenticationParameters();
 	return json(authParams);
@@ -117,8 +115,7 @@ https://ik.imagekit.io/your_id/image.jpg?tr=w-300,h-300
 
 ## Helper Function
 
-```typescript
-// src/lib/utils/image.ts
+```typescript filename="src/lib/utils/image.ts"
 const IMAGEKIT_URL = process.env.IMAGEKIT_URL_ENDPOINT;
 
 export function getImageUrl(

@@ -7,8 +7,7 @@ Complete example showing how to integrate an external ERP system.
 
 ### ERP Client
 
-```typescript
-// src/lib/server/integrations/erp/client.ts
+```typescript filename="src/lib/server/integrations/erp/client.ts"
 export class ErpClient {
 	private baseUrl = process.env.ERP_BASE_URL!;
 	private apiKey = process.env.ERP_API_KEY!;
@@ -38,8 +37,7 @@ export const erpClient = new ErpClient();
 
 ## Inventory Sync
 
-```typescript
-// src/lib/server/integrations/erp/inventory-sync.ts
+```typescript filename="src/lib/server/integrations/erp/inventory-sync.ts"
 import {
 	registerSyncJob,
 	scheduleSyncJob,
@@ -84,8 +82,7 @@ export async function initInventorySync() {
 
 ## Order Push
 
-```typescript
-// src/lib/server/integrations/erp/order-push.ts
+```typescript filename="src/lib/server/integrations/erp/order-push.ts"
 import { onPersistent, withRetry } from "$lib/server/integrations";
 import { erpClient } from "./client";
 
@@ -112,8 +109,7 @@ onPersistent("order.paid", async ({ orderId }) => {
 
 ## Webhook Handler
 
-```typescript
-// src/routes/api/webhooks/erp/+server.ts
+```typescript filename="src/routes/api/webhooks/erp/+server.ts"
 import { createWebhookHandler, signatureVerifiers } from "$lib/server/integrations";
 
 export const POST = createWebhookHandler({
@@ -149,8 +145,7 @@ export const POST = createWebhookHandler({
 
 ## Initialize on Server Start
 
-```typescript
-// src/hooks.server.ts
+```typescript filename="src/hooks.server.ts"
 import { startWorker } from "$lib/server/integrations";
 import { initInventorySync } from "$lib/server/integrations/erp/inventory-sync";
 import "./lib/server/integrations/erp/order-push";

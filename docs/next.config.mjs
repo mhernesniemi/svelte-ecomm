@@ -1,12 +1,14 @@
 import nextra from 'nextra';
 
 const withNextra = nextra({
-	contentDirBasePath: '/'
+	contentDirBasePath: '/',
+	defaultShowCopyCode: true
 });
 
 export default withNextra({
 	basePath: '/docs',
 	output: 'export',
+	trailingSlash: true,
 	images: {
 		unoptimized: true
 	}

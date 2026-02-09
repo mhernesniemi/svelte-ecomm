@@ -22,7 +22,6 @@ This is a **full-stack e-commerce platform** built with:
 ## Tools
 
 - Use Bun everywhere when possible.
-- **Do NOT run `bun run build`** — it breaks the local dev server and requires a restart. Use `bunx svelte-check --threshold error` for type checking if needed, or skip verification entirely since the dev server catches errors in real-time.
 
 ## UI Guidelines
 

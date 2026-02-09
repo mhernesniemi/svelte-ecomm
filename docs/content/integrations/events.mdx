@@ -83,8 +83,7 @@ await db.transaction(async (tx) => {
 
 Extend the EventMap type:
 
-```typescript
-// src/lib/server/integrations/events.ts
+```typescript filename="src/lib/server/integrations/events.ts"
 export type EventMap = {
 	// ... existing events
 	"custom.event": { myData: string };
