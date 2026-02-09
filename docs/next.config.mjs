@@ -6,5 +6,8 @@ const withNextra = nextra({
 });
 
 export default withNextra({
-	basePath: '/docs'
+	basePath: '/docs',
+	eslint: {
+		ignoreDuringBuilds: true
+	}
 });

@@ -1,3 +1,10 @@
+/* Logo */
+.hoikka-logo {
+	font-family: monospace;
+	color: pink;
+	font-size: 22px;
+}
+
 /* Code blocks — softer, warm-tinted backgrounds */
 .nextra-code pre {
 	background-color: #faf8f9 !important;
