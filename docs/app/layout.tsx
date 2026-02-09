@@ -2,6 +2,7 @@ import { Footer, Layout, Navbar } from 'nextra-theme-docs';
 import { Head } from 'nextra/components';
 import { getPageMap } from 'nextra/page-map';
 import 'nextra-theme-docs/style.css';
+import './custom.css';
 
 export const metadata = {
 	title: 'Hoikka Documentation'
@@ -14,7 +15,13 @@ export default async function RootLayout({
 }) {
 	return (
 		<html lang="en" dir="ltr" suppressHydrationWarning>
-			<Head />
+			<Head
+				color={{
+					hue: { dark: 330, light: 330 },
+					saturation: { dark: 80, light: 81 },
+					lightness: { dark: 65, light: 50 }
+				}}
+			/>
 			<body>
 				<Layout
 					navbar={
