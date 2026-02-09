@@ -10,8 +10,8 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Badge } from "$lib/components/admin/ui/badge";
   import X from "@lucide/svelte/icons/x";
+  import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -70,6 +70,30 @@
 
   function removeFacetValue(id: number) {
     selectedFacetValues = selectedFacetValues.filter((fv) => fv !== id);
+  }
+
+  // Group pricing — all client-side, saved with main form
+  let groupPricingEnabled = $state(data.groupPrices.length > 0);
+  let groupPrices = $state<{ groupId: number; price: string }[]>(
+    data.groupPrices.map((gp) => ({ groupId: gp.groupId, price: (gp.price / 100).toFixed(2) }))
+  );
+  let newGroupId = $state<number | null>(null);
+  let newGroupPrice = $state("");
+
+  const availableGroups = $derived(
+    data.customerGroups.filter((g) => !groupPrices.some((gp) => gp.groupId === g.id))
+  );
+
+  function addGroupPrice() {
+    const groupId = newGroupId ?? availableGroups[0]?.id;
+    if (!groupId || !newGroupPrice) return;
+    groupPrices = [...groupPrices, { groupId, price: newGroupPrice }];
+    newGroupPrice = "";
+    newGroupId = null;
+  }
+
+  function removeGroupPrice(groupId: number) {
+    groupPrices = groupPrices.filter((gp) => gp.groupId !== groupId);
   }
 </script>
 
@@ -204,6 +228,114 @@
           {/if}
         </div>
       </div>
+
+      <!-- Group Pricing -->
+      <div class="rounded-lg bg-surface shadow">
+        <div class="flex flex-col gap-4 p-6">
+          <h2 class="text-lg font-semibold">Group Pricing</h2>
+
+          <div class="flex items-center gap-2">
+            <Checkbox id="groupPricingEnabled" bind:checked={groupPricingEnabled} />
+            <label for="groupPricingEnabled" class="text-sm text-foreground-secondary">
+              Enable customer group based pricing
+            </label>
+          </div>
+
+          {#if groupPricingEnabled}
+            {#if data.customerGroups.length === 0}
+              <p class="text-sm text-muted-foreground">
+                No customer groups exist.
+                <a
+                  href="/admin/customers/groups"
+                  class="text-blue-600 hover:underline dark:text-blue-400"
+                >
+                  Create one
+                </a>
+                to set group-specific prices.
+              </p>
+            {:else}
+              <div class="space-y-4">
+                <!-- Column headers -->
+                <div class="grid grid-cols-2 gap-4">
+                  <span class="text-sm font-medium text-foreground-secondary">Group</span>
+                  <span class="text-sm font-medium text-foreground-secondary">Price (EUR)</span>
+                </div>
+
+                <!-- Existing group prices -->
+                {#each groupPrices as gp}
+                  {@const group = data.customerGroups.find((g) => g.id === gp.groupId)}
+                  <div class="grid grid-cols-2 gap-4">
+                    <div
+                      class="flex h-10 items-center rounded-lg border border-input-border bg-muted px-3 text-sm text-muted-foreground"
+                    >
+                      {group?.name ?? `Group #${gp.groupId}`}
+                    </div>
+                    <div class="flex gap-2">
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        bind:value={gp.price}
+                        class="h-10 w-full rounded-lg border border-input-border px-3 text-sm"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        class="h-10 w-10 shrink-0"
+                        onclick={() => removeGroupPrice(gp.groupId)}
+                      >
+                        <Trash2 class="h-4 w-4 text-red-500" />
+                      </Button>
+                    </div>
+                  </div>
+                {/each}
+
+                <!-- Add row -->
+                {#if availableGroups.length > 0}
+                  <div class="grid grid-cols-2 gap-4">
+                    <select
+                      bind:value={newGroupId}
+                      class="h-10 w-full rounded-lg border border-input-border px-3 text-sm"
+                    >
+                      {#each availableGroups as group}
+                        <option value={group.id}>{group.name}</option>
+                      {/each}
+                    </select>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      bind:value={newGroupPrice}
+                      placeholder="0.00"
+                      class="h-10 w-full rounded-lg border border-input-border px-3 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Button type="button" variant="outline" size="sm" onclick={addGroupPrice}>
+                      Add Price
+                    </Button>
+                  </div>
+                {/if}
+              </div>
+            {/if}
+          {/if}
+
+          <!-- Hidden inputs for main form -->
+          {#if groupPricingEnabled}
+            <input form="variant-form" type="hidden" name="groupPricingEnabled" value="on" />
+            {#each groupPrices as gp}
+              <input
+                form="variant-form"
+                type="hidden"
+                name="groupPriceGroupId"
+                value={gp.groupId}
+              />
+              <input form="variant-form" type="hidden" name="groupPricePrice" value={gp.price} />
+            {/each}
+          {/if}
+        </div>
+      </div>
     </div>
 
     <!-- Sidebar (Right) -->
@@ -304,7 +436,6 @@
             class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
           >
             {data.product.name}
-            <ChevronRight class="h-4 w-4" />
           </a>
         </div>
       </div>

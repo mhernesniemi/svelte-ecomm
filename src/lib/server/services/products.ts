@@ -16,7 +16,8 @@ import {
 	facets,
 	facetTranslations,
 	productAssets,
-	assets
+	assets,
+	productVariantGroupPrices
 } from "../db/schema.js";
 import type {
 	Product,
@@ -444,6 +445,40 @@ export class ProductService {
 				and(
 					eq(variantFacetValues.variantId, variantId),
 					eq(variantFacetValues.facetValueId, facetValueId)
+				)
+			);
+	}
+
+	// ============================================================================
+	// GROUP PRICING METHODS
+	// ============================================================================
+
+	async getGroupPrices(variantId: number) {
+		return db
+			.select()
+			.from(productVariantGroupPrices)
+			.where(eq(productVariantGroupPrices.variantId, variantId));
+	}
+
+	async setGroupPrice(variantId: number, groupId: number, price: number) {
+		const [result] = await db
+			.insert(productVariantGroupPrices)
+			.values({ variantId, groupId, price })
+			.onConflictDoUpdate({
+				target: [productVariantGroupPrices.variantId, productVariantGroupPrices.groupId],
+				set: { price }
+			})
+			.returning();
+		return result;
+	}
+
+	async removeGroupPrice(variantId: number, groupId: number) {
+		await db
+			.delete(productVariantGroupPrices)
+			.where(
+				and(
+					eq(productVariantGroupPrices.variantId, variantId),
+					eq(productVariantGroupPrices.groupId, groupId)
 				)
 			);
 	}

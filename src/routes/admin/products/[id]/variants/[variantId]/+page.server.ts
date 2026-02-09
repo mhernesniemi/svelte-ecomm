@@ -1,5 +1,6 @@
 import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
+import { customerGroupService } from "$lib/server/services/customerGroups.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -11,10 +12,12 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Invalid ID");
 	}
 
-	const [product, variant, facets] = await Promise.all([
+	const [product, variant, facets, customerGroups, groupPrices] = await Promise.all([
 		productService.getById(productId, "en"),
 		productService.getVariantById(variantId, "en"),
-		facetService.list("en")
+		facetService.list("en"),
+		customerGroupService.list(),
+		productService.getGroupPrices(variantId)
 	]);
 
 	if (!product) {
@@ -28,7 +31,9 @@ export const load: PageServerLoad = async ({ params }) => {
 	return {
 		product: { id: product.id, name: product.translations[0]?.name ?? "Product" },
 		variant,
-		facets
+		facets,
+		customerGroups,
+		groupPrices
 	};
 };
 
@@ -46,6 +51,10 @@ export const actions: Actions = {
 			.getAll("facetValueIds")
 			.map(Number)
 			.filter((id) => !isNaN(id));
+
+		const groupPricingEnabled = formData.get("groupPricingEnabled") === "on";
+		const groupPriceGroupIds = formData.getAll("groupPriceGroupId").map(Number);
+		const groupPricePrices = formData.getAll("groupPricePrice").map(Number);
 
 		if (!sku || isNaN(price)) {
 			return fail(400, { error: "SKU and price are required" });
@@ -73,6 +82,33 @@ export const actions: Actions = {
 					if (!currentIds.includes(id)) {
 						await productService.addVariantFacetValue(variantId, id);
 					}
+				}
+			}
+
+			// Sync group prices
+			const currentGroupPrices = await productService.getGroupPrices(variantId);
+			if (groupPricingEnabled) {
+				const desiredGroupIds = new Set(groupPriceGroupIds);
+
+				// Remove group prices no longer in the list
+				for (const gp of currentGroupPrices) {
+					if (!desiredGroupIds.has(gp.groupId)) {
+						await productService.removeGroupPrice(variantId, gp.groupId);
+					}
+				}
+
+				// Upsert desired group prices
+				for (let i = 0; i < groupPriceGroupIds.length; i++) {
+					const groupId = groupPriceGroupIds[i];
+					const groupPrice = Math.round(groupPricePrices[i] * 100);
+					if (!isNaN(groupId) && !isNaN(groupPrice) && groupPrice >= 0) {
+						await productService.setGroupPrice(variantId, groupId, groupPrice);
+					}
+				}
+			} else {
+				// Disabled — remove all group prices
+				for (const gp of currentGroupPrices) {
+					await productService.removeGroupPrice(variantId, gp.groupId);
 				}
 			}
 

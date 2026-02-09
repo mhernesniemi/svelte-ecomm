@@ -8,7 +8,7 @@
  * - Guest users get a `cartToken` stored in cookies
  * - Logged-in users have carts linked to `customerId`
  */
-import { eq, and, desc, sql, isNull } from "drizzle-orm";
+import { eq, and, desc, sql, isNull, inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
 import {
 	orders,
@@ -21,7 +21,9 @@ import {
 	orderShipping,
 	products,
 	assets,
-	customers
+	customers,
+	productVariantGroupPrices,
+	customerGroupMembers
 } from "../db/schema.js";
 import type {
 	Order,
@@ -277,13 +279,15 @@ export class OrderService {
 
 		if (!variant) throw new Error("Variant not found");
 
+		// Find existing line early (needed for both stock check and upsert)
+		const existingLine = order.lines.find((l) => l.variantId === input.variantId);
+
 		// Check stock availability using reservations (only for tracked variants)
 		if (variant.trackInventory) {
 			const availableStock = await reservationService.getAvailableStockExcludingOrder(
 				input.variantId,
 				orderId
 			);
-			const existingLine = order.lines.find((l) => l.variantId === input.variantId);
 			const existingQuantity = existingLine?.quantity ?? 0;
 			const totalQuantity = existingQuantity + input.quantity;
 
@@ -319,12 +323,19 @@ export class OrderService {
 		const taxRate = await taxService.getTaxRate(taxCode);
 		const isTaxExempt = await taxService.isCustomerTaxExempt(order.customerId);
 
+		// Resolve group-specific price (lowest of base price and any matching group prices)
+		const effectivePrice = await this.resolveEffectivePrice(
+			variant.price,
+			variant.id,
+			order.customerId
+		);
+
 		// Update existing line or create new one
 		if (existingLine) {
 			// Update quantity and recalculate tax
 			const newQuantity = existingLine.quantity + input.quantity;
 			const lineTax = taxService.calculateLineTax(
-				variant.price,
+				effectivePrice,
 				newQuantity,
 				taxRate,
 				isTaxExempt
@@ -351,7 +362,7 @@ export class OrderService {
 
 		// Calculate tax for new line
 		const lineTax = taxService.calculateLineTax(
-			variant.price,
+			effectivePrice,
 			input.quantity,
 			taxRate,
 			isTaxExempt
@@ -364,7 +375,7 @@ export class OrderService {
 				orderId,
 				variantId: input.variantId,
 				quantity: input.quantity,
-				unitPrice: variant.price,
+				unitPrice: effectivePrice,
 				lineTotal: lineTax.lineTotalGross,
 				taxCode,
 				taxRate: taxRate.toString(),
@@ -957,6 +968,41 @@ export class OrderService {
 	// ============================================================================
 	// PRIVATE HELPERS
 	// ============================================================================
+
+	private async resolveEffectivePrice(
+		variantPrice: number,
+		variantId: number,
+		customerId: number | null
+	): Promise<number> {
+		if (!customerId) return variantPrice;
+
+		// Get customer's group memberships
+		const memberships = await db
+			.select({ groupId: customerGroupMembers.groupId })
+			.from(customerGroupMembers)
+			.where(eq(customerGroupMembers.customerId, customerId));
+
+		if (memberships.length === 0) return variantPrice;
+
+		const groupIds = memberships.map((m) => m.groupId);
+
+		// Get matching group prices for this variant
+		const groupPrices = await db
+			.select({ price: productVariantGroupPrices.price })
+			.from(productVariantGroupPrices)
+			.where(
+				and(
+					eq(productVariantGroupPrices.variantId, variantId),
+					inArray(productVariantGroupPrices.groupId, groupIds)
+				)
+			);
+
+		if (groupPrices.length === 0) return variantPrice;
+
+		// Return the lowest of all matching group prices and the base price
+		const allPrices = [variantPrice, ...groupPrices.map((gp) => gp.price)];
+		return Math.min(...allPrices);
+	}
 
 	private async loadOrderRelations(order: Order): Promise<OrderWithRelations> {
 		// Join order lines with variant -> product -> featured asset to get images
