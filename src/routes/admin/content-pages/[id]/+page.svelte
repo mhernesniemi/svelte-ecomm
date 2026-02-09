@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { onMount } from "svelte";
@@ -127,13 +128,10 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="published"
-              name="published"
-              bind:checked={published}
-              class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
-            />
+            <Checkbox id="published" bind:checked={published} />
+            {#if published}
+              <input type="hidden" name="published" value="on" />
+            {/if}
             <label for="published" class="text-sm font-medium text-foreground-secondary">
               Published
             </label>

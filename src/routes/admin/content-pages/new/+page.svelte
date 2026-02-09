@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
 
@@ -26,6 +27,7 @@
   import { slugify } from "$lib/utils";
 
   let autoSlug = $state(true);
+  let published = $state(true);
   $effect(() => {
     if (autoSlug && title) {
       slug = slugify(title);
@@ -97,11 +99,7 @@
                   class="flex-1 rounded-lg border border-input-border px-3 py-2 shadow-sm"
                 />
                 <label class="flex items-center gap-2 text-sm text-muted-foreground">
-                  <input
-                    type="checkbox"
-                    bind:checked={autoSlug}
-                    class="rounded border-input-border"
-                  />
+                  <Checkbox bind:checked={autoSlug} />
                   Auto
                 </label>
               </div>
@@ -121,13 +119,10 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              id="published"
-              name="published"
-              checked
-              class="h-4 w-4 rounded border-input-border text-blue-600 dark:text-blue-400"
-            />
+            <Checkbox id="published" bind:checked={published} />
+            {#if published}
+              <input type="hidden" name="published" value="on" />
+            {/if}
             <label for="published" class="text-sm font-medium text-foreground-secondary">
               Published
             </label>

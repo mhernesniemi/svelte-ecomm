@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
@@ -758,13 +759,11 @@
               </div>
 
               <label class="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  name="setFeatured"
-                  value="true"
+                <Checkbox
                   checked={currentEditingImage.isFeatured}
                   disabled={currentEditingImage.isFeatured}
-                  class="h-4 w-4 rounded border-input-border text-blue-600 focus:ring-blue-500 dark:text-blue-400"
+                  name="setFeatured"
+                  value="true"
                 />
                 <span class="text-sm text-foreground-secondary">Featured image</span>
               </label>

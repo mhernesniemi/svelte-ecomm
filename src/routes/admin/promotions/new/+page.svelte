@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -28,6 +29,7 @@
   let selectedCollectionIds = $state<number[]>([]);
   let productComboboxOpen = $state(false);
   let collectionComboboxOpen = $state(false);
+  let combinesWithOtherPromotions = $state(false);
 
   function toggleProduct(id: number) {
     if (selectedProductIds.includes(id)) {
@@ -469,11 +471,10 @@
         <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Combinations</h2>
           <label class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="combinesWithOtherPromotions"
-              class="h-4 w-4 rounded border-input-border"
-            />
+            <Checkbox bind:checked={combinesWithOtherPromotions} />
+            {#if combinesWithOtherPromotions}
+              <input type="hidden" name="combinesWithOtherPromotions" value="on" />
+            {/if}
             <span class="text-sm">Combines with other promotions</span>
           </label>
           <p class="mt-2 text-xs text-muted-foreground">

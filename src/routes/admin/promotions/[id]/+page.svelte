@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Popover from "$lib/components/admin/ui/popover";
@@ -22,6 +23,8 @@
   let appliesTo = $state(promo.appliesTo);
   let selectedProductIds = $state<number[]>(promo.products.map((p) => p.productId));
   let selectedCollectionIds = $state<number[]>(promo.collections.map((c) => c.collectionId));
+  let enabled = $state(promo.enabled);
+  let combinesWithOtherPromotions = $state(promo.combinesWithOtherPromotions);
   let showDelete = $state(false);
   let productComboboxOpen = $state(false);
   let collectionComboboxOpen = $state(false);
@@ -459,6 +462,13 @@
             Leave empty for no start/end date restrictions.
           </p>
         </div>
+        <button
+          type="button"
+          class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
+          onclick={() => (showDelete = true)}
+        >
+          Delete this promotion
+        </button>
       </div>
 
       <!-- Right Sidebar -->
@@ -467,12 +477,10 @@
         <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Status</h2>
           <label class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="enabled"
-              checked={promo.enabled}
-              class="h-4 w-4 rounded border-input-border"
-            />
+            <Checkbox bind:checked={enabled} />
+            {#if enabled}
+              <input type="hidden" name="enabled" value="on" />
+            {/if}
             <span class="text-sm">Enabled</span>
           </label>
         </div>
@@ -481,12 +489,10 @@
         <div class="rounded-lg bg-surface p-6 shadow">
           <h2 class="mb-4 text-lg font-semibold">Combinations</h2>
           <label class="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="combinesWithOtherPromotions"
-              checked={promo.combinesWithOtherPromotions}
-              class="h-4 w-4 rounded border-input-border"
-            />
+            <Checkbox bind:checked={combinesWithOtherPromotions} />
+            {#if combinesWithOtherPromotions}
+              <input type="hidden" name="combinesWithOtherPromotions" value="on" />
+            {/if}
             <span class="text-sm">Combines with other promotions</span>
           </label>
           <p class="mt-2 text-xs text-muted-foreground">
@@ -526,14 +532,6 @@
       </div>
     </div>
   </form>
-
-  <button
-    type="button"
-    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
-    onclick={() => (showDelete = true)}
-  >
-    Delete this promotion
-  </button>
 </div>
 
 <DeleteConfirmDialog

@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { slugify } from "$lib/utils";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
 
@@ -83,7 +84,7 @@
             class="flex-1 rounded-lg border border-input-border px-3 py-2"
           />
           <label class="flex items-center gap-2 text-sm text-muted-foreground">
-            <input type="checkbox" bind:checked={autoSlug} class="rounded border-input-border" />
+            <Checkbox bind:checked={autoSlug} />
             Auto
           </label>
         </div>
