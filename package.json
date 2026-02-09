@@ -11,7 +11,7 @@
 	"scripts": {
 		"dev": "bun --bun vite dev",
 		"build": "vitest run && bun run build:docs && vite build && bun run prepack",
-		"build:docs": "cd docs && npm ci && npm run build && rm -rf ../static/docs && mv build ../static/docs",
+		"build:docs": "cd docs && bun install && bun run build && rm -rf ../static/docs && mv out ../static/docs",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"prepack": "svelte-kit sync && svelte-package && publint",

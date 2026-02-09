@@ -1,0 +1,168 @@
+
+# ERP Integration Example
+
+Complete example showing how to integrate an external ERP system.
+
+## Setup
+
+### ERP Client
+
+```typescript
+// src/lib/server/integrations/erp/client.ts
+export class ErpClient {
+	private baseUrl = process.env.ERP_BASE_URL!;
+	private apiKey = process.env.ERP_API_KEY!;
+
+	async getInventory(): Promise<ErpInventoryItem[]> {
+		const res = await fetch(`${this.baseUrl}/inventory`, {
+			headers: { Authorization: `Bearer ${this.apiKey}` }
+		});
+		return res.json();
+	}
+
+	async createOrder(order: ErpOrder): Promise<ErpOrderResponse> {
+		const res = await fetch(`${this.baseUrl}/orders`, {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${this.apiKey}`,
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(order)
+		});
+		return res.json();
+	}
+}
+
+export const erpClient = new ErpClient();
+```
+
+## Inventory Sync
+
+```typescript
+// src/lib/server/integrations/erp/inventory-sync.ts
+import {
+	registerSyncJob,
+	scheduleSyncJob,
+	syncIntervals,
+	type SyncJob
+} from "$lib/server/integrations";
+import { erpClient } from "./client";
+
+const inventorySync: SyncJob<ErpInventoryItem, typeof productVariants.$inferSelect> = {
+	name: "erp-inventory",
+
+	fetchExternal: () => erpClient.getInventory(),
+
+	getExternalId: (item) => item.sku,
+
+	findLocal: async (sku) => {
+		const [variant] = await db
+			.select()
+			.from(productVariants)
+			.where(eq(productVariants.sku, sku));
+		return variant ?? null;
+	},
+
+	create: async (item) => {
+		console.log(`Unknown SKU from ERP: ${item.sku}`);
+	},
+
+	update: async (item, local) => {
+		await db
+			.update(productVariants)
+			.set({ stock: item.quantity })
+			.where(eq(productVariants.id, local.id));
+	}
+};
+
+registerSyncJob(inventorySync);
+
+export async function initInventorySync() {
+	await scheduleSyncJob("erp-inventory", syncIntervals.hours(1));
+}
+```
+
+## Order Push
+
+```typescript
+// src/lib/server/integrations/erp/order-push.ts
+import { onPersistent, withRetry } from "$lib/server/integrations";
+import { erpClient } from "./client";
+
+onPersistent("order.paid", async ({ orderId }) => {
+	const order = await orderService.getById(orderId);
+	if (!order) return;
+
+	await withRetry(
+		() =>
+			erpClient.createOrder({
+				reference: order.code,
+				customerEmail: order.customer?.email,
+				items: order.lines.map((line) => ({
+					sku: line.variant.sku,
+					quantity: line.quantity,
+					unitPrice: line.unitPrice
+				})),
+				total: order.total
+			}),
+		{ maxAttempts: 5, delayMs: 2000, backoff: true }
+	);
+});
+```
+
+## Webhook Handler
+
+```typescript
+// src/routes/api/webhooks/erp/+server.ts
+import { createWebhookHandler, signatureVerifiers } from "$lib/server/integrations";
+
+export const POST = createWebhookHandler({
+	secret: process.env.ERP_WEBHOOK_SECRET,
+	verifySignature: signatureVerifiers.hmacHeader("x-erp-signature"),
+
+	handlers: {
+		"inventory.updated": async (payload: { sku: string; quantity: number }) => {
+			// Look up variant by SKU and update stock
+			const [variant] = await db
+				.select()
+				.from(productVariants)
+				.where(eq(productVariants.sku, payload.sku));
+			if (variant) {
+				await db
+					.update(productVariants)
+					.set({ stock: payload.quantity })
+					.where(eq(productVariants.id, variant.id));
+			}
+		},
+
+		"order.shipped": async (payload: { reference: string; trackingNumber: string }) => {
+			const order = await orderService.getByCode(payload.reference);
+			if (order) {
+				await orderService.transitionState(order.id, "shipped");
+			}
+		}
+	},
+
+	persistent: true
+});
+```
+
+## Initialize on Server Start
+
+```typescript
+// src/hooks.server.ts
+import { startWorker } from "$lib/server/integrations";
+import { initInventorySync } from "$lib/server/integrations/erp/inventory-sync";
+import "./lib/server/integrations/erp/order-push";
+
+startWorker();
+initInventorySync();
+```
+
+## Environment Variables
+
+```bash
+ERP_BASE_URL="https://erp.example.com/api"
+ERP_API_KEY="your-api-key"
+ERP_WEBHOOK_SECRET="your-webhook-secret"
+```

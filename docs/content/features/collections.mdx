@@ -1,0 +1,80 @@
+
+# Collections
+
+Collections group products for navigation and merchandising. They can be manual or rule-based (smart collections).
+
+## Manual Collections
+
+Manually assign products:
+
+```typescript
+await collectionService.addProduct(collectionId, productId);
+await collectionService.removeProduct(collectionId, productId);
+```
+
+## Smart Collections
+
+Define rules to automatically include products:
+
+```typescript
+const collection = await collectionService.create({
+	slug: "summer-sale",
+	translations: [{ languageCode: "en", name: "Summer Sale" }],
+	rules: {
+		conditions: [
+			{
+				type: "facet",
+				facetId: 5, // Category facet
+				valueIds: [12, 13] // T-Shirts, Shorts
+			},
+			{
+				type: "price",
+				operator: "lt",
+				value: 5000 // Under 50€
+			}
+		],
+		match: "all" // Products must match ALL conditions
+	}
+});
+```
+
+### Rule Types
+
+| Type    | Description                         |
+| ------- | ----------------------------------- |
+| `facet` | Products with specific facet values |
+| `price` | Price range (lt, gt, eq, between)   |
+
+### Match Mode
+
+- `all` - Product must match all conditions
+- `any` - Product must match at least one condition
+
+## Hierarchical Collections
+
+Collections can be nested:
+
+```typescript
+// Parent: "Clothing"
+// Children: "Men's", "Women's", "Kids"
+
+const collection = await collectionService.create({
+	slug: "mens-clothing",
+	parentId: clothingCollectionId
+	// ...
+});
+```
+
+## Querying Collections
+
+```typescript
+// Get collection with products
+const collection = await collectionService.getBySlug('summer-sale', {
+  languageCode: 'en',
+  page: 1,
+  limit: 20
+});
+
+// Returns products matching the rules
+collection.products = [{ ... }, { ... }];
+```
