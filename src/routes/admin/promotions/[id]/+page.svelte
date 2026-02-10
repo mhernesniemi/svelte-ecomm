@@ -2,7 +2,7 @@
   import { enhance } from "$app/forms";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
-  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Button } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Badge } from "$lib/components/admin/ui/badge";
@@ -116,10 +116,7 @@
       <Badge variant="outline">{typeLabels[promo.promotionType]}</Badge>
       <Badge variant={promoStatus.variant}>{promoStatus.label}</Badge>
     </div>
-    <div class="flex items-center gap-3">
-      <a href="/admin/promotions" class={buttonVariants({ variant: "outline" })}>Cancel</a>
-      <Button type="submit" form="edit-form">Save Changes</Button>
-    </div>
+    <Button type="submit" form="edit-form">Save Changes</Button>
   </div>
 
   <form
