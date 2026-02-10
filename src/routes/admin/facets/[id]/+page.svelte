@@ -48,6 +48,10 @@
     </Button>
   </div>
 
+  <!-- Two Column Layout -->
+  <div class="flex flex-col gap-6 lg:flex-row">
+    <!-- Main Content (Left) -->
+    <div class="flex-1 space-y-6">
   <!-- Edit Facet -->
   <form
     id="facet-form"
@@ -92,13 +96,6 @@
       </div>
     </div>
   </form>
-
-  <!-- Translations -->
-  <TranslationEditor
-    fields={[{ name: "name", label: "Name", type: "text" }]}
-    translations={translationsToMap(data.facetTranslations)}
-    formId="facet-form"
-  />
 
   <!-- Values -->
   <div class="overflow-hidden rounded-lg bg-surface shadow">
@@ -354,6 +351,17 @@
   >
     Delete this facet
   </button>
+    </div>
+
+    <!-- Sidebar (Right) -->
+    <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
+      <TranslationEditor
+        fields={[{ name: "name", label: "Name", type: "text" }]}
+        translations={translationsToMap(data.facetTranslations)}
+        formId="facet-form"
+      />
+    </div>
+  </div>
 </div>
 
 <DeleteConfirmDialog

@@ -22,9 +22,9 @@
 
 {#if TRANSLATION_LANGUAGES.length > 0}
 <div class="overflow-hidden rounded-lg bg-surface shadow">
-  <div class="flex items-center gap-2 border-b border-border px-6 py-4">
-    <Globe class="h-5 w-5 text-muted-foreground" />
-    <h2 class="text-lg font-semibold">Translations{TRANSLATION_LANGUAGES.length === 1 ? ` (${TRANSLATION_LANGUAGES[0].name})` : ""}</h2>
+  <div class="flex items-center gap-2 border-b border-border px-4 py-3">
+    <Globe class="h-4 w-4 text-muted-foreground" />
+    <h2 class="font-semibold">Translations{TRANSLATION_LANGUAGES.length === 1 ? ` (${TRANSLATION_LANGUAGES[0].name})` : ""}</h2>
   </div>
 
   <!-- Language Tabs -->
@@ -44,12 +44,13 @@
     </div>
   {/if}
 
-  <div class="p-6">
+  <div class="p-4">
     {#each TRANSLATION_LANGUAGES as lang}
       {#if activeTab === lang.code}
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {@const textFieldCount = fields.filter((f) => f.type === "text").length}
+        <div class={textFieldCount > 1 ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "grid grid-cols-1 gap-4"}>
           {#each fields as field}
-            <div class={field.type !== "text" ? "sm:col-span-2" : ""}>
+            <div class={field.type !== "text" && textFieldCount > 1 ? "sm:col-span-2" : ""}>
               <label
                 for="translation_{lang.code}_{field.name}"
                 class="mb-1 block text-sm font-medium text-foreground-secondary"
