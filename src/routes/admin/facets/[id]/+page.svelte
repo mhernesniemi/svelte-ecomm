@@ -116,12 +116,14 @@
             <div>
               <label
                 for="facet_name"
-                class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >Name <span class="text-red-500">*</span></label
               >
               <input
                 type="text"
                 id="facet_name"
                 name="name_en"
+                required
                 bind:value={facetName}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
@@ -129,12 +131,14 @@
             <div>
               <label
                 for="facet_code"
-                class="mb-1 block text-sm font-medium text-foreground-secondary">Code</label
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >Code <span class="text-red-500">*</span></label
               >
               <input
                 type="text"
                 id="facet_code"
                 name="code"
+                required
                 bind:value={facetCode}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
@@ -175,7 +179,7 @@
                         for="value_name_{i}"
                         class="mb-1 block text-sm font-medium text-foreground-secondary"
                       >
-                        Name
+                        Name <span class="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -190,7 +194,7 @@
                         for="value_code_{i}"
                         class="mb-1 block text-sm font-medium text-foreground-secondary"
                       >
-                        Code
+                        Code <span class="text-red-500">*</span>
                       </label>
                       <div class="flex items-center gap-4">
                         <input
