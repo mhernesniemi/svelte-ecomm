@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { stripHtml } from "$lib/utils";
+  import { stripHtml, getTranslation } from "$lib/utils";
 
   let { data } = $props();
 
-  const trans = $derived(
-    data.page.translations.find((t) => t.languageCode === "en") ?? data.page.translations[0]
-  );
+  const trans = $derived(getTranslation(data.page.translations));
 </script>
 
 <svelte:head>

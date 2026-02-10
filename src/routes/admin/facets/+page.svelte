@@ -6,6 +6,7 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Tag from "@lucide/svelte/icons/tag";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { getTranslation } from "$lib/utils.js";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -17,7 +18,7 @@
   type FacetRow = (typeof data.facets)[0];
 
   function getName(translations: { languageCode: string; name: string }[]): string {
-    return translations.find((t) => t.languageCode === "en")?.name ?? "";
+    return getTranslation(translations)?.name ?? "";
   }
 
   const columns: ColumnDef<FacetRow>[] = [

@@ -11,6 +11,7 @@ import {
 	products,
 	productTranslations
 } from "../db/schema.js";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 
 export type Category = typeof categories.$inferSelect;
 export type CategoryTranslation = typeof categoryTranslations.$inferSelect;
@@ -30,7 +31,6 @@ export type CategoryBreadcrumb = {
 };
 
 export class CategoryService {
-	private defaultLanguage = "en";
 
 	/**
 	 * Create a new category
@@ -137,7 +137,7 @@ export class CategoryService {
 	 * Get breadcrumb path from root to category
 	 */
 	async getBreadcrumbs(categoryId: number, language?: string): Promise<CategoryBreadcrumb[]> {
-		const lang = language ?? this.defaultLanguage;
+		const lang = language ?? DEFAULT_LANGUAGE;
 		const breadcrumbs: CategoryBreadcrumb[] = [];
 		let currentId: number | null = categoryId;
 

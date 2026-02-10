@@ -32,16 +32,16 @@ import type {
 	FacetCount,
 	PaginatedResult
 } from "$lib/types.js";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 
 export class ProductService {
-	private defaultLanguage = "en";
 
 	/**
 	 * List products with filtering and pagination
 	 */
 	async list(options: ProductListOptions = {}): Promise<PaginatedResult<ProductWithRelations>> {
 		const {
-			language = this.defaultLanguage,
+			language = DEFAULT_LANGUAGE,
 			facets: facetFilters,
 			search,
 			visibility = "public",
@@ -115,7 +115,7 @@ export class ProductService {
 	 * Get a single product by ID
 	 */
 	async getById(id: number, language?: string): Promise<ProductWithRelations | null> {
-		const lang = language ?? this.defaultLanguage;
+		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const product = await db
 			.select()
@@ -132,7 +132,7 @@ export class ProductService {
 	 * Get a product by slug
 	 */
 	async getBySlug(slug: string, language?: string): Promise<ProductWithRelations | null> {
-		const lang = language ?? this.defaultLanguage;
+		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const translation = await db
 			.select()
@@ -264,7 +264,7 @@ export class ProductService {
 		currentFilters: Record<string, string[]> = {},
 		language?: string
 	): Promise<FacetCount[]> {
-		const lang = language ?? this.defaultLanguage;
+		const lang = language ?? DEFAULT_LANGUAGE;
 
 		// Get the facet
 		const facet = await db.select().from(facets).where(eq(facets.code, facetCode)).limit(1);
@@ -418,7 +418,7 @@ export class ProductService {
 		variantId: number,
 		language?: string
 	): Promise<ProductVariantWithRelations | null> {
-		const lang = language ?? this.defaultLanguage;
+		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const variant = await db
 			.select()
@@ -665,7 +665,7 @@ export class ProductService {
 	 * Get lightweight product catalog for client-side search
 	 * Returns only the fields needed for search: id, name, slug, price, image
 	 */
-	async getSearchCatalog(language = this.defaultLanguage) {
+	async getSearchCatalog(language = DEFAULT_LANGUAGE) {
 		const rows = await db
 			.select({
 				id: products.id,

@@ -5,6 +5,7 @@
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import Pencil from "@lucide/svelte/icons/pencil";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { getTranslation } from "$lib/utils.js";
 
   let { data }: { data: PageData } = $props();
 
@@ -12,7 +13,7 @@
   let editingId = $state<number | null>(null);
 
   function getName(translations: { languageCode: string; name: string }[]): string {
-    return translations.find((t) => t.languageCode === "en")?.name ?? "";
+    return getTranslation(translations)?.name ?? "";
   }
 
   type FlatCategory = { id: number; name: string; depth: number };

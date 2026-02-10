@@ -1,11 +1,12 @@
 <script lang="ts">
   import type { PageData } from "./$types";
+  import { getTranslation } from "$lib/utils";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
 
   let { data }: { data: PageData } = $props();
 
   function getName(translations: { languageCode: string; name: string }[]): string {
-    return translations.find((t) => t.languageCode === "en")?.name ?? "";
+    return getTranslation(translations)?.name ?? "";
   }
 
   function buildPath(node: (typeof data.tree)[0], parents: string[] = []): string {

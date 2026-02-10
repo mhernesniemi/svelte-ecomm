@@ -1,5 +1,6 @@
 import { facetService } from "$lib/server/services/facets.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -8,7 +9,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(400, "Invalid facet ID");
 	}
 
-	const facet = await facetService.getById(id, "en");
+	const facet = await facetService.getById(id);
 	if (!facet) {
 		throw error(404, "Facet not found");
 	}
@@ -30,7 +31,7 @@ export const actions: Actions = {
 		try {
 			await facetService.update(id, {
 				code: code.toLowerCase().replace(/\s+/g, "_"),
-				translations: [{ languageCode: "en", name: nameEn }]
+				translations: [{ languageCode: DEFAULT_LANGUAGE, name: nameEn }]
 			});
 			return { success: true, message: "Facet updated" };
 		} catch {
@@ -52,7 +53,7 @@ export const actions: Actions = {
 			await facetService.createValue({
 				facetId,
 				code: code.toLowerCase().replace(/\s+/g, "_"),
-				translations: [{ languageCode: "en", name: nameEn }]
+				translations: [{ languageCode: DEFAULT_LANGUAGE, name: nameEn }]
 			});
 			return { success: true, message: "Value created" };
 		} catch {
@@ -73,7 +74,7 @@ export const actions: Actions = {
 		try {
 			await facetService.updateValue(id, {
 				code: code.toLowerCase().replace(/\s+/g, "_"),
-				translations: [{ languageCode: "en", name: nameEn }]
+				translations: [{ languageCode: DEFAULT_LANGUAGE, name: nameEn }]
 			});
 			return { success: true, message: "Value updated" };
 		} catch {

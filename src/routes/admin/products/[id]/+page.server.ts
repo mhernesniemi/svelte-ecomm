@@ -5,6 +5,7 @@ import { categoryService } from "$lib/server/services/categories.js";
 import { collectionService } from "$lib/server/services/collections.js";
 import { taxService } from "$lib/server/services/tax.js";
 import { error, fail, redirect } from "@sveltejs/kit";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -14,7 +15,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Invalid product ID");
 	}
 
-	const product = await productService.getById(id, "en");
+	const product = await productService.getById(id);
 
 	if (!product) {
 		throw error(404, "Product not found");
@@ -22,11 +23,11 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	const [facets, categoryTree, productCategories, taxRates, productCollections] =
 		await Promise.all([
-			facetService.list("en"),
+			facetService.list(),
 			categoryService.getTree(),
 			categoryService.getProductCategories(id),
 			taxService.getAllTaxRates(),
-			collectionService.getCollectionsForProduct(id, "en")
+			collectionService.getCollectionsForProduct(id)
 		]);
 
 	return {
@@ -73,7 +74,7 @@ export const actions: Actions = {
 				taxCode: taxCode || "standard",
 				translations: [
 					{
-						languageCode: "en",
+						languageCode: DEFAULT_LANGUAGE,
 						name,
 						slug,
 						description: description || undefined
@@ -82,7 +83,7 @@ export const actions: Actions = {
 			});
 
 			// Update facet values
-			const product = await productService.getById(id, "en");
+			const product = await productService.getById(id);
 			if (product) {
 				const currentFacetIds = product.facetValues.map((fv) => fv.id);
 				for (const fvId of currentFacetIds) {
@@ -121,7 +122,7 @@ export const actions: Actions = {
 
 		try {
 			// Get current facet values
-			const product = await productService.getById(productId, "en");
+			const product = await productService.getById(productId);
 			if (!product) {
 				return fail(404, { error: "Product not found" });
 			}

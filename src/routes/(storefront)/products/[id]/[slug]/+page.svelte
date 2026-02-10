@@ -5,7 +5,7 @@
   import { invalidateAll } from "$app/navigation";
   import { cartStore } from "$lib/stores/cart.svelte";
   import { wishlistStore } from "$lib/stores/wishlist.svelte";
-  import { formatPrice, stripHtml } from "$lib/utils";
+  import { formatPrice, stripHtml, getTranslation } from "$lib/utils";
   import { findBestDiscount, getDiscountedPrice } from "$lib/promotion-utils";
   import { Button, buttonVariants } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
@@ -19,7 +19,7 @@
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
   const product = $derived(data.product);
-  const enTrans = $derived(product.translations.find((t) => t.languageCode === "en"));
+  const enTrans = $derived(getTranslation(product.translations));
 
   let selectedVariantId = $state<number | null>(null);
   let quantity = $state(1);
@@ -59,7 +59,7 @@
   );
 
   function getVariantName(variant: (typeof product.variants)[0]): string {
-    const trans = variant.translations.find((t) => t.languageCode === "en");
+    const trans = getTranslation(variant.translations);
     return trans?.name ?? variant.sku;
   }
 

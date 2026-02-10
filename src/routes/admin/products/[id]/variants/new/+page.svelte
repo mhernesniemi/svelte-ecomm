@@ -11,6 +11,7 @@
   import X from "@lucide/svelte/icons/x";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
+  import { getTranslation } from "$lib/utils";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -35,10 +36,10 @@
 
   const flatFacetValues: FlatFacetValue[] = $derived(
     data.facets.flatMap((facet) => {
-      const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+      const facetName = getTranslation(facet.translations)?.name ?? facet.code;
       return facet.values.map((value) => ({
         id: value.id,
-        name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
+        name: getTranslation(value.translations)?.name ?? value.code,
         facetName
       }));
     })
@@ -225,12 +226,12 @@
                     <Command.Empty>No facet value found.</Command.Empty>
                     {#each data.facets as facet}
                       {@const facetName =
-                        facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code}
+                        getTranslation(facet.translations)?.name ?? facet.code}
                       {#if facet.values.length > 0}
                         <Command.Group heading={facetName}>
                           {#each facet.values as value}
                             {@const valueName =
-                              value.translations.find((t) => t.languageCode === "en")?.name ??
+                              getTranslation(value.translations)?.name ??
                               value.code}
                             <Command.Item
                               value="{facetName} {valueName}"

@@ -3,6 +3,7 @@ import { wishlistService } from "$lib/server/services/wishlist.js";
 import { reviewService } from "$lib/server/services/reviews.js";
 import { categoryService } from "$lib/server/services/categories.js";
 import { taxService } from "$lib/server/services/tax.js";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
@@ -13,7 +14,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		throw error(404, "Product not found");
 	}
 
-	const product = await productService.getById(id, "en");
+	const product = await productService.getById(id);
 
 	if (!product || product.visibility === "draft") {
 		throw error(404, "Product not found");
@@ -28,7 +29,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	}
 
 	// Redirect if slug doesn't match (for SEO and correct URLs)
-	const correctSlug = product.translations.find((t) => t.languageCode === "en")?.slug;
+	const correctSlug = product.translations.find((t) => t.languageCode === DEFAULT_LANGUAGE)?.slug;
 	if (correctSlug && params.slug !== correctSlug) {
 		throw redirect(301, `/products/${id}/${correctSlug}`);
 	}
@@ -51,7 +52,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	// Get breadcrumbs for the first category (primary category path)
 	const breadcrumbs =
 		productCategories.length > 0
-			? await categoryService.getBreadcrumbs(productCategories[0].id, "en")
+			? await categoryService.getBreadcrumbs(productCategories[0].id)
 			: [];
 
 	return {
@@ -78,7 +79,7 @@ export const actions: Actions = {
 			return fail(404, { reviewError: "Product not found" });
 		}
 
-		const product = await productService.getById(id, "en");
+		const product = await productService.getById(id);
 		if (!product) {
 			return fail(404, { reviewError: "Product not found" });
 		}

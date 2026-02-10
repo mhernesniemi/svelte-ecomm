@@ -1,5 +1,6 @@
 import { categoryService } from "$lib/server/services/categories.js";
 import { fail } from "@sveltejs/kit";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
@@ -24,7 +25,7 @@ export const actions: Actions = {
 			await categoryService.create({
 				slug: slug.toLowerCase().replace(/\s+/g, "-"),
 				parentId: parentId ? Number(parentId) : null,
-				translations: [{ languageCode: "en", name: nameEn }]
+				translations: [{ languageCode: DEFAULT_LANGUAGE, name: nameEn }]
 			});
 
 			return { success: true };
@@ -48,7 +49,7 @@ export const actions: Actions = {
 			await categoryService.update(id, {
 				slug: slug.toLowerCase().replace(/\s+/g, "-"),
 				parentId: parentId ? Number(parentId) : null,
-				translations: [{ languageCode: "en", name: nameEn }]
+				translations: [{ languageCode: DEFAULT_LANGUAGE, name: nameEn }]
 			});
 
 			return { success: true };

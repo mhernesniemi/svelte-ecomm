@@ -4,7 +4,7 @@ import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
 import { assetService } from "$lib/server/services/assets.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
-import { slugify } from "$lib/utils.js";
+import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);
@@ -18,11 +18,10 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	// Load facets for filter builder
-	const facets = await facetService.list("en");
+	const facets = await facetService.list();
 
 	// Load all products for manual selection (admin sees all visibility states)
 	const { items: products } = await productService.list({
-		language: "en",
 		visibility: ["public", "private", "draft"],
 		limit: 100
 	});
@@ -32,7 +31,6 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	// Get matching products for the data table
 	const preview = await collectionService.getProductsForCollection(id, {
-		language: "en",
 		limit: 100
 	});
 
@@ -59,7 +57,7 @@ export const actions: Actions = {
 				isPrivate,
 				translations: [
 					{
-						languageCode: "en",
+						languageCode: DEFAULT_LANGUAGE,
 						name,
 						slug: slugify(slug),
 						description: description || undefined
@@ -86,7 +84,6 @@ export const actions: Actions = {
 		try {
 			const filters = JSON.parse(filtersJson);
 			const result = await collectionService.previewFilters(filters, {
-				language: "en",
 				limit: 100
 			});
 			return { preview: result.products, productCount: result.total };

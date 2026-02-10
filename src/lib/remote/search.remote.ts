@@ -3,6 +3,7 @@
  */
 import { command } from "$app/server";
 import { productService } from "$lib/server/services/index.js";
+import { getTranslation } from "$lib/utils.js";
 
 export interface SearchResult {
 	id: number;
@@ -29,7 +30,7 @@ export const searchProducts = command(
 		});
 
 		return result.items.map((product) => {
-			const translation = product.translations.find((t) => t.languageCode === "en");
+			const translation = getTranslation(product.translations);
 			const defaultVariant = product.variants[0];
 
 			return {

@@ -23,7 +23,6 @@ export const load: PageServerLoad = async ({ url }) => {
 
 	// Fetch products with filters (public only)
 	const result = await productService.list({
-		language: "en",
 		visibility: "public",
 		facets: Object.keys(facetFilters).length > 0 ? facetFilters : undefined,
 		search,
@@ -32,13 +31,13 @@ export const load: PageServerLoad = async ({ url }) => {
 	});
 
 	// Fetch all facets for filter sidebar
-	const facets = await facetService.list("en");
+	const facets = await facetService.list();
 
 	// Get facet counts for currently visible products
 	const facetCounts: Record<string, { code: string; name: string; count: number }[]> = {};
 	for (const facet of facets) {
 		if (!facet.isPrivate) {
-			const counts = await productService.getFacetCounts(facet.code, facetFilters, "en");
+			const counts = await productService.getFacetCounts(facet.code, facetFilters);
 			facetCounts[facet.code] = counts.map((c: FacetCount) => ({
 				code: c.valueCode,
 				name: c.valueName,

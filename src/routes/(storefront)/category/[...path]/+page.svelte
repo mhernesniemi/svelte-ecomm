@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { PageData } from "./$types";
+  import { getTranslation } from "$lib/utils";
   import Package from "@lucide/svelte/icons/package";
   import ProductCard from "$lib/components/storefront/ProductCard.svelte";
 
   let { data }: { data: PageData } = $props();
 
   function getName(translations: { languageCode: string; name: string }[]): string {
-    return translations.find((t) => t.languageCode === "en")?.name ?? "";
+    return getTranslation(translations)?.name ?? "";
   }
 
   function buildCategoryPath(breadcrumbs: typeof data.breadcrumbs, upToIndex: number): string {

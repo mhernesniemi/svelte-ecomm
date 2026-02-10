@@ -7,6 +7,7 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { getTranslation } from "$lib/utils";
 
   let { data } = $props();
 
@@ -15,13 +16,6 @@
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
 
   type CollectionRow = (typeof data.collections)[0];
-
-  function getTranslation(
-    translations: { languageCode: string; name: string; slug: string }[],
-    lang: string
-  ) {
-    return translations.find((t) => t.languageCode === lang) ?? translations[0];
-  }
 
   const columns: ColumnDef<CollectionRow>[] = [
     {
@@ -42,12 +36,12 @@
       enableSorting: false
     },
     {
-      accessorFn: (row) => getTranslation(row.translations, "en")?.name ?? "Untitled",
+      accessorFn: (row) => getTranslation(row.translations)?.name ?? "Untitled",
       id: "name",
       header: "Collection",
       cell: ({ row }) =>
         renderSnippet(collectionCell, {
-          name: getTranslation(row.original.translations, "en")?.name ?? "Untitled",
+          name: getTranslation(row.original.translations)?.name ?? "Untitled",
           id: row.original.id
         })
     },

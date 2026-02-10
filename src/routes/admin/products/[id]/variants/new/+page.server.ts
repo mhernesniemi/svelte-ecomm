@@ -1,6 +1,7 @@
 import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -10,13 +11,13 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Invalid product ID");
 	}
 
-	const product = await productService.getById(productId, "en");
+	const product = await productService.getById(productId);
 
 	if (!product) {
 		throw error(404, "Product not found");
 	}
 
-	const facets = await facetService.list("en");
+	const facets = await facetService.list();
 
 	return {
 		product: { id: product.id, name: product.translations[0]?.name ?? "Product" },
@@ -50,7 +51,7 @@ export const actions: Actions = {
 				price,
 				stock,
 				trackInventory,
-				translations: name ? [{ languageCode: "en", name }] : []
+				translations: name ? [{ languageCode: DEFAULT_LANGUAGE, name }] : []
 			});
 
 			// Add facet values to the variant

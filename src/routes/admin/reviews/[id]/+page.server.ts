@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const [product, customer] = await Promise.all([
-		productService.getById(review.productId, "en"),
+		productService.getById(review.productId),
 		customerService.getById(review.customerId)
 	]);
 

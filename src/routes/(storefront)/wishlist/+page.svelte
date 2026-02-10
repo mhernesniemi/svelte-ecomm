@@ -2,7 +2,7 @@
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
-  import { cn } from "$lib/utils";
+  import { cn, getTranslation } from "$lib/utils";
   import { cartStore } from "$lib/stores/cart.svelte";
   import type { PageData, ActionData } from "./$types";
   import Heart from "@lucide/svelte/icons/heart";
@@ -17,11 +17,11 @@
   let message = $state<{ type: "success" | "error"; text: string } | null>(null);
 
   function getName(item: (typeof items)[0]): string {
-    return item.product.translations.find((t) => t.languageCode === "en")?.name ?? "Product";
+    return getTranslation(item.product.translations)?.name ?? "Product";
   }
 
   function getSlug(item: (typeof items)[0]): string {
-    return item.product.translations.find((t) => t.languageCode === "en")?.slug ?? "";
+    return getTranslation(item.product.translations)?.slug ?? "";
   }
 
   function getPrice(item: (typeof items)[0]): number {

@@ -1,5 +1,6 @@
 import { productService } from "$lib/server/services/products.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -22,7 +23,7 @@ export const actions: Actions = {
 				visibility: "draft",
 				translations: [
 					{
-						languageCode: "en",
+						languageCode: DEFAULT_LANGUAGE,
 						name,
 						slug
 					}

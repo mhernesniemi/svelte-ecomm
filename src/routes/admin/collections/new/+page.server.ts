@@ -1,6 +1,6 @@
 import { collectionService } from "$lib/server/services/collections.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
-import { slugify } from "$lib/utils.js";
+import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -23,7 +23,7 @@ export const actions: Actions = {
 				isPrivate: false,
 				translations: [
 					{
-						languageCode: "en",
+						languageCode: DEFAULT_LANGUAGE,
 						name,
 						slug: slugify(slug)
 					}

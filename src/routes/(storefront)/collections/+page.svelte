@@ -1,19 +1,8 @@
 <script lang="ts">
   import FolderOpen from "@lucide/svelte/icons/folder-open";
+  import { getTranslation } from "$lib/utils";
 
   let { data } = $props();
-
-  function getTranslation(
-    translations: {
-      languageCode: string;
-      name: string;
-      slug: string;
-      description?: string | null;
-    }[],
-    lang: string
-  ) {
-    return translations.find((t) => t.languageCode === lang) ?? translations[0];
-  }
 </script>
 
 <svelte:head>
@@ -38,7 +27,7 @@
   {:else}
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {#each data.collections as collection}
-        {@const trans = getTranslation(collection.translations, "en")}
+        {@const trans = getTranslation(collection.translations)}
         <a
           href="/collections/{collection.id}/{trans?.slug}"
           class="group rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"

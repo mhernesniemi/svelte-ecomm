@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { ProductWithRelations } from "$lib/types";
-  import { formatPrice } from "$lib/utils";
+  import { formatPrice, getTranslation } from "$lib/utils";
   import { findBestDiscount, getDiscountedPrice, type ActiveDiscount } from "$lib/promotion-utils";
   import ImageIcon from "@lucide/svelte/icons/image";
 
@@ -9,7 +9,7 @@
     activeDiscounts = []
   }: { product: ProductWithRelations; activeDiscounts?: ActiveDiscount[] } = $props();
 
-  const translation = $derived(product.translations.find((t) => t.languageCode === "en"));
+  const translation = $derived(getTranslation(product.translations));
   const name = $derived(translation?.name ?? "Untitled");
   const slug = $derived(translation?.slug ?? "");
   const lowestPrice = $derived(

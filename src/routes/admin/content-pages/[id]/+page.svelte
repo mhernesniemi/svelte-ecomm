@@ -9,6 +9,7 @@
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
+  import { getTranslation } from "$lib/utils.js";
 
   let { data, form } = $props();
 
@@ -27,9 +28,7 @@
   let isSubmitting = $state(false);
   let showDelete = $state(false);
 
-  const translation = $derived(
-    data.page.translations.find((t) => t.languageCode === "en") ?? data.page.translations[0]
-  );
+  const translation = $derived(getTranslation(data.page.translations));
 
   let title = $state("");
   let slug = $state("");

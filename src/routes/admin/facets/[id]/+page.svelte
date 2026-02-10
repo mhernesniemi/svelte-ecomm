@@ -6,6 +6,7 @@
   import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import { getTranslation } from "$lib/utils.js";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -21,7 +22,7 @@
   });
 
   function getName(translations: { languageCode: string; name: string }[]): string {
-    return translations.find((t) => t.languageCode === "en")?.name ?? "";
+    return getTranslation(translations)?.name ?? "";
   }
 
   let facetName = $state("");

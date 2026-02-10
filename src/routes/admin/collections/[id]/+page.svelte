@@ -27,6 +27,7 @@
   import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash2 from "@lucide/svelte/icons/trash-2";
+  import { getTranslation } from "$lib/utils";
 
   let { data, form } = $props();
 
@@ -53,9 +54,7 @@
   let localFilters = $state<LocalFilter[]>([]);
 
   $effect(() => {
-    const trans =
-      data.collection.translations.find((t) => t.languageCode === "en") ??
-      data.collection.translations[0];
+    const trans = getTranslation(data.collection.translations);
     name = trans?.name ?? "";
     slug = trans?.slug ?? "";
     description = trans?.description ?? "";
@@ -78,9 +77,7 @@
 
   // Unsaved changes detection
   const hasUnsavedChanges = $derived.by(() => {
-    const trans =
-      data.collection.translations.find((t) => t.languageCode === "en") ??
-      data.collection.translations[0];
+    const trans = getTranslation(data.collection.translations);
     const savedName = trans?.name ?? "";
     const savedSlug = trans?.slug ?? "";
     const savedDescription = trans?.description ?? "";
@@ -245,10 +242,10 @@
   type FlatFacetValue = { id: number; name: string; facetName: string };
   const flatFacetValues: FlatFacetValue[] = $derived(
     data.facets.flatMap((facet) => {
-      const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+      const facetName = getTranslation(facet.translations)?.name ?? facet.code;
       return facet.values.map((value) => ({
         id: value.id,
-        name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
+        name: getTranslation(value.translations)?.name ?? value.code,
         facetName
       }));
     })
@@ -260,8 +257,7 @@
   }
 
   function getProductName(product: (typeof data.products)[0]): string {
-    const trans = product.translations.find((t) => t.languageCode === "en");
-    return trans?.name ?? `Product #${product.id}`;
+    return getTranslation(product.translations)?.name ?? `Product #${product.id}`;
   }
 
   function getProductNameById(id: number): string {
@@ -272,8 +268,7 @@
   // ── Preview table ────────────────────────────────────────────────────
 
   function getPreviewProductName(product: PreviewProduct): string {
-    const trans = product.translations.find((t) => t.languageCode === "en");
-    return trans?.name ?? `Product #${product.id}`;
+    return getTranslation(product.translations)?.name ?? `Product #${product.id}`;
   }
 
   const previewColumns: ColumnDef<PreviewProduct>[] = [
@@ -485,12 +480,12 @@
                               <Command.Empty>No facet values found.</Command.Empty>
                               {#each data.facets as facet}
                                 {@const facetName =
-                                  facet.translations.find((t) => t.languageCode === "en")?.name ??
+                                  getTranslation(facet.translations)?.name ??
                                   facet.code}
                                 <Command.Group heading={facetName}>
                                   {#each facet.values as value}
                                     {@const valueName =
-                                      value.translations.find((t) => t.languageCode === "en")
+                                      getTranslation(value.translations)
                                         ?.name ?? value.code}
                                     <Command.Item
                                       value="{facetName} {valueName}"

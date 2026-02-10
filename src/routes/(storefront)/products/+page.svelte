@@ -4,6 +4,7 @@
   import { Button } from "$lib/components/storefront/ui/button";
   import ProductCard from "$lib/components/storefront/ProductCard.svelte";
   import type { PageData } from "./$types";
+  import { getTranslation } from "$lib/utils";
   import Check from "@lucide/svelte/icons/check";
 
   let { data }: { data: PageData } = $props();
@@ -11,7 +12,7 @@
   const pageTitle = $derived(data.search ? `Search: ${data.search} | Hoikka` : "Products | Hoikka");
 
   function getFacetName(facet: (typeof data.facets)[0]): string {
-    return facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+    return getTranslation(facet.translations)?.name ?? facet.code;
   }
 
   function isFilterActive(facetCode: string, valueCode: string): boolean {

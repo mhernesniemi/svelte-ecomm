@@ -10,7 +10,6 @@ const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 export const load: PageServerLoad = async () => {
 	// Get featured products (public only, limited to 2 for demo layout)
 	const result = await productService.list({
-		language: "en",
 		visibility: "public",
 		limit: 2
 	});

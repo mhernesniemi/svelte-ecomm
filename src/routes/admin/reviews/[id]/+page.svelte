@@ -5,6 +5,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import { getTranslation } from "$lib/utils.js";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -18,7 +19,7 @@
 
   function getProductName(): string {
     return (
-      data.product?.translations.find((t) => t.languageCode === "en")?.name ?? "Unknown product"
+      getTranslation(data.product?.translations ?? [])?.name ?? "Unknown product"
     );
   }
 

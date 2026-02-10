@@ -9,6 +9,7 @@
   import Package from "@lucide/svelte/icons/package";
   import ImageIcon from "@lucide/svelte/icons/image";
   import { toast } from "svelte-sonner";
+  import { getTranslation } from "$lib/utils.js";
   import type { PageData, ActionData } from "./$types";
   import PlusIcon from "@lucide/svelte/icons/plus";
 
@@ -26,7 +27,7 @@
   type ProductRow = (typeof data.products)[0];
 
   function getProductName(product: ProductRow): string {
-    return product.translations.find((t) => t.languageCode === "en")?.name ?? "Untitled";
+    return getTranslation(product.translations)?.name ?? "Untitled";
   }
 
   const columns: ColumnDef<ProductRow>[] = [

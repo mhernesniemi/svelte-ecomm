@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { contentPageService } from "$lib/server/services/content-pages.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
-import { slugify } from "$lib/utils.js";
+import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
 
 export const load: PageServerLoad = async () => {
 	return {};
@@ -30,7 +30,7 @@ export const actions: Actions = {
 				published,
 				translations: [
 					{
-						languageCode: "en",
+						languageCode: DEFAULT_LANGUAGE,
 						title,
 						slug: slugify(slug),
 						body: body || undefined

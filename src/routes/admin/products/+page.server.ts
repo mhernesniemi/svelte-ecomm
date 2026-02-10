@@ -6,7 +6,6 @@ export const load: PageServerLoad = async () => {
 	const result = await productService.list({
 		limit: 1000,
 		offset: 0,
-		language: "en",
 		visibility: ["public", "private", "draft"]
 	});
 

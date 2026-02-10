@@ -2,6 +2,7 @@ import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { customerGroupService } from "$lib/server/services/customerGroups.js";
 import { error, fail, redirect } from "@sveltejs/kit";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -13,9 +14,9 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const [product, variant, facets, customerGroups, groupPrices] = await Promise.all([
-		productService.getById(productId, "en"),
-		productService.getVariantById(variantId, "en"),
-		facetService.list("en"),
+		productService.getById(productId),
+		productService.getVariantById(variantId),
+		facetService.list(),
 		customerGroupService.list(),
 		productService.getGroupPrices(variantId)
 	]);
@@ -66,11 +67,11 @@ export const actions: Actions = {
 				price,
 				stock,
 				trackInventory,
-				translations: [{ languageCode: "en", name: name || undefined }]
+				translations: [{ languageCode: DEFAULT_LANGUAGE, name: name || undefined }]
 			});
 
 			// Sync facet values
-			const variant = await productService.getVariantById(variantId, "en");
+			const variant = await productService.getVariantById(variantId);
 			if (variant) {
 				const currentIds = variant.facetValues.map((fv) => fv.id);
 				for (const id of currentIds) {

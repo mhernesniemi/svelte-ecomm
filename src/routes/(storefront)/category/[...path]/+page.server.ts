@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	}
 
 	// Verify the path is correct by checking breadcrumbs
-	const breadcrumbs = await categoryService.getBreadcrumbs(category.id, "en");
+	const breadcrumbs = await categoryService.getBreadcrumbs(category.id);
 	const expectedPath = breadcrumbs.map((b) => b.slug).join("/");
 
 	if (params.path !== expectedPath) {

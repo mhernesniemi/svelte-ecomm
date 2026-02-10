@@ -1,14 +1,15 @@
 import { productService } from "$lib/server/services/products.js";
 import { collectionService } from "$lib/server/services/collections.js";
 import { categoryService } from "$lib/server/services/categories.js";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { RequestHandler } from "./$types";
 
 const SITE_URL = "https://hoikka.dev"; // TODO: Move to env
 
 export const GET: RequestHandler = async () => {
 	const [products, collections, categories] = await Promise.all([
-		productService.list({ language: "en", visibility: "public", limit: 1000 }),
-		collectionService.list({ language: "en" }),
+		productService.list({ visibility: "public", limit: 1000 }),
+		collectionService.list(),
 		categoryService.getTree()
 	]);
 
@@ -22,7 +23,7 @@ export const GET: RequestHandler = async () => {
 
 	// Products
 	for (const product of products.items) {
-		const slug = product.translations.find((t) => t.languageCode === "en")?.slug;
+		const slug = product.translations.find((t) => t.languageCode === DEFAULT_LANGUAGE)?.slug;
 		if (slug) {
 			urls.push({
 				loc: `/products/${product.id}/${slug}`,
@@ -35,7 +36,7 @@ export const GET: RequestHandler = async () => {
 
 	// Collections
 	for (const collection of collections) {
-		const slug = collection.translations.find((t) => t.languageCode === "en")?.slug;
+		const slug = collection.translations.find((t) => t.languageCode === DEFAULT_LANGUAGE)?.slug;
 		if (slug) {
 			urls.push({
 				loc: `/collections/${collection.id}/${slug}`,

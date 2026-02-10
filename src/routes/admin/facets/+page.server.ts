@@ -3,7 +3,7 @@ import { fail } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-	const facets = await facetService.list("en");
+	const facets = await facetService.list();
 
 	return { facets };
 };

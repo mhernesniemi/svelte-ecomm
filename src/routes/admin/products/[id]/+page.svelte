@@ -29,7 +29,7 @@
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
-  import { cn } from "$lib/utils";
+  import { cn, getTranslation } from "$lib/utils";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -91,10 +91,10 @@
 
   const flatFacetValues: FlatFacetValue[] = $derived(
     data.facets.flatMap((facet) => {
-      const facetName = facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code;
+      const facetName = getTranslation(facet.translations)?.name ?? facet.code;
       return facet.values.map((value) => ({
         id: value.id,
-        name: value.translations.find((t) => t.languageCode === "en")?.name ?? value.code,
+        name: getTranslation(value.translations)?.name ?? value.code,
         facetName
       }));
     })
@@ -118,7 +118,7 @@
 
   // Helper to get translated name
   function getCategoryName(translations: { languageCode: string; name: string }[]): string {
-    return translations.find((t) => t.languageCode === "en")?.name ?? "";
+    return getTranslation(translations)?.name ?? "";
   }
 
   // Flatten tree into list with depth info for display
@@ -164,7 +164,7 @@
 
   // Get the primary translation (English)
   const translation = $derived(
-    data.product.translations.find((t) => t.languageCode === "en") ?? data.product.translations[0]
+    getTranslation(data.product.translations)
   );
 
   let productName = $state("");
@@ -373,7 +373,7 @@
                 <TableRow>
                   <TableCell class="font-mono text-sm">{variant.sku}</TableCell>
                   <TableCell class="text-sm">
-                    {variant.translations.find((t) => t.languageCode === "en")?.name ?? "-"}
+                    {getTranslation(variant.translations)?.name ?? "-"}
                   </TableCell>
                   <TableCell class="text-sm">{(variant.price / 100).toFixed(2)} EUR</TableCell>
                   <TableCell class="text-sm">{variant.stock}</TableCell>
@@ -384,7 +384,7 @@
                       <div class="flex flex-wrap gap-1">
                         {#each variant.facetValues as fv}
                           {@const name =
-                            fv.translations.find((t) => t.languageCode === "en")?.name ?? fv.code}
+                            getTranslation(fv.translations)?.name ?? fv.code}
                           <span class="rounded bg-muted px-2 py-0.5 text-xs">{name}</span>
                         {/each}
                       </div>
@@ -545,12 +545,12 @@
                     <Command.Empty>No facet value found.</Command.Empty>
                     {#each data.facets as facet}
                       {@const facetName =
-                        facet.translations.find((t) => t.languageCode === "en")?.name ?? facet.code}
+                        getTranslation(facet.translations)?.name ?? facet.code}
                       {#if facet.values.length > 0}
                         <Command.Group heading={facetName}>
                           {#each facet.values as value}
                             {@const valueName =
-                              value.translations.find((t) => t.languageCode === "en")?.name ??
+                              getTranslation(value.translations)?.name ??
                               value.code}
                             <Command.Item
                               value="{facetName} {valueName}"
@@ -680,7 +680,7 @@
             <div class="space-y-1.5">
               {#each data.productCollections as collection}
                 {@const collectionName =
-                  collection.translations.find((t) => t.languageCode === "en")?.name ??
+                  getTranslation(collection.translations)?.name ??
                   `Collection #${collection.id}`}
                 <a
                   href="/admin/collections/{collection.id}"

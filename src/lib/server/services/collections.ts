@@ -34,6 +34,7 @@ import type {
 	ProductWithRelations,
 	PaginatedResult
 } from "$lib/types.js";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 
 // Type for filter handler functions
 type FilterHandler = (
@@ -42,7 +43,6 @@ type FilterHandler = (
 ) => Promise<Set<number>>;
 
 export class CollectionService {
-	private defaultLanguage = "en";
 
 	// =========================================================================
 	// FILTER HANDLERS - Strategy pattern for filter compilation
@@ -344,7 +344,7 @@ export class CollectionService {
 	 * List public collections (for storefront)
 	 */
 	async list(options: { language?: string } = {}): Promise<CollectionWithCount[]> {
-		const { language = this.defaultLanguage } = options;
+		const { language = DEFAULT_LANGUAGE } = options;
 
 		const collectionList = await db
 			.select()
@@ -467,7 +467,7 @@ export class CollectionService {
 		collectionId: number,
 		options: { language?: string; limit?: number; offset?: number } = {}
 	): Promise<PaginatedResult<ProductWithRelations>> {
-		const { language = this.defaultLanguage, limit = 20, offset = 0 } = options;
+		const { language = DEFAULT_LANGUAGE, limit = 20, offset = 0 } = options;
 
 		// Load filters for this collection
 		const filters = await db
@@ -548,7 +548,7 @@ export class CollectionService {
 		}[],
 		options: { language?: string; limit?: number } = {}
 	): Promise<{ products: ProductWithRelations[]; total: number }> {
-		const { language = this.defaultLanguage, limit = 10 } = options;
+		const { language = DEFAULT_LANGUAGE, limit = 10 } = options;
 
 		if (filters.length === 0) {
 			return { products: [], total: 0 };

@@ -3,7 +3,7 @@ import { collectionService } from "$lib/server/services/collections.js";
 import { fail, redirect } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async () => {
-	const collections = await collectionService.listAll("en");
+	const collections = await collectionService.listAll();
 
 	// Get product counts for each collection
 	const collectionsWithCounts = await Promise.all(

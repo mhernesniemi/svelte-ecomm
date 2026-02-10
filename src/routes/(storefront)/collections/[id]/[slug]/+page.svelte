@@ -1,24 +1,11 @@
 <script lang="ts">
   import Package from "@lucide/svelte/icons/package";
   import ProductCard from "$lib/components/storefront/ProductCard.svelte";
-  import { stripHtml } from "$lib/utils";
+  import { stripHtml, getTranslation } from "$lib/utils";
 
   let { data } = $props();
 
-  type CollectionTranslation = {
-    languageCode: string;
-    name: string;
-    slug?: string;
-    description?: string | null;
-  };
-
-  function getTranslation(translations: CollectionTranslation[], lang: string) {
-    return (
-      translations.find((t: CollectionTranslation) => t.languageCode === lang) ?? translations[0]
-    );
-  }
-
-  const collectionTrans = $derived(getTranslation(data.collection.translations, "en"));
+  const collectionTrans = $derived(getTranslation(data.collection.translations));
 </script>
 
 <svelte:head>
