@@ -17,10 +17,9 @@ await collectionService.removeProduct(collectionId, productId);
 Define rules to automatically include products:
 
 ```typescript
-import { DEFAULT_LANGUAGE } from "$lib/utils";
-
 const collection = await collectionService.create({
-	translations: [{ languageCode: DEFAULT_LANGUAGE, name: "Summer Sale", slug: "summer-sale" }],
+	name: "Summer Sale",
+	slug: "summer-sale",
 	rules: {
 		conditions: [
 			{

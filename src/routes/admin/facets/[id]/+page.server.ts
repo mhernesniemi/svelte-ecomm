@@ -1,4 +1,5 @@
 import { facetService } from "$lib/server/services/facets.js";
+import { translationService } from "$lib/server/services/translations.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -8,12 +9,16 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(400, "Invalid facet ID");
 	}
 
-	const facet = await facetService.getById(id);
+	const [facet, facetTranslations, valueTranslations] = await Promise.all([
+		facetService.getById(id),
+		translationService.getFacetTranslations(id),
+		translationService.getAllFacetValueTranslations(id)
+	]);
 	if (!facet) {
 		throw error(404, "Facet not found");
 	}
 
-	return { facet };
+	return { facet, facetTranslations, valueTranslations };
 };
 
 export const actions: Actions = {
@@ -94,6 +99,46 @@ export const actions: Actions = {
 			return { success: true, message: "Value deleted" };
 		} catch {
 			return fail(500, { error: "Failed to delete value" });
+		}
+	},
+
+	saveTranslation: async ({ request }) => {
+		const formData = await request.formData();
+		const entityId = Number(formData.get("entityId"));
+		const languageCode = formData.get("languageCode") as string;
+		const name = formData.get("name") as string;
+
+		if (!entityId || !languageCode) {
+			return fail(400, { error: "Missing required fields" });
+		}
+
+		try {
+			await translationService.upsertFacetTranslation(entityId, languageCode, {
+				name: name || ""
+			});
+			return { success: true, message: "Translation saved" };
+		} catch {
+			return fail(500, { error: "Failed to save translation" });
+		}
+	},
+
+	saveValueTranslation: async ({ request }) => {
+		const formData = await request.formData();
+		const facetValueId = Number(formData.get("facetValueId"));
+		const languageCode = formData.get("languageCode") as string;
+		const name = formData.get("name") as string;
+
+		if (!facetValueId || !languageCode) {
+			return fail(400, { error: "Missing required fields" });
+		}
+
+		try {
+			await translationService.upsertFacetValueTranslation(facetValueId, languageCode, {
+				name: name || ""
+			});
+			return { success: true, message: "Value translation saved" };
+		} catch {
+			return fail(500, { error: "Failed to save value translation" });
 		}
 	},
 

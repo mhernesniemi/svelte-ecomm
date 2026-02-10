@@ -1,6 +1,7 @@
 import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { customerGroupService } from "$lib/server/services/customerGroups.js";
+import { translationService } from "$lib/server/services/translations.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -12,12 +13,13 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Invalid ID");
 	}
 
-	const [product, variant, facets, customerGroups, groupPrices] = await Promise.all([
+	const [product, variant, facets, customerGroups, groupPrices, translations] = await Promise.all([
 		productService.getById(productId),
 		productService.getVariantById(variantId),
 		facetService.list(),
 		customerGroupService.list(),
-		productService.getGroupPrices(variantId)
+		productService.getGroupPrices(variantId),
+		translationService.getVariantTranslations(variantId)
 	]);
 
 	if (!product) {
@@ -33,7 +35,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		variant,
 		facets,
 		customerGroups,
-		groupPrices
+		groupPrices,
+		translations
 	};
 };
 
@@ -115,6 +118,26 @@ export const actions: Actions = {
 			return { success: true };
 		} catch (e) {
 			return fail(500, { error: "Failed to update variant" });
+		}
+	},
+
+	saveTranslation: async ({ request }) => {
+		const formData = await request.formData();
+		const entityId = Number(formData.get("entityId"));
+		const languageCode = formData.get("languageCode") as string;
+		const name = formData.get("name") as string;
+
+		if (!entityId || !languageCode) {
+			return fail(400, { error: "Missing required fields" });
+		}
+
+		try {
+			await translationService.upsertVariantTranslation(entityId, languageCode, {
+				name: name || null
+			});
+			return { translationSuccess: true };
+		} catch {
+			return fail(500, { error: "Failed to save translation" });
 		}
 	},
 

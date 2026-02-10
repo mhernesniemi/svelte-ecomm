@@ -4,6 +4,8 @@
 ```
 src/
 ├── lib/
+│   ├── config/
+│   │   └── languages.ts     # Language config (DEFAULT_LANGUAGE, LANGUAGES, translationsToMap)
 │   ├── server/
 │   │   ├── db/              # Database schema & client
 │   │   │   ├── index.ts     # Drizzle client
@@ -15,6 +17,7 @@ src/
 │   │   │   ├── cart.ts
 │   │   │   ├── customers.ts
 │   │   │   ├── collections.ts
+│   │   │   ├── translations.ts  # Multi-language TranslationService
 │   │   │   ├── payments/    # Payment provider pattern
 │   │   │   └── shipping/    # Shipping provider pattern
 │   │   └── integrations/    # External system utilities
@@ -24,6 +27,8 @@ src/
 │   │       ├── webhooks.ts  # Webhook handlers
 │   │       └── retry.ts     # Retry utility
 │   ├── components/          # Shared UI components
+│   │   └── admin/
+│   │       └── TranslationEditor.svelte  # Reusable translation editing UI
 │   └── types.ts             # TypeScript types
 ├── routes/
 │   ├── (storefront)/        # Customer-facing store

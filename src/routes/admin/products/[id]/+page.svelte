@@ -21,6 +21,8 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
+  import { translationsToMap } from "$lib/config/languages.js";
   import Check from "@lucide/svelte/icons/check";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import X from "@lucide/svelte/icons/x";
@@ -389,6 +391,17 @@
           </TableBody>
         </Table>
       </div>
+      <!-- Translations -->
+      <TranslationEditor
+        fields={[
+          { name: "name", label: "Name", type: "text" },
+          { name: "slug", label: "Slug", type: "text" },
+          { name: "description", label: "Description", type: "richtext" }
+        ]}
+        translations={translationsToMap(data.translations)}
+        entityId={data.product.id}
+      />
+
       <button
         type="button"
         class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"

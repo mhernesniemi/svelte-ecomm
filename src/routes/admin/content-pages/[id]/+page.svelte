@@ -6,6 +6,8 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
+  import { translationsToMap } from "$lib/config/languages.js";
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
@@ -137,6 +139,17 @@
       </div>
     </div>
   </form>
+
+  <!-- Translations -->
+  <TranslationEditor
+    fields={[
+      { name: "title", label: "Title", type: "text" },
+      { name: "slug", label: "Slug", type: "text" },
+      { name: "body", label: "Body", type: "richtext" }
+    ]}
+    translations={translationsToMap(data.translations)}
+    entityId={data.page.id}
+  />
 
   <button
     type="button"

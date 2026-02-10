@@ -20,3 +20,4 @@ export type {
 	CategoryBreadcrumb
 } from "./categories.js";
 export { contentPageService, ContentPageService } from "./content-pages.js";
+export { translationService, TranslationService } from "./translations.js";

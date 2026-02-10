@@ -4,6 +4,7 @@ import { assetService } from "$lib/server/services/assets.js";
 import { categoryService } from "$lib/server/services/categories.js";
 import { collectionService } from "$lib/server/services/collections.js";
 import { taxService } from "$lib/server/services/tax.js";
+import { translationService } from "$lib/server/services/translations.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -20,13 +21,14 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Product not found");
 	}
 
-	const [facets, categoryTree, productCategories, taxRates, productCollections] =
+	const [facets, categoryTree, productCategories, taxRates, productCollections, translations] =
 		await Promise.all([
 			facetService.list(),
 			categoryService.getTree(),
 			categoryService.getProductCategories(id),
 			taxService.getAllTaxRates(),
-			collectionService.getCollectionsForProduct(id)
+			collectionService.getCollectionsForProduct(id),
+			translationService.getProductTranslations(id)
 		]);
 
 	return {
@@ -35,7 +37,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		categoryTree,
 		productCategories,
 		taxRates,
-		productCollections
+		productCollections,
+		translations
 	};
 };
 
@@ -222,6 +225,30 @@ export const actions: Actions = {
 			return { categorySuccess: true };
 		} catch (e) {
 			return fail(500, { categoryError: "Failed to update categories" });
+		}
+	},
+
+	saveTranslation: async ({ request }) => {
+		const formData = await request.formData();
+		const entityId = Number(formData.get("entityId"));
+		const languageCode = formData.get("languageCode") as string;
+		const name = formData.get("name") as string;
+		const slug = formData.get("slug") as string;
+		const description = formData.get("description") as string;
+
+		if (!entityId || !languageCode) {
+			return fail(400, { error: "Missing required fields" });
+		}
+
+		try {
+			await translationService.upsertProductTranslation(entityId, languageCode, {
+				name: name || "",
+				slug: slug || "",
+				description: description || null
+			});
+			return { translationSuccess: true };
+		} catch {
+			return fail(500, { error: "Failed to save translation" });
 		}
 	},
 

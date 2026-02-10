@@ -16,17 +16,18 @@ Product
 
 ## Multi-Language Support
 
-Products use translation tables. Services resolve translations and return flat fields:
+Default language (English) fields are stored directly on the `products` table. Non-default languages (e.g. Finnish) use the `product_translations` table, managed via `TranslationService`.
 
 ```typescript
 const product = await productService.getById(123);
 
-// Flat translated fields — no manual resolution needed
+// Default language fields — directly on the products table
 product.name;        // "Blue Shirt"
 product.slug;        // "blue-shirt"
 product.description; // "<p>A nice shirt</p>"
-product.translations; // Still available for editing
 ```
+
+Translations are edited in the admin panel via the `TranslationEditor` component. See [Localization](/core/localization) for details.
 
 ## Variants
 
@@ -73,11 +74,19 @@ const results = await productService.list({ search: "shirt" });
 ## Admin Operations
 
 ```typescript
-import { DEFAULT_LANGUAGE } from "$lib/utils";
-
-// Create product
+// Create product — default language fields go directly on the entity
 await productService.create({
-	translations: [{ languageCode: DEFAULT_LANGUAGE, name: "Blue Shirt", slug: "blue-shirt", description: "..." }]
+  name: "Blue Shirt",
+  slug: "blue-shirt",
+  description: "..."
+});
+
+// Add a Finnish translation
+import { translationService } from "$lib/server/services/translations";
+await translationService.upsertProductTranslation(productId, "fi", {
+  name: "Sininen paita",
+  slug: "sininen-paita",
+  description: "..."
 });
 
 // Variant operations are handled through productService

@@ -3,6 +3,7 @@ import { collectionService } from "$lib/server/services/collections.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
 import { assetService } from "$lib/server/services/assets.js";
+import { translationService } from "$lib/server/services/translations.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import { slugify } from "$lib/utils.js";
 
@@ -30,11 +31,12 @@ export const load: PageServerLoad = async ({ params }) => {
 	const productCount = await collectionService.getProductCount(id);
 
 	// Get matching products for the data table
-	const preview = await collectionService.getProductsForCollection(id, {
-		limit: 100
-	});
+	const [preview, translations] = await Promise.all([
+		collectionService.getProductsForCollection(id, { limit: 100 }),
+		translationService.getCollectionTranslations(id)
+	]);
 
-	return { collection, facets, products, productCount, preview: preview.items };
+	return { collection, facets, products, productCount, preview: preview.items, translations };
 };
 
 export const actions: Actions = {
@@ -84,6 +86,30 @@ export const actions: Actions = {
 			return { preview: result.products, productCount: result.total };
 		} catch {
 			return fail(400, { error: "Invalid filters" });
+		}
+	},
+
+	saveTranslation: async ({ request }) => {
+		const formData = await request.formData();
+		const entityId = Number(formData.get("entityId"));
+		const languageCode = formData.get("languageCode") as string;
+		const name = formData.get("name") as string;
+		const slug = formData.get("slug") as string;
+		const description = formData.get("description") as string;
+
+		if (!entityId || !languageCode) {
+			return fail(400, { error: "Missing required fields" });
+		}
+
+		try {
+			await translationService.upsertCollectionTranslation(entityId, languageCode, {
+				name: name || "",
+				slug: slug || "",
+				description: description || null
+			});
+			return { success: true, message: "Translation saved" };
+		} catch {
+			return fail(500, { error: "Failed to save translation" });
 		}
 	},
 

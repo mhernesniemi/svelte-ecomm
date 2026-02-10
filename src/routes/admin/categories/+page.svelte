@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
   import type { PageData } from "./$types";
+  import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import Pencil from "@lucide/svelte/icons/pencil";
   import PlusIcon from "@lucide/svelte/icons/plus";
@@ -50,7 +51,7 @@
           };
         }}
       >
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label
               for="cat_name_en"
@@ -66,6 +67,23 @@
               class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             />
           </div>
+          {#each TRANSLATION_LANGUAGES as lang}
+            <div>
+              <label
+                for="cat_name_{lang.code}"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
+                {lang.name} name
+              </label>
+              <input
+                type="text"
+                id="cat_name_{lang.code}"
+                name="name_{lang.code}"
+                placeholder="Leave empty to use default"
+                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+              />
+            </div>
+          {/each}
           <div>
             <label for="cat_slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
               Slug
@@ -161,7 +179,7 @@
                   }}
                 >
                   <input type="hidden" name="id" value={node.id} />
-                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                       <label
                         for="edit_name_{node.id}"
@@ -177,6 +195,23 @@
                         class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       />
                     </div>
+                    {#each TRANSLATION_LANGUAGES as lang}
+                      <div>
+                        <label
+                          for="edit_name_{lang.code}_{node.id}"
+                          class="mb-1 block text-sm font-medium text-foreground-secondary"
+                        >
+                          {lang.name} name
+                        </label>
+                        <input
+                          type="text"
+                          id="edit_name_{lang.code}_{node.id}"
+                          name="name_{lang.code}"
+                          value={data.categoryTranslations[node.id]?.find((t) => t.languageCode === lang.code)?.name ?? ""}
+                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                        />
+                      </div>
+                    {/each}
                     <div>
                       <label
                         for="edit_slug_{node.id}"

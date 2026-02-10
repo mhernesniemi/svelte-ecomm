@@ -3,6 +3,9 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
+  import { translationsToMap } from "$lib/config/languages.js";
+  import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -90,6 +93,13 @@
       </div>
     </div>
   </form>
+
+  <!-- Translations -->
+  <TranslationEditor
+    fields={[{ name: "name", label: "Name", type: "text" }]}
+    translations={translationsToMap(data.facetTranslations)}
+    entityId={data.facet.id}
+  />
 
   <!-- Values -->
   <div class="overflow-hidden rounded-lg bg-surface shadow">
@@ -269,6 +279,47 @@
                     </div>
                   </div>
                 </form>
+                {#each TRANSLATION_LANGUAGES as lang}
+                  <form
+                    method="POST"
+                    action="?/saveValueTranslation"
+                    class="mt-3 border-t border-border pt-3"
+                    use:enhance={() => {
+                      return async ({ result, update }) => {
+                        if (result.type === "success") {
+                          toast.success(`${lang.name} translation saved`);
+                        }
+                        await update({ reset: false });
+                      };
+                    }}
+                  >
+                    <input type="hidden" name="facetValueId" value={value.id} />
+                    <input type="hidden" name="languageCode" value={lang.code} />
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <label
+                          for="edit_value_name_{lang.code}_{value.id}"
+                          class="mb-1 block text-sm font-medium text-foreground-secondary"
+                        >
+                          {lang.name} name
+                        </label>
+                        <input
+                          type="text"
+                          id="edit_value_name_{lang.code}_{value.id}"
+                          name="name"
+                          value={data.valueTranslations[value.id]?.find((t) => t.languageCode === lang.code)?.name ?? ""}
+                          placeholder="Leave empty to use default"
+                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <div class="flex items-end">
+                        <Button type="submit" size="sm" variant="outline">
+                          Save {lang.name}
+                        </Button>
+                      </div>
+                    </div>
+                  </form>
+                {/each}
                 <div class="mt-3 border-t border-border pt-3">
                   <form
                     method="POST"

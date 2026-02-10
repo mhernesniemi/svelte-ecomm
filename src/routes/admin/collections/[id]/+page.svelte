@@ -13,6 +13,8 @@
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
+  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
+  import { translationsToMap } from "$lib/config/languages.js";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -704,6 +706,17 @@
           />
         </div>
       </div>
+
+      <!-- Translations -->
+      <TranslationEditor
+        fields={[
+          { name: "name", label: "Name", type: "text" },
+          { name: "slug", label: "Slug", type: "text" },
+          { name: "description", label: "Description", type: "richtext" }
+        ]}
+        translations={translationsToMap(data.translations)}
+        entityId={data.collection.id}
+      />
 
       <button
         type="button"

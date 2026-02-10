@@ -18,16 +18,17 @@ src/lib/server/db/
 ```typescript
 products
 ├── id: serial primary key
-├── slug: varchar unique
+├── name, slug, description       // Default language (English) fields
+├── type, visibility, taxCode
 ├── featuredAssetId: integer
 ├── createdAt, updatedAt: timestamp
 
-product_translations
+product_translations              // Non-default language translations
 ├── id, productId, languageCode
-├── name, description
+├── name, slug, description
 
 product_variants
-├── id, productId, sku, price, stock
+├── id, productId, name, sku, price, stock
 
 product_variant_translations
 ├── id, variantId, languageCode, name

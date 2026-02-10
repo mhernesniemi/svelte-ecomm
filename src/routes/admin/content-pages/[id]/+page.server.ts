@@ -1,5 +1,6 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { contentPageService } from "$lib/server/services/content-pages.js";
+import { translationService } from "$lib/server/services/translations.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import { slugify } from "$lib/utils.js";
 
@@ -9,12 +10,15 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(400, "Invalid page ID");
 	}
 
-	const page = await contentPageService.getById(id);
+	const [page, translations] = await Promise.all([
+		contentPageService.getById(id),
+		translationService.getContentPageTranslations(id)
+	]);
 	if (!page) {
 		throw error(404, "Content page not found");
 	}
 
-	return { page };
+	return { page, translations };
 };
 
 export const actions: Actions = {
@@ -42,6 +46,30 @@ export const actions: Actions = {
 			return { success: true, message: "Page updated successfully" };
 		} catch (err) {
 			return fail(500, { error: "Failed to update page" });
+		}
+	},
+
+	saveTranslation: async ({ request }) => {
+		const formData = await request.formData();
+		const entityId = Number(formData.get("entityId"));
+		const languageCode = formData.get("languageCode") as string;
+		const title = formData.get("title") as string;
+		const slug = formData.get("slug") as string;
+		const body = formData.get("body") as string;
+
+		if (!entityId || !languageCode) {
+			return fail(400, { error: "Missing required fields" });
+		}
+
+		try {
+			await translationService.upsertContentPageTranslation(entityId, languageCode, {
+				title: title || "",
+				slug: slug || "",
+				body: body || null
+			});
+			return { success: true, message: "Translation saved" };
+		} catch {
+			return fail(500, { error: "Failed to save translation" });
 		}
 	},
 

@@ -45,23 +45,6 @@ export function throttle<T extends (...args: Parameters<T>) => void>(
 }
 
 // ============================================================================
-// LANGUAGE UTILITIES
-// ============================================================================
-
-/** Default language for the system */
-export const DEFAULT_LANGUAGE = "en";
-
-/**
- * Find a translation matching the given language, falling back to the first translation
- */
-export function getTranslation<T extends { languageCode: string }>(
-	translations: T[],
-	language: string = DEFAULT_LANGUAGE
-): T | undefined {
-	return translations.find((t) => t.languageCode === language) ?? translations[0];
-}
-
-// ============================================================================
 // CURRENCY UTILITIES
 // ============================================================================
 

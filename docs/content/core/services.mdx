@@ -75,6 +75,30 @@ const customer = await customerService.getOrCreateFromClerk(clerkUser);
 const customer = await customerService.getByEmail("user@example.com");
 ```
 
+## Translation Service
+
+Manages translations for all 7 translatable entities. Uses Drizzle's `onConflictDoUpdate` for upserts.
+
+```typescript
+import { translationService } from "$lib/server/services/translations";
+
+// Get translations for an entity
+const rows = await translationService.getProductTranslations(productId);
+
+// Upsert a translation (insert or update)
+await translationService.upsertProductTranslation(productId, "fi", {
+  name: "Sininen paita",
+  slug: "sininen-paita",
+  description: "<p>Hieno paita</p>"
+});
+
+// Bulk methods for list pages
+const allCategoryTranslations = await translationService.getAllCategoryTranslations();
+const facetValueTranslations = await translationService.getAllFacetValueTranslations(facetId);
+```
+
+See [Localization](/core/localization) for the full API and admin UI integration.
+
 ## Other Services
 
 See `src/lib/server/services/` for all available services including:
@@ -87,6 +111,7 @@ See `src/lib/server/services/` for all available services including:
 - `reservationService` — Stock reservations
 - `customerGroupService` — Customer group management
 - `contentPageService` — CMS content pages
+- `translationService` — Multi-language translations for all entities
 - `assetService` — Image/file management
 - `wishlistService` — Customer wishlists
 - `reviewService` — Product reviews

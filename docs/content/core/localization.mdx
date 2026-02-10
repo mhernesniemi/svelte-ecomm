@@ -1,19 +1,63 @@
 
 # Localization
 
-The database schema fully supports multiple languages via separate translation tables. Translations are resolved at the **service layer** — services return flat, resolved objects so components can access `product.name` directly instead of digging into translation arrays.
+Hoikka supports multiple languages. The default language (English) is stored directly on entity tables for simplicity, while non-default languages use separate translation tables.
 
 ## Language Configuration
 
-The default language is defined in `src/lib/utils.ts`:
+Languages are configured in `src/lib/config/languages.ts`:
 
 ```typescript
-import { DEFAULT_LANGUAGE } from "$lib/utils";
-
-DEFAULT_LANGUAGE; // "en"
+import {
+  DEFAULT_LANGUAGE,       // "en"
+  LANGUAGES,              // [{ code: "en", name: "English" }, { code: "fi", name: "Suomi" }]
+  TRANSLATION_LANGUAGES,  // [{ code: "fi", name: "Suomi" }] — excludes default
+  translationsToMap       // Utility for components
+} from "$lib/config/languages";
 ```
 
-To change the default language for the entire application, update this single constant. All services and resolution utilities derive their default from it.
+- **`DEFAULT_LANGUAGE`** — The language stored on entity tables (e.g. `products.name`)
+- **`LANGUAGES`** — All supported languages
+- **`TRANSLATION_LANGUAGES`** — Languages that use translation tables (everything except default)
+- **`translationsToMap()`** — Converts translation rows into `Record<langCode, Record<field, value>>` for component consumption
+
+## How It Works
+
+### Default Language (English)
+
+Default language fields live directly on entity tables:
+
+```
+products.name = "Blue Shirt"
+products.slug = "blue-shirt"
+products.description = "<p>A nice shirt</p>"
+```
+
+Services return these fields directly — no translation resolution needed:
+
+```typescript
+const product = await productService.getById(123);
+product.name; // "Blue Shirt" — directly from the products table
+```
+
+### Non-Default Languages (Finnish, etc.)
+
+Non-default languages are stored in translation tables and managed through the `TranslationService`:
+
+```typescript
+import { translationService } from "$lib/server/services/translations";
+
+// Save a Finnish translation
+await translationService.upsertProductTranslation(productId, "fi", {
+  name: "Sininen paita",
+  slug: "sininen-paita",
+  description: "<p>Hieno paita</p>"
+});
+
+// Read translations
+const rows = await translationService.getProductTranslations(productId);
+// [{ languageCode: "fi", name: "Sininen paita", slug: "sininen-paita", ... }]
+```
 
 ## Translation Tables
 
@@ -27,117 +71,157 @@ To change the default language for the entire application, update this single co
 | `categories`       | `category_translations`        | `name`                        |
 | `content_pages`    | `content_page_translations`    | `title`, `slug`, `body`       |
 
-Each translation table has a `languageCode` column (ISO 639-1, e.g. `"en"`, `"fi"`) with a unique index on `(parentId, languageCode)`.
+Each translation table has a unique index on `(entity_id, language_code)`. The `TranslationService` uses Drizzle's `onConflictDoUpdate` for upserts.
 
-## Service-Layer Resolution
+## TranslationService
 
-Services resolve translations internally and return `Resolved*` types with flat translated fields. Components never need to pick translations manually.
-
-```typescript
-// Service returns a ResolvedProduct with flat fields
-const product = await productService.getById(123);
-
-product.name;        // "Blue Shirt" (resolved from translations)
-product.slug;        // "blue-shirt"
-product.description; // "<p>A nice shirt</p>"
-product.translations; // Still available for editing forms
-```
-
-Services accept an optional `language` parameter (defaults to `DEFAULT_LANGUAGE`). Since only one language is currently used, you don't need to pass it.
-
-### Resolution Utilities
-
-The resolution functions live in `src/lib/server/i18n.ts`:
+A single service (`src/lib/server/services/translations.ts`) handles all 7 entities with a consistent API:
 
 ```typescript
-import { resolveProduct, resolveCollection, resolveFacet } from "$lib/server/i18n";
+import { translationService } from "$lib/server/services/translations";
 
-// Each function takes an entity with translations[] and an optional language,
-// and returns the entity with flat translated fields merged on
-const resolved = resolveProduct(rawProduct, "en");
-resolved.name; // "Blue Shirt"
+// Pattern: get + upsert per entity
+await translationService.getProductTranslations(productId);
+await translationService.upsertProductTranslation(productId, "fi", { name, slug, description });
+
+await translationService.getVariantTranslations(variantId);
+await translationService.upsertVariantTranslation(variantId, "fi", { name });
+
+await translationService.getFacetTranslations(facetId);
+await translationService.upsertFacetTranslation(facetId, "fi", { name });
+
+await translationService.getAllFacetValueTranslations(facetId); // Bulk: all values for a facet
+await translationService.upsertFacetValueTranslation(facetValueId, "fi", { name });
+
+await translationService.getCollectionTranslations(collectionId);
+await translationService.upsertCollectionTranslation(collectionId, "fi", { name, slug, description });
+
+await translationService.getAllCategoryTranslations(); // Bulk: all categories
+await translationService.upsertCategoryTranslation(categoryId, "fi", { name });
+
+await translationService.getContentPageTranslations(pageId);
+await translationService.upsertContentPageTranslation(pageId, "fi", { title, slug, body });
 ```
 
-Available resolution functions: `resolveProduct`, `resolveVariant`, `resolveFacet`, `resolveFacetValue`, `resolveCollection`, `resolveCategory`, `resolveCategoryTreeNode`, `resolveContentPage`.
+## Admin UI
 
-### Resolved Types
+### TranslationEditor Component
 
-`Resolved*` types extend the base types with flat translated fields while keeping `translations[]` intact:
-
-```typescript
-// ResolvedProduct extends Product
-interface ResolvedProduct extends Product {
-  name: string;
-  slug: string;
-  description: string | null;
-  translations: ProductTranslation[]; // kept for editing
-  variants: ResolvedProductVariant[];
-  facetValues: ResolvedFacetValue[];
-}
-```
-
-### Svelte Components
-
-Components access translated fields directly — no helper functions needed:
+A reusable component (`src/lib/components/admin/TranslationEditor.svelte`) provides the translation editing UI for all entity admin pages:
 
 ```svelte
 <script lang="ts">
-  let { data } = $props();
+  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
+  import { translationsToMap } from "$lib/config/languages";
 </script>
 
-<h1>{data.product.name}</h1>
-<p>{data.collection.description}</p>
+<TranslationEditor
+  fields={[
+    { name: "name", label: "Name", type: "text" },
+    { name: "slug", label: "Slug", type: "text" },
+    { name: "description", label: "Description", type: "richtext" }
+  ]}
+  translations={translationsToMap(data.translations)}
+  entityId={data.product.id}
+/>
 ```
 
-For admin forms that need to edit translations, the `translations` array is still available:
+**Props:**
+- `fields` — Array of `{ name, label, type }` where type is `"text"`, `"textarea"`, or `"richtext"`
+- `translations` — A `Record<langCode, Record<field, value>>` map (use `translationsToMap()` to convert from DB rows)
+- `entityId` — The entity's ID
+- `action` — Form action URL (defaults to `"?/saveTranslation"`)
 
-```svelte
-<input name="name" value={data.product.name} />
-<!-- translations[] available for multi-language editing -->
-```
+**Behavior:**
+- Renders a "Translations" card with a globe icon header
+- Language tabs for each non-default language
+- Posts to the `saveTranslation` action with `entityId`, `languageCode`, and field values
+- Toast notification on save
+- Hint text: "Leave empty to use the default (English) value."
 
-## Route Load Functions
+### Wiring Pattern
 
-Routes just call services — no language passthrough needed:
+Each admin edit page follows the same pattern:
+
+**1. Load translations in `+page.server.ts`:**
 
 ```typescript
-export const load: PageServerLoad = async () => {
-  const product = await productService.getById(123);
-  const facets = await facetService.list();
-  return { product, facets };
+import { translationService } from "$lib/server/services/translations";
+
+export const load = async ({ params }) => {
+  const [product, translations] = await Promise.all([
+    productService.getById(id),
+    translationService.getProductTranslations(id)
+  ]);
+  return { product, translations };
 };
 ```
 
-## Creating Translations
-
-When creating or updating records, use `DEFAULT_LANGUAGE` for the language code:
+**2. Add a `saveTranslation` action:**
 
 ```typescript
-import { DEFAULT_LANGUAGE } from "$lib/utils";
+export const actions = {
+  saveTranslation: async ({ request }) => {
+    const formData = await request.formData();
+    const entityId = Number(formData.get("entityId"));
+    const languageCode = formData.get("languageCode") as string;
+    const name = formData.get("name") as string;
+    // ... other fields
 
-await productService.create({
-  translations: [{ languageCode: DEFAULT_LANGUAGE, name: "Blue Shirt", slug: "blue-shirt" }]
-});
+    await translationService.upsertProductTranslation(entityId, languageCode, {
+      name: name || "",
+      slug: slug || "",
+      description: description || null
+    });
+    return { translationSuccess: true };
+  }
+};
+```
+
+**3. Add `<TranslationEditor>` in `+page.svelte`:**
+
+```svelte
+<TranslationEditor
+  fields={[
+    { name: "name", label: "Name", type: "text" },
+    { name: "slug", label: "Slug", type: "text" },
+    { name: "description", label: "Description", type: "richtext" }
+  ]}
+  translations={translationsToMap(data.translations)}
+  entityId={data.product.id}
+/>
+```
+
+### Inline Translation Editing
+
+For entities with inline editing (categories, facet values), Finnish name fields are added directly to the create/update forms instead of using the `TranslationEditor` component:
+
+```svelte
+<!-- Category inline edit -->
+<input name="name_en" value={node.name} />
+<input name="name_fi" value={categoryTranslations[node.id]?.fi?.name ?? ""} />
+```
+
+## Storefront Resolution
+
+The storefront resolves translations at the service layer. Services accept an optional `language` parameter. When multi-language storefronts are needed, pass the detected language to service calls:
+
+```typescript
+// Future: detect language from URL prefix, cookie, or Accept-Language header
+const product = await productService.getById(123, language);
 ```
 
 ## Adding a New Language
 
-1. No schema changes needed — translation tables already support any ISO 639-1 code
-2. Add translations for the new language to existing records:
-
-```typescript
-await productService.update(productId, {
-  translations: [{ languageCode: "fi", name: "Sininen paita", slug: "sininen-paita" }]
-});
-```
-
-3. Add a language detection hook (URL prefix, cookie, or `Accept-Language` header) and pass the language to services
+1. Add the language to `LANGUAGES` in `src/lib/config/languages.ts`
+2. No schema changes needed — translation tables already support any language code
+3. The admin UI automatically picks up the new language (TranslationEditor renders tabs for all `TRANSLATION_LANGUAGES`)
+4. Add translations for existing records via the admin UI or programmatically via `TranslationService`
 
 ## Best Practices
 
-1. **Never hardcode `"en"`** — always use `DEFAULT_LANGUAGE`
-2. **Access flat fields in components** — use `product.name`, not `product.translations[0].name`
-3. **Use `DEFAULT_LANGUAGE` in form actions** — when saving translations, reference the constant
-4. **Don't pass language to services** — they default to `DEFAULT_LANGUAGE`. When multi-language is added, introduce a per-request language hook
-
-See `src/lib/server/db/schema.ts` for translation table definitions and `src/lib/server/i18n.ts` for resolution utilities.
+1. **Never hardcode `"en"`** — always use `DEFAULT_LANGUAGE` from the config
+2. **Default language fields go on entity tables** — `products.name`, not in `product_translations`
+3. **Non-default translations go in translation tables** — managed via `TranslationService`
+4. **Use `translationsToMap()`** — converts DB rows to the map format expected by `TranslationEditor`
+5. **Leave translations empty to fall back** — the storefront uses entity table fields when no translation exists

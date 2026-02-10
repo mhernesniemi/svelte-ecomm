@@ -9,6 +9,8 @@
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Badge } from "$lib/components/admin/ui/badge";
+  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
+  import { translationsToMap } from "$lib/config/languages.js";
   import X from "@lucide/svelte/icons/x";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -330,6 +332,13 @@
           {/if}
         </div>
       </div>
+
+      <!-- Translations -->
+      <TranslationEditor
+        fields={[{ name: "name", label: "Name", type: "text" }]}
+        translations={translationsToMap(data.translations)}
+        entityId={data.variant.id}
+      />
     </div>
 
     <!-- Sidebar (Right) -->
