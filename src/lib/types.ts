@@ -65,24 +65,17 @@ export type ProductVisibility = Product["visibility"];
 /** Product type - physical or digital */
 export type ProductType = Product["type"];
 
-/** Product with translations loaded */
-export interface ProductWithTranslations extends Product {
-	translations: ProductTranslation[];
-}
-
 /** Product with all related data */
 export interface ProductWithRelations extends Product {
-	translations: ProductTranslation[];
 	variants: ProductVariantWithRelations[];
-	facetValues: FacetValueWithTranslations[];
+	facetValues: FacetValue[];
 	assets: Asset[];
 	featuredAsset?: Asset | null;
 }
 
 /** Variant with all related data */
 export interface ProductVariantWithRelations extends ProductVariant {
-	translations: ProductVariantTranslation[];
-	facetValues: FacetValueWithTranslations[];
+	facetValues: FacetValue[];
 	assets: Asset[];
 	featuredAsset?: Asset | null;
 }
@@ -103,19 +96,9 @@ export type NewFacetValue = InferInsertModel<typeof facetValues>;
 export type FacetValueTranslation = InferSelectModel<typeof facetValueTranslations>;
 export type NewFacetValueTranslation = InferInsertModel<typeof facetValueTranslations>;
 
-/** Facet with translations */
-export interface FacetWithTranslations extends Facet {
-	translations: FacetTranslation[];
-}
-
 /** Facet with all values */
-export interface FacetWithValues extends FacetWithTranslations {
-	values: FacetValueWithTranslations[];
-}
-
-/** Facet value with translations */
-export interface FacetValueWithTranslations extends FacetValue {
-	translations: FacetValueTranslation[];
+export interface FacetWithValues extends Facet {
+	values: FacetValue[];
 }
 
 // ============================================================================
@@ -290,21 +273,9 @@ export type CollectionFilterField = CollectionFilter["field"];
 /** Collection filter operator - derived from schema enum */
 export type CollectionFilterOperator = CollectionFilter["operator"];
 
-/** Collection with translations */
-export interface CollectionWithTranslations extends Collection {
-	translations: CollectionTranslation[];
-}
-
 /** Collection with all related data */
 export interface CollectionWithRelations extends Collection {
-	translations: CollectionTranslation[];
 	filters: CollectionFilter[];
-	featuredAsset?: Asset | null;
-}
-
-/** Collection with product count */
-export interface CollectionWithCount extends CollectionWithTranslations {
-	productCount: number;
 	featuredAsset?: Asset | null;
 }
 
@@ -335,7 +306,7 @@ export interface ReviewWithCustomer extends Review {
 
 /** Review with product and customer info (for admin) */
 export interface ReviewWithRelations extends Review {
-	product: ProductWithTranslations;
+	product: Product;
 	customer: Customer;
 }
 
@@ -349,70 +320,6 @@ export type NewContentPage = InferInsertModel<typeof contentPages>;
 export type ContentPageTranslation = InferSelectModel<typeof contentPageTranslations>;
 export type NewContentPageTranslation = InferInsertModel<typeof contentPageTranslations>;
 
-export interface ContentPageWithTranslations extends ContentPage {
-	translations: ContentPageTranslation[];
-}
-
-// ============================================================================
-// RESOLVED TYPES (flat translated fields + translations[] kept for editing)
-// ============================================================================
-
-/** Product with resolved translation fields */
-export interface ResolvedProduct extends Product {
-	name: string;
-	slug: string;
-	description: string | null;
-	translations: ProductTranslation[];
-	variants: ResolvedProductVariant[];
-	facetValues: ResolvedFacetValue[];
-	assets: Asset[];
-	featuredAsset?: Asset | null;
-}
-
-/** Variant with resolved translation fields */
-export interface ResolvedProductVariant extends ProductVariant {
-	name: string;
-	translations: ProductVariantTranslation[];
-	facetValues: ResolvedFacetValue[];
-	assets: Asset[];
-	featuredAsset?: Asset | null;
-}
-
-/** Facet value with resolved translation fields */
-export interface ResolvedFacetValue extends FacetValue {
-	name: string;
-	translations: FacetValueTranslation[];
-}
-
-/** Facet with resolved translation fields */
-export interface ResolvedFacet extends Facet {
-	name: string;
-	translations: FacetTranslation[];
-	values: ResolvedFacetValue[];
-}
-
-/** Collection with resolved translation fields */
-export interface ResolvedCollection extends Collection {
-	name: string;
-	slug: string;
-	description: string | null;
-	translations: CollectionTranslation[];
-	filters: CollectionFilter[];
-	featuredAsset?: Asset | null;
-}
-
-/** Collection with product count and resolved fields */
-export interface ResolvedCollectionWithCount extends ResolvedCollection {
-	productCount: number;
-}
-
-/** Content page with resolved translation fields */
-export interface ResolvedContentPage extends ContentPage {
-	title: string;
-	slug: string;
-	body: string | null;
-	translations: ContentPageTranslation[];
-}
 
 // ============================================================================
 // FILTER & QUERY TYPES
@@ -425,7 +332,6 @@ export interface FacetFilter {
 
 /** Product list options */
 export interface ProductListOptions {
-	language?: string;
 	facets?: FacetFilter;
 	search?: string;
 	visibility?: ProductVisibility | ProductVisibility[];
@@ -463,24 +369,18 @@ export interface CreateProductInput {
 	type?: ProductType;
 	visibility?: ProductVisibility;
 	taxCode?: string;
-	translations: {
-		languageCode: string;
-		name: string;
-		slug: string;
-		description?: string;
-	}[];
+	name: string;
+	slug: string;
+	description?: string;
 }
 
 export interface UpdateProductInput {
 	type?: ProductType;
 	visibility?: ProductVisibility;
 	taxCode?: string;
-	translations?: {
-		languageCode: string;
-		name?: string;
-		slug?: string;
-		description?: string;
-	}[];
+	name?: string;
+	slug?: string;
+	description?: string;
 }
 
 export interface CreateVariantInput {
@@ -489,10 +389,7 @@ export interface CreateVariantInput {
 	price: number;
 	stock?: number;
 	trackInventory?: boolean;
-	translations?: {
-		languageCode: string;
-		name?: string;
-	}[];
+	name?: string;
 }
 
 export interface UpdateVariantInput {
@@ -500,10 +397,7 @@ export interface UpdateVariantInput {
 	price?: number;
 	stock?: number;
 	trackInventory?: boolean;
-	translations?: {
-		languageCode: string;
-		name?: string;
-	}[];
+	name?: string;
 }
 
 export interface CreateOrderInput {
@@ -565,12 +459,9 @@ export interface CreateCollectionInput {
 	isPrivate?: boolean;
 	position?: number;
 	featuredAssetId?: number;
-	translations: {
-		languageCode: string;
-		name: string;
-		slug: string;
-		description?: string;
-	}[];
+	name: string;
+	slug: string;
+	description?: string;
 	filters?: {
 		field: CollectionFilterField;
 		operator: CollectionFilterOperator;
@@ -582,12 +473,9 @@ export interface UpdateCollectionInput {
 	isPrivate?: boolean;
 	position?: number;
 	featuredAssetId?: number | null;
-	translations?: {
-		languageCode: string;
-		name?: string;
-		slug?: string;
-		description?: string;
-	}[];
+	name?: string;
+	slug?: string;
+	description?: string;
 }
 
 export interface AddCollectionFilterInput {

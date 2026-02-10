@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { ResolvedProduct } from "$lib/types";
+  import type { ProductWithRelations } from "$lib/types";
   import { formatPrice } from "$lib/utils";
   import { findBestDiscount, getDiscountedPrice, type ActiveDiscount } from "$lib/promotion-utils";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -7,7 +7,7 @@
   let {
     product,
     activeDiscounts = []
-  }: { product: ResolvedProduct; activeDiscounts?: ActiveDiscount[] } = $props();
+  }: { product: ProductWithRelations; activeDiscounts?: ActiveDiscount[] } = $props();
 
   const name = $derived(product.name);
   const slug = $derived(product.slug);

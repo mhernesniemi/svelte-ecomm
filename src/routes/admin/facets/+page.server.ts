@@ -2,8 +2,8 @@ import { facetService } from "$lib/server/services/facets.js";
 import { fail } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const facets = await facetService.list(locals.language);
+export const load: PageServerLoad = async () => {
+	const facets = await facetService.list();
 
 	return { facets };
 };

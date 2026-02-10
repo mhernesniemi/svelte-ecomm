@@ -4,27 +4,26 @@ import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
 import { assetService } from "$lib/server/services/assets.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
-import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
+import { slugify } from "$lib/utils.js";
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);
 	if (isNaN(id)) {
 		throw error(400, "Invalid collection ID");
 	}
 
-	const collection = await collectionService.getById(id, locals.language);
+	const collection = await collectionService.getById(id);
 	if (!collection) {
 		throw error(404, "Collection not found");
 	}
 
 	// Load facets for filter builder
-	const facets = await facetService.list(locals.language);
+	const facets = await facetService.list();
 
 	// Load all products for manual selection (admin sees all visibility states)
 	const { items: products } = await productService.list({
 		visibility: ["public", "private", "draft"],
-		limit: 100,
-		language: locals.language
+		limit: 100
 	});
 
 	// Get product count
@@ -32,8 +31,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	// Get matching products for the data table
 	const preview = await collectionService.getProductsForCollection(id, {
-		limit: 100,
-		language: locals.language
+		limit: 100
 	});
 
 	return { collection, facets, products, productCount, preview: preview.items };
@@ -57,14 +55,9 @@ export const actions: Actions = {
 		try {
 			await collectionService.update(id, {
 				isPrivate,
-				translations: [
-					{
-						languageCode: DEFAULT_LANGUAGE,
-						name,
-						slug: slugify(slug),
-						description: description || undefined
-					}
-				]
+				name,
+				slug: slugify(slug),
+				description: description || undefined
 			});
 
 			// Replace filters if provided

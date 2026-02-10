@@ -6,22 +6,15 @@ import { eq, and, desc, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import {
 	facets,
-	facetTranslations,
 	facetValues,
-	facetValueTranslations,
 	productFacetValues
 } from "../db/schema.js";
 import type {
 	Facet,
-	FacetWithValues,
 	FacetValue,
-	FacetValueWithTranslations,
-	PaginatedResult,
-	ResolvedFacet,
-	ResolvedFacetValue
+	FacetWithValues,
+	PaginatedResult
 } from "$lib/types.js";
-import { DEFAULT_LANGUAGE } from "$lib/utils.js";
-import { resolveFacet, resolveFacetValue } from "$lib/server/i18n.js";
 
 export class FacetService {
 
@@ -30,27 +23,17 @@ export class FacetService {
 	 */
 	async create(input: {
 		code: string;
+		name: string;
 		isPrivate?: boolean;
-		translations: { languageCode: string; name: string }[];
 	}): Promise<Facet> {
 		const [facet] = await db
 			.insert(facets)
 			.values({
 				code: input.code,
+				name: input.name,
 				isPrivate: input.isPrivate ?? false
 			})
 			.returning();
-
-		// Insert translations
-		if (input.translations.length > 0) {
-			await db.insert(facetTranslations).values(
-				input.translations.map((t) => ({
-					facetId: facet.id,
-					languageCode: t.languageCode,
-					name: t.name
-				}))
-			);
-		}
 
 		return facet;
 	}
@@ -58,41 +41,32 @@ export class FacetService {
 	/**
 	 * Get facet by ID with values
 	 */
-	async getById(id: number, language?: string): Promise<ResolvedFacet | null> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-
+	async getById(id: number): Promise<FacetWithValues | null> {
 		const [facet] = await db.select().from(facets).where(eq(facets.id, id));
 
 		if (!facet) return null;
 
-		const raw = await this.loadFacetWithValues(facet, lang);
-		return resolveFacet(raw, lang);
+		return this.loadFacetWithValues(facet);
 	}
 
 	/**
 	 * Get facet by code
 	 */
-	async getByCode(code: string, language?: string): Promise<ResolvedFacet | null> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-
+	async getByCode(code: string): Promise<FacetWithValues | null> {
 		const [facet] = await db.select().from(facets).where(eq(facets.code, code));
 
 		if (!facet) return null;
 
-		const raw = await this.loadFacetWithValues(facet, lang);
-		return resolveFacet(raw, lang);
+		return this.loadFacetWithValues(facet);
 	}
 
 	/**
 	 * List all facets
 	 */
-	async list(language?: string): Promise<ResolvedFacet[]> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-
+	async list(): Promise<FacetWithValues[]> {
 		const facetList = await db.select().from(facets).orderBy(facets.code);
 
-		const raw = await Promise.all(facetList.map((f: Facet) => this.loadFacetWithValues(f, lang)));
-		return raw.map((f) => resolveFacet(f, lang));
+		return Promise.all(facetList.map((f: Facet) => this.loadFacetWithValues(f)));
 	}
 
 	/**
@@ -102,39 +76,24 @@ export class FacetService {
 		id: number,
 		input: {
 			code?: string;
+			name?: string;
 			isPrivate?: boolean;
-			translations?: { languageCode: string; name: string }[];
 		}
 	): Promise<Facet | null> {
 		const [facet] = await db.select().from(facets).where(eq(facets.id, id));
 
 		if (!facet) return null;
 
+		const updateData: Record<string, unknown> = {};
+		if (input.code) updateData.code = input.code;
+		if (input.name !== undefined) updateData.name = input.name;
+		if (input.isPrivate !== undefined) updateData.isPrivate = input.isPrivate;
+
 		const [updated] = await db
 			.update(facets)
-			.set({
-				...(input.code && { code: input.code }),
-				...(input.isPrivate !== undefined && { isPrivate: input.isPrivate })
-			})
+			.set(updateData)
 			.where(eq(facets.id, id))
 			.returning();
-
-		// Update translations
-		if (input.translations) {
-			for (const t of input.translations) {
-				await db
-					.insert(facetTranslations)
-					.values({
-						facetId: id,
-						languageCode: t.languageCode,
-						name: t.name
-					})
-					.onConflictDoUpdate({
-						target: [facetTranslations.facetId, facetTranslations.languageCode],
-						set: { name: t.name }
-					});
-			}
-		}
 
 		return updated;
 	}
@@ -157,26 +116,16 @@ export class FacetService {
 	async createValue(input: {
 		facetId: number;
 		code: string;
-		translations: { languageCode: string; name: string }[];
+		name: string;
 	}): Promise<FacetValue> {
 		const [value] = await db
 			.insert(facetValues)
 			.values({
 				facetId: input.facetId,
-				code: input.code
+				code: input.code,
+				name: input.name
 			})
 			.returning();
-
-		// Insert translations
-		if (input.translations.length > 0) {
-			await db.insert(facetValueTranslations).values(
-				input.translations.map((t) => ({
-					facetValueId: value.id,
-					languageCode: t.languageCode,
-					name: t.name
-				}))
-			);
-		}
 
 		return value;
 	}
@@ -184,19 +133,10 @@ export class FacetService {
 	/**
 	 * Get facet value by ID
 	 */
-	async getValueById(id: number, language?: string): Promise<ResolvedFacetValue | null> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-
+	async getValueById(id: number): Promise<FacetValue | null> {
 		const [value] = await db.select().from(facetValues).where(eq(facetValues.id, id));
 
-		if (!value) return null;
-
-		const translations = await db
-			.select()
-			.from(facetValueTranslations)
-			.where(eq(facetValueTranslations.facetValueId, id));
-
-		return resolveFacetValue({ ...value, translations }, lang);
+		return value ?? null;
 	}
 
 	/**
@@ -206,40 +146,22 @@ export class FacetService {
 		id: number,
 		input: {
 			code?: string;
-			translations?: { languageCode: string; name: string }[];
+			name?: string;
 		}
 	): Promise<FacetValue | null> {
 		const [value] = await db.select().from(facetValues).where(eq(facetValues.id, id));
 
 		if (!value) return null;
 
+		const updateData: Record<string, unknown> = {};
+		if (input.code) updateData.code = input.code;
+		if (input.name !== undefined) updateData.name = input.name;
+
 		const [updated] = await db
 			.update(facetValues)
-			.set({
-				...(input.code && { code: input.code })
-			})
+			.set(updateData)
 			.where(eq(facetValues.id, id))
 			.returning();
-
-		// Update translations
-		if (input.translations) {
-			for (const t of input.translations) {
-				await db
-					.insert(facetValueTranslations)
-					.values({
-						facetValueId: id,
-						languageCode: t.languageCode,
-						name: t.name
-					})
-					.onConflictDoUpdate({
-						target: [
-							facetValueTranslations.facetValueId,
-							facetValueTranslations.languageCode
-						],
-						set: { name: t.name }
-					});
-			}
-		}
 
 		return updated;
 	}
@@ -268,13 +190,7 @@ export class FacetService {
 	// PRIVATE HELPERS
 	// ============================================================================
 
-	private async loadFacetWithValues(facet: Facet, language: string): Promise<FacetWithValues> {
-		// Load translations
-		const translations = await db
-			.select()
-			.from(facetTranslations)
-			.where(eq(facetTranslations.facetId, facet.id));
-
+	private async loadFacetWithValues(facet: Facet): Promise<FacetWithValues> {
 		// Load values
 		const valueList = await db
 			.select()
@@ -282,20 +198,9 @@ export class FacetService {
 			.where(eq(facetValues.facetId, facet.id))
 			.orderBy(facetValues.code);
 
-		const values: FacetValueWithTranslations[] = [];
-		for (const v of valueList) {
-			const valueTranslations = await db
-				.select()
-				.from(facetValueTranslations)
-				.where(eq(facetValueTranslations.facetValueId, v.id));
-
-			values.push({ ...v, translations: valueTranslations });
-		}
-
 		return {
 			...facet,
-			translations,
-			values
+			values: valueList
 		};
 	}
 }

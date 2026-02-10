@@ -1,6 +1,5 @@
 import { productService } from "$lib/server/services/products.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
-import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -21,13 +20,8 @@ export const actions: Actions = {
 			const product = await productService.create({
 				type: "physical",
 				visibility: "draft",
-				translations: [
-					{
-						languageCode: DEFAULT_LANGUAGE,
-						name,
-						slug
-					}
-				]
+				name,
+				slug
 			});
 
 			throw redirect(303, `/admin/products/${product.id}`);

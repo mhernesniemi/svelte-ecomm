@@ -10,20 +10,19 @@ Manages products and their variants. Returns `ResolvedProduct` with flat transla
 ```typescript
 import { productService } from "$lib/server/services/products";
 
-// Get by ID or slug (pass language for translation resolution)
-const product = await productService.getById(123, locals.language);
-const product = await productService.getBySlug("blue-shirt", locals.language);
+// Get by ID or slug — returns resolved flat fields
+const product = await productService.getById(123);
+const product = await productService.getBySlug("blue-shirt");
 
 product.name; // "Blue Shirt" (resolved from translations)
 
 // List with pagination
 const { items, total } = await productService.list({
-	limit: 20,
-	language: locals.language
+	limit: 20
 });
 
 // Search
-const results = await productService.list({ search: "shirt", language: locals.language });
+const results = await productService.list({ search: "shirt" });
 
 // CRUD
 await productService.create({ slug: "new-product" /* ... */ });

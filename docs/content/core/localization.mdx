@@ -1,3 +1,4 @@
+
 # Localization
 
 The database schema fully supports multiple languages via separate translation tables. Translations are resolved at the **service layer** — services return flat, resolved objects so components can access `product.name` directly instead of digging into translation arrays.
@@ -13,19 +14,6 @@ DEFAULT_LANGUAGE; // "en"
 ```
 
 To change the default language for the entire application, update this single constant. All services and resolution utilities derive their default from it.
-
-### Per-Request Language
-
-Language is set once per request via `locals.language` in `src/hooks.server.ts`:
-
-```typescript
-const languageHandler: Handle = async ({ event, resolve }) => {
-  event.locals.language = DEFAULT_LANGUAGE;
-  return resolve(event);
-};
-```
-
-Routes pass `locals.language` to services so the correct translation is resolved automatically.
 
 ## Translation Tables
 
@@ -47,13 +35,15 @@ Services resolve translations internally and return `Resolved*` types with flat 
 
 ```typescript
 // Service returns a ResolvedProduct with flat fields
-const product = await productService.getById(123, locals.language);
+const product = await productService.getById(123);
 
 product.name;        // "Blue Shirt" (resolved from translations)
 product.slug;        // "blue-shirt"
 product.description; // "<p>A nice shirt</p>"
 product.translations; // Still available for editing forms
 ```
+
+Services accept an optional `language` parameter (defaults to `DEFAULT_LANGUAGE`). Since only one language is currently used, you don't need to pass it.
 
 ### Resolution Utilities
 
@@ -62,7 +52,7 @@ The resolution functions live in `src/lib/server/i18n.ts`:
 ```typescript
 import { resolveProduct, resolveCollection, resolveFacet } from "$lib/server/i18n";
 
-// Each function takes an entity with translations[] and a language,
+// Each function takes an entity with translations[] and an optional language,
 // and returns the entity with flat translated fields merged on
 const resolved = resolveProduct(rawProduct, "en");
 resolved.name; // "Blue Shirt"
@@ -108,12 +98,12 @@ For admin forms that need to edit translations, the `translations` array is stil
 
 ## Route Load Functions
 
-Routes pass `locals.language` to services:
+Routes just call services — no language passthrough needed:
 
 ```typescript
-export const load: PageServerLoad = async ({ locals }) => {
-  const product = await productService.getById(123, locals.language);
-  const facets = await facetService.list(locals.language);
+export const load: PageServerLoad = async () => {
+  const product = await productService.getById(123);
+  const facets = await facetService.list();
   return { product, facets };
 };
 ```
@@ -141,13 +131,13 @@ await productService.update(productId, {
 });
 ```
 
-3. Update the language hook to detect the user's language (from URL, cookie, or `Accept-Language` header)
+3. Add a language detection hook (URL prefix, cookie, or `Accept-Language` header) and pass the language to services
 
 ## Best Practices
 
-1. **Never hardcode `"en"`** — always use `DEFAULT_LANGUAGE` or `locals.language`
+1. **Never hardcode `"en"`** — always use `DEFAULT_LANGUAGE`
 2. **Access flat fields in components** — use `product.name`, not `product.translations[0].name`
-3. **Pass `locals.language` in load functions** — services resolve the correct translation
-4. **Use `DEFAULT_LANGUAGE` in form actions** — when saving translations, reference the constant
+3. **Use `DEFAULT_LANGUAGE` in form actions** — when saving translations, reference the constant
+4. **Don't pass language to services** — they default to `DEFAULT_LANGUAGE`. When multi-language is added, introduce a per-request language hook
 
 See `src/lib/server/db/schema.ts` for translation table definitions and `src/lib/server/i18n.ts` for resolution utilities.

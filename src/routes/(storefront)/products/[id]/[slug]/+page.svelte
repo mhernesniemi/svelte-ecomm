@@ -58,7 +58,7 @@
   );
 
   function getVariantName(variant: (typeof product.variants)[0]): string {
-    return variant.name;
+    return variant.name ?? variant.sku;
   }
 
   // Review form state

@@ -1,6 +1,6 @@
 import { collectionService } from "$lib/server/services/collections.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
-import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
+import { slugify } from "$lib/utils.js";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -21,13 +21,8 @@ export const actions: Actions = {
 		try {
 			const collection = await collectionService.create({
 				isPrivate: false,
-				translations: [
-					{
-						languageCode: DEFAULT_LANGUAGE,
-						name,
-						slug: slugify(slug)
-					}
-				]
+				name,
+				slug: slugify(slug)
 			});
 
 			throw redirect(303, `/admin/collections/${collection.id}`);

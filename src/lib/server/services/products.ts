@@ -6,15 +6,11 @@ import { eq, and, desc, asc, sql, inArray, isNull, like } from "drizzle-orm";
 import { db } from "../db/index.js";
 import {
 	products,
-	productTranslations,
 	productVariants,
-	productVariantTranslations,
 	productFacetValues,
 	variantFacetValues,
 	facetValues,
-	facetValueTranslations,
 	facets,
-	facetTranslations,
 	productAssets,
 	assets,
 	productVariantGroupPrices
@@ -30,21 +26,17 @@ import type {
 	CreateVariantInput,
 	UpdateVariantInput,
 	FacetCount,
-	PaginatedResult,
-	ResolvedProduct,
-	ResolvedProductVariant
+	FacetValue,
+	PaginatedResult
 } from "$lib/types.js";
-import { DEFAULT_LANGUAGE } from "$lib/utils.js";
-import { resolveProduct, resolveVariant } from "$lib/server/i18n.js";
 
 export class ProductService {
 
 	/**
 	 * List products with filtering and pagination
 	 */
-	async list(options: ProductListOptions = {}): Promise<PaginatedResult<ResolvedProduct>> {
+	async list(options: ProductListOptions = {}): Promise<PaginatedResult<ProductWithRelations>> {
 		const {
-			language = DEFAULT_LANGUAGE,
 			facets: facetFilters,
 			search,
 			visibility = "public",
@@ -75,7 +67,7 @@ export class ProductService {
 
 		// Search filter
 		if (search) {
-			const searchProductIds = await this.searchProductIds(search, language);
+			const searchProductIds = await this.searchProductIds(search);
 			if (searchProductIds.length === 0) {
 				return { items: [], pagination: { total: 0, limit, offset, hasMore: false } };
 			}
@@ -98,11 +90,10 @@ export class ProductService {
 			.limit(limit)
 			.offset(offset);
 
-		// Load relations for each product and resolve translations
-		const rawItems = await Promise.all(
-			productList.map((p) => this.loadProductRelations(p, language))
+		// Load relations for each product
+		const items = await Promise.all(
+			productList.map((p) => this.loadProductRelations(p))
 		);
-		const items = rawItems.map((p) => resolveProduct(p, language));
 
 		return {
 			items,
@@ -118,9 +109,7 @@ export class ProductService {
 	/**
 	 * Get a single product by ID
 	 */
-	async getById(id: number, language?: string): Promise<ResolvedProduct | null> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-
+	async getById(id: number): Promise<ProductWithRelations | null> {
 		const product = await db
 			.select()
 			.from(products)
@@ -129,25 +118,22 @@ export class ProductService {
 
 		if (!product[0]) return null;
 
-		const raw = await this.loadProductRelations(product[0], lang);
-		return resolveProduct(raw, lang);
+		return this.loadProductRelations(product[0]);
 	}
 
 	/**
 	 * Get a product by slug
 	 */
-	async getBySlug(slug: string, language?: string): Promise<ResolvedProduct | null> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-
-		const translation = await db
+	async getBySlug(slug: string): Promise<ProductWithRelations | null> {
+		const product = await db
 			.select()
-			.from(productTranslations)
-			.where(eq(productTranslations.slug, slug))
+			.from(products)
+			.where(and(eq(products.slug, slug), isNull(products.deletedAt)))
 			.limit(1);
 
-		if (!translation[0]) return null;
+		if (!product[0]) return null;
 
-		return this.getById(translation[0].productId, lang);
+		return this.loadProductRelations(product[0]);
 	}
 
 	/**
@@ -157,24 +143,14 @@ export class ProductService {
 		const [product] = await db
 			.insert(products)
 			.values({
+				name: input.name,
+				slug: input.slug,
+				description: input.description,
 				type: input.type ?? "physical",
 				visibility: input.visibility ?? "public",
 				taxCode: input.taxCode ?? "standard"
 			})
 			.returning();
-
-		// Insert translations
-		if (input.translations.length > 0) {
-			await db.insert(productTranslations).values(
-				input.translations.map((t) => ({
-					productId: product.id,
-					languageCode: t.languageCode,
-					name: t.name,
-					slug: t.slug,
-					description: t.description
-				}))
-			);
-		}
 
 		return product;
 	}
@@ -182,56 +158,30 @@ export class ProductService {
 	/**
 	 * Update an existing product
 	 */
-	async update(id: number, input: UpdateProductInput): Promise<ResolvedProduct | null> {
+	async update(id: number, input: UpdateProductInput): Promise<ProductWithRelations | null> {
 		const existing = await this.getById(id);
 		if (!existing) return null;
 
 		// Update product fields
-		const updates: {
-			type?: "physical" | "digital";
-			visibility?: "public" | "private" | "draft";
-			taxCode?: string;
-		} = {};
+		const updates: Record<string, unknown> = {};
 		if (input.type !== undefined) updates.type = input.type;
 		if (input.visibility !== undefined) updates.visibility = input.visibility;
 		if (input.taxCode !== undefined) updates.taxCode = input.taxCode;
+		if (input.name !== undefined) updates.name = input.name;
+		if (input.slug !== undefined) updates.slug = input.slug;
+		if (input.description !== undefined) updates.description = input.description;
 
 		if (Object.keys(updates).length > 0) {
 			await db.update(products).set(updates).where(eq(products.id, id));
-		}
-
-		// Update translations
-		if (input.translations) {
-			for (const t of input.translations) {
-				await db
-					.insert(productTranslations)
-					.values({
-						productId: id,
-						languageCode: t.languageCode,
-						name: t.name ?? "",
-						slug: t.slug ?? "",
-						description: t.description
-					})
-					.onConflictDoUpdate({
-						target: [productTranslations.productId, productTranslations.languageCode],
-						set: {
-							...(t.name && { name: t.name }),
-							...(t.slug && { slug: t.slug }),
-							...(t.description !== undefined && { description: t.description })
-						}
-					});
-			}
 		}
 
 		return this.getById(id);
 	}
 
 	/**
-	 * Soft delete a product and clean up translations
+	 * Soft delete a product
 	 */
 	async delete(id: number): Promise<boolean> {
-		await db.delete(productTranslations).where(eq(productTranslations.productId, id));
-
 		await db.update(products).set({ deletedAt: new Date() }).where(eq(products.id, id));
 
 		return true;
@@ -266,11 +216,8 @@ export class ProductService {
 	 */
 	async getFacetCounts(
 		facetCode: string,
-		currentFilters: Record<string, string[]> = {},
-		language?: string
+		currentFilters: Record<string, string[]> = {}
 	): Promise<FacetCount[]> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-
 		// Get the facet
 		const facet = await db.select().from(facets).where(eq(facets.code, facetCode)).limit(1);
 
@@ -281,37 +228,21 @@ export class ProductService {
 			.select({
 				valueId: facetValues.id,
 				valueCode: facetValues.code,
+				valueName: facetValues.name,
 				count: sql<number>`count(distinct ${productFacetValues.productId})`
 			})
 			.from(facetValues)
 			.leftJoin(productFacetValues, eq(productFacetValues.facetValueId, facetValues.id))
 			.leftJoin(products, eq(products.id, productFacetValues.productId))
 			.where(and(eq(facetValues.facetId, facet[0].id), isNull(products.deletedAt)))
-			.groupBy(facetValues.id, facetValues.code);
+			.groupBy(facetValues.id, facetValues.code, facetValues.name);
 
-		// Get translations
-		const result: FacetCount[] = [];
-		for (const v of values) {
-			const translation = await db
-				.select()
-				.from(facetValueTranslations)
-				.where(
-					and(
-						eq(facetValueTranslations.facetValueId, v.valueId),
-						eq(facetValueTranslations.languageCode, lang)
-					)
-				)
-				.limit(1);
-
-			result.push({
-				facetCode,
-				valueCode: v.valueCode,
-				valueName: translation[0]?.name ?? v.valueCode,
-				count: Number(v.count)
-			});
-		}
-
-		return result;
+		return values.map((v) => ({
+			facetCode,
+			valueCode: v.valueCode,
+			valueName: v.valueName || v.valueCode,
+			count: Number(v.count)
+		}));
 	}
 
 	// ============================================================================
@@ -326,23 +257,13 @@ export class ProductService {
 			.insert(productVariants)
 			.values({
 				productId: input.productId,
+				name: input.name,
 				sku: input.sku,
 				price: input.price,
 				stock: input.stock ?? 0,
 				trackInventory: input.trackInventory ?? true
 			})
 			.returning();
-
-		// Insert translations
-		if (input.translations && input.translations.length > 0) {
-			await db.insert(productVariantTranslations).values(
-				input.translations.map((t) => ({
-					variantId: variant.id,
-					languageCode: t.languageCode,
-					name: t.name
-				}))
-			);
-		}
 
 		return variant;
 	}
@@ -355,39 +276,18 @@ export class ProductService {
 
 		if (!variant) return null;
 
-		const updateData: Partial<typeof variant> = {};
+		const updateData: Record<string, unknown> = {};
 		if (input.sku !== undefined) updateData.sku = input.sku;
 		if (input.price !== undefined) updateData.price = input.price;
 		if (input.stock !== undefined) updateData.stock = input.stock;
 		if (input.trackInventory !== undefined) updateData.trackInventory = input.trackInventory;
+		if (input.name !== undefined) updateData.name = input.name;
 
 		const [updated] = await db
 			.update(productVariants)
 			.set(updateData)
 			.where(eq(productVariants.id, id))
 			.returning();
-
-		// Update translations
-		if (input.translations) {
-			for (const t of input.translations) {
-				if (t.name !== undefined) {
-					await db
-						.insert(productVariantTranslations)
-						.values({
-							variantId: id,
-							languageCode: t.languageCode,
-							name: t.name
-						})
-						.onConflictDoUpdate({
-							target: [
-								productVariantTranslations.variantId,
-								productVariantTranslations.languageCode
-							],
-							set: { name: t.name }
-						});
-				}
-			}
-		}
 
 		return updated;
 	}
@@ -417,14 +317,9 @@ export class ProductService {
 	}
 
 	/**
-	 * Add facet value to variant
+	 * Get variant by ID with relations
 	 */
-	async getVariantById(
-		variantId: number,
-		language?: string
-	): Promise<ResolvedProductVariant | null> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-
+	async getVariantById(variantId: number): Promise<ProductVariantWithRelations | null> {
 		const variant = await db
 			.select()
 			.from(productVariants)
@@ -433,8 +328,7 @@ export class ProductService {
 
 		if (!variant[0]) return null;
 
-		const raw = await this.loadVariantRelations(variant[0], lang);
-		return resolveVariant(raw, lang);
+		return this.loadVariantRelations(variant[0]);
 	}
 
 	async addVariantFacetValue(variantId: number, facetValueId: number): Promise<void> {
@@ -494,15 +388,8 @@ export class ProductService {
 	// ============================================================================
 
 	private async loadProductRelations(
-		product: Product,
-		language: string
+		product: Product
 	): Promise<ProductWithRelations> {
-		// Load translations
-		const translations = await db
-			.select()
-			.from(productTranslations)
-			.where(eq(productTranslations.productId, product.id));
-
 		// Load variants
 		const variantList = await db
 			.select()
@@ -512,7 +399,7 @@ export class ProductService {
 			);
 
 		const variants = await Promise.all(
-			variantList.map((v) => this.loadVariantRelations(v, language))
+			variantList.map((v) => this.loadVariantRelations(v))
 		);
 
 		// Load facet values
@@ -530,15 +417,7 @@ export class ProductService {
 				.limit(1);
 
 			if (value[0]) {
-				const valueTranslations = await db
-					.select()
-					.from(facetValueTranslations)
-					.where(eq(facetValueTranslations.facetValueId, value[0].id));
-
-				facetValuesData.push({
-					...value[0],
-					translations: valueTranslations
-				});
+				facetValuesData.push(value[0]);
 			}
 		}
 
@@ -564,7 +443,6 @@ export class ProductService {
 
 		return {
 			...product,
-			translations,
 			variants,
 			facetValues: facetValuesData,
 			assets: assetList,
@@ -573,22 +451,15 @@ export class ProductService {
 	}
 
 	private async loadVariantRelations(
-		variant: ProductVariant,
-		language: string
+		variant: ProductVariant
 	): Promise<ProductVariantWithRelations> {
-		// Load translations
-		const translations = await db
-			.select()
-			.from(productVariantTranslations)
-			.where(eq(productVariantTranslations.variantId, variant.id));
-
 		// Load facet values
 		const facetValueIds = await db
 			.select({ facetValueId: variantFacetValues.facetValueId })
 			.from(variantFacetValues)
 			.where(eq(variantFacetValues.variantId, variant.id));
 
-		const facetValuesData = [];
+		const facetValuesData: FacetValue[] = [];
 		for (const fv of facetValueIds) {
 			const value = await db
 				.select()
@@ -597,21 +468,12 @@ export class ProductService {
 				.limit(1);
 
 			if (value[0]) {
-				const valueTranslations = await db
-					.select()
-					.from(facetValueTranslations)
-					.where(eq(facetValueTranslations.facetValueId, value[0].id));
-
-				facetValuesData.push({
-					...value[0],
-					translations: valueTranslations
-				});
+				facetValuesData.push(value[0]);
 			}
 		}
 
 		return {
 			...variant,
-			translations,
 			facetValues: facetValuesData,
 			assets: [],
 			featuredAsset: null
@@ -651,50 +513,40 @@ export class ProductService {
 		return productMatches.map((p) => p.productId);
 	}
 
-	private async searchProductIds(search: string, language: string): Promise<number[]> {
+	private async searchProductIds(search: string): Promise<number[]> {
 		const searchPattern = `%${search}%`;
 
 		const matches = await db
-			.select({ productId: productTranslations.productId })
-			.from(productTranslations)
+			.select({ id: products.id })
+			.from(products)
 			.where(
-				and(
-					eq(productTranslations.languageCode, language),
-					sql`(${productTranslations.name} ILIKE ${searchPattern} OR ${productTranslations.description} ILIKE ${searchPattern})`
-				)
+				sql`(${products.name} ILIKE ${searchPattern} OR ${products.description} ILIKE ${searchPattern})`
 			);
 
-		return matches.map((m) => m.productId);
+		return matches.map((m) => m.id);
 	}
 
 	/**
 	 * Get lightweight product catalog for client-side search
 	 * Returns only the fields needed for search: id, name, slug, price, image
 	 */
-	async getSearchCatalog(language = DEFAULT_LANGUAGE) {
+	async getSearchCatalog() {
 		const rows = await db
 			.select({
 				id: products.id,
-				name: productTranslations.name,
-				slug: productTranslations.slug,
+				name: products.name,
+				slug: products.slug,
 				price: productVariants.price,
 				image: assets.source
 			})
 			.from(products)
-			.innerJoin(
-				productTranslations,
-				and(
-					eq(productTranslations.productId, products.id),
-					eq(productTranslations.languageCode, language)
-				)
-			)
 			.leftJoin(
 				productVariants,
 				and(eq(productVariants.productId, products.id), isNull(productVariants.deletedAt))
 			)
 			.leftJoin(assets, eq(assets.id, products.featuredAssetId))
 			.where(and(eq(products.visibility, "public"), isNull(products.deletedAt)))
-			.orderBy(asc(productTranslations.name));
+			.orderBy(asc(products.name));
 
 		// Deduplicate by product id (multiple variants produce multiple rows), keep lowest price
 		const seen = new Map<

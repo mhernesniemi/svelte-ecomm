@@ -1,15 +1,15 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { contentPageService } from "$lib/server/services/content-pages.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
-import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
+import { slugify } from "$lib/utils.js";
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);
 	if (isNaN(id)) {
 		throw error(400, "Invalid page ID");
 	}
 
-	const page = await contentPageService.getById(id, locals.language);
+	const page = await contentPageService.getById(id);
 	if (!page) {
 		throw error(404, "Content page not found");
 	}
@@ -34,14 +34,9 @@ export const actions: Actions = {
 		try {
 			await contentPageService.update(id, {
 				published,
-				translations: [
-					{
-						languageCode: DEFAULT_LANGUAGE,
-						title,
-						slug: slugify(slug),
-						body: body || undefined
-					}
-				]
+				title,
+				slug: slugify(slug),
+				body: body || undefined
 			});
 
 			return { success: true, message: "Page updated successfully" };

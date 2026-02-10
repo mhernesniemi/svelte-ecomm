@@ -1,11 +1,10 @@
 import { categoryService } from "$lib/server/services/categories.js";
 import { fail } from "@sveltejs/kit";
-import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const tree = await categoryService.getTree(locals.language);
-	const categories = await categoryService.list(locals.language);
+export const load: PageServerLoad = async () => {
+	const tree = await categoryService.getTree();
+	const categories = await categoryService.list();
 
 	return { tree, categories };
 };
@@ -25,7 +24,7 @@ export const actions: Actions = {
 			await categoryService.create({
 				slug: slug.toLowerCase().replace(/\s+/g, "-"),
 				parentId: parentId ? Number(parentId) : null,
-				translations: [{ languageCode: DEFAULT_LANGUAGE, name: nameEn }]
+				name: nameEn
 			});
 
 			return { success: true };
@@ -49,7 +48,7 @@ export const actions: Actions = {
 			await categoryService.update(id, {
 				slug: slug.toLowerCase().replace(/\s+/g, "-"),
 				parentId: parentId ? Number(parentId) : null,
-				translations: [{ languageCode: DEFAULT_LANGUAGE, name: nameEn }]
+				name: nameEn
 			});
 
 			return { success: true };

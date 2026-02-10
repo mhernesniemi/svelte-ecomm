@@ -2,7 +2,7 @@ import type { PageServerLoad } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { error, redirect } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async ({ params, url, locals }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 	const limit = 12;
 	const offset = (page - 1) * limit;
 
-	const collection = await collectionService.getById(id, locals.language);
+	const collection = await collectionService.getById(id);
 	if (!collection || collection.isPrivate) {
 		throw error(404, "Collection not found");
 	}
@@ -26,7 +26,7 @@ export const load: PageServerLoad = async ({ params, url, locals }) => {
 
 	const { items: products, pagination } = await collectionService.getProductsForCollection(
 		collection.id,
-		{ language: locals.language, limit, offset }
+		{ limit, offset }
 	);
 
 	return {

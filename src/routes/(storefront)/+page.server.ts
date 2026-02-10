@@ -7,12 +7,11 @@ import type { PageServerLoad, Actions } from "./$types";
 const ADMIN_SESSION_COOKIE = "admin_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async () => {
 	// Get featured products (public only, limited to 2 for demo layout)
 	const result = await productService.list({
 		visibility: "public",
-		limit: 2,
-		language: locals.language
+		limit: 2
 	});
 
 	return {

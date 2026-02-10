@@ -2,12 +2,11 @@ import { productService } from "$lib/server/services/products.js";
 import { fail } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async () => {
 	const result = await productService.list({
 		limit: 1000,
 		offset: 0,
-		visibility: ["public", "private", "draft"],
-		language: locals.language
+		visibility: ["public", "private", "draft"]
 	});
 
 	return {

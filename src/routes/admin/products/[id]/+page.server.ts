@@ -5,17 +5,16 @@ import { categoryService } from "$lib/server/services/categories.js";
 import { collectionService } from "$lib/server/services/collections.js";
 import { taxService } from "$lib/server/services/tax.js";
 import { error, fail, redirect } from "@sveltejs/kit";
-import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
 		throw error(404, "Invalid product ID");
 	}
 
-	const product = await productService.getById(id, locals.language);
+	const product = await productService.getById(id);
 
 	if (!product) {
 		throw error(404, "Product not found");
@@ -23,11 +22,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	const [facets, categoryTree, productCategories, taxRates, productCollections] =
 		await Promise.all([
-			facetService.list(locals.language),
-			categoryService.getTree(locals.language),
-			categoryService.getProductCategories(id, locals.language),
+			facetService.list(),
+			categoryService.getTree(),
+			categoryService.getProductCategories(id),
 			taxService.getAllTaxRates(),
-			collectionService.getCollectionsForProduct(id, locals.language)
+			collectionService.getCollectionsForProduct(id)
 		]);
 
 	return {
@@ -72,14 +71,9 @@ export const actions: Actions = {
 				type,
 				visibility,
 				taxCode: taxCode || "standard",
-				translations: [
-					{
-						languageCode: DEFAULT_LANGUAGE,
-						name,
-						slug,
-						description: description || undefined
-					}
-				]
+				name,
+				slug,
+				description: description || undefined
 			});
 
 			// Update facet values

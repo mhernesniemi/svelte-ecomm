@@ -22,8 +22,8 @@ Usage in routes:
 ```typescript filename="src/routes/admin/products/[id]/+page.server.ts"
 import { productService } from "$lib/server/services/products";
 
-export const load = async ({ params, locals }) => {
-	const product = await productService.getById(params.id, locals.language);
+export const load = async ({ params }) => {
+	const product = await productService.getById(params.id);
 	return { product }; // product.name is already resolved
 };
 ```
@@ -49,7 +49,7 @@ const PROVIDERS = new Map<string, PaymentProvider>([
 ## Data Flow
 
 ```
-Route (load/action) — passes locals.language
+Route (load/action)
     ↓
 Service (business logic + translation resolution)
     ↓

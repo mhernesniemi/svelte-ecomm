@@ -106,9 +106,9 @@ Reusable Svelte components. Split into:
 ```
 Browser Request
     ↓
-hooks.server.ts (sets locals.language)
+hooks.server.ts (auth, cart, wishlist)
     ↓
-+page.server.ts (load function, passes locals.language)
++page.server.ts (load function calls services)
     ↓
 Service (resolves translations, returns Resolved* types)
     ↓
@@ -291,12 +291,12 @@ Services resolve translations internally using `src/lib/server/i18n.ts` and retu
 
 ```typescript
 // Service resolves translations — components access flat fields
-const product = await productService.getById(123, locals.language);
+const product = await productService.getById(123);
 product.name;         // "Blue Shirt" (resolved)
 product.translations; // Still available for editing forms
 ```
 
-Language is set once per request via `locals.language` in hooks. Routes pass it to services.
+Services default to `DEFAULT_LANGUAGE`. When multi-language support is needed, a per-request language can be passed to services.
 
 ### Guest Carts (Cookie-based)
 

@@ -2,8 +2,8 @@ import { contentPageService } from "$lib/server/services/content-pages.js";
 import { fail } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const pages = await contentPageService.list(locals.language);
+export const load: PageServerLoad = async () => {
+	const pages = await contentPageService.list();
 	return { pages };
 };
 

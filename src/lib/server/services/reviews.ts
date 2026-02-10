@@ -12,7 +12,6 @@ import { db } from "../db/index.js";
 import {
 	reviews,
 	products,
-	productTranslations,
 	customers,
 	orders,
 	orderLines,
@@ -182,24 +181,11 @@ export class ReviewService {
 			.limit(limit)
 			.offset(offset);
 
-		// Get translations for products
-		const productIds = [...new Set(items.map((item) => item.product.id))];
-		const translations =
-			productIds.length > 0
-				? await db
-						.select()
-						.from(productTranslations)
-						.where(sql`${productTranslations.productId} IN ${productIds}`)
-				: [];
-
 		return {
 			items: items.map((row) => ({
 				...row.review,
 				customer: row.customer,
-				product: {
-					...row.product,
-					translations: translations.filter((t) => t.productId === row.product.id)
-				}
+				product: row.product
 			})),
 			pagination: {
 				total,

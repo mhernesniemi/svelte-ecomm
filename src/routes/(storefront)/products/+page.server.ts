@@ -3,7 +3,7 @@ import { facetService } from "$lib/server/services/facets.js";
 import type { PageServerLoad } from "./$types";
 import type { FacetCount, FacetWithValues } from "$lib/types.js";
 
-export const load: PageServerLoad = async ({ url, locals }) => {
+export const load: PageServerLoad = async ({ url }) => {
 	const search = url.searchParams.get("q") ?? undefined;
 	const page = Number(url.searchParams.get("page")) || 1;
 	const limit = 12;
@@ -28,11 +28,10 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		search,
 		limit,
 		offset,
-		language: locals.language
 	});
 
 	// Fetch all facets for filter sidebar
-	const facets = await facetService.list(locals.language);
+	const facets = await facetService.list();
 
 	// Get facet counts for currently visible products
 	const facetCounts: Record<string, { code: string; name: string; count: number }[]> = {};

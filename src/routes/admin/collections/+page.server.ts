@@ -2,8 +2,8 @@ import type { PageServerLoad, Actions } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { fail, redirect } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const collections = await collectionService.listAll(locals.language);
+export const load: PageServerLoad = async () => {
+	const collections = await collectionService.listAll();
 
 	// Get product counts for each collection
 	const collectionsWithCounts = await Promise.all(

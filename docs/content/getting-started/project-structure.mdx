@@ -91,8 +91,8 @@ orderService.create(), .updateStatus()
 **2. Route handlers (`+page.server.ts`)** - Thin controllers that wire HTTP to services:
 
 ```typescript
-export const load = async ({ params, locals }) => {
-	const product = await productService.getById(id, locals.language);
+export const load = async ({ params }) => {
+	const product = await productService.getById(id);
 	return { product }; // product.name is already resolved
 };
 
@@ -111,12 +111,12 @@ export const actions = {
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  REQUEST → hooks.server.ts sets locals.language         │
+│  REQUEST → hooks.server.ts (auth, cart, wishlist)       │
 └────────────────────────┬────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │  +page.server.ts (thin controller)                      │
-│  - load() → passes locals.language to services          │
+│  - load() → calls services                              │
 │  - actions → handle form submissions                    │
 └────────────────────────┬────────────────────────────────┘
                          ▼

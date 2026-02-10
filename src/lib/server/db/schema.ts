@@ -36,6 +36,9 @@ export const products = pgTable(
 	"products",
 	{
 		id: serial("id").primaryKey(),
+		name: varchar("name", { length: 255 }).default("").notNull(),
+		slug: varchar("slug", { length: 255 }).default("").notNull(),
+		description: text("description"),
 		type: text("type", {
 			enum: ["physical", "digital"]
 		})
@@ -90,6 +93,7 @@ export const productVariants = pgTable(
 		productId: integer("product_id")
 			.references(() => products.id, { onDelete: "cascade" })
 			.notNull(),
+		name: varchar("name", { length: 255 }),
 		sku: varchar("sku", { length: 255 }).notNull(),
 		price: integer("price").notNull(), // Price in cents
 		stock: integer("stock").default(0).notNull(),
@@ -155,6 +159,7 @@ export const productVariantGroupPrices = pgTable(
 
 export const facets = pgTable("facets", {
 	id: serial("id").primaryKey(),
+	name: varchar("name", { length: 255 }).default("").notNull(),
 	code: varchar("code", { length: 255 }).notNull().unique(),
 	isPrivate: boolean("is_private").default(false).notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -186,6 +191,7 @@ export const facetValues = pgTable(
 		facetId: integer("facet_id")
 			.references(() => facets.id, { onDelete: "cascade" })
 			.notNull(),
+		name: varchar("name", { length: 255 }).default("").notNull(),
 		code: varchar("code", { length: 255 }).notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
@@ -728,6 +734,9 @@ export const orderPromotions = pgTable(
 
 export const collections = pgTable("collections", {
 	id: serial("id").primaryKey(),
+	name: varchar("name", { length: 255 }).default("").notNull(),
+	slug: varchar("slug", { length: 255 }).default("").notNull(),
+	description: text("description"),
 	isPrivate: boolean("is_private").default(false).notNull(),
 	featuredAssetId: integer("featured_asset_id").references(() => assets.id),
 	position: integer("position").default(0).notNull(),
@@ -787,6 +796,7 @@ export const categories = pgTable(
 	"categories",
 	{
 		id: serial("id").primaryKey(),
+		name: varchar("name", { length: 255 }).default("").notNull(),
 		parentId: integer("parent_id"),
 		slug: varchar("slug", { length: 255 }).notNull().unique(),
 		position: integer("position").default(0).notNull(),
@@ -1379,6 +1389,9 @@ export const jobs = pgTable(
 
 export const contentPages = pgTable("content_pages", {
 	id: serial("id").primaryKey(),
+	title: varchar("title", { length: 255 }).default("").notNull(),
+	slug: varchar("slug", { length: 255 }).default("").notNull(),
+	body: text("body"),
 	published: boolean("published").default(false).notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at")

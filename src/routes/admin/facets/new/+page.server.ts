@@ -1,6 +1,5 @@
 import { facetService } from "$lib/server/services/facets.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
-import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -16,7 +15,7 @@ export const actions: Actions = {
 		try {
 			const facet = await facetService.create({
 				code: code.toLowerCase().replace(/\s+/g, "_"),
-				translations: [{ languageCode: DEFAULT_LANGUAGE, name: nameEn }]
+				name: nameEn
 			});
 
 			throw redirect(303, `/admin/facets/${facet.id}`);

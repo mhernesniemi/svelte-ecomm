@@ -6,31 +6,13 @@ import { eq, and, isNull, asc, inArray, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
 import {
 	categories,
-	categoryTranslations,
-	productCategories,
-	products,
-	productTranslations
+	productCategories
 } from "../db/schema.js";
-import { DEFAULT_LANGUAGE } from "$lib/utils.js";
-import { resolveCategory, resolveCategoryTreeNode } from "$lib/server/i18n.js";
 
 export type Category = typeof categories.$inferSelect;
-export type CategoryTranslation = typeof categoryTranslations.$inferSelect;
 
-export type CategoryWithTranslations = Category & {
-	translations: CategoryTranslation[];
-};
-
-export type CategoryTreeNode = CategoryWithTranslations & {
+export type CategoryTreeNode = Category & {
 	children: CategoryTreeNode[];
-};
-
-export type ResolvedCategory = CategoryWithTranslations & {
-	name: string;
-};
-
-export type ResolvedCategoryTreeNode = ResolvedCategory & {
-	children: ResolvedCategoryTreeNode[];
 };
 
 export type CategoryBreadcrumb = {
@@ -46,100 +28,78 @@ export class CategoryService {
 	 */
 	async create(input: {
 		slug: string;
+		name: string;
 		parentId?: number | null;
 		position?: number;
-		translations: { languageCode: string; name: string }[];
 	}): Promise<Category> {
 		const [category] = await db
 			.insert(categories)
 			.values({
 				slug: input.slug,
+				name: input.name,
 				parentId: input.parentId ?? null,
 				position: input.position ?? 0
 			})
 			.returning();
 
-		if (input.translations.length > 0) {
-			await db.insert(categoryTranslations).values(
-				input.translations.map((t) => ({
-					categoryId: category.id,
-					languageCode: t.languageCode,
-					name: t.name
-				}))
-			);
-		}
-
 		return category;
 	}
 
 	/**
-	 * Get category by ID with translations
+	 * Get category by ID
 	 */
-	async getById(id: number, language?: string): Promise<ResolvedCategory | null> {
+	async getById(id: number): Promise<Category | null> {
 		const category = await db.query.categories.findFirst({
-			where: eq(categories.id, id),
-			with: { translations: true }
+			where: eq(categories.id, id)
 		});
 
-		if (!category) return null;
-		return resolveCategory(category, language ?? DEFAULT_LANGUAGE);
+		return category ?? null;
 	}
 
 	/**
-	 * Get category by slug with translations
+	 * Get category by slug
 	 */
-	async getBySlug(slug: string, language?: string): Promise<ResolvedCategory | null> {
+	async getBySlug(slug: string): Promise<Category | null> {
 		const category = await db.query.categories.findFirst({
-			where: eq(categories.slug, slug),
-			with: { translations: true }
+			where: eq(categories.slug, slug)
 		});
 
-		if (!category) return null;
-		return resolveCategory(category, language ?? DEFAULT_LANGUAGE);
+		return category ?? null;
 	}
 
 	/**
 	 * Get all root categories (no parent)
 	 */
-	async getRoots(language?: string): Promise<ResolvedCategory[]> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-		const results = await db.query.categories.findMany({
+	async getRoots(): Promise<Category[]> {
+		return db.query.categories.findMany({
 			where: isNull(categories.parentId),
-			with: { translations: true },
 			orderBy: [asc(categories.position), asc(categories.id)]
 		});
-		return results.map((c) => resolveCategory(c, lang));
 	}
 
 	/**
 	 * Get children of a category
 	 */
-	async getChildren(parentId: number, language?: string): Promise<ResolvedCategory[]> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-		const results = await db.query.categories.findMany({
+	async getChildren(parentId: number): Promise<Category[]> {
+		return db.query.categories.findMany({
 			where: eq(categories.parentId, parentId),
-			with: { translations: true },
 			orderBy: [asc(categories.position), asc(categories.id)]
 		});
-		return results.map((c) => resolveCategory(c, lang));
 	}
 
 	/**
 	 * Build full category tree
 	 */
-	async getTree(language?: string): Promise<ResolvedCategoryTreeNode[]> {
-		const lang = language ?? DEFAULT_LANGUAGE;
+	async getTree(): Promise<CategoryTreeNode[]> {
 		const allCategories = await db.query.categories.findMany({
-			with: { translations: true },
 			orderBy: [asc(categories.position), asc(categories.id)]
 		});
 
-		const tree = this.buildTree(allCategories, null);
-		return tree.map((node) => resolveCategoryTreeNode(node, lang));
+		return this.buildTree(allCategories, null);
 	}
 
 	private buildTree(
-		allCategories: CategoryWithTranslations[],
+		allCategories: Category[],
 		parentId: number | null
 	): CategoryTreeNode[] {
 		return allCategories
@@ -153,25 +113,21 @@ export class CategoryService {
 	/**
 	 * Get breadcrumb path from root to category
 	 */
-	async getBreadcrumbs(categoryId: number, language?: string): Promise<CategoryBreadcrumb[]> {
-		const lang = language ?? DEFAULT_LANGUAGE;
+	async getBreadcrumbs(categoryId: number): Promise<CategoryBreadcrumb[]> {
 		const breadcrumbs: CategoryBreadcrumb[] = [];
 		let currentId: number | null = categoryId;
 
 		while (currentId !== null) {
-			const category: CategoryWithTranslations | undefined =
-				await db.query.categories.findFirst({
-					where: eq(categories.id, currentId),
-					with: { translations: true }
-				});
+			const category: Category | undefined = await db.query.categories.findFirst({
+				where: eq(categories.id, currentId)
+			});
 
 			if (!category) break;
 
-			const resolved = resolveCategory(category, lang);
 			breadcrumbs.unshift({
-				id: resolved.id,
-				slug: resolved.slug,
-				name: resolved.name
+				id: category.id,
+				slug: category.slug,
+				name: category.name
 			});
 
 			currentId = category.parentId;
@@ -207,32 +163,19 @@ export class CategoryService {
 		id: number,
 		input: {
 			slug?: string;
+			name?: string;
 			parentId?: number | null;
 			position?: number;
-			translations?: { languageCode: string; name: string }[];
 		}
-	): Promise<ResolvedCategory | null> {
-		const updateData: Partial<Category> = {};
+	): Promise<Category | null> {
+		const updateData: Record<string, unknown> = {};
 		if (input.slug !== undefined) updateData.slug = input.slug;
+		if (input.name !== undefined) updateData.name = input.name;
 		if (input.parentId !== undefined) updateData.parentId = input.parentId;
 		if (input.position !== undefined) updateData.position = input.position;
 
 		if (Object.keys(updateData).length > 0) {
 			await db.update(categories).set(updateData).where(eq(categories.id, id));
-		}
-
-		if (input.translations) {
-			// Delete existing and insert new
-			await db.delete(categoryTranslations).where(eq(categoryTranslations.categoryId, id));
-			if (input.translations.length > 0) {
-				await db.insert(categoryTranslations).values(
-					input.translations.map((t) => ({
-						categoryId: id,
-						languageCode: t.languageCode,
-						name: t.name
-					}))
-				);
-			}
 		}
 
 		return this.getById(id);
@@ -269,18 +212,15 @@ export class CategoryService {
 	/**
 	 * Get all categories for a product
 	 */
-	async getProductCategories(productId: number, language?: string): Promise<ResolvedCategory[]> {
-		const lang = language ?? DEFAULT_LANGUAGE;
+	async getProductCategories(productId: number): Promise<Category[]> {
 		const result = await db.query.productCategories.findMany({
 			where: eq(productCategories.productId, productId),
 			with: {
-				category: {
-					with: { translations: true }
-				}
+				category: true
 			}
 		});
 
-		return result.map((pc) => resolveCategory(pc.category, lang));
+		return result.map((pc) => pc.category);
 	}
 
 	/**
@@ -328,13 +268,10 @@ export class CategoryService {
 	/**
 	 * List all categories flat (for admin)
 	 */
-	async list(language?: string): Promise<ResolvedCategory[]> {
-		const lang = language ?? DEFAULT_LANGUAGE;
-		const results = await db.query.categories.findMany({
-			with: { translations: true },
+	async list(): Promise<Category[]> {
+		return db.query.categories.findMany({
 			orderBy: [asc(categories.position), asc(categories.id)]
 		});
-		return results.map((c) => resolveCategory(c, lang));
 	}
 }
 

@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { contentPageService } from "$lib/server/services/content-pages.js";
 import { fail, redirect, isRedirect } from "@sveltejs/kit";
-import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
+import { slugify } from "$lib/utils.js";
 
 export const load: PageServerLoad = async () => {
 	return {};
@@ -28,14 +28,9 @@ export const actions: Actions = {
 		try {
 			const page = await contentPageService.create({
 				published,
-				translations: [
-					{
-						languageCode: DEFAULT_LANGUAGE,
-						title,
-						slug: slugify(slug),
-						body: body || undefined
-					}
-				]
+				title,
+				slug: slugify(slug),
+				body: body || undefined
 			});
 
 			throw redirect(303, `/admin/content-pages/${page.id}?created=1`);

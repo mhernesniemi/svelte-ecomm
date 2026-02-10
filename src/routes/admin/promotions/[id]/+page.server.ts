@@ -14,23 +14,22 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const { items: products } = await productService.list({
-		language: "fi",
 		visibility: ["public", "private", "draft"],
 		limit: 100
 	});
 
-	const collections = await collectionService.list({ language: "fi" });
+	const collections = await collectionService.list();
 	const customerGroups = await customerGroupService.list();
 
 	return {
 		promotion,
 		products: products.map((p) => ({
 			id: p.id,
-			name: p.translations[0]?.name ?? `Product #${p.id}`
+			name: p.name || `Product #${p.id}`
 		})),
 		collections: collections.map((c) => ({
 			id: c.id,
-			name: c.translations[0]?.name ?? `Collection #${c.id}`
+			name: c.name || `Collection #${c.id}`
 		})),
 		customerGroups: customerGroups.map((g) => ({
 			id: g.id,

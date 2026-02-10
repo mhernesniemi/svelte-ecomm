@@ -16,7 +16,6 @@ export type { User, Session } from "./auth.js";
 export { categoryService, CategoryService } from "./categories.js";
 export type {
 	Category,
-	CategoryWithTranslations,
 	CategoryTreeNode,
 	CategoryBreadcrumb
 } from "./categories.js";

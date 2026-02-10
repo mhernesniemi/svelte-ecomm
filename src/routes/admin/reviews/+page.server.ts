@@ -2,9 +2,8 @@ import type { PageServerLoad, Actions } from "./$types";
 import { reviewService } from "$lib/server/services/reviews.js";
 import { fail } from "@sveltejs/kit";
 import type { ReviewStatus } from "$lib/types.js";
-import { resolveTranslation } from "$lib/server/i18n.js";
 
-export const load: PageServerLoad = async ({ url, locals }) => {
+export const load: PageServerLoad = async ({ url }) => {
 	const status = url.searchParams.get("status") as ReviewStatus | null;
 
 	const result = await reviewService.list({
@@ -13,17 +12,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		offset: 0
 	});
 
-	// Resolve product names for display
-	const reviews = result.items.map((review) => ({
-		...review,
-		product: {
-			...review.product,
-			name: resolveTranslation(review.product.translations, locals.language)?.name ?? "Unknown"
-		}
-	}));
-
 	return {
-		reviews,
+		reviews: result.items,
 		currentStatus: status
 	};
 };

@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		throw error(404, "Product not found");
 	}
 
-	const product = await productService.getById(id, locals.language);
+	const product = await productService.getById(id);
 
 	if (!product || product.visibility === "draft") {
 		throw error(404, "Product not found");
@@ -44,13 +44,13 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 			locals.customer
 				? reviewService.getCustomerReviewForProduct(locals.customer.id, product.id)
 				: null,
-			categoryService.getProductCategories(product.id, locals.language)
+			categoryService.getProductCategories(product.id)
 		]);
 
 	// Get breadcrumbs for the first category (primary category path)
 	const breadcrumbs =
 		productCategories.length > 0
-			? await categoryService.getBreadcrumbs(productCategories[0].id, locals.language)
+			? await categoryService.getBreadcrumbs(productCategories[0].id)
 			: [];
 
 	return {

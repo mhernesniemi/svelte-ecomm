@@ -19,7 +19,7 @@ Product
 Products use translation tables. Services resolve translations and return flat fields:
 
 ```typescript
-const product = await productService.getById(123, locals.language);
+const product = await productService.getById(123);
 
 // Flat translated fields — no manual resolution needed
 product.name;        // "Blue Shirt"
