@@ -26,7 +26,7 @@ export default async function RootLayout({
 				<Layout
 					navbar={
 						<Navbar
-							logo={<span className="hoikka-logo">Hoikka</span>}
+							logo={<><img src="/face.png" alt="" className="hoikka-face" /><span className="hoikka-logo">Hoikka</span></>}
 							projectLink="https://github.com/your-org/hoikka"
 						/>
 					}

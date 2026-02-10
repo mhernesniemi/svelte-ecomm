@@ -154,8 +154,7 @@
                 {#if depth > 0}
                   <span class="whitespace-pre text-gray-300">{"— ".repeat(depth)}</span>
                 {/if}
-                <span class="text-sm font-medium text-foreground">{node.name}</span
-                >
+                <span class="text-sm font-medium text-foreground">{node.name}</span>
                 <span class="text-sm text-placeholder">{fullPath}</span>
               </div>
               <Pencil
@@ -207,7 +206,9 @@
                           type="text"
                           id="edit_name_{lang.code}_{node.id}"
                           name="name_{lang.code}"
-                          value={data.categoryTranslations[node.id]?.find((t) => t.languageCode === lang.code)?.name ?? ""}
+                          value={data.categoryTranslations[node.id]?.find(
+                            (t) => t.languageCode === lang.code
+                          )?.name ?? ""}
                           class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                         />
                       </div>
