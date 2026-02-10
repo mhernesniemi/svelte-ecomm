@@ -710,7 +710,9 @@
                           step="0.01"
                           min="0"
                           class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                          value={typeof filter.value === "number" ? (filter.value / 100).toFixed(2) : ""}
+                          value={typeof filter.value === "number"
+                            ? (filter.value / 100).toFixed(2)
+                            : ""}
                           placeholder="0.00"
                           onchange={(e) => {
                             localFilters[index] = {
@@ -751,7 +753,8 @@
                       </div>
                     {:else if filter.field === "visibility"}
                       <select
-                        class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                        name="visibility"
+                        class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
                         value={filter.value}
                         onchange={(e) => {
                           localFilters[index] = {

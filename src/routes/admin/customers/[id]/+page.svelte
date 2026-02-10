@@ -71,7 +71,7 @@
 
   <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
     <!-- Customer Info -->
-    <div class="lg:col-span-1">
+    <div class="space-y-8 lg:col-span-1">
       <div class="rounded-lg bg-surface p-6 shadow">
         <h2 class="mb-4 text-lg font-semibold">Customer Information</h2>
 
