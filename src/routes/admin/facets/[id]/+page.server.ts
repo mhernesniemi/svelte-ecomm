@@ -42,62 +42,44 @@ export const actions: Actions = {
 			// Save facet translations
 			for (const lang of TRANSLATION_LANGUAGES) {
 				const tName = formData.get(`name_${lang.code}`) as string;
-
 				await translationService.upsertFacetTranslation(id, lang.code, {
 					name: tName || ""
 				});
 			}
 
-			// Delete removed values
-			const deleteValueIds = formData.getAll("delete_value").map(Number).filter(Boolean);
-			for (const valueId of deleteValueIds) {
-				await facetService.deleteValue(valueId);
-			}
+			// Sync values from client state
+			const valuesJson = formData.get("values_json") as string;
+			const submittedValues: { id: number | null; name: string; code: string; translations: Record<string, string> }[] = JSON.parse(valuesJson || "[]");
+			const submittedIds = new Set(submittedValues.filter((v) => v.id).map((v) => v.id));
 
-			// Save value updates and translations
+			// Delete removed values
 			const facet = await facetService.getById(id);
 			if (facet) {
-				for (const value of facet.values) {
-					const valueName = formData.get(`value_${value.id}_name_en`) as string;
-					const valueCode = formData.get(`value_${value.id}_code`) as string;
-
-					if (valueName && valueCode) {
-						await facetService.updateValue(value.id, {
-							name: valueName,
-							code: valueCode.toLowerCase().replace(/\s+/g, "_")
-						});
-					}
-
-					for (const lang of TRANSLATION_LANGUAGES) {
-						const transName = formData.get(`value_${value.id}_name_${lang.code}`) as string;
-						await translationService.upsertFacetValueTranslation(value.id, lang.code, {
-							name: transName || ""
-						});
+				for (const existing of facet.values) {
+					if (!submittedIds.has(existing.id)) {
+						await facetService.deleteValue(existing.id);
 					}
 				}
 			}
 
-			// Create new values
-			const newValueCount = Number(formData.get("new_value_count")) || 0;
-			for (let i = 0; i < newValueCount; i++) {
-				const newName = formData.get(`new_value_${i}_name_en`) as string;
-				const newCode = formData.get(`new_value_${i}_code`) as string;
+			// Create or update values
+			for (const v of submittedValues) {
+				if (!v.name || !v.code) continue;
+				const normalizedCode = v.code.toLowerCase().replace(/\s+/g, "_");
 
-				if (newName && newCode) {
-					const created = await facetService.createValue({
-						facetId: id,
-						code: newCode.toLowerCase().replace(/\s+/g, "_"),
-						name: newName
+				let valueId: number;
+				if (v.id) {
+					await facetService.updateValue(v.id, { name: v.name, code: normalizedCode });
+					valueId = v.id;
+				} else {
+					const created = await facetService.createValue({ facetId: id, name: v.name, code: normalizedCode });
+					valueId = created.id;
+				}
+
+				for (const lang of TRANSLATION_LANGUAGES) {
+					await translationService.upsertFacetValueTranslation(valueId, lang.code, {
+						name: v.translations?.[lang.code] || ""
 					});
-
-					if (created) {
-						for (const lang of TRANSLATION_LANGUAGES) {
-							const transName = formData.get(`new_value_${i}_name_${lang.code}`) as string;
-							await translationService.upsertFacetValueTranslation(created.id, lang.code, {
-								name: transName || ""
-							});
-						}
-					}
 				}
 			}
 
