@@ -22,9 +22,9 @@ Usage in routes:
 ```typescript filename="src/routes/admin/products/[id]/+page.server.ts"
 import { productService } from "$lib/server/services/products";
 
-export const load = async ({ params }) => {
-	const product = await productService.getById(params.id);
-	return { product };
+export const load = async ({ params, locals }) => {
+	const product = await productService.getById(params.id, locals.language);
+	return { product }; // product.name is already resolved
 };
 ```
 
@@ -49,12 +49,14 @@ const PROVIDERS = new Map<string, PaymentProvider>([
 ## Data Flow
 
 ```
-Route (load/action)
+Route (load/action) — passes locals.language
     ↓
-Service (business logic)
+Service (business logic + translation resolution)
     ↓
 Database (Drizzle ORM)
 ```
+
+Services resolve translations internally using `src/lib/server/i18n.ts`, returning `Resolved*` types with flat translated fields (e.g. `product.name` instead of `product.translations[0].name`).
 
 ## Form Actions
 

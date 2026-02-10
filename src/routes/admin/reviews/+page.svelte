@@ -8,7 +8,7 @@
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import type { PageData, ActionData } from "./$types";
-  import { cn, getTranslation } from "$lib/utils";
+  import { cn } from "$lib/utils";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -26,7 +26,7 @@
   });
 
   function getProductName(review: ReviewRow): string {
-    return getTranslation(review.product.translations)?.name ?? "Unknown";
+    return review.product.name;
   }
 
   function getStatusVariant(status: string): BadgeVariant {

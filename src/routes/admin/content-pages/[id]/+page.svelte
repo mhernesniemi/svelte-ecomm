@@ -9,8 +9,6 @@
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
-  import { getTranslation } from "$lib/utils.js";
-
   let { data, form } = $props();
 
   onMount(() => {
@@ -28,15 +26,13 @@
   let isSubmitting = $state(false);
   let showDelete = $state(false);
 
-  const translation = $derived(getTranslation(data.page.translations));
-
   let title = $state("");
   let slug = $state("");
   let published = $state(false);
 
   $effect(() => {
-    title = translation?.title ?? "";
-    slug = translation?.slug ?? "";
+    title = data.page.title ?? "";
+    slug = data.page.slug ?? "";
     published = data.page.published;
   });
 </script>
@@ -123,7 +119,7 @@
             </label>
             <RichTextEditor
               name="body"
-              content={translation?.body ?? ""}
+              content={data.page.body ?? ""}
               placeholder="Write page content..."
             />
           </div>

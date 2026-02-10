@@ -18,6 +18,7 @@ declare global {
 			// Admin user (separate from customer)
 			adminUser: User | null;
 			adminSessionId: string | null;
+			language: string;
 		}
 		// interface PageData {}
 		// interface PageState {}

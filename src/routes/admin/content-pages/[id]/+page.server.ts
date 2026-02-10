@@ -3,13 +3,13 @@ import { contentPageService } from "$lib/server/services/content-pages.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const id = Number(params.id);
 	if (isNaN(id)) {
 		throw error(400, "Invalid page ID");
 	}
 
-	const page = await contentPageService.getById(id);
+	const page = await contentPageService.getById(id, locals.language);
 	if (!page) {
 		throw error(404, "Content page not found");
 	}

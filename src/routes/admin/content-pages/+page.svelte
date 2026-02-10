@@ -5,7 +5,6 @@
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FileText from "@lucide/svelte/icons/file-text";
-  import { getTranslation } from "$lib/utils.js";
   import type { PageData } from "./$types";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import { Badge } from "$lib/components/admin/ui/badge";
@@ -17,14 +16,6 @@
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
 
   type PageRow = (typeof data.pages)[0];
-
-  function getTitle(translations: { languageCode: string; title: string }[]): string {
-    return getTranslation(translations)?.title ?? "";
-  }
-
-  function getSlug(translations: { languageCode: string; slug: string }[]): string {
-    return getTranslation(translations)?.slug ?? "";
-  }
 
   const columns: ColumnDef<PageRow>[] = [
     {
@@ -45,17 +36,17 @@
       enableSorting: false
     },
     {
-      accessorFn: (row) => getTitle(row.translations),
+      accessorFn: (row) => row.title,
       id: "title",
       header: "Title",
       cell: ({ row }) =>
         renderSnippet(titleCell, {
           id: row.original.id,
-          title: getTitle(row.original.translations)
+          title: row.original.title
         })
     },
     {
-      accessorFn: (row) => getSlug(row.translations),
+      accessorFn: (row) => row.slug,
       id: "slug",
       header: "Slug"
     },

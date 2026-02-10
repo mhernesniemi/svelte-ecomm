@@ -12,6 +12,7 @@ import { CLERK_SECRET_KEY } from "$env/static/private";
 import { orderService } from "$lib/server/services/orders.js";
 import { shippingService, paymentService, wishlistService } from "$lib/server/services/index.js";
 import { authService } from "$lib/server/services/auth.js";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 
 const CART_COOKIE_NAME = "cart_token";
 const CART_COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -20,6 +21,12 @@ const WISHLIST_COOKIE_NAME = "wishlist_token";
 const WISHLIST_COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year
 
 const ADMIN_SESSION_COOKIE = "admin_session";
+
+// Language handler - sets request language from future URL prefix, cookie, or Accept-Language
+const languageHandler: Handle = async ({ event, resolve }) => {
+	event.locals.language = DEFAULT_LANGUAGE;
+	return resolve(event);
+};
 
 // Clerk authentication handler
 const clerkHandler = withClerkHandler();
@@ -182,6 +189,7 @@ const adminAuth: Handle = async ({ event, resolve }) => {
 
 // Combine handlers in sequence
 export const handle = sequence(
+	languageHandler,
 	clerkHandler,
 	customerSync,
 	cartHandler,

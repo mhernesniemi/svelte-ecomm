@@ -5,35 +5,44 @@
 import { eq, and, desc } from "drizzle-orm";
 import { db } from "../db/index.js";
 import { contentPages, contentPageTranslations } from "../db/schema.js";
-import type { ContentPageWithTranslations } from "$lib/types.js";
+import type { ContentPageWithTranslations, ResolvedContentPage } from "$lib/types.js";
+import { DEFAULT_LANGUAGE } from "$lib/utils.js";
+import { resolveContentPage } from "$lib/server/i18n.js";
 
 export class ContentPageService {
-	async list(): Promise<ContentPageWithTranslations[]> {
+	async list(language?: string): Promise<ResolvedContentPage[]> {
+		const lang = language ?? DEFAULT_LANGUAGE;
 		const pages = await db.query.contentPages.findMany({
 			with: { translations: true },
 			orderBy: [desc(contentPages.createdAt)]
 		});
-		return pages;
+		return pages.map((p) => resolveContentPage(p, lang));
 	}
 
-	async getById(id: number): Promise<ContentPageWithTranslations | undefined> {
-		return db.query.contentPages.findFirst({
+	async getById(id: number, language?: string): Promise<ResolvedContentPage | null> {
+		const lang = language ?? DEFAULT_LANGUAGE;
+		const page = await db.query.contentPages.findFirst({
 			where: eq(contentPages.id, id),
 			with: { translations: true }
 		});
+		if (!page) return null;
+		return resolveContentPage(page, lang);
 	}
 
-	async getPublishedById(id: number): Promise<ContentPageWithTranslations | undefined> {
-		return db.query.contentPages.findFirst({
+	async getPublishedById(id: number, language?: string): Promise<ResolvedContentPage | null> {
+		const lang = language ?? DEFAULT_LANGUAGE;
+		const page = await db.query.contentPages.findFirst({
 			where: and(eq(contentPages.id, id), eq(contentPages.published, true)),
 			with: { translations: true }
 		});
+		if (!page) return null;
+		return resolveContentPage(page, lang);
 	}
 
 	async create(input: {
 		published?: boolean;
 		translations: { languageCode: string; title: string; slug: string; body?: string }[];
-	}): Promise<ContentPageWithTranslations> {
+	}): Promise<ResolvedContentPage> {
 		const [page] = await db
 			.insert(contentPages)
 			.values({ published: input.published ?? false })
@@ -60,7 +69,7 @@ export class ContentPageService {
 			published?: boolean;
 			translations?: { languageCode: string; title: string; slug: string; body?: string }[];
 		}
-	): Promise<ContentPageWithTranslations | null> {
+	): Promise<ResolvedContentPage | null> {
 		const existing = await this.getById(id);
 		if (!existing) return null;
 

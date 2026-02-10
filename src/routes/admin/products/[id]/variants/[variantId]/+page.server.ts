@@ -5,7 +5,7 @@ import { error, fail, redirect } from "@sveltejs/kit";
 import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const productId = Number(params.id);
 	const variantId = Number(params.variantId);
 
@@ -14,9 +14,9 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const [product, variant, facets, customerGroups, groupPrices] = await Promise.all([
-		productService.getById(productId),
-		productService.getVariantById(variantId),
-		facetService.list(),
+		productService.getById(productId, locals.language),
+		productService.getVariantById(variantId, locals.language),
+		facetService.list(locals.language),
 		customerGroupService.list(),
 		productService.getGroupPrices(variantId)
 	]);

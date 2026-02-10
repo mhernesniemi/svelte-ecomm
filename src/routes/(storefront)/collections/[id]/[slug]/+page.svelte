@@ -1,25 +1,23 @@
 <script lang="ts">
   import Package from "@lucide/svelte/icons/package";
   import ProductCard from "$lib/components/storefront/ProductCard.svelte";
-  import { stripHtml, getTranslation } from "$lib/utils";
+  import { stripHtml } from "$lib/utils";
 
   let { data } = $props();
-
-  const collectionTrans = $derived(getTranslation(data.collection.translations));
 </script>
 
 <svelte:head>
-  <title>{collectionTrans?.name ?? "Collection"} | Hoikka</title>
+  <title>{data.collection.name} | Hoikka</title>
   <meta
     name="description"
-    content={stripHtml(collectionTrans?.description)?.slice(0, 160) ||
-      `Browse our ${collectionTrans?.name} collection.`}
+    content={stripHtml(data.collection.description)?.slice(0, 160) ||
+      `Browse our ${data.collection.name} collection.`}
   />
-  <meta property="og:title" content="{collectionTrans?.name ?? 'Collection'} | Hoikka" />
+  <meta property="og:title" content="{data.collection.name} | Hoikka" />
   <meta
     property="og:description"
-    content={stripHtml(collectionTrans?.description)?.slice(0, 160) ||
-      `Browse our ${collectionTrans?.name} collection.`}
+    content={stripHtml(data.collection.description)?.slice(0, 160) ||
+      `Browse our ${data.collection.name} collection.`}
   />
   <meta property="og:type" content="website" />
 </svelte:head>
@@ -33,10 +31,10 @@
       </a>
     </nav>
 
-    <h1 class="text-3xl font-bold text-gray-900">{collectionTrans?.name ?? "Collection"}</h1>
-    {#if collectionTrans?.description}
+    <h1 class="text-3xl font-bold text-gray-900">{data.collection.name}</h1>
+    {#if data.collection.description}
       <div class="prose prose-lg mt-2 max-w-none prose-gray">
-        {@html collectionTrans.description}
+        {@html data.collection.description}
       </div>
     {/if}
     <p class="mt-2 text-sm text-gray-500">{data.pagination.total} products</p>

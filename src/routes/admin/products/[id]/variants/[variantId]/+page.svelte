@@ -12,7 +12,6 @@
   import X from "@lucide/svelte/icons/x";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import { getTranslation } from "$lib/utils";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -26,11 +25,6 @@
   let trackInventory = $state(data.variant.trackInventory);
   let showDelete = $state(false);
   let facetComboboxOpen = $state(false);
-
-  // Get the English translation name
-  const variantName = $derived(
-    getTranslation(data.variant.translations)?.name ?? ""
-  );
 
   // Facet value selections - initialize from current variant data
   let selectedFacetValues = $state<number[]>([]);
@@ -47,14 +41,13 @@
   };
 
   const flatFacetValues: FlatFacetValue[] = $derived(
-    data.facets.flatMap((facet) => {
-      const facetName = getTranslation(facet.translations)?.name ?? facet.code;
-      return facet.values.map((value) => ({
+    data.facets.flatMap((facet) =>
+      facet.values.map((value) => ({
         id: value.id,
-        name: getTranslation(value.translations)?.name ?? value.code,
-        facetName
-      }));
-    })
+        name: value.name,
+        facetName: facet.name
+      }))
+    )
   );
 
   function getSelectedFacetValueObjects() {
@@ -151,7 +144,7 @@
                 type="text"
                 id="variant_name"
                 name="variant_name"
-                value={variantName}
+                value={data.variant.name}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
@@ -368,16 +361,11 @@
                   <Command.List id="facet-listbox" class="max-h-64">
                     <Command.Empty>No facet value found.</Command.Empty>
                     {#each data.facets as facet}
-                      {@const facetName =
-                        getTranslation(facet.translations)?.name ?? facet.code}
                       {#if facet.values.length > 0}
-                        <Command.Group heading={facetName}>
+                        <Command.Group heading={facet.name}>
                           {#each facet.values as value}
-                            {@const valueName =
-                              getTranslation(value.translations)?.name ??
-                              value.code}
                             <Command.Item
-                              value="{facetName} {valueName}"
+                              value="{facet.name} {value.name}"
                               onSelect={() => toggleFacetValue(value.id)}
                               class="cursor-pointer"
                             >
@@ -387,7 +375,7 @@
                                     <Check class="h-4 w-4" />
                                   {/if}
                                 </div>
-                                <span>{valueName}</span>
+                                <span>{value.name}</span>
                               </div>
                             </Command.Item>
                           {/each}

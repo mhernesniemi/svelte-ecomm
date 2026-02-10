@@ -1,9 +1,8 @@
 import type { PageServerLoad } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { error, redirect } from "@sveltejs/kit";
-import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
@@ -14,21 +13,20 @@ export const load: PageServerLoad = async ({ params, url }) => {
 	const limit = 12;
 	const offset = (page - 1) * limit;
 
-	const collection = await collectionService.getById(id, DEFAULT_LANGUAGE);
+	const collection = await collectionService.getById(id, locals.language);
 	if (!collection || collection.isPrivate) {
 		throw error(404, "Collection not found");
 	}
 
 	// Redirect if slug doesn't match (for SEO and correct URLs)
-	const correctSlug = collection.translations.find((t) => t.languageCode === DEFAULT_LANGUAGE)?.slug;
-	if (correctSlug && params.slug !== correctSlug) {
+	if (collection.slug && params.slug !== collection.slug) {
 		const pageParam = page > 1 ? `?page=${page}` : "";
-		throw redirect(301, `/collections/${id}/${correctSlug}${pageParam}`);
+		throw redirect(301, `/collections/${id}/${collection.slug}${pageParam}`);
 	}
 
 	const { items: products, pagination } = await collectionService.getProductsForCollection(
 		collection.id,
-		{ language: DEFAULT_LANGUAGE, limit, offset }
+		{ language: locals.language, limit, offset }
 	);
 
 	return {

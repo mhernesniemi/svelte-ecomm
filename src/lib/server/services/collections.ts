@@ -32,9 +32,13 @@ import type {
 	CreateCollectionInput,
 	UpdateCollectionInput,
 	ProductWithRelations,
-	PaginatedResult
+	PaginatedResult,
+	ResolvedCollection,
+	ResolvedCollectionWithCount,
+	ResolvedProduct
 } from "$lib/types.js";
 import { DEFAULT_LANGUAGE } from "$lib/utils.js";
+import { resolveCollection, resolveCollectionWithCount, resolveProduct } from "$lib/server/i18n.js";
 
 // Type for filter handler functions
 type FilterHandler = (
@@ -201,7 +205,7 @@ export class CollectionService {
 	/**
 	 * Create a new collection
 	 */
-	async create(input: CreateCollectionInput): Promise<CollectionWithRelations> {
+	async create(input: CreateCollectionInput): Promise<ResolvedCollection> {
 		const [collection] = await db
 			.insert(collections)
 			.values({
@@ -236,7 +240,7 @@ export class CollectionService {
 			);
 		}
 
-		return this.getById(collection.id) as Promise<CollectionWithRelations>;
+		return this.getById(collection.id) as Promise<ResolvedCollection>;
 	}
 
 	/**
@@ -245,7 +249,7 @@ export class CollectionService {
 	async update(
 		id: number,
 		input: UpdateCollectionInput
-	): Promise<CollectionWithRelations | null> {
+	): Promise<ResolvedCollection | null> {
 		const existing = await this.getById(id);
 		if (!existing) return null;
 
@@ -301,7 +305,8 @@ export class CollectionService {
 	/**
 	 * Get a collection by ID with all relations
 	 */
-	async getById(id: number, language?: string): Promise<CollectionWithRelations | null> {
+	async getById(id: number, language?: string): Promise<ResolvedCollection | null> {
+		const lang = language ?? DEFAULT_LANGUAGE;
 		const collection = await db
 			.select()
 			.from(collections)
@@ -310,13 +315,14 @@ export class CollectionService {
 
 		if (!collection[0]) return null;
 
-		return this.loadCollectionRelations(collection[0], language);
+		const raw = await this.loadCollectionRelations(collection[0], lang);
+		return resolveCollection(raw, lang);
 	}
 
 	/**
 	 * Get a collection by slug
 	 */
-	async getBySlug(slug: string, language?: string): Promise<CollectionWithRelations | null> {
+	async getBySlug(slug: string, language?: string): Promise<ResolvedCollection | null> {
 		const translation = await db
 			.select()
 			.from(collectionTranslations)
@@ -331,19 +337,23 @@ export class CollectionService {
 	/**
 	 * List all collections (for admin)
 	 */
-	async listAll(language?: string): Promise<CollectionWithTranslations[]> {
+	async listAll(language?: string): Promise<ResolvedCollection[]> {
+		const lang = language ?? DEFAULT_LANGUAGE;
 		const collectionList = await db
 			.select()
 			.from(collections)
 			.orderBy(collections.position, desc(collections.createdAt));
 
-		return Promise.all(collectionList.map((c) => this.loadCollectionTranslations(c, language)));
+		const raw = await Promise.all(
+			collectionList.map((c) => this.loadCollectionRelations(c, lang))
+		);
+		return raw.map((c) => resolveCollection(c, lang));
 	}
 
 	/**
 	 * List public collections (for storefront)
 	 */
-	async list(options: { language?: string } = {}): Promise<CollectionWithCount[]> {
+	async list(options: { language?: string } = {}): Promise<ResolvedCollectionWithCount[]> {
 		const { language = DEFAULT_LANGUAGE } = options;
 
 		const collectionList = await db
@@ -353,7 +363,7 @@ export class CollectionService {
 			.orderBy(collections.position, desc(collections.createdAt));
 
 		// Load translations, counts, and featured assets
-		return Promise.all(
+		const raw = await Promise.all(
 			collectionList.map(async (c) => {
 				const [withTranslations, productCount, featuredAsset] = await Promise.all([
 					this.loadCollectionTranslations(c, language),
@@ -366,9 +376,11 @@ export class CollectionService {
 					...withTranslations,
 					productCount,
 					featuredAsset: featuredAsset[0] ?? null
-				};
+				} as CollectionWithCount;
 			})
 		);
+
+		return raw.map((c) => resolveCollectionWithCount(c, language));
 	}
 
 	// =========================================================================
@@ -466,7 +478,7 @@ export class CollectionService {
 	async getProductsForCollection(
 		collectionId: number,
 		options: { language?: string; limit?: number; offset?: number } = {}
-	): Promise<PaginatedResult<ProductWithRelations>> {
+	): Promise<PaginatedResult<ResolvedProduct>> {
 		const { language = DEFAULT_LANGUAGE, limit = 20, offset = 0 } = options;
 
 		// Load filters for this collection
@@ -521,10 +533,11 @@ export class CollectionService {
 			.limit(limit)
 			.offset(offset);
 
-		// Load full relations
-		const items = await Promise.all(
+		// Load full relations and resolve translations
+		const rawItems = await Promise.all(
 			productList.map((p) => this.loadProductRelations(p, language))
 		);
+		const items = rawItems.map((p) => resolveProduct(p, language));
 
 		return {
 			items,
@@ -547,7 +560,7 @@ export class CollectionService {
 			value: unknown;
 		}[],
 		options: { language?: string; limit?: number } = {}
-	): Promise<{ products: ProductWithRelations[]; total: number }> {
+	): Promise<{ products: ResolvedProduct[]; total: number }> {
 		const { language = DEFAULT_LANGUAGE, limit = 10 } = options;
 
 		if (filters.length === 0) {
@@ -600,11 +613,11 @@ export class CollectionService {
 			.orderBy(desc(products.createdAt))
 			.limit(limit);
 
-		const productItems = await Promise.all(
+		const rawItems = await Promise.all(
 			productList.map((p) => this.loadProductRelations(p, language))
 		);
 
-		return { products: productItems, total };
+		return { products: rawItems.map((p) => resolveProduct(p, language)), total };
 	}
 
 	/**
@@ -624,13 +637,14 @@ export class CollectionService {
 	async getCollectionsForProduct(
 		productId: number,
 		language?: string
-	): Promise<CollectionWithTranslations[]> {
+	): Promise<ResolvedCollection[]> {
 		const allCollections = await db
 			.select()
 			.from(collections)
 			.orderBy(collections.position, desc(collections.createdAt));
 
-		const matched: CollectionWithTranslations[] = [];
+		const lang = language ?? DEFAULT_LANGUAGE;
+		const matched: ResolvedCollection[] = [];
 
 		for (const collection of allCollections) {
 			const filters = await db
@@ -659,7 +673,8 @@ export class CollectionService {
 			}
 
 			if (matchingProductIds?.has(productId)) {
-				matched.push(await this.loadCollectionTranslations(collection, language));
+				const raw = await this.loadCollectionRelations(collection, lang);
+				matched.push(resolveCollection(raw, lang));
 			}
 		}
 

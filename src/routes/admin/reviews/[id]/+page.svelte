@@ -5,7 +5,6 @@
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import { getTranslation } from "$lib/utils.js";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -16,12 +15,6 @@
     if (form?.success) toast.success(form.message || "Success");
     if (form?.error) toast.error(form.error);
   });
-
-  function getProductName(): string {
-    return (
-      getTranslation(data.product?.translations ?? [])?.name ?? "Unknown product"
-    );
-  }
 
   function getStatusVariant(status: string): BadgeVariant {
     switch (status) {
@@ -86,7 +79,7 @@
               href="/admin/products/{data.product.id}"
               class="text-blue-600 hover:text-blue-800 dark:text-blue-400"
             >
-              {getProductName()}
+              {data.product?.name ?? "Unknown product"}
             </a>
           {:else}
             <span class="text-placeholder">Deleted product</span>

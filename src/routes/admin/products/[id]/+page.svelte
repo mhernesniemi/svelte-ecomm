@@ -29,7 +29,7 @@
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
-  import { cn, getTranslation } from "$lib/utils";
+  import { cn } from "$lib/utils";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -90,14 +90,13 @@
   };
 
   const flatFacetValues: FlatFacetValue[] = $derived(
-    data.facets.flatMap((facet) => {
-      const facetName = getTranslation(facet.translations)?.name ?? facet.code;
-      return facet.values.map((value) => ({
+    data.facets.flatMap((facet) =>
+      facet.values.map((value) => ({
         id: value.id,
-        name: getTranslation(value.translations)?.name ?? value.code,
-        facetName
-      }));
-    })
+        name: value.name,
+        facetName: facet.name
+      }))
+    )
   );
 
   function getSelectedFacetValueObjects() {
@@ -116,26 +115,19 @@
     selectedProductFacets = selectedProductFacets.filter((fv) => fv !== id);
   }
 
-  // Helper to get translated name
-  function getCategoryName(translations: { languageCode: string; name: string }[]): string {
-    return getTranslation(translations)?.name ?? "";
-  }
-
   // Flatten tree into list with depth info for display
   type FlatCategory = {
     id: number;
     name: string;
     depth: number;
-    translations: { languageCode: string; name: string }[];
   };
 
   function flattenTree(nodes: typeof data.categoryTree, depth = 0): FlatCategory[] {
     return nodes.flatMap((node) => [
       {
         id: node.id,
-        name: getCategoryName(node.translations),
-        depth,
-        translations: node.translations
+        name: node.name,
+        depth
       },
       ...flattenTree(node.children, depth + 1)
     ]);
@@ -162,15 +154,10 @@
     selectedCategories = selectedCategories.filter((c) => c !== id);
   }
 
-  // Get the primary translation (English)
-  const translation = $derived(
-    getTranslation(data.product.translations)
-  );
-
   let productName = $state("");
 
   $effect(() => {
-    productName = translation?.name ?? "";
+    productName = data.product.name;
   });
 
   async function handleImagesSelected(
@@ -223,9 +210,9 @@
         class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         ><ChevronLeft class="h-4 w-4" /> Back to Products</a
       >
-      {#if translation?.slug}
+      {#if data.product.slug}
         <a
-          href="/products/{data.product.id}/{translation.slug}"
+          href="/products/{data.product.id}/{data.product.slug}"
           target="_blank"
           class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         >
@@ -284,7 +271,7 @@
                   type="text"
                   id="slug"
                   name="slug"
-                  value={translation?.slug ?? ""}
+                  value={data.product.slug}
                   required
                   class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
@@ -300,7 +287,7 @@
               </label>
               <RichTextEditor
                 name="description"
-                content={translation?.description ?? ""}
+                content={data.product.description ?? ""}
                 placeholder="Write product description..."
               />
             </div>
@@ -373,7 +360,7 @@
                 <TableRow>
                   <TableCell class="font-mono text-sm">{variant.sku}</TableCell>
                   <TableCell class="text-sm">
-                    {getTranslation(variant.translations)?.name ?? "-"}
+                    {variant.name}
                   </TableCell>
                   <TableCell class="text-sm">{(variant.price / 100).toFixed(2)} EUR</TableCell>
                   <TableCell class="text-sm">{variant.stock}</TableCell>
@@ -383,9 +370,7 @@
                     {:else}
                       <div class="flex flex-wrap gap-1">
                         {#each variant.facetValues as fv}
-                          {@const name =
-                            getTranslation(fv.translations)?.name ?? fv.code}
-                          <span class="rounded bg-muted px-2 py-0.5 text-xs">{name}</span>
+                          <span class="rounded bg-muted px-2 py-0.5 text-xs">{fv.name}</span>
                         {/each}
                       </div>
                     {/if}
@@ -544,16 +529,11 @@
                   <Command.List id="facet-listbox" class="max-h-64">
                     <Command.Empty>No facet value found.</Command.Empty>
                     {#each data.facets as facet}
-                      {@const facetName =
-                        getTranslation(facet.translations)?.name ?? facet.code}
                       {#if facet.values.length > 0}
-                        <Command.Group heading={facetName}>
+                        <Command.Group heading={facet.name}>
                           {#each facet.values as value}
-                            {@const valueName =
-                              getTranslation(value.translations)?.name ??
-                              value.code}
                             <Command.Item
-                              value="{facetName} {valueName}"
+                              value="{facet.name} {value.name}"
                               onSelect={() => toggleFacetValue(value.id)}
                               class="cursor-pointer"
                             >
@@ -563,7 +543,7 @@
                                     <Check class="h-4 w-4" />
                                   {/if}
                                 </div>
-                                <span>{valueName}</span>
+                                <span>{value.name}</span>
                               </div>
                             </Command.Item>
                           {/each}
@@ -679,14 +659,11 @@
           <div class="p-4">
             <div class="space-y-1.5">
               {#each data.productCollections as collection}
-                {@const collectionName =
-                  getTranslation(collection.translations)?.name ??
-                  `Collection #${collection.id}`}
                 <a
                   href="/admin/collections/{collection.id}"
                   class="block text-sm text-blue-600 hover:underline dark:text-blue-400"
                 >
-                  {collectionName}
+                  {collection.name}
                 </a>
               {/each}
             </div>

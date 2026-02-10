@@ -6,24 +6,25 @@ import { assetService } from "$lib/server/services/assets.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import { slugify, DEFAULT_LANGUAGE } from "$lib/utils.js";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const id = Number(params.id);
 	if (isNaN(id)) {
 		throw error(400, "Invalid collection ID");
 	}
 
-	const collection = await collectionService.getById(id);
+	const collection = await collectionService.getById(id, locals.language);
 	if (!collection) {
 		throw error(404, "Collection not found");
 	}
 
 	// Load facets for filter builder
-	const facets = await facetService.list();
+	const facets = await facetService.list(locals.language);
 
 	// Load all products for manual selection (admin sees all visibility states)
 	const { items: products } = await productService.list({
 		visibility: ["public", "private", "draft"],
-		limit: 100
+		limit: 100,
+		language: locals.language
 	});
 
 	// Get product count
@@ -31,7 +32,8 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	// Get matching products for the data table
 	const preview = await collectionService.getProductsForCollection(id, {
-		limit: 100
+		limit: 100,
+		language: locals.language
 	});
 
 	return { collection, facets, products, productCount, preview: preview.items };

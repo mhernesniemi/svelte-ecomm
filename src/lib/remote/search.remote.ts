@@ -3,7 +3,6 @@
  */
 import { command } from "$app/server";
 import { productService } from "$lib/server/services/index.js";
-import { getTranslation } from "$lib/utils.js";
 
 export interface SearchResult {
 	id: number;
@@ -29,17 +28,12 @@ export const searchProducts = command(
 			visibility: "public"
 		});
 
-		return result.items.map((product) => {
-			const translation = getTranslation(product.translations);
-			const defaultVariant = product.variants[0];
-
-			return {
-				id: product.id,
-				name: translation?.name || "Untitled",
-				slug: translation?.slug || "",
-				price: defaultVariant?.price || 0,
-				image: product.featuredAsset?.source || null
-			};
-		});
+		return result.items.map((product) => ({
+			id: product.id,
+			name: product.name,
+			slug: product.slug,
+			price: product.variants[0]?.price || 0,
+			image: product.featuredAsset?.source || null
+		}));
 	}
 );

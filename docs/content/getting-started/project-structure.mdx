@@ -8,6 +8,7 @@ src/
 │   │   ├── db/              # Database schema & client
 │   │   │   ├── index.ts     # Drizzle client
 │   │   │   └── schema.ts    # Table definitions
+│   │   ├── i18n.ts          # Translation resolution utilities
 │   │   ├── services/        # Business logic
 │   │   │   ├── products.ts
 │   │   │   ├── orders.ts
@@ -90,9 +91,9 @@ orderService.create(), .updateStatus()
 **2. Route handlers (`+page.server.ts`)** - Thin controllers that wire HTTP to services:
 
 ```typescript
-export const load = async ({ params }) => {
-	const product = await productService.getById(id);
-	return { product };
+export const load = async ({ params, locals }) => {
+	const product = await productService.getById(id, locals.language);
+	return { product }; // product.name is already resolved
 };
 
 export const actions = {
@@ -110,19 +111,19 @@ export const actions = {
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  REQUEST                                                │
+│  REQUEST → hooks.server.ts sets locals.language         │
 └────────────────────────┬────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │  +page.server.ts (thin controller)                      │
-│  - load() → fetch data                                  │
+│  - load() → passes locals.language to services          │
 │  - actions → handle form submissions                    │
 └────────────────────────┬────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────┐
-│  services/*.ts (business logic)                         │
-│  - productService, orderService, etc.                   │
-│  - validation, complex operations                       │
+│  services/*.ts (business logic + i18n resolution)       │
+│  - resolves translations via i18n.ts                    │
+│  - returns Resolved* types with flat fields             │
 └────────────────────────┬────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────┐
@@ -130,11 +131,11 @@ export const actions = {
 │  - data structure, relationships                        │
 └─────────────────────────────────────────────────────────┘
                          ▲
-                         │ data
+                         │ resolved data (product.name)
                          ▼
 ┌─────────────────────────────────────────────────────────┐
 │  +page.svelte (view)                                    │
-│  - renders UI with data from load()                     │
+│  - accesses flat fields: product.name, collection.slug  │
 │  - forms POST to actions                                │
 └─────────────────────────────────────────────────────────┘
 ```

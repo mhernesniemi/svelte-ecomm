@@ -11,6 +11,7 @@ src/
 │   │   ├── db/
 │   │   │   ├── schema.ts      # All database tables (Drizzle ORM)
 │   │   │   └── index.ts       # Database client
+│   │   ├── i18n.ts            # Translation resolution utilities
 │   │   └── services/          # Business logic (server-only)
 │   │       ├── orders.ts
 │   │       ├── products.ts
@@ -105,13 +106,15 @@ Reusable Svelte components. Split into:
 ```
 Browser Request
     ↓
-+page.server.ts (load function)
+hooks.server.ts (sets locals.language)
     ↓
-Service (e.g., orderService.getById())
++page.server.ts (load function, passes locals.language)
+    ↓
+Service (resolves translations, returns Resolved* types)
     ↓
 Database (via Drizzle)
     ↓
-+page.svelte (receives data as props)
++page.svelte (receives resolved data: product.name)
     ↓
 HTML Response
 ```
@@ -274,9 +277,9 @@ This ensures:
 - Easy to import anywhere: `import { orderService } from "$lib/server/services/orders.js"`
 - Testable (can mock the export)
 
-### Translation Tables
+### Translation Resolution
 
-Multi-language support via separate translation tables:
+Multi-language support via separate translation tables, resolved at the service layer:
 
 ```
 products (id, type, visibility, ...)
@@ -284,14 +287,16 @@ products (id, type, visibility, ...)
     └── product_translations (id, product_id, language_code, name, slug, description)
 ```
 
-Query pattern:
+Services resolve translations internally using `src/lib/server/i18n.ts` and return `Resolved*` types with flat fields:
 
 ```typescript
-const product = await db.query.products.findFirst({
-	with: { translations: true }
-});
-const name = product.translations.find((t) => t.languageCode === "en")?.name;
+// Service resolves translations — components access flat fields
+const product = await productService.getById(123, locals.language);
+product.name;         // "Blue Shirt" (resolved)
+product.translations; // Still available for editing forms
 ```
+
+Language is set once per request via `locals.language` in hooks. Routes pass it to services.
 
 ### Guest Carts (Cookie-based)
 

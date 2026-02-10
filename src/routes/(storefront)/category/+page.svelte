@@ -1,13 +1,8 @@
 <script lang="ts">
   import type { PageData } from "./$types";
-  import { getTranslation } from "$lib/utils";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
 
   let { data }: { data: PageData } = $props();
-
-  function getName(translations: { languageCode: string; name: string }[]): string {
-    return getTranslation(translations)?.name ?? "";
-  }
 
   function buildPath(node: (typeof data.tree)[0], parents: string[] = []): string {
     return "/category/" + [...parents, node.slug].join("/");
@@ -50,7 +45,7 @@
             href={buildPath(rootCategory)}
             class="text-lg font-semibold text-gray-900 hover:text-blue-600"
           >
-            {getName(rootCategory.translations)}
+            {rootCategory.name}
           </a>
 
           {#if rootCategory.children.length > 0}
@@ -61,7 +56,7 @@
                     href={buildPath(child, [rootCategory.slug])}
                     class="text-sm text-gray-600 hover:text-blue-600"
                   >
-                    {getName(child.translations)}
+                    {child.name}
                   </a>
 
                   {#if child.children.length > 0}
@@ -72,7 +67,7 @@
                             href={buildPath(grandchild, [rootCategory.slug, child.slug])}
                             class="text-xs text-gray-500 hover:text-blue-600"
                           >
-                            {getName(grandchild.translations)}
+                            {grandchild.name}
                           </a>
                         </li>
                       {/each}

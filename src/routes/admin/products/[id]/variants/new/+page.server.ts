@@ -4,23 +4,23 @@ import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const productId = Number(params.id);
 
 	if (isNaN(productId)) {
 		throw error(404, "Invalid product ID");
 	}
 
-	const product = await productService.getById(productId);
+	const product = await productService.getById(productId, locals.language);
 
 	if (!product) {
 		throw error(404, "Product not found");
 	}
 
-	const facets = await facetService.list();
+	const facets = await facetService.list(locals.language);
 
 	return {
-		product: { id: product.id, name: product.translations[0]?.name ?? "Product" },
+		product: { id: product.id, name: product.name },
 		facets
 	};
 };

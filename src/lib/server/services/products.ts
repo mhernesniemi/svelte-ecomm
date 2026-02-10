@@ -30,16 +30,19 @@ import type {
 	CreateVariantInput,
 	UpdateVariantInput,
 	FacetCount,
-	PaginatedResult
+	PaginatedResult,
+	ResolvedProduct,
+	ResolvedProductVariant
 } from "$lib/types.js";
 import { DEFAULT_LANGUAGE } from "$lib/utils.js";
+import { resolveProduct, resolveVariant } from "$lib/server/i18n.js";
 
 export class ProductService {
 
 	/**
 	 * List products with filtering and pagination
 	 */
-	async list(options: ProductListOptions = {}): Promise<PaginatedResult<ProductWithRelations>> {
+	async list(options: ProductListOptions = {}): Promise<PaginatedResult<ResolvedProduct>> {
 		const {
 			language = DEFAULT_LANGUAGE,
 			facets: facetFilters,
@@ -95,10 +98,11 @@ export class ProductService {
 			.limit(limit)
 			.offset(offset);
 
-		// Load relations for each product
-		const items = await Promise.all(
+		// Load relations for each product and resolve translations
+		const rawItems = await Promise.all(
 			productList.map((p) => this.loadProductRelations(p, language))
 		);
+		const items = rawItems.map((p) => resolveProduct(p, language));
 
 		return {
 			items,
@@ -114,7 +118,7 @@ export class ProductService {
 	/**
 	 * Get a single product by ID
 	 */
-	async getById(id: number, language?: string): Promise<ProductWithRelations | null> {
+	async getById(id: number, language?: string): Promise<ResolvedProduct | null> {
 		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const product = await db
@@ -125,13 +129,14 @@ export class ProductService {
 
 		if (!product[0]) return null;
 
-		return this.loadProductRelations(product[0], lang);
+		const raw = await this.loadProductRelations(product[0], lang);
+		return resolveProduct(raw, lang);
 	}
 
 	/**
 	 * Get a product by slug
 	 */
-	async getBySlug(slug: string, language?: string): Promise<ProductWithRelations | null> {
+	async getBySlug(slug: string, language?: string): Promise<ResolvedProduct | null> {
 		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const translation = await db
@@ -177,7 +182,7 @@ export class ProductService {
 	/**
 	 * Update an existing product
 	 */
-	async update(id: number, input: UpdateProductInput): Promise<ProductWithRelations | null> {
+	async update(id: number, input: UpdateProductInput): Promise<ResolvedProduct | null> {
 		const existing = await this.getById(id);
 		if (!existing) return null;
 
@@ -417,7 +422,7 @@ export class ProductService {
 	async getVariantById(
 		variantId: number,
 		language?: string
-	): Promise<ProductVariantWithRelations | null> {
+	): Promise<ResolvedProductVariant | null> {
 		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const variant = await db
@@ -428,7 +433,8 @@ export class ProductService {
 
 		if (!variant[0]) return null;
 
-		return this.loadVariantRelations(variant[0], lang);
+		const raw = await this.loadVariantRelations(variant[0], lang);
+		return resolveVariant(raw, lang);
 	}
 
 	async addVariantFacetValue(variantId: number, facetValueId: number): Promise<void> {

@@ -4,16 +4,11 @@
   import { Button } from "$lib/components/storefront/ui/button";
   import ProductCard from "$lib/components/storefront/ProductCard.svelte";
   import type { PageData } from "./$types";
-  import { getTranslation } from "$lib/utils";
   import Check from "@lucide/svelte/icons/check";
 
   let { data }: { data: PageData } = $props();
 
   const pageTitle = $derived(data.search ? `Search: ${data.search} | Hoikka` : "Products | Hoikka");
-
-  function getFacetName(facet: (typeof data.facets)[0]): string {
-    return getTranslation(facet.translations)?.name ?? facet.code;
-  }
 
   function isFilterActive(facetCode: string, valueCode: string): boolean {
     return data.activeFilters[facetCode]?.includes(valueCode) ?? false;
@@ -88,7 +83,7 @@
         {@const counts = data.facetCounts[facet.code] ?? []}
         {#if counts.length > 0}
           <div class="mb-6">
-            <h3 class="mb-3 font-semibold">{getFacetName(facet)}</h3>
+            <h3 class="mb-3 font-semibold">{facet.name}</h3>
             <div class="space-y-2">
               {#each counts as value}
                 {@const active = isFilterActive(facet.code, value.code)}

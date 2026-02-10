@@ -16,9 +16,12 @@ import type {
 	FacetWithValues,
 	FacetValue,
 	FacetValueWithTranslations,
-	PaginatedResult
+	PaginatedResult,
+	ResolvedFacet,
+	ResolvedFacetValue
 } from "$lib/types.js";
 import { DEFAULT_LANGUAGE } from "$lib/utils.js";
+import { resolveFacet, resolveFacetValue } from "$lib/server/i18n.js";
 
 export class FacetService {
 
@@ -55,38 +58,41 @@ export class FacetService {
 	/**
 	 * Get facet by ID with values
 	 */
-	async getById(id: number, language?: string): Promise<FacetWithValues | null> {
+	async getById(id: number, language?: string): Promise<ResolvedFacet | null> {
 		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const [facet] = await db.select().from(facets).where(eq(facets.id, id));
 
 		if (!facet) return null;
 
-		return this.loadFacetWithValues(facet, lang);
+		const raw = await this.loadFacetWithValues(facet, lang);
+		return resolveFacet(raw, lang);
 	}
 
 	/**
 	 * Get facet by code
 	 */
-	async getByCode(code: string, language?: string): Promise<FacetWithValues | null> {
+	async getByCode(code: string, language?: string): Promise<ResolvedFacet | null> {
 		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const [facet] = await db.select().from(facets).where(eq(facets.code, code));
 
 		if (!facet) return null;
 
-		return this.loadFacetWithValues(facet, lang);
+		const raw = await this.loadFacetWithValues(facet, lang);
+		return resolveFacet(raw, lang);
 	}
 
 	/**
 	 * List all facets
 	 */
-	async list(language?: string): Promise<FacetWithValues[]> {
+	async list(language?: string): Promise<ResolvedFacet[]> {
 		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const facetList = await db.select().from(facets).orderBy(facets.code);
 
-		return Promise.all(facetList.map((f: Facet) => this.loadFacetWithValues(f, lang)));
+		const raw = await Promise.all(facetList.map((f: Facet) => this.loadFacetWithValues(f, lang)));
+		return raw.map((f) => resolveFacet(f, lang));
 	}
 
 	/**
@@ -178,7 +184,7 @@ export class FacetService {
 	/**
 	 * Get facet value by ID
 	 */
-	async getValueById(id: number, language?: string): Promise<FacetValueWithTranslations | null> {
+	async getValueById(id: number, language?: string): Promise<ResolvedFacetValue | null> {
 		const lang = language ?? DEFAULT_LANGUAGE;
 
 		const [value] = await db.select().from(facetValues).where(eq(facetValues.id, id));
@@ -190,7 +196,7 @@ export class FacetService {
 			.from(facetValueTranslations)
 			.where(eq(facetValueTranslations.facetValueId, id));
 
-		return { ...value, translations };
+		return resolveFacetValue({ ...value, translations }, lang);
 	}
 
 	/**

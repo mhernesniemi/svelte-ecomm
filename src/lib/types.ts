@@ -354,6 +354,67 @@ export interface ContentPageWithTranslations extends ContentPage {
 }
 
 // ============================================================================
+// RESOLVED TYPES (flat translated fields + translations[] kept for editing)
+// ============================================================================
+
+/** Product with resolved translation fields */
+export interface ResolvedProduct extends Product {
+	name: string;
+	slug: string;
+	description: string | null;
+	translations: ProductTranslation[];
+	variants: ResolvedProductVariant[];
+	facetValues: ResolvedFacetValue[];
+	assets: Asset[];
+	featuredAsset?: Asset | null;
+}
+
+/** Variant with resolved translation fields */
+export interface ResolvedProductVariant extends ProductVariant {
+	name: string;
+	translations: ProductVariantTranslation[];
+	facetValues: ResolvedFacetValue[];
+	assets: Asset[];
+	featuredAsset?: Asset | null;
+}
+
+/** Facet value with resolved translation fields */
+export interface ResolvedFacetValue extends FacetValue {
+	name: string;
+	translations: FacetValueTranslation[];
+}
+
+/** Facet with resolved translation fields */
+export interface ResolvedFacet extends Facet {
+	name: string;
+	translations: FacetTranslation[];
+	values: ResolvedFacetValue[];
+}
+
+/** Collection with resolved translation fields */
+export interface ResolvedCollection extends Collection {
+	name: string;
+	slug: string;
+	description: string | null;
+	translations: CollectionTranslation[];
+	filters: CollectionFilter[];
+	featuredAsset?: Asset | null;
+}
+
+/** Collection with product count and resolved fields */
+export interface ResolvedCollectionWithCount extends ResolvedCollection {
+	productCount: number;
+}
+
+/** Content page with resolved translation fields */
+export interface ResolvedContentPage extends ContentPage {
+	title: string;
+	slug: string;
+	body: string | null;
+	translations: ContentPageTranslation[];
+}
+
+// ============================================================================
 // FILTER & QUERY TYPES
 // ============================================================================
 

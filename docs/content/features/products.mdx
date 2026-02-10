@@ -16,18 +16,16 @@ Product
 
 ## Multi-Language Support
 
-Products use translation tables. The `getTranslation()` helper finds the right translation with a fallback:
+Products use translation tables. Services resolve translations and return flat fields:
 
 ```typescript
-import { getTranslation } from "$lib/utils";
+const product = await productService.getById(123, locals.language);
 
-const product = await productService.getById(123);
-
-// Get localized name (defaults to DEFAULT_LANGUAGE)
-const name = getTranslation(product.translations)?.name;
-
-// Explicit language
-const fName = getTranslation(product.translations, "fi")?.name;
+// Flat translated fields — no manual resolution needed
+product.name;        // "Blue Shirt"
+product.slug;        // "blue-shirt"
+product.description; // "<p>A nice shirt</p>"
+product.translations; // Still available for editing
 ```
 
 ## Variants

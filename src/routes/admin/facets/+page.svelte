@@ -6,7 +6,6 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Tag from "@lucide/svelte/icons/tag";
   import PlusIcon from "@lucide/svelte/icons/plus";
-  import { getTranslation } from "$lib/utils.js";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -16,10 +15,6 @@
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
 
   type FacetRow = (typeof data.facets)[0];
-
-  function getName(translations: { languageCode: string; name: string }[]): string {
-    return getTranslation(translations)?.name ?? "";
-  }
 
   const columns: ColumnDef<FacetRow>[] = [
     {
@@ -40,13 +35,13 @@
       enableSorting: false
     },
     {
-      accessorFn: (row) => getName(row.translations),
+      accessorFn: (row) => row.name,
       id: "name",
       header: "Name",
       cell: ({ row }) =>
         renderSnippet(nameCell, {
           id: row.original.id,
-          name: getName(row.original.translations)
+          name: row.original.name
         })
     },
     {

@@ -68,13 +68,16 @@ const collection = await collectionService.create({
 
 ## Querying Collections
 
+Services return resolved types with flat translated fields:
+
 ```typescript
-// Get collection by slug (uses DEFAULT_LANGUAGE)
-const collection = await collectionService.getBySlug("summer-sale");
+// Get collection by slug (pass language for translation resolution)
+const collection = await collectionService.getBySlug("summer-sale", locals.language);
+collection.name; // "Summer Sale" (resolved)
 
 // Get products for a collection with pagination
 const { items, pagination } = await collectionService.getProductsForCollection(
   collection.id,
-  { limit: 20, offset: 0 }
+  { limit: 20, offset: 0, language: locals.language }
 );
 ```

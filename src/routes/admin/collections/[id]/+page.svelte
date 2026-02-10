@@ -27,8 +27,6 @@
   import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash2 from "@lucide/svelte/icons/trash-2";
-  import { getTranslation } from "$lib/utils";
-
   let { data, form } = $props();
 
   $effect(() => {
@@ -54,10 +52,9 @@
   let localFilters = $state<LocalFilter[]>([]);
 
   $effect(() => {
-    const trans = getTranslation(data.collection.translations);
-    name = trans?.name ?? "";
-    slug = trans?.slug ?? "";
-    description = trans?.description ?? "";
+    name = data.collection.name ?? "";
+    slug = data.collection.slug ?? "";
+    description = data.collection.description ?? "";
     isPrivate = data.collection.isPrivate;
 
     localFilters = data.collection.filters.map((f) => ({
@@ -77,10 +74,9 @@
 
   // Unsaved changes detection
   const hasUnsavedChanges = $derived.by(() => {
-    const trans = getTranslation(data.collection.translations);
-    const savedName = trans?.name ?? "";
-    const savedSlug = trans?.slug ?? "";
-    const savedDescription = trans?.description ?? "";
+    const savedName = data.collection.name ?? "";
+    const savedSlug = data.collection.slug ?? "";
+    const savedDescription = data.collection.description ?? "";
     const savedIsPrivate = data.collection.isPrivate;
     const savedFilters = JSON.stringify(
       data.collection.filters.map((f) => ({ field: f.field, operator: f.operator, value: f.value }))
@@ -242,11 +238,10 @@
   type FlatFacetValue = { id: number; name: string; facetName: string };
   const flatFacetValues: FlatFacetValue[] = $derived(
     data.facets.flatMap((facet) => {
-      const facetName = getTranslation(facet.translations)?.name ?? facet.code;
       return facet.values.map((value) => ({
         id: value.id,
-        name: getTranslation(value.translations)?.name ?? value.code,
-        facetName
+        name: value.name ?? value.code,
+        facetName: facet.name ?? facet.code
       }));
     })
   );
@@ -257,7 +252,7 @@
   }
 
   function getProductName(product: (typeof data.products)[0]): string {
-    return getTranslation(product.translations)?.name ?? `Product #${product.id}`;
+    return product.name ?? `Product #${product.id}`;
   }
 
   function getProductNameById(id: number): string {
@@ -268,7 +263,7 @@
   // ── Preview table ────────────────────────────────────────────────────
 
   function getPreviewProductName(product: PreviewProduct): string {
-    return getTranslation(product.translations)?.name ?? `Product #${product.id}`;
+    return product.name ?? `Product #${product.id}`;
   }
 
   const previewColumns: ColumnDef<PreviewProduct>[] = [
@@ -479,16 +474,10 @@
                             <Command.List class="max-h-64">
                               <Command.Empty>No facet values found.</Command.Empty>
                               {#each data.facets as facet}
-                                {@const facetName =
-                                  getTranslation(facet.translations)?.name ??
-                                  facet.code}
-                                <Command.Group heading={facetName}>
+                                <Command.Group heading={facet.name ?? facet.code}>
                                   {#each facet.values as value}
-                                    {@const valueName =
-                                      getTranslation(value.translations)
-                                        ?.name ?? value.code}
                                     <Command.Item
-                                      value="{facetName} {valueName}"
+                                      value="{facet.name ?? facet.code} {value.name ?? value.code}"
                                       onSelect={() => toggleArrayValue(index, value.id)}
                                       class="cursor-pointer"
                                     >
@@ -498,7 +487,7 @@
                                             <Check class="h-4 w-4" />
                                           {/if}
                                         </div>
-                                        <span>{valueName}</span>
+                                        <span>{value.name ?? value.code}</span>
                                       </div>
                                     </Command.Item>
                                   {/each}

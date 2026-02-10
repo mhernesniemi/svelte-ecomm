@@ -7,7 +7,6 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import PlusIcon from "@lucide/svelte/icons/plus";
-  import { getTranslation } from "$lib/utils";
 
   let { data } = $props();
 
@@ -36,12 +35,12 @@
       enableSorting: false
     },
     {
-      accessorFn: (row) => getTranslation(row.translations)?.name ?? "Untitled",
+      accessorFn: (row) => row.name,
       id: "name",
       header: "Collection",
       cell: ({ row }) =>
         renderSnippet(collectionCell, {
-          name: getTranslation(row.original.translations)?.name ?? "Untitled",
+          name: row.original.name,
           id: row.original.id
         })
     },

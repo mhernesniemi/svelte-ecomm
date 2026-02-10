@@ -1,6 +1,5 @@
 <script lang="ts">
   import FolderOpen from "@lucide/svelte/icons/folder-open";
-  import { getTranslation } from "$lib/utils";
 
   let { data } = $props();
 </script>
@@ -27,25 +26,24 @@
   {:else}
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {#each data.collections as collection}
-        {@const trans = getTranslation(collection.translations)}
         <a
-          href="/collections/{collection.id}/{trans?.slug}"
+          href="/collections/{collection.id}/{collection.slug}"
           class="group rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
         >
           <div class="flex items-center gap-3">
             <FolderOpen class="h-8 w-8 text-gray-400" />
             <div>
               <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
-                {trans?.name ?? "Untitled"}
+                {collection.name}
               </h2>
               <p class="text-sm text-gray-500">
                 {collection.productCount} products
               </p>
             </div>
           </div>
-          {#if trans?.description}
+          {#if collection.description}
             <div class="prose prose-sm mt-3 line-clamp-2 max-w-none prose-gray">
-              {@html trans.description}
+              {@html collection.description}
             </div>
           {/if}
         </a>

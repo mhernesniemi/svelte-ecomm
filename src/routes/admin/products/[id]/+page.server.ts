@@ -8,14 +8,14 @@ import { error, fail, redirect } from "@sveltejs/kit";
 import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
 		throw error(404, "Invalid product ID");
 	}
 
-	const product = await productService.getById(id);
+	const product = await productService.getById(id, locals.language);
 
 	if (!product) {
 		throw error(404, "Product not found");
@@ -23,11 +23,11 @@ export const load: PageServerLoad = async ({ params }) => {
 
 	const [facets, categoryTree, productCategories, taxRates, productCollections] =
 		await Promise.all([
-			facetService.list(),
-			categoryService.getTree(),
-			categoryService.getProductCategories(id),
+			facetService.list(locals.language),
+			categoryService.getTree(locals.language),
+			categoryService.getProductCategories(id, locals.language),
 			taxService.getAllTaxRates(),
-			collectionService.getCollectionsForProduct(id)
+			collectionService.getCollectionsForProduct(id, locals.language)
 		]);
 
 	return {

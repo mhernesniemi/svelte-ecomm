@@ -6,7 +6,6 @@
   import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import { getTranslation } from "$lib/utils.js";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -21,20 +20,16 @@
     if (form?.error) toast.error(form.error);
   });
 
-  function getName(translations: { languageCode: string; name: string }[]): string {
-    return getTranslation(translations)?.name ?? "";
-  }
-
   let facetName = $state("");
   let facetCode = $state("");
 
   $effect(() => {
-    facetName = getName(data.facet.translations);
+    facetName = data.facet.name ?? "";
     facetCode = data.facet.code;
   });
 </script>
 
-<svelte:head><title>{getName(data.facet.translations)} | Facets | Admin</title></svelte:head>
+<svelte:head><title>{data.facet.name} | Facets | Admin</title></svelte:head>
 
 <div class="space-y-6">
   <div class="mb-6 flex items-center justify-between">
@@ -45,7 +40,7 @@
     >
   </div>
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold">{getName(data.facet.translations)}</h1>
+    <h1 class="text-2xl font-bold">{data.facet.name}</h1>
     <Button type="submit" form="facet-form" disabled={isSubmitting}>
       {isSubmitting ? "Saving..." : "Save Changes"}
     </Button>
@@ -203,7 +198,7 @@
               }}
             >
               <div class="flex items-center gap-3">
-                <span class="font-medium text-foreground">{getName(value.translations)}</span>
+                <span class="font-medium text-foreground">{value.name}</span>
                 <span class="text-sm text-placeholder">{value.code}</span>
               </div>
               <Pencil
@@ -240,7 +235,7 @@
                         type="text"
                         id="edit_value_name_{value.id}"
                         name="name_en"
-                        value={getName(value.translations)}
+                        value={value.name}
                         class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       />
                     </div>

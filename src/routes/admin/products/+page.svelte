@@ -9,7 +9,6 @@
   import Package from "@lucide/svelte/icons/package";
   import ImageIcon from "@lucide/svelte/icons/image";
   import { toast } from "svelte-sonner";
-  import { getTranslation } from "$lib/utils.js";
   import type { PageData, ActionData } from "./$types";
   import PlusIcon from "@lucide/svelte/icons/plus";
 
@@ -25,10 +24,6 @@
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
 
   type ProductRow = (typeof data.products)[0];
-
-  function getProductName(product: ProductRow): string {
-    return getTranslation(product.translations)?.name ?? "Untitled";
-  }
 
   const columns: ColumnDef<ProductRow>[] = [
     {
@@ -49,12 +44,12 @@
       enableSorting: false
     },
     {
-      accessorFn: (row) => getProductName(row),
+      accessorFn: (row) => row.name,
       id: "name",
       header: "Product",
       cell: ({ row }) =>
         renderSnippet(productCell, {
-          name: getProductName(row.original),
+          name: row.original.name,
           id: row.original.id,
           image: row.original.featuredAsset?.preview ?? row.original.featuredAsset?.source ?? null
         })

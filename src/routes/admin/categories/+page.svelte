@@ -5,22 +5,16 @@
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import Pencil from "@lucide/svelte/icons/pencil";
   import PlusIcon from "@lucide/svelte/icons/plus";
-  import { getTranslation } from "$lib/utils.js";
-
   let { data }: { data: PageData } = $props();
 
   let showCreate = $state(false);
   let editingId = $state<number | null>(null);
 
-  function getName(translations: { languageCode: string; name: string }[]): string {
-    return getTranslation(translations)?.name ?? "";
-  }
-
   type FlatCategory = { id: number; name: string; depth: number };
 
   function flattenTree(nodes: typeof data.tree, depth = 0): FlatCategory[] {
     return nodes.flatMap((node) => [
-      { id: node.id, name: getName(node.translations), depth },
+      { id: node.id, name: node.name, depth },
       ...flattenTree(node.children, depth + 1)
     ]);
   }
@@ -142,7 +136,7 @@
                 {#if depth > 0}
                   <span class="whitespace-pre text-gray-300">{"— ".repeat(depth)}</span>
                 {/if}
-                <span class="text-sm font-medium text-foreground">{getName(node.translations)}</span
+                <span class="text-sm font-medium text-foreground">{node.name}</span
                 >
                 <span class="text-sm text-placeholder">{fullPath}</span>
               </div>
@@ -179,7 +173,7 @@
                         type="text"
                         id="edit_name_{node.id}"
                         name="name_en"
-                        value={getName(node.translations)}
+                        value={node.name}
                         class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       />
                     </div>

@@ -3,13 +3,13 @@ import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import { DEFAULT_LANGUAGE } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const id = Number(params.id);
 	if (isNaN(id)) {
 		throw error(400, "Invalid facet ID");
 	}
 
-	const facet = await facetService.getById(id);
+	const facet = await facetService.getById(id, locals.language);
 	if (!facet) {
 		throw error(404, "Facet not found");
 	}

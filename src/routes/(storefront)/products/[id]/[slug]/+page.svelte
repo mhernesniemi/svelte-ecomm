@@ -5,7 +5,7 @@
   import { invalidateAll } from "$app/navigation";
   import { cartStore } from "$lib/stores/cart.svelte";
   import { wishlistStore } from "$lib/stores/wishlist.svelte";
-  import { formatPrice, stripHtml, getTranslation } from "$lib/utils";
+  import { formatPrice, stripHtml } from "$lib/utils";
   import { findBestDiscount, getDiscountedPrice } from "$lib/promotion-utils";
   import { Button, buttonVariants } from "$lib/components/storefront/ui/button";
   import { Alert } from "$lib/components/storefront/ui/alert";
@@ -19,7 +19,6 @@
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
   const product = $derived(data.product);
-  const enTrans = $derived(getTranslation(product.translations));
 
   let selectedVariantId = $state<number | null>(null);
   let quantity = $state(1);
@@ -59,8 +58,7 @@
   );
 
   function getVariantName(variant: (typeof product.variants)[0]): string {
-    const trans = getTranslation(variant.translations);
-    return trans?.name ?? variant.sku;
+    return variant.name;
   }
 
   // Review form state
@@ -140,14 +138,14 @@
 </script>
 
 <svelte:head>
-  <title>{enTrans?.name ?? "Product"} | Hoikka</title>
+  <title>{product.name} | Hoikka</title>
   <meta
     name="description"
-    content={stripHtml(enTrans?.description)?.slice(0, 160) ||
+    content={stripHtml(product.description)?.slice(0, 160) ||
       "View product details and add to cart."}
   />
-  <meta property="og:title" content={enTrans?.name ?? "Product"} />
-  <meta property="og:description" content={stripHtml(enTrans?.description)?.slice(0, 160) ?? ""} />
+  <meta property="og:title" content={product.name} />
+  <meta property="og:description" content={stripHtml(product.description)?.slice(0, 160) ?? ""} />
   <meta property="og:type" content="product" />
   {#if product.featuredAsset}
     <meta property="og:image" content={product.featuredAsset.source} />
@@ -157,8 +155,8 @@
   {@html `<script type="application/ld+json">${JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Product",
-    name: enTrans?.name,
-    description: stripHtml(enTrans?.description),
+    name: product.name,
+    description: stripHtml(product.description),
     image: product.featuredAsset?.source,
     sku: product.variants[0]?.sku,
     offers: {
@@ -203,7 +201,7 @@
         {/each}
         <li class="flex items-center gap-1">
           <ChevronRight class="h-3.5 w-3.5 text-gray-400" />
-          <span class="font-medium text-gray-900">{enTrans?.name ?? "Product"}</span>
+          <span class="font-medium text-gray-900">{product.name}</span>
         </li>
       </ol>
     </nav>
@@ -223,7 +221,7 @@
         {#if images.length > 0}
           <img
             src="{images[selectedImageIndex].source}?tr=w-600,h-600,fo-auto"
-            alt={enTrans?.name}
+            alt={product.name}
             class="h-full w-full object-cover"
           />
         {:else}
@@ -259,7 +257,7 @@
     <!-- Product Info -->
     <div class="ml-10">
       <div class="mb-4 flex items-center justify-between">
-        <h1 class="text-3xl font-bold">{enTrans?.name ?? "Product"}</h1>
+        <h1 class="text-3xl font-bold">{product.name}</h1>
         <button
           type="button"
           onclick={handleToggleWishlist}
@@ -300,9 +298,9 @@
         </div>
       {/if}
 
-      {#if enTrans?.description}
+      {#if product.description}
         <div class="prose mb-12 max-w-none prose-gray">
-          {@html enTrans.description}
+          {@html product.description}
         </div>
       {/if}
 

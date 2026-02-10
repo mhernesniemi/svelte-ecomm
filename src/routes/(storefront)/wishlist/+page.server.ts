@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 	// Load products using ProductService (view composition at route level)
 	const products = await Promise.all(
 		items.map(async (item) => {
-			const product = await productService.getById(item.productId);
+			const product = await productService.getById(item.productId, locals.language);
 			return product ? { item, product } : null;
 		})
 	);

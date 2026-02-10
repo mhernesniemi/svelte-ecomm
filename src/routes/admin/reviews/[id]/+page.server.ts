@@ -4,7 +4,7 @@ import { customerService } from "$lib/server/services/customers.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
 	const id = Number(params.id);
 	if (isNaN(id)) {
 		throw error(400, "Invalid review ID");
@@ -16,7 +16,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const [product, customer] = await Promise.all([
-		productService.getById(review.productId),
+		productService.getById(review.productId, locals.language),
 		customerService.getById(review.customerId)
 	]);
 
