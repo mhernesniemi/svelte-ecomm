@@ -176,6 +176,8 @@ const adminAuth: Handle = async ({ event, resolve }) => {
 		event.locals.adminUser = user;
 	}
 
+	event.locals.adminDark = event.cookies.get("admin-dark") === "1";
+
 	return resolve(event);
 };
 

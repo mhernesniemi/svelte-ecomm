@@ -35,6 +35,7 @@
   let { children, data }: { children: any; data: LayoutData } = $props();
 
   let sidebarOpen = $state(false);
+  let mounted = $state(false);
 
   beforeNavigate(() => {
     sidebarOpen = false;
@@ -42,17 +43,19 @@
 
   onMount(() => {
     const cleanup = initTheme();
-    // Reset html background when leaving admin (e.g. navigating to storefront)
+    mounted = true;
     return () => {
       cleanup();
       document.documentElement.style.backgroundColor = "";
     };
   });
 
+  const dark = $derived(mounted ? isDark() : data.adminDark);
+
   // Set <html> background so macOS overscroll bounce matches the admin theme.
   // Without this the body's default bg-gray-50 shows through as a white flash.
   $effect(() => {
-    document.documentElement.style.backgroundColor = isDark() ? "oklch(0.175 0.014 265)" : "";
+    document.documentElement.style.backgroundColor = dark ? "oklch(0.175 0.014 265)" : "";
   });
 
   interface NavItem {
@@ -81,7 +84,7 @@
 <div
   class="min-h-screen bg-background font-sans text-foreground antialiased"
   data-admin
-  class:dark={isDark()}
+  class:dark={dark}
 >
   <!-- Sidebar -->
   <aside
