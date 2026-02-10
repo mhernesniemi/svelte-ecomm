@@ -39,13 +39,42 @@ export const actions: Actions = {
 				name: nameEn
 			});
 
-			// Save translations
+			// Save facet translations
 			for (const lang of TRANSLATION_LANGUAGES) {
 				const tName = formData.get(`name_${lang.code}`) as string;
 
 				await translationService.upsertFacetTranslation(id, lang.code, {
 					name: tName || ""
 				});
+			}
+
+			// Delete removed values
+			const deleteValueIds = formData.getAll("delete_value").map(Number).filter(Boolean);
+			for (const valueId of deleteValueIds) {
+				await facetService.deleteValue(valueId);
+			}
+
+			// Save value updates and translations
+			const facet = await facetService.getById(id);
+			if (facet) {
+				for (const value of facet.values) {
+					const valueName = formData.get(`value_${value.id}_name_en`) as string;
+					const valueCode = formData.get(`value_${value.id}_code`) as string;
+
+					if (valueName && valueCode) {
+						await facetService.updateValue(value.id, {
+							name: valueName,
+							code: valueCode.toLowerCase().replace(/\s+/g, "_")
+						});
+					}
+
+					for (const lang of TRANSLATION_LANGUAGES) {
+						const transName = formData.get(`value_${value.id}_name_${lang.code}`) as string;
+						await translationService.upsertFacetValueTranslation(value.id, lang.code, {
+							name: transName || ""
+						});
+					}
+				}
 			}
 
 			return { success: true, message: "Facet updated" };
@@ -73,63 +102,6 @@ export const actions: Actions = {
 			return { success: true, message: "Value created" };
 		} catch {
 			return fail(500, { error: "Failed to create value" });
-		}
-	},
-
-	updateValue: async ({ request }) => {
-		const formData = await request.formData();
-		const id = Number(formData.get("id"));
-		const code = formData.get("code") as string;
-		const nameEn = formData.get("name_en") as string;
-
-		if (!id || !code || !nameEn) {
-			return fail(400, { error: "All fields are required" });
-		}
-
-		try {
-			await facetService.updateValue(id, {
-				code: code.toLowerCase().replace(/\s+/g, "_"),
-				name: nameEn
-			});
-			return { success: true, message: "Value updated" };
-		} catch {
-			return fail(500, { error: "Failed to update value" });
-		}
-	},
-
-	deleteValue: async ({ request }) => {
-		const formData = await request.formData();
-		const id = Number(formData.get("id"));
-
-		if (!id) {
-			return fail(400, { error: "Value ID is required" });
-		}
-
-		try {
-			await facetService.deleteValue(id);
-			return { success: true, message: "Value deleted" };
-		} catch {
-			return fail(500, { error: "Failed to delete value" });
-		}
-	},
-
-	saveValueTranslation: async ({ request }) => {
-		const formData = await request.formData();
-		const facetValueId = Number(formData.get("facetValueId"));
-		const languageCode = formData.get("languageCode") as string;
-		const name = formData.get("name") as string;
-
-		if (!facetValueId || !languageCode) {
-			return fail(400, { error: "Missing required fields" });
-		}
-
-		try {
-			await translationService.upsertFacetValueTranslation(facetValueId, languageCode, {
-				name: name || ""
-			});
-			return { success: true, message: "Value translation saved" };
-		} catch {
-			return fail(500, { error: "Failed to save value translation" });
 		}
 	},
 

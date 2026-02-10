@@ -7,8 +7,8 @@
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
   import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
-  import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
+  import Trash from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData, ActionData } from "./$types";
 
@@ -16,8 +16,12 @@
 
   let isSubmitting = $state(false);
   let showDelete = $state(false);
-  let editingValueId = $state<number | null>(null);
   let showAddValue = $state(false);
+  let deletedValueIds = $state<number[]>([]);
+
+  const visibleValues = $derived(
+    data.facet.values.filter((v) => !deletedValueIds.includes(v.id))
+  );
 
   onMount(() => {
     if ($page.url.searchParams.has("created")) {
@@ -33,9 +37,27 @@
   let facetName = $state("");
   let facetCode = $state("");
 
+  let valueStates = $state<
+    Record<number, { name: string; code: string; translations: Record<string, string> }>
+  >({});
+
   $effect(() => {
     facetName = data.facet.name ?? "";
     facetCode = data.facet.code;
+
+    const states: typeof valueStates = {};
+    for (const value of data.facet.values) {
+      states[value.id] = {
+        name: value.name ?? "",
+        code: value.code,
+        translations: {}
+      };
+      for (const lang of TRANSLATION_LANGUAGES) {
+        const t = data.valueTranslations[value.id]?.find((t) => t.languageCode === lang.code);
+        states[value.id].translations[lang.code] = t?.name ?? "";
+      }
+    }
+    valueStates = states;
   });
 </script>
 
@@ -60,317 +82,239 @@
   <div class="flex flex-col gap-6 lg:flex-row">
     <!-- Main Content (Left) -->
     <div class="flex-1 space-y-6">
-  <!-- Edit Facet -->
-  <form
-    id="facet-form"
-    method="POST"
-    action="?/update"
-    use:enhance={() => {
-      isSubmitting = true;
-      return async ({ result, update }) => {
-        await update({ reset: false });
-        isSubmitting = false;
-        if (result.type === "success") {
-          toast.success("Facet updated");
-        }
-      };
-    }}
-    class="overflow-hidden rounded-lg bg-surface shadow"
-  >
-    <div class="p-6">
-      <h2 class="mb-4 text-lg font-medium text-foreground">Facet Details</h2>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div>
-          <label for="facet_name" class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >Name</label
-          >
-          <input
-            type="text"
-            id="facet_name"
-            name="name_en"
-            bind:value={facetName}
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label for="facet_code" class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >Code</label
-          >
-          <input
-            type="text"
-            id="facet_code"
-            name="code"
-            bind:value={facetCode}
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-          />
-        </div>
-      </div>
-    </div>
-  </form>
-
-  <!-- Values -->
-  <div class="overflow-hidden rounded-lg bg-surface shadow">
-    <div class="flex items-center justify-between border-b border-border p-6">
-      <div>
-        <h2 class="text-lg font-medium text-foreground">Values</h2>
-        <p class="mt-1 text-sm text-foreground-tertiary">
-          {data.facet.values.length} value{data.facet.values.length !== 1 ? "s" : ""}
-        </p>
-      </div>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onclick={() => {
-          showAddValue = !showAddValue;
-          editingValueId = null;
+      <!-- Edit Facet -->
+      <form
+        id="facet-form"
+        method="POST"
+        action="?/update"
+        use:enhance={() => {
+          isSubmitting = true;
+          return async ({ result, update }) => {
+            await update({ reset: false });
+            isSubmitting = false;
+            if (result.type === "success") {
+              deletedValueIds = [];
+              toast.success("Facet updated");
+            }
+          };
         }}
+        class="overflow-hidden rounded-lg bg-surface shadow"
       >
-        <Plus class="h-4 w-4" />
-        Add Value
-      </Button>
-    </div>
-
-    <!-- Add Value Form -->
-    {#if showAddValue}
-      <div class="border-b border-border bg-background p-6">
-        <form
-          method="POST"
-          action="?/createValue"
-          use:enhance={() => {
-            return async ({ result, update }) => {
-              await update();
-              if (result.type === "success") {
-                toast.success("Value added");
-              }
-              showAddValue = false;
-            };
-          }}
-        >
+        {#each deletedValueIds as id}
+          <input type="hidden" name="delete_value" value={id} />
+        {/each}
+        <div class="p-6">
+          <h2 class="mb-4 text-lg font-medium text-foreground">Facet Details</h2>
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
-                for="new_value_name"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
+                for="facet_name"
+                class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label
               >
-                Name
-              </label>
               <input
                 type="text"
-                id="new_value_name"
+                id="facet_name"
                 name="name_en"
-                placeholder="e.g., Red"
-                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                bind:value={facetName}
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
               <label
-                for="new_value_code"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
+                for="facet_code"
+                class="mb-1 block text-sm font-medium text-foreground-secondary">Code</label
               >
-                Code
-              </label>
               <input
                 type="text"
-                id="new_value_code"
+                id="facet_code"
                 name="code"
-                placeholder="e.g., red"
-                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                bind:value={facetCode}
+                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
-          <div class="mt-4 flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onclick={() => (showAddValue = false)}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" size="sm">Add Value</Button>
-          </div>
-        </form>
-      </div>
-    {/if}
+        </div>
+      </form>
 
-    <!-- Values List -->
-    {#if data.facet.values.length === 0 && !showAddValue}
-      <div class="p-12 text-center">
-        <p class="text-sm text-muted-foreground">
-          No values yet. Add values to use this facet for filtering.
-        </p>
-      </div>
-    {:else}
-      <div>
-        {#each data.facet.values as value, i}
-          <div class={i > 0 ? "border-t border-border" : ""}>
-            <!-- Value row -->
-            <button
-              type="button"
-              class="group flex w-full cursor-pointer items-center justify-between px-6 py-3 text-left {editingValueId ===
-              value.id
-                ? 'bg-background'
-                : 'hover:bg-hover'}"
-              onclick={() => {
-                editingValueId = editingValueId === value.id ? null : value.id;
-                showAddValue = false;
+      <!-- Values -->
+      <div class="overflow-hidden rounded-lg bg-surface shadow">
+        <div class="flex items-center justify-between border-b border-border p-6">
+          <div>
+            <h2 class="text-lg font-medium text-foreground">Values</h2>
+            <p class="mt-1 text-sm text-foreground-tertiary">
+              {visibleValues.length} value{visibleValues.length !== 1 ? "s" : ""}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onclick={() => (showAddValue = !showAddValue)}
+          >
+            <Plus class="h-4 w-4" />
+            Add Value
+          </Button>
+        </div>
+
+        <!-- Add Value Form -->
+        {#if showAddValue}
+          <div class="border-b border-border bg-surface p-6">
+            <form
+              method="POST"
+              action="?/createValue"
+              use:enhance={() => {
+                return async ({ result, update }) => {
+                  await update();
+                  if (result.type === "success") {
+                    toast.success("Value added");
+                  }
+                  showAddValue = false;
+                };
               }}
             >
-              <div class="flex items-center gap-3">
-                <span class="font-medium text-foreground">{value.name}</span>
-                <span class="text-sm text-placeholder">{value.code}</span>
-              </div>
-              <Pencil
-                class="h-4 w-4 text-placeholder opacity-0 transition-opacity group-hover:opacity-100 {editingValueId ===
-                value.id
-                  ? '!text-blue-600 !opacity-100 dark:text-blue-400'
-                  : ''}"
-              />
-            </button>
-
-            <!-- Value edit panel -->
-            {#if editingValueId === value.id}
-              <div class="border-t border-border bg-background px-6 pt-3 pb-4">
-                <form
-                  method="POST"
-                  action="?/updateValue"
-                  use:enhance={() => {
-                    return async ({ result, update }) => {
-                      await update();
-                      if (result.type === "success") {
-                        toast.success("Value updated");
-                      }
-                      editingValueId = null;
-                    };
-                  }}
-                >
-                  <input type="hidden" name="id" value={value.id} />
-                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label
-                        for="edit_value_name_{value.id}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
-                      >
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        id="edit_value_name_{value.id}"
-                        name="name_en"
-                        value={value.name}
-                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="edit_value_code_{value.id}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
-                      >
-                        Code
-                      </label>
-                      <input
-                        type="text"
-                        id="edit_value_code_{value.id}"
-                        name="code"
-                        value={value.code}
-                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div class="mt-4 flex items-center justify-between">
-                    <div class="flex gap-2">
-                      <Button type="submit" size="sm">Save</Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onclick={() => (editingValueId = null)}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-                {#each TRANSLATION_LANGUAGES as lang}
-                  <form
-                    method="POST"
-                    action="?/saveValueTranslation"
-                    class="mt-3 border-t border-border pt-3"
-                    use:enhance={() => {
-                      return async ({ result, update }) => {
-                        if (result.type === "success") {
-                          toast.success(`${lang.name} translation saved`);
-                        }
-                        await update({ reset: false });
-                      };
-                    }}
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label
+                    for="new_value_name"
+                    class="mb-1 block text-sm font-medium text-foreground-secondary"
                   >
-                    <input type="hidden" name="facetValueId" value={value.id} />
-                    <input type="hidden" name="languageCode" value={lang.code} />
-                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div>
-                        <label
-                          for="edit_value_name_{lang.code}_{value.id}"
-                          class="mb-1 block text-sm font-medium text-foreground-secondary"
-                        >
-                          {lang.name} name
-                        </label>
-                        <input
-                          type="text"
-                          id="edit_value_name_{lang.code}_{value.id}"
-                          name="name"
-                          value={data.valueTranslations[value.id]?.find((t) => t.languageCode === lang.code)?.name ?? ""}
-                          placeholder="Leave empty to use default"
-                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                        />
-                      </div>
-                      <div class="flex items-end">
-                        <Button type="submit" size="sm" variant="outline">
-                          Save {lang.name}
-                        </Button>
-                      </div>
-                    </div>
-                  </form>
-                {/each}
-                <div class="mt-3 border-t border-border pt-3">
-                  <form
-                    method="POST"
-                    action="?/deleteValue"
-                    use:enhance={() => {
-                      return async ({ result, update }) => {
-                        await update();
-                        if (result.type === "success") {
-                          toast.success("Value deleted");
-                        }
-                        editingValueId = null;
-                      };
-                    }}
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="new_value_name"
+                    name="name_en"
+                    placeholder="e.g., Red"
+                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label
+                    for="new_value_code"
+                    class="mb-1 block text-sm font-medium text-foreground-secondary"
                   >
-                    <input type="hidden" name="id" value={value.id} />
-                    <button
-                      type="submit"
-                      class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
-                    >
-                      Delete this value
-                    </button>
-                  </form>
+                    Code
+                  </label>
+                  <input
+                    type="text"
+                    id="new_value_code"
+                    name="code"
+                    placeholder="e.g., red"
+                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                  />
                 </div>
               </div>
-            {/if}
+              <div class="mt-4 flex justify-end gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onclick={() => (showAddValue = false)}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" size="sm">Add Value</Button>
+              </div>
+            </form>
           </div>
-        {/each}
-      </div>
-    {/if}
-  </div>
+        {/if}
 
-  <button
-    type="button"
-    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
-    onclick={() => (showDelete = true)}
-  >
-    Delete this facet
-  </button>
+        <!-- Values List -->
+        {#if visibleValues.length === 0 && !showAddValue}
+          <div class="p-12 text-center">
+            <p class="text-sm text-muted-foreground">
+              No values yet. Add values to use this facet for filtering.
+            </p>
+          </div>
+        {:else}
+          <div>
+            {#each visibleValues as value, i}
+              {#if valueStates[value.id]}
+                <div class={i > 0 ? "border-t border-border" : ""}>
+                  <div class="relative p-6">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div class="space-y-3">
+                        <div>
+                          <label
+                            for="value_name_{value.id}"
+                            class="mb-1 block text-sm font-medium text-foreground-secondary"
+                          >
+                            Name
+                          </label>
+                          <input
+                            form="facet-form"
+                            type="text"
+                            id="value_name_{value.id}"
+                            name="value_{value.id}_name_en"
+                            bind:value={valueStates[value.id].name}
+                            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                          />
+                        </div>
+                        {#each TRANSLATION_LANGUAGES as lang}
+                          <div>
+                            <label
+                              for="value_name_{lang.code}_{value.id}"
+                              class="mb-1 block text-sm font-medium text-foreground-secondary"
+                            >
+                              Name ({lang.name})
+                            </label>
+                            <input
+                              form="facet-form"
+                              type="text"
+                              id="value_name_{lang.code}_{value.id}"
+                              name="value_{value.id}_name_{lang.code}"
+                              bind:value={valueStates[value.id].translations[lang.code]}
+                              placeholder={valueStates[value.id].name}
+                              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                            />
+                          </div>
+                        {/each}
+                      </div>
+                      <div class="flex flex-col justify-between">
+                        <div>
+                          <label
+                            for="value_code_{value.id}"
+                            class="mb-1 block text-sm font-medium text-foreground-secondary"
+                          >
+                            Code
+                          </label>
+                          <input
+                            form="facet-form"
+                            type="text"
+                            id="value_code_{value.id}"
+                            name="value_{value.id}_code"
+                            bind:value={valueStates[value.id].code}
+                            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                          />
+                        </div>
+                        <div class="flex justify-end">
+                          <Button
+                            type="button"
+                            variant="destructive-ghost"
+                            size="icon"
+                            class="size-8"
+                            onclick={() => (deletedValueIds = [...deletedValueIds, value.id])}
+                          >
+                            <Trash class="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {/if}
+            {/each}
+          </div>
+        {/if}
+      </div>
+
+      <button
+        type="button"
+        class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
+        onclick={() => (showDelete = true)}
+      >
+        Delete this facet
+      </button>
     </div>
 
     <!-- Sidebar (Right) -->
