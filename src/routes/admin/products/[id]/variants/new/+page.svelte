@@ -96,8 +96,8 @@
         use:enhance={() => {
           isSubmitting = true;
           return async ({ update }) => {
-            isSubmitting = false;
             await update({ reset: false });
+            isSubmitting = false;
           };
         }}
         class="rounded-lg bg-surface shadow"

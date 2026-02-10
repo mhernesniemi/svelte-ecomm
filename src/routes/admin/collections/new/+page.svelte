@@ -8,6 +8,8 @@
 
   let { form } = $props();
 
+  let isSubmitting = $state(false);
+
   $effect(() => {
     if (form?.error) toast.error(form.error);
   });
@@ -42,7 +44,9 @@
     <h1 class="text-2xl font-bold">Create Collection</h1>
     <div class="flex items-center gap-3">
       <a href="/admin/collections" class={buttonVariants({ variant: "outline" })}>Cancel</a>
-      <Button type="submit" form="create-collection-form">Create Collection</Button>
+      <Button type="submit" form="create-collection-form" disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "Create Collection"}
+      </Button>
     </div>
   </div>
 
@@ -50,8 +54,10 @@
     id="create-collection-form"
     method="POST"
     use:enhance={() => {
+      isSubmitting = true;
       return async ({ update }) => {
         await update({ reset: false });
+        isSubmitting = false;
       };
     }}
     class="rounded-lg bg-surface shadow"

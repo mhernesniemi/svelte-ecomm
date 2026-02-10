@@ -24,7 +24,7 @@ export const actions: Actions = {
 				slug
 			});
 
-			throw redirect(303, `/admin/products/${product.id}`);
+			throw redirect(303, `/admin/products/${product.id}?created`);
 		} catch (error) {
 			if (isRedirect(error)) throw error;
 			return fail(500, {

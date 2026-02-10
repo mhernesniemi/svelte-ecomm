@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { page } from "$app/stores";
+  import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
@@ -42,32 +43,27 @@
 
   let visibility = $state(data.product.visibility);
 
-  // Show toast from URL params (variant created/deleted redirects)
-  $effect(() => {
+  // Show toast from URL params (created/variant redirects)
+  onMount(() => {
     const url = $page.url;
-    if (url.searchParams.has("variantCreated")) {
-      toast.success("Variant created successfully");
-      // Clean the URL
-      const newUrl = new URL(url);
-      newUrl.searchParams.delete("variantCreated");
-      history.replaceState({}, "", newUrl.pathname + newUrl.search);
-    }
-    if (url.searchParams.has("variantDeleted")) {
-      toast.success("Variant deleted successfully");
-      const newUrl = new URL(url);
-      newUrl.searchParams.delete("variantDeleted");
-      history.replaceState({}, "", newUrl.pathname + newUrl.search);
+    const messages: Record<string, string> = {
+      created: "Product created successfully",
+      variantCreated: "Variant created successfully",
+      variantDeleted: "Variant deleted successfully"
+    };
+    for (const [param, message] of Object.entries(messages)) {
+      if (url.searchParams.has(param)) {
+        toast.success(message);
+        history.replaceState({}, "", url.pathname);
+        break;
+      }
     }
   });
 
   // Show toast notifications based on form results
   $effect(() => {
-    if (form?.success) toast.success("Product updated successfully");
     if (form?.error) toast.error(form.error);
     if (form?.imageError) toast.error(form.imageError);
-    if (form?.imageRemoved) toast.success("Image removed");
-    if (form?.featuredSet) toast.success("Featured image updated");
-    if (form?.altUpdated) toast.success("Image updated");
   });
 
   let showDelete = $state(false);
@@ -247,9 +243,12 @@
         action="?/update"
         use:enhance={() => {
           isSavingProduct = true;
-          return async ({ update }) => {
+          return async ({ result, update }) => {
             await update({ reset: false });
             isSavingProduct = false;
+            if (result.type === "success") {
+              toast.success("Product updated successfully");
+            }
           };
         }}
         class="overflow-hidden rounded-lg bg-surface shadow"
@@ -429,7 +428,18 @@
                     >
                       <Pencil class="h-4 w-4" />
                     </Button>
-                    <form method="POST" action="?/removeImage" use:enhance>
+                    <form
+                      method="POST"
+                      action="?/removeImage"
+                      use:enhance={() => {
+                        return async ({ result, update }) => {
+                          await update();
+                          if (result.type === "success") {
+                            toast.success("Image removed");
+                          }
+                        };
+                      }}
+                    >
                       <input type="hidden" name="assetId" value={asset.id} />
                       <Button type="submit" variant="destructive" size="sm" class="h-8 w-8 p-0">
                         <Trash2 class="h-4 w-4" />
@@ -807,6 +817,11 @@
                 await update();
                 if (result.type === "success") {
                   editingImageAlt = null;
+                  if (result.data?.featuredSet) {
+                    toast.success("Featured image updated");
+                  } else if (result.data?.altUpdated) {
+                    toast.success("Image updated");
+                  }
                 }
               };
             }}

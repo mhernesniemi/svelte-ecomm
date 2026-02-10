@@ -18,7 +18,7 @@ export const actions: Actions = {
 				name: nameEn
 			});
 
-			throw redirect(303, `/admin/facets/${facet.id}`);
+			throw redirect(303, `/admin/facets/${facet.id}?created`);
 		} catch (err) {
 			if (isRedirect(err)) throw err;
 			return fail(500, { error: "Failed to create facet" });

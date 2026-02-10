@@ -61,8 +61,8 @@
     use:enhance={() => {
       isSubmitting = true;
       return async ({ update }) => {
-        isSubmitting = false;
         await update({ reset: false });
+        isSubmitting = false;
       };
     }}
     class="space-y-6"

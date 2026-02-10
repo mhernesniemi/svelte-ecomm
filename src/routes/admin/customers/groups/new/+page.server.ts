@@ -16,7 +16,7 @@ export const actions: Actions = {
 
 		try {
 			const group = await customerGroupService.create({ name });
-			throw redirect(303, `/admin/customers/groups/${group.id}`);
+			throw redirect(303, `/admin/customers/groups/${group.id}?created`);
 		} catch (error) {
 			if (isRedirect(error)) throw error;
 			return fail(500, {

@@ -26,7 +26,6 @@
   });
 
   $effect(() => {
-    if (form?.success) toast.success(form.message || "Page updated");
     if (form?.error) toast.error(form.error);
   });
 
@@ -82,9 +81,12 @@
     action="?/update"
     use:enhance={() => {
       isSubmitting = true;
-      return async ({ update }) => {
-        isSubmitting = false;
+      return async ({ result, update }) => {
         await update({ reset: false });
+        isSubmitting = false;
+        if (result.type === "success") {
+          toast.success("Page updated");
+        }
       };
     }}
     class="space-y-6"

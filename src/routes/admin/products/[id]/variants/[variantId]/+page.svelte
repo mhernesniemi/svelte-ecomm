@@ -19,7 +19,6 @@
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
   $effect(() => {
-    if (form?.success) toast.success("Variant updated successfully");
     if (form?.error) toast.error(form.error);
   });
 
@@ -126,9 +125,12 @@
         action="?/update"
         use:enhance={() => {
           isSubmitting = true;
-          return async ({ update }) => {
-            isSubmitting = false;
+          return async ({ result, update }) => {
             await update({ reset: false });
+            isSubmitting = false;
+            if (result.type === "success") {
+              toast.success("Variant updated");
+            }
           };
         }}
         class="rounded-lg bg-surface shadow"

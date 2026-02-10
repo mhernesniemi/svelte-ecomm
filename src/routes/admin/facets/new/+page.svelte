@@ -40,8 +40,8 @@
     use:enhance={() => {
       isSubmitting = true;
       return async ({ update }) => {
-        isSubmitting = false;
         await update({ reset: false });
+        isSubmitting = false;
       };
     }}
     id="create-form"

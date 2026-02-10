@@ -25,7 +25,7 @@ export const actions: Actions = {
 				slug: slugify(slug)
 			});
 
-			throw redirect(303, `/admin/collections/${collection.id}`);
+			throw redirect(303, `/admin/collections/${collection.id}?created`);
 		} catch (err) {
 			if (isRedirect(err)) throw err;
 			return fail(500, {

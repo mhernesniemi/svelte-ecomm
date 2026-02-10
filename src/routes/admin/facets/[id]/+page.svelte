@@ -1,5 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -17,8 +19,14 @@
   let editingValueId = $state<number | null>(null);
   let showAddValue = $state(false);
 
+  onMount(() => {
+    if ($page.url.searchParams.has("created")) {
+      toast.success("Facet created successfully");
+      history.replaceState({}, "", $page.url.pathname);
+    }
+  });
+
   $effect(() => {
-    if (form?.success) toast.success(form.message || "Success");
     if (form?.error) toast.error(form.error);
   });
 
@@ -59,9 +67,12 @@
     action="?/update"
     use:enhance={() => {
       isSubmitting = true;
-      return async ({ update }) => {
-        isSubmitting = false;
+      return async ({ result, update }) => {
         await update({ reset: false });
+        isSubmitting = false;
+        if (result.type === "success") {
+          toast.success("Facet updated");
+        }
       };
     }}
     class="overflow-hidden rounded-lg bg-surface shadow"
@@ -127,8 +138,11 @@
           method="POST"
           action="?/createValue"
           use:enhance={() => {
-            return async ({ update }) => {
+            return async ({ result, update }) => {
               await update();
+              if (result.type === "success") {
+                toast.success("Value added");
+              }
               showAddValue = false;
             };
           }}
@@ -222,8 +236,11 @@
                   method="POST"
                   action="?/updateValue"
                   use:enhance={() => {
-                    return async ({ update }) => {
+                    return async ({ result, update }) => {
                       await update();
+                      if (result.type === "success") {
+                        toast.success("Value updated");
+                      }
                       editingValueId = null;
                     };
                   }}
@@ -321,8 +338,11 @@
                     method="POST"
                     action="?/deleteValue"
                     use:enhance={() => {
-                      return async ({ update }) => {
+                      return async ({ result, update }) => {
                         await update();
+                        if (result.type === "success") {
+                          toast.success("Value deleted");
+                        }
                         editingValueId = null;
                       };
                     }}

@@ -21,6 +21,7 @@
     if (form?.error) toast.error(form.error);
   });
 
+  let isSubmitting = $state(false);
   let method = $state<"code" | "automatic">("code");
   let promotionType = $state<"order" | "product" | "free_shipping">("order");
   let discountType = $state<"percentage" | "fixed_amount">("percentage");
@@ -82,11 +83,23 @@
     <h1 class="text-2xl font-bold">Create Promotion</h1>
     <div class="flex items-center gap-3">
       <a href="/admin/promotions" class={buttonVariants({ variant: "outline" })}>Cancel</a>
-      <Button type="submit" form="create-form">Create Promotion</Button>
+      <Button type="submit" form="create-form" disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "Create Promotion"}
+      </Button>
     </div>
   </div>
 
-  <form method="POST" use:enhance id="create-form">
+  <form
+    method="POST"
+    use:enhance={() => {
+      isSubmitting = true;
+      return async ({ update }) => {
+        await update({ reset: false });
+        isSubmitting = false;
+      };
+    }}
+    id="create-form"
+  >
     <input type="hidden" name="productIds" value={JSON.stringify(selectedProductIds)} />
     <input type="hidden" name="collectionIds" value={JSON.stringify(selectedCollectionIds)} />
 

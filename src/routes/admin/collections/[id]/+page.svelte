@@ -2,6 +2,8 @@
   import { deserialize, enhance } from "$app/forms";
   import { beforeNavigate } from "$app/navigation";
   import { invalidateAll } from "$app/navigation";
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet } from "$lib/components/admin/data-table";
@@ -36,8 +38,14 @@
   import Trash2 from "@lucide/svelte/icons/trash-2";
   let { data, form } = $props();
 
+  onMount(() => {
+    if ($page.url.searchParams.has("created")) {
+      toast.success("Collection created successfully");
+      history.replaceState({}, "", $page.url.pathname);
+    }
+  });
+
   $effect(() => {
-    if (form?.success) toast.success(form.message || "Collection updated");
     if (form?.error) toast.error(form.error);
   });
 
@@ -364,9 +372,12 @@
         action="?/update"
         use:enhance={() => {
           isSubmitting = true;
-          return async ({ update }) => {
+          return async ({ result, update }) => {
             await update({ reset: false });
             isSubmitting = false;
+            if (result.type === "success") {
+              toast.success("Collection updated");
+            }
           };
         }}
         class="space-y-6"
@@ -875,7 +886,18 @@
                 >
                   <Pencil class="h-3.5 w-3.5" />
                 </Button>
-                <form method="POST" action="?/removeImage" use:enhance>
+                <form
+                  method="POST"
+                  action="?/removeImage"
+                  use:enhance={() => {
+                    return async ({ result, update }) => {
+                      await update();
+                      if (result.type === "success") {
+                        toast.success("Image removed");
+                      }
+                    };
+                  }}
+                >
                   <input type="hidden" name="assetId" value={asset.id} />
                   <Button type="submit" variant="destructive" size="sm" class="h-7 w-7 p-0">
                     <Trash2 class="h-3.5 w-3.5" />
@@ -932,6 +954,7 @@
                 await update();
                 if (result.type === "success") {
                   editingImageAlt = null;
+                  toast.success("Image updated");
                 }
               };
             }}

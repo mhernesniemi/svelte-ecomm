@@ -1,5 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
@@ -18,11 +20,14 @@
   let comboboxOpen = $state(false);
   let selectedCustomerId = $state<number | null>(null);
 
-  $effect(() => {
-    if (form?.success) {
-      toast.success(form.message || "Success");
-      selectedCustomerId = null;
+  onMount(() => {
+    if ($page.url.searchParams.has("created")) {
+      toast.success("Customer group created successfully");
+      history.replaceState({}, "", $page.url.pathname);
     }
+  });
+
+  $effect(() => {
     if (form?.error) toast.error(form.error);
   });
 
@@ -75,9 +80,12 @@
         action="?/update"
         use:enhance={() => {
           isSubmitting = true;
-          return async ({ update }) => {
-            isSubmitting = false;
+          return async ({ result, update }) => {
             await update({ reset: false });
+            isSubmitting = false;
+            if (result.type === "success") {
+              toast.success("Group updated");
+            }
           };
         }}
         class="overflow-hidden rounded-lg bg-surface shadow"
@@ -136,7 +144,20 @@
           {#if availableCustomers.length === 0}
             <p class="text-sm text-muted-foreground">All customers are already in this group</p>
           {:else}
-            <form method="POST" action="?/addCustomer" use:enhance class="flex items-end gap-4">
+            <form
+              method="POST"
+              action="?/addCustomer"
+              use:enhance={() => {
+                return async ({ result, update }) => {
+                  await update();
+                  if (result.type === "success") {
+                    toast.success("Customer added");
+                    selectedCustomerId = null;
+                  }
+                };
+              }}
+              class="flex items-end gap-4"
+            >
               <input type="hidden" name="customerId" value={selectedCustomerId ?? ""} />
               <div>
                 <Popover.Root bind:open={comboboxOpen}>
@@ -201,7 +222,18 @@
                     </a>
                     <span class="ml-2 text-sm text-muted-foreground">{customer.email}</span>
                   </div>
-                  <form method="POST" action="?/removeCustomer" use:enhance>
+                  <form
+                    method="POST"
+                    action="?/removeCustomer"
+                    use:enhance={() => {
+                      return async ({ result, update }) => {
+                        await update();
+                        if (result.type === "success") {
+                          toast.success("Customer removed");
+                        }
+                      };
+                    }}
+                  >
                     <input type="hidden" name="customerId" value={customer.id} />
                     <button
                       type="submit"

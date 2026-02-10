@@ -10,7 +10,8 @@
 
   let { form }: { form: ActionData } = $props();
 
-  // Show toast notifications based on form results
+  let isSubmitting = $state(false);
+
   $effect(() => {
     if (form?.error) toast.error(form.error);
   });
@@ -46,7 +47,9 @@
     <h1 class="text-2xl font-bold">Create Product</h1>
     <div class="flex items-center gap-3">
       <a href="/admin/products" class={buttonVariants({ variant: "outline" })}>Cancel</a>
-      <Button type="submit" form="create-product-form">Create Product</Button>
+      <Button type="submit" form="create-product-form" disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "Create Product"}
+      </Button>
     </div>
   </div>
 
@@ -54,8 +57,10 @@
     id="create-product-form"
     method="POST"
     use:enhance={() => {
+      isSubmitting = true;
       return async ({ update }) => {
         await update({ reset: false });
+        isSubmitting = false;
       };
     }}
     class="rounded-lg bg-surface shadow"

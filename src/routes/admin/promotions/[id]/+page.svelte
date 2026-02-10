@@ -93,7 +93,6 @@
   });
 
   $effect(() => {
-    if (form?.success) toast.success("Promotion updated");
     if (form?.error) toast.error(form.error);
   });
 </script>
@@ -127,8 +126,11 @@
     method="POST"
     action="?/update"
     use:enhance={() => {
-      return async ({ update }) => {
+      return async ({ result, update }) => {
         await update({ reset: false });
+        if (result.type === "success") {
+          toast.success("Promotion updated");
+        }
       };
     }}
     id="edit-form"

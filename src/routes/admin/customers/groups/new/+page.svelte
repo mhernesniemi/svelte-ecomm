@@ -11,6 +11,7 @@
     if (form?.error) toast.error(form.error);
   });
 
+  let isSubmitting = $state(false);
   let name = $state("");
 
   $effect(() => {
@@ -34,7 +35,9 @@
       <a href="/admin/customers?tab=groups" class={buttonVariants({ variant: "outline" })}>
         Cancel
       </a>
-      <Button type="submit" form="create-group-form">Create Group</Button>
+      <Button type="submit" form="create-group-form" disabled={isSubmitting}>
+        {isSubmitting ? "Creating..." : "Create Group"}
+      </Button>
     </div>
   </div>
 
@@ -42,8 +45,10 @@
     id="create-group-form"
     method="POST"
     use:enhance={() => {
+      isSubmitting = true;
       return async ({ update }) => {
         await update({ reset: false });
+        isSubmitting = false;
       };
     }}
     class="rounded-lg bg-surface shadow"
