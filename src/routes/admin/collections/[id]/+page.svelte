@@ -510,15 +510,45 @@
 
       <!-- Collection Filters -->
       <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="p-6">
-          <h2 class="mb-4 text-lg font-medium text-foreground">Collection Filters</h2>
-          <p class="mb-4 text-sm text-foreground-tertiary">
-            Products are included based on these filters (AND logic)
-          </p>
+        <div class="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Filters</h2>
+          <!-- Add filter dropdown -->
+          <DropdownMenu.Root bind:open={addFilterOpen}>
+            <DropdownMenu.Trigger>
+              {#snippet child({ props })}
+                <Button variant="outline" size="sm" {...props}>
+                  <Plus class="h-4 w-4" />
+                  Add Filter
+                </Button>
+              {/snippet}
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content align="end">
+              {#each filterTypes as ft}
+                <DropdownMenu.Item
+                  onclick={() => {
+                    addFilterOpen = false;
+                    addFilter(ft.field, ft.operator);
+                  }}
+                >
+                  {ft.label}
+                </DropdownMenu.Item>
+              {/each}
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+        </div>
 
+        <div class="p-6">
           {#if localFilters.length > 0}
-            <div class="mb-4 space-y-3">
+            <div class="space-y-3">
               {#each localFilters as filter, index (filter.key)}
+                {#if index > 0}
+                  <div class="flex justify-center">
+                    <span
+                      class="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground-secondary"
+                      >AND</span
+                    >
+                  </div>
+                {/if}
                 <div class="rounded-lg border border-border">
                   <!-- Card header -->
                   <div class="flex items-center justify-between border-b border-border px-4 py-2.5">
@@ -738,47 +768,25 @@
               {/each}
             </div>
           {:else}
-            <div class="mb-4 rounded-lg border border-dashed border-input-border p-6 text-center">
+            <div class="rounded-lg border border-dashed border-input-border p-6 text-center">
               <p class="text-sm text-muted-foreground">
                 No filters defined. Add a filter to populate this collection.
               </p>
             </div>
           {/if}
-
-          <!-- Add filter dropdown -->
-          <DropdownMenu.Root bind:open={addFilterOpen}>
-            <DropdownMenu.Trigger>
-              {#snippet child({ props })}
-                <Button variant="outline" size="sm" {...props}>
-                  <Plus class="h-4 w-4" />
-                  Add filter
-                </Button>
-              {/snippet}
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Content align="start">
-              {#each filterTypes as ft}
-                <DropdownMenu.Item
-                  onclick={() => {
-                    addFilterOpen = false;
-                    addFilter(ft.field, ft.operator);
-                  }}
-                >
-                  {ft.label}
-                </DropdownMenu.Item>
-              {/each}
-            </DropdownMenu.Content>
-          </DropdownMenu.Root>
         </div>
       </div>
 
       <!-- Products -->
-      <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="p-6">
-          <h2 class="mb-1 text-lg font-medium text-foreground">
+      <div class="overflow-hidden rounded-lg bg-surface pb-4 shadow">
+        <div class="border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">
             Preview Products <span class="text-base font-normal text-foreground-secondary"
               >({previewCount ?? data.productCount})</span
             >
           </h2>
+        </div>
+        <div class="px-6 pt-4">
           <DataTable
             data={previewProducts ?? data.preview}
             columns={previewColumns}
