@@ -20,10 +20,11 @@
   let activeTab = $state(TRANSLATION_LANGUAGES[0]?.code ?? "fi");
 </script>
 
+{#if TRANSLATION_LANGUAGES.length > 0}
 <div class="overflow-hidden rounded-lg bg-surface shadow">
   <div class="flex items-center gap-2 border-b border-border px-6 py-4">
     <Globe class="h-5 w-5 text-muted-foreground" />
-    <h2 class="text-lg font-semibold">Translations</h2>
+    <h2 class="text-lg font-semibold">Translations{TRANSLATION_LANGUAGES.length === 1 ? ` (${TRANSLATION_LANGUAGES[0].name})` : ""}</h2>
   </div>
 
   <!-- Language Tabs -->
@@ -93,3 +94,4 @@
     {/each}
   </div>
 </div>
+{/if}
