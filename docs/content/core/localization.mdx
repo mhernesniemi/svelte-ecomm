@@ -105,99 +105,23 @@ await translationService.upsertContentPageTranslation(pageId, "fi", { title, slu
 
 ## Admin UI
 
+Translations are saved as part of the main entity form — there is no separate save action for translations. The `update` action in each `+page.server.ts` reads translation fields from the form data and calls the appropriate `translationService.upsert*()` method.
+
+Translation field inputs use the naming convention `{fieldName}_{langCode}` (e.g. `name_fi`, `slug_fi`, `description_fi`).
+
+### Inline Language Tabs
+
+Products, collections, and content pages render language tabs directly in the main form card. Each tab shows the translatable fields for that language, using a `hidden` class to keep all fields mounted (important for rich text editors).
+
 ### TranslationEditor Component
 
-A reusable component (`src/lib/components/admin/TranslationEditor.svelte`) provides the translation editing UI for all entity admin pages:
-
-```svelte
-<script lang="ts">
-  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
-  import { translationsToMap } from "$lib/config/languages";
-</script>
-
-<TranslationEditor
-  fields={[
-    { name: "name", label: "Name", type: "text" },
-    { name: "slug", label: "Slug", type: "text" },
-    { name: "description", label: "Description", type: "richtext" }
-  ]}
-  translations={translationsToMap(data.translations)}
-  entityId={data.product.id}
-/>
-```
-
-**Props:**
-- `fields` — Array of `{ name, label, type }` where type is `"text"`, `"textarea"`, or `"richtext"`
-- `translations` — A `Record<langCode, Record<field, value>>` map (use `translationsToMap()` to convert from DB rows)
-- `entityId` — The entity's ID
-- `action` — Form action URL (defaults to `"?/saveTranslation"`)
-
-**Behavior:**
-- Renders a "Translations" card with a globe icon header
-- Language tabs for each non-default language
-- Posts to the `saveTranslation` action with `entityId`, `languageCode`, and field values
-- Toast notification on save
-- Hint text: "Leave empty to use the default (English) value."
-
-### Wiring Pattern
-
-Each admin edit page follows the same pattern:
-
-**1. Load translations in `+page.server.ts`:**
-
-```typescript
-import { translationService } from "$lib/server/services/translations";
-
-export const load = async ({ params }) => {
-  const [product, translations] = await Promise.all([
-    productService.getById(id),
-    translationService.getProductTranslations(id)
-  ]);
-  return { product, translations };
-};
-```
-
-**2. Add a `saveTranslation` action:**
-
-```typescript
-export const actions = {
-  saveTranslation: async ({ request }) => {
-    const formData = await request.formData();
-    const entityId = Number(formData.get("entityId"));
-    const languageCode = formData.get("languageCode") as string;
-    const name = formData.get("name") as string;
-    // ... other fields
-
-    await translationService.upsertProductTranslation(entityId, languageCode, {
-      name: name || "",
-      slug: slug || "",
-      description: description || null
-    });
-    return { translationSuccess: true };
-  }
-};
-```
-
-**3. Add `<TranslationEditor>` in `+page.svelte`:**
-
-```svelte
-<TranslationEditor
-  fields={[
-    { name: "name", label: "Name", type: "text" },
-    { name: "slug", label: "Slug", type: "text" },
-    { name: "description", label: "Description", type: "richtext" }
-  ]}
-  translations={translationsToMap(data.translations)}
-  entityId={data.product.id}
-/>
-```
+For simpler entities (variants, facets), a shared `TranslationEditor` component (`src/lib/components/admin/TranslationEditor.svelte`) renders a separate "Translations" card. It uses the HTML `form` attribute to associate its inputs with the main form.
 
 ### Inline Translation Editing
 
-For entities with inline editing (categories, facet values), Finnish name fields are added directly to the create/update forms instead of using the `TranslationEditor` component:
+For entities with inline editing (categories, facet values), translation fields are added directly to the create/update forms:
 
 ```svelte
-<!-- Category inline edit -->
 <input name="name_en" value={node.name} />
 <input name="name_fi" value={categoryTranslations[node.id]?.fi?.name ?? ""} />
 ```
@@ -215,7 +139,7 @@ const product = await productService.getById(123, language);
 
 1. Add the language to `LANGUAGES` in `src/lib/config/languages.ts`
 2. No schema changes needed — translation tables already support any language code
-3. The admin UI automatically picks up the new language (TranslationEditor renders tabs for all `TRANSLATION_LANGUAGES`)
+3. The admin UI automatically picks up the new language (language tabs render for all `TRANSLATION_LANGUAGES`)
 4. Add translations for existing records via the admin UI or programmatically via `TranslationService`
 
 ## Best Practices
@@ -223,5 +147,5 @@ const product = await productService.getById(123, language);
 1. **Never hardcode `"en"`** — always use `DEFAULT_LANGUAGE` from the config
 2. **Default language fields go on entity tables** — `products.name`, not in `product_translations`
 3. **Non-default translations go in translation tables** — managed via `TranslationService`
-4. **Use `translationsToMap()`** — converts DB rows to the map format expected by `TranslationEditor`
+4. **Use `translationsToMap()`** — converts DB rows to the map format used by translation UI
 5. **Leave translations empty to fall back** — the storefront uses entity table fields when no translation exists
