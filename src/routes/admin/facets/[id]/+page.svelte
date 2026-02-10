@@ -4,8 +4,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
-  import { translationsToMap } from "$lib/config/languages.js";
-  import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Plus from "@lucide/svelte/icons/plus";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";

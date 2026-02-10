@@ -3,7 +3,7 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
-  import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import { TRANSLATION_LANGUAGES, DEFAULT_LANGUAGE, LANGUAGES } from "$lib/config/languages.js";
   import Globe from "@lucide/svelte/icons/globe";
 
   interface Field {
@@ -106,7 +106,7 @@
           </div>
 
           <p class="mt-3 text-xs text-muted-foreground">
-            Leave empty to use the default (English) value.
+            Leave empty to use the default ({LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name}) value.
           </p>
 
           <div class="mt-4">

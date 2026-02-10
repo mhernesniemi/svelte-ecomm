@@ -1,5 +1,6 @@
 import { categoryService } from "$lib/server/services/categories.js";
 import { translationService } from "$lib/server/services/translations.js";
+import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
 import { fail } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -18,7 +19,6 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const slug = formData.get("slug") as string;
 		const nameEn = formData.get("name_en") as string;
-		const nameFi = formData.get("name_fi") as string;
 		const parentId = formData.get("parent_id") as string;
 
 		if (!slug || !nameEn) {
@@ -32,10 +32,13 @@ export const actions: Actions = {
 				name: nameEn
 			});
 
-			if (nameFi && category) {
-				await translationService.upsertCategoryTranslation(category.id, "fi", {
-					name: nameFi
-				});
+			if (category) {
+				for (const lang of TRANSLATION_LANGUAGES) {
+					const name = formData.get(`name_${lang.code}`) as string;
+					if (name) {
+						await translationService.upsertCategoryTranslation(category.id, lang.code, { name });
+					}
+				}
 			}
 
 			return { success: true };
@@ -49,7 +52,6 @@ export const actions: Actions = {
 		const id = Number(formData.get("id"));
 		const slug = formData.get("slug") as string;
 		const nameEn = formData.get("name_en") as string;
-		const nameFi = formData.get("name_fi") as string;
 		const parentId = formData.get("parent_id") as string;
 
 		if (!id || !slug || !nameEn) {
@@ -63,9 +65,10 @@ export const actions: Actions = {
 				name: nameEn
 			});
 
-			if (nameFi !== null) {
-				await translationService.upsertCategoryTranslation(id, "fi", {
-					name: nameFi || ""
+			for (const lang of TRANSLATION_LANGUAGES) {
+				const name = formData.get(`name_${lang.code}`) as string;
+				await translationService.upsertCategoryTranslation(id, lang.code, {
+					name: name || ""
 				});
 			}
 

@@ -10,12 +10,7 @@ export const LANGUAGES = [
 /** Languages that use translation tables (everything except default) */
 export const TRANSLATION_LANGUAGES = LANGUAGES.filter((l) => l.code !== DEFAULT_LANGUAGE);
 
-/**
- * Convert translation rows into a map: { fi: { name: "...", slug: "..." } }
- *
- * Each row must have a `languageCode` string field. All other string/null fields
- * are treated as translatable fields.
- */
+/** Convert translation rows into a map: { fi: { name: "...", slug: "..." } } */
 export function translationsToMap<T extends { languageCode: string }>(
 	rows: T[]
 ): Record<string, Record<string, string | null>> {
@@ -26,8 +21,9 @@ export function translationsToMap<T extends { languageCode: string }>(
 		const fieldMap: Record<string, string | null> = {};
 
 		for (const [key, value] of Object.entries(fields)) {
-			if (key === "id" || key.endsWith("Id")) continue;
-			fieldMap[key] = value as string | null;
+			if (typeof value === "string" || value === null) {
+				fieldMap[key] = value;
+			}
 		}
 
 		map[languageCode] = fieldMap;
