@@ -693,7 +693,7 @@
                     {:else if filter.field === "price"}
                       <div class="flex items-center gap-3">
                         <select
-                          class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                          class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
                           value={filter.operator}
                           onchange={(e) => {
                             localFilters[index] = {
@@ -702,8 +702,8 @@
                             };
                           }}
                         >
-                          <option value="gte">{"≥"}</option>
-                          <option value="lte">{"≤"}</option>
+                          <option value="gte">at least</option>
+                          <option value="lte">at most</option>
                         </select>
                         <input
                           type="number"
@@ -722,7 +722,7 @@
                     {:else if filter.field === "stock"}
                       <div class="flex items-center gap-3">
                         <select
-                          class="rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                          class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
                           value={filter.operator}
                           onchange={(e) => {
                             localFilters[index] = {
@@ -731,8 +731,8 @@
                             };
                           }}
                         >
-                          <option value="gt">{">"}</option>
-                          <option value="gte">{"≥"}</option>
+                          <option value="gt">more than</option>
+                          <option value="gte">at least</option>
                         </select>
                         <input
                           type="number"
