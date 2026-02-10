@@ -13,7 +13,12 @@
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
-  import { translationsToMap, LANGUAGES, DEFAULT_LANGUAGE, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import {
+    translationsToMap,
+    LANGUAGES,
+    DEFAULT_LANGUAGE,
+    TRANSLATION_LANGUAGES
+  } from "$lib/config/languages.js";
   import { cn } from "$lib/utils";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
@@ -377,9 +382,9 @@
                 <button
                   type="button"
                   class={cn(
-                    "px-4 py-2.5 text-sm font-medium",
+                    "border-b-2 border-transparent px-4 py-2.5 text-sm font-medium",
                     activeLanguageTab === lang.code
-                      ? "border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                      ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                   onclick={() => (activeLanguageTab = lang.code)}

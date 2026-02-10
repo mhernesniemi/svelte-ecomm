@@ -6,7 +6,12 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import { translationsToMap, LANGUAGES, DEFAULT_LANGUAGE, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import {
+    translationsToMap,
+    LANGUAGES,
+    DEFAULT_LANGUAGE,
+    TRANSLATION_LANGUAGES
+  } from "$lib/config/languages.js";
   import { cn } from "$lib/utils";
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -50,23 +55,21 @@
       class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Pages</a
     >
+    {#if published && slug}
+      <a
+        href="/pages/{data.page.id}/{slug}"
+        target="_blank"
+        class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >
+        View in store <ExternalLink class="h-3.5 w-3.5" />
+      </a>
+    {/if}
   </div>
-  <div class="flex items-center justify-between">
+  <div class="mt-2 flex items-center justify-between">
     <h1 class="text-2xl font-bold">{title || "Edit Content Page"}</h1>
-    <div class="flex items-center gap-3">
-      {#if published && slug}
-        <a
-          href="/pages/{data.page.id}/{slug}"
-          target="_blank"
-          class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground-secondary"
-        >
-          View on storefront <ExternalLink class="h-3.5 w-3.5" />
-        </a>
-      {/if}
-      <Button type="submit" form="content-page-form" disabled={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Save Changes"}
-      </Button>
-    </div>
+    <Button type="submit" form="content-page-form" disabled={isSubmitting}>
+      {isSubmitting ? "Saving..." : "Save Changes"}
+    </Button>
   </div>
 
   <form
@@ -90,9 +93,9 @@
             <button
               type="button"
               class={cn(
-                "px-4 py-2.5 text-sm font-medium",
+                "border-b-2 border-transparent px-4 py-2.5 text-sm font-medium",
                 activeLanguageTab === lang.code
-                  ? "border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                  ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
                   : "text-muted-foreground hover:text-foreground"
               )}
               onclick={() => (activeLanguageTab = lang.code)}
