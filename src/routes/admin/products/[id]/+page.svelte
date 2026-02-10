@@ -21,8 +21,7 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
-  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
-  import { translationsToMap } from "$lib/config/languages.js";
+  import { translationsToMap, LANGUAGES, DEFAULT_LANGUAGE, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import Check from "@lucide/svelte/icons/check";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import X from "@lucide/svelte/icons/x";
@@ -157,6 +156,8 @@
   }
 
   let productName = $state("");
+  let activeLanguageTab = $state(DEFAULT_LANGUAGE);
+  const translationMap = $derived(translationsToMap(data.translations));
 
   $effect(() => {
     productName = data.product.name;
@@ -246,10 +247,31 @@
             isSavingProduct = false;
           };
         }}
-        class="rounded-lg bg-surface shadow"
+        class="overflow-hidden rounded-lg bg-surface shadow"
       >
-        <div class="space-y-6 p-6">
-          <div class="space-y-4">
+        <!-- Language Tabs -->
+        {#if TRANSLATION_LANGUAGES.length > 0}
+          <div class="flex border-b border-border">
+            {#each LANGUAGES as lang}
+              <button
+                type="button"
+                class={cn(
+                  "px-4 py-2.5 text-sm font-medium",
+                  activeLanguageTab === lang.code
+                    ? "border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                onclick={() => (activeLanguageTab = lang.code)}
+              >
+                {lang.name}
+              </button>
+            {/each}
+          </div>
+        {/if}
+
+        <!-- Default language fields -->
+        <div class={activeLanguageTab !== DEFAULT_LANGUAGE ? "hidden" : ""}>
+          <div class="space-y-4 p-6">
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label for="name" class="mb-1 block text-sm font-medium text-foreground-secondary">
@@ -293,39 +315,137 @@
                 placeholder="Write product description..."
               />
             </div>
-          </div>
 
-          <!-- Common Fields -->
-          <div class="grid grid-cols-2 gap-4">
-            <label class="block">
-              <span class="text-sm font-medium text-foreground-secondary">Product Type</span>
-              <select
-                name="type"
-                class="mt-1 block w-full rounded-md border-input-border shadow-sm"
-              >
-                <option value="physical" selected={data.product.type === "physical"}
-                  >Physical</option
-                >
-                <option value="digital" selected={data.product.type === "digital"}>Digital</option>
-              </select>
-            </label>
-
-            <label class="block">
-              <span class="text-sm font-medium text-foreground-secondary">Tax Rate</span>
-              <select
-                name="taxCode"
-                class="mt-1 block w-full rounded-md border-input-border shadow-sm"
-              >
-                {#each data.taxRates as rate}
-                  <option value={rate.code} selected={data.product.taxCode === rate.code}>
-                    {rate.name} ({(rate.rate * 100).toFixed(0)}%)
-                  </option>
-                {/each}
-              </select>
-            </label>
           </div>
         </div>
+
+        <!-- Translation language fields -->
+        {#each TRANSLATION_LANGUAGES as lang}
+          <div class={activeLanguageTab !== lang.code ? "hidden" : ""}>
+            <div class="space-y-4 p-6">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="translation_{lang.code}_name"
+                    class="mb-1 block text-sm font-medium text-foreground-secondary"
+                  >
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    id="translation_{lang.code}_name"
+                    name="name_{lang.code}"
+                    value={translationMap[lang.code]?.name ?? ""}
+                    class="w-full rounded-lg border border-input-border px-3 py-2"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="translation_{lang.code}_slug"
+                    class="mb-1 block text-sm font-medium text-foreground-secondary"
+                  >
+                    Slug
+                  </label>
+                  <input
+                    type="text"
+                    id="translation_{lang.code}_slug"
+                    name="slug_{lang.code}"
+                    value={translationMap[lang.code]?.slug ?? ""}
+                    class="w-full rounded-lg border border-input-border px-3 py-2"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label
+                  for="translation_{lang.code}_description"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
+                  Description
+                </label>
+                <RichTextEditor
+                  name="description_{lang.code}"
+                  content={translationMap[lang.code]?.description ?? ""}
+                  placeholder="Write product description..."
+                />
+              </div>
+
+              <p class="text-xs text-muted-foreground">
+                Leave empty to use the {LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name} value.
+              </p>
+            </div>
+          </div>
+        {/each}
       </form>
+
+      <!-- Images Section -->
+      <div class="rounded-lg bg-surface shadow">
+        <div class="flex items-center justify-between border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Images</h2>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onclick={() => (showImagePicker = true)}
+            disabled={isSavingImages}
+          >
+            <Plus class="h-4 w-4" />
+            Add
+          </Button>
+        </div>
+
+        <div class="p-6">
+          {#if data.product.assets.length > 0}
+            <div class="grid grid-cols-3 gap-3">
+              {#each data.product.assets as asset}
+                <div class="group relative">
+                  <img
+                    src="{asset.source}?tr=w-200,h-200,fo-auto"
+                    alt={asset.alt || asset.name}
+                    class={cn(
+                      "h-36 w-full rounded-lg border border-border object-cover",
+                      data.product.featuredAssetId === asset.id && "ring-2 ring-blue-500"
+                    )}
+                  />
+                  <div
+                    class="absolute inset-0 flex items-center justify-center gap-1 rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+                  >
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      class="h-8 w-8 p-0"
+                      onclick={() =>
+                        (editingImageAlt = {
+                          id: asset.id,
+                          alt: asset.alt || "",
+                          isFeatured: data.product.featuredAssetId === asset.id
+                        })}
+                    >
+                      <Pencil class="h-4 w-4" />
+                    </Button>
+                    <form method="POST" action="?/removeImage" use:enhance>
+                      <input type="hidden" name="assetId" value={asset.id} />
+                      <Button type="submit" variant="destructive" size="sm" class="h-8 w-8 p-0">
+                        <Trash2 class="h-4 w-4" />
+                      </Button>
+                    </form>
+                  </div>
+                  {#if data.product.featuredAssetId === asset.id}
+                    <span
+                      class="absolute top-1 left-1 rounded bg-blue-600 px-1.5 py-0.5 text-xs text-white"
+                      >Featured</span
+                    >
+                  {/if}
+                </div>
+              {/each}
+            </div>
+          {:else}
+            <p class="py-4 text-center text-sm text-muted-foreground">No images yet</p>
+          {/if}
+        </div>
+      </div>
 
       <!-- Variants Section -->
       <div class="rounded-lg bg-surface pb-4 shadow">
@@ -391,17 +511,6 @@
           </TableBody>
         </Table>
       </div>
-      <!-- Translations -->
-      <TranslationEditor
-        fields={[
-          { name: "name", label: "Name", type: "text" },
-          { name: "slug", label: "Slug", type: "text" },
-          { name: "description", label: "Description", type: "richtext" }
-        ]}
-        translations={translationsToMap(data.translations)}
-        formId="product-form"
-      />
-
       <button
         type="button"
         class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
@@ -447,71 +556,37 @@
         </div>
       </div>
 
-      <!-- Images Section -->
+      <!-- Product Settings -->
       <div class="rounded-lg bg-surface shadow">
-        <div class="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Images</h2>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onclick={() => (showImagePicker = true)}
-            disabled={isSavingImages}
-          >
-            <Plus class="h-4 w-4" />
-            Add
-          </Button>
+        <div class="border-b border-border px-4 py-3">
+          <h2 class="font-semibold">Settings</h2>
         </div>
-
-        <div class="p-4">
-          {#if data.product.assets.length > 0}
-            <div class="grid grid-cols-2 gap-2">
-              {#each data.product.assets as asset}
-                <div class="group relative">
-                  <img
-                    src="{asset.source}?tr=w-100,h-100,fo-auto"
-                    alt={asset.alt || asset.name}
-                    class="h-24 w-full rounded border border-border object-cover {data.product
-                      .featuredAssetId === asset.id
-                      ? 'ring-2 ring-blue-500'
-                      : ''}"
-                  />
-                  <div
-                    class="absolute inset-0 flex items-center justify-center gap-1 rounded bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
-                  >
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      class="h-7 w-7 p-0"
-                      onclick={() =>
-                        (editingImageAlt = {
-                          id: asset.id,
-                          alt: asset.alt || "",
-                          isFeatured: data.product.featuredAssetId === asset.id
-                        })}
-                    >
-                      <Pencil class="h-3.5 w-3.5" />
-                    </Button>
-                    <form method="POST" action="?/removeImage" use:enhance>
-                      <input type="hidden" name="assetId" value={asset.id} />
-                      <Button type="submit" variant="destructive" size="sm" class="h-7 w-7 p-0">
-                        <Trash2 class="h-3.5 w-3.5" />
-                      </Button>
-                    </form>
-                  </div>
-                  {#if data.product.featuredAssetId === asset.id}
-                    <span
-                      class="absolute top-1 left-1 rounded bg-blue-600 px-1 py-0.5 text-[10px] text-white"
-                      >Featured</span
-                    >
-                  {/if}
-                </div>
+        <div class="space-y-3 p-4">
+          <label class="block">
+            <span class="text-sm font-medium text-foreground-secondary">Product Type</span>
+            <select
+              form="product-form"
+              name="type"
+              class="mt-1 block w-full rounded-md border-input-border shadow-sm"
+            >
+              <option value="physical" selected={data.product.type === "physical"}>Physical</option>
+              <option value="digital" selected={data.product.type === "digital"}>Digital</option>
+            </select>
+          </label>
+          <label class="block">
+            <span class="text-sm font-medium text-foreground-secondary">Tax Rate</span>
+            <select
+              form="product-form"
+              name="taxCode"
+              class="mt-1 block w-full rounded-md border-input-border shadow-sm"
+            >
+              {#each data.taxRates as rate}
+                <option value={rate.code} selected={data.product.taxCode === rate.code}>
+                  {rate.name} ({(rate.rate * 100).toFixed(0)}%)
+                </option>
               {/each}
-            </div>
-          {:else}
-            <p class="py-4 text-center text-sm text-muted-foreground">No images yet</p>
-          {/if}
+            </select>
+          </label>
         </div>
       </div>
 
