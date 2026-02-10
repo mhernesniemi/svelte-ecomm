@@ -27,7 +27,6 @@
   type GroupRow = (typeof data.groups)[0];
 
   $effect(() => {
-    if (form?.success) toast.success(form.message || "Success");
     if (form?.error) toast.error(form.error);
   });
 

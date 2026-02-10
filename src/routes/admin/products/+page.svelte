@@ -15,7 +15,6 @@
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
   $effect(() => {
-    if (form?.success) toast.success(form.message || "Success");
     if (form?.error) toast.error(form.error);
   });
 
