@@ -19,7 +19,7 @@
     DEFAULT_LANGUAGE,
     TRANSLATION_LANGUAGES
   } from "$lib/config/languages.js";
-  import { cn } from "$lib/utils";
+  import { cn, BASE_CURRENCY } from "$lib/utils";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -707,17 +707,19 @@
                         </select>
                         <input
                           type="number"
+                          step="0.01"
+                          min="0"
                           class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                          value={filter.value}
-                          placeholder="Price in cents"
+                          value={typeof filter.value === "number" ? (filter.value / 100).toFixed(2) : ""}
+                          placeholder="0.00"
                           onchange={(e) => {
                             localFilters[index] = {
                               ...filter,
-                              value: Number((e.target as HTMLInputElement).value)
+                              value: Math.round(Number((e.target as HTMLInputElement).value) * 100)
                             };
                           }}
                         />
-                        <span class="text-sm text-muted-foreground">cents</span>
+                        <span class="text-sm text-muted-foreground">{BASE_CURRENCY}</span>
                       </div>
                     {:else if filter.field === "stock"}
                       <div class="flex items-center gap-3">
