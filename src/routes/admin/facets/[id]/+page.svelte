@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { page } from "$app/stores";
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -16,8 +16,11 @@
 
   let isSubmitting = $state(false);
   let showDelete = $state(false);
-  let showAddValue = $state(false);
   let deletedValueIds = $state<number[]>([]);
+  let newValues = $state<
+    { key: number; name: string; code: string; translations: Record<string, string> }[]
+  >([]);
+  let nextNewKey = $state(0);
 
   const visibleValues = $derived(
     data.facet.values.filter((v) => !deletedValueIds.includes(v.id))
@@ -94,6 +97,7 @@
             isSubmitting = false;
             if (result.type === "success") {
               deletedValueIds = [];
+              newValues = [];
               toast.success("Facet updated");
             }
           };
@@ -103,6 +107,14 @@
         {#each deletedValueIds as id}
           <input type="hidden" name="delete_value" value={id} />
         {/each}
+        {#each newValues as nv, i}
+          <input type="hidden" name="new_value_{i}_name_en" value={nv.name} />
+          <input type="hidden" name="new_value_{i}_code" value={nv.code} />
+          {#each TRANSLATION_LANGUAGES as lang}
+            <input type="hidden" name="new_value_{i}_name_{lang.code}" value={nv.translations[lang.code] ?? ""} />
+          {/each}
+        {/each}
+        <input type="hidden" name="new_value_count" value={newValues.length} />
         <div class="p-6">
           <h2 class="mb-4 text-lg font-medium text-foreground">Facet Details</h2>
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -142,85 +154,32 @@
           <div>
             <h2 class="text-lg font-medium text-foreground">Values</h2>
             <p class="mt-1 text-sm text-foreground-tertiary">
-              {visibleValues.length} value{visibleValues.length !== 1 ? "s" : ""}
+              {visibleValues.length + newValues.length} value{visibleValues.length + newValues.length !== 1 ? "s" : ""}
             </p>
           </div>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onclick={() => (showAddValue = !showAddValue)}
+            onclick={async () => {
+              const key = nextNewKey;
+              const translations: Record<string, string> = {};
+              for (const lang of TRANSLATION_LANGUAGES) {
+                translations[lang.code] = "";
+              }
+              newValues = [...newValues, { key, name: "", code: "", translations }];
+              nextNewKey++;
+              await tick();
+              document.getElementById(`new_value_name_${key}`)?.focus();
+            }}
           >
             <Plus class="h-4 w-4" />
             Add Value
           </Button>
         </div>
 
-        <!-- Add Value Form -->
-        {#if showAddValue}
-          <div class="border-b border-border bg-surface p-6">
-            <form
-              method="POST"
-              action="?/createValue"
-              use:enhance={() => {
-                return async ({ result, update }) => {
-                  await update();
-                  if (result.type === "success") {
-                    toast.success("Value added");
-                  }
-                  showAddValue = false;
-                };
-              }}
-            >
-              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label
-                    for="new_value_name"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="new_value_name"
-                    name="name_en"
-                    placeholder="e.g., Red"
-                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                  />
-                </div>
-                <div>
-                  <label
-                    for="new_value_code"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Code
-                  </label>
-                  <input
-                    type="text"
-                    id="new_value_code"
-                    name="code"
-                    placeholder="e.g., red"
-                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                  />
-                </div>
-              </div>
-              <div class="mt-4 flex justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onclick={() => (showAddValue = false)}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" size="sm">Add Value</Button>
-              </div>
-            </form>
-          </div>
-        {/if}
-
         <!-- Values List -->
-        {#if visibleValues.length === 0 && !showAddValue}
+        {#if visibleValues.length === 0 && newValues.length === 0}
           <div class="p-12 text-center">
             <p class="text-sm text-muted-foreground">
               No values yet. Add values to use this facet for filtering.
@@ -231,78 +190,144 @@
             {#each visibleValues as value, i}
               {#if valueStates[value.id]}
                 <div class={i > 0 ? "border-t border-border" : ""}>
-                  <div class="relative p-6">
+                  <div class="space-y-3 p-6">
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <div class="space-y-3">
-                        <div>
-                          <label
-                            for="value_name_{value.id}"
-                            class="mb-1 block text-sm font-medium text-foreground-secondary"
-                          >
-                            Name
-                          </label>
-                          <input
-                            form="facet-form"
-                            type="text"
-                            id="value_name_{value.id}"
-                            name="value_{value.id}_name_en"
-                            bind:value={valueStates[value.id].name}
-                            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                          />
-                        </div>
-                        {#each TRANSLATION_LANGUAGES as lang}
-                          <div>
-                            <label
-                              for="value_name_{lang.code}_{value.id}"
-                              class="mb-1 block text-sm font-medium text-foreground-secondary"
-                            >
-                              Name ({lang.name})
-                            </label>
-                            <input
-                              form="facet-form"
-                              type="text"
-                              id="value_name_{lang.code}_{value.id}"
-                              name="value_{value.id}_name_{lang.code}"
-                              bind:value={valueStates[value.id].translations[lang.code]}
-                              placeholder={valueStates[value.id].name}
-                              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                            />
-                          </div>
-                        {/each}
+                      <div>
+                        <label
+                          for="value_name_{value.id}"
+                          class="mb-1 block text-sm font-medium text-foreground-secondary"
+                        >
+                          Name
+                        </label>
+                        <input
+                          form="facet-form"
+                          type="text"
+                          id="value_name_{value.id}"
+                          name="value_{value.id}_name_en"
+                          bind:value={valueStates[value.id].name}
+                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                        />
                       </div>
-                      <div class="flex flex-col justify-between">
+                      <div>
+                        <label
+                          for="value_code_{value.id}"
+                          class="mb-1 block text-sm font-medium text-foreground-secondary"
+                        >
+                          Code
+                        </label>
+                        <input
+                          form="facet-form"
+                          type="text"
+                          id="value_code_{value.id}"
+                          name="value_{value.id}_code"
+                          bind:value={valueStates[value.id].code}
+                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      {#each TRANSLATION_LANGUAGES as lang}
                         <div>
                           <label
-                            for="value_code_{value.id}"
+                            for="value_name_{lang.code}_{value.id}"
                             class="mb-1 block text-sm font-medium text-foreground-secondary"
                           >
-                            Code
+                            Name ({lang.name})
                           </label>
                           <input
                             form="facet-form"
                             type="text"
-                            id="value_code_{value.id}"
-                            name="value_{value.id}_code"
-                            bind:value={valueStates[value.id].code}
+                            id="value_name_{lang.code}_{value.id}"
+                            name="value_{value.id}_name_{lang.code}"
+                            bind:value={valueStates[value.id].translations[lang.code]}
+                            placeholder={valueStates[value.id].name}
                             class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                           />
                         </div>
-                        <div class="flex justify-end">
-                          <Button
-                            type="button"
-                            variant="destructive-ghost"
-                            size="icon"
-                            class="size-8"
-                            onclick={() => (deletedValueIds = [...deletedValueIds, value.id])}
-                          >
-                            <Trash class="h-4 w-4" />
-                          </Button>
-                        </div>
+                      {/each}
+                      <div class="flex items-end justify-end">
+                        <Button
+                          type="button"
+                          variant="destructive-ghost"
+                          size="icon"
+                          class="size-8"
+                          onclick={() => (deletedValueIds = [...deletedValueIds, value.id])}
+                        >
+                          <Trash class="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>
                 </div>
               {/if}
+            {/each}
+            {#each newValues as nv, ni}
+              <div class="border-t border-border">
+                <div class="space-y-3 p-6">
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <label
+                        for="new_value_name_{nv.key}"
+                        class="mb-1 block text-sm font-medium text-foreground-secondary"
+                      >
+                        Name
+                      </label>
+                      <input
+                        type="text"
+                        id="new_value_name_{nv.key}"
+                        bind:value={newValues[ni].name}
+                        placeholder="e.g., Red"
+                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label
+                        for="new_value_code_{nv.key}"
+                        class="mb-1 block text-sm font-medium text-foreground-secondary"
+                      >
+                        Code
+                      </label>
+                      <input
+                        type="text"
+                        id="new_value_code_{nv.key}"
+                        bind:value={newValues[ni].code}
+                        placeholder="e.g., red"
+                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {#each TRANSLATION_LANGUAGES as lang}
+                      <div>
+                        <label
+                          for="new_value_name_{lang.code}_{nv.key}"
+                          class="mb-1 block text-sm font-medium text-foreground-secondary"
+                        >
+                          Name ({lang.name})
+                        </label>
+                        <input
+                          type="text"
+                          id="new_value_name_{lang.code}_{nv.key}"
+                          bind:value={newValues[ni].translations[lang.code]}
+                          placeholder={newValues[ni].name}
+                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                        />
+                      </div>
+                    {/each}
+                    <div class="flex items-end justify-end">
+                      <Button
+                        type="button"
+                        variant="destructive-ghost"
+                        size="icon"
+                        class="size-8"
+                        onclick={() => (newValues = newValues.filter((_, j) => j !== ni))}
+                      >
+                        <Trash class="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             {/each}
           </div>
         {/if}

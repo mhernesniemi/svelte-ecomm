@@ -77,31 +77,33 @@ export const actions: Actions = {
 				}
 			}
 
+			// Create new values
+			const newValueCount = Number(formData.get("new_value_count")) || 0;
+			for (let i = 0; i < newValueCount; i++) {
+				const newName = formData.get(`new_value_${i}_name_en`) as string;
+				const newCode = formData.get(`new_value_${i}_code`) as string;
+
+				if (newName && newCode) {
+					const created = await facetService.createValue({
+						facetId: id,
+						code: newCode.toLowerCase().replace(/\s+/g, "_"),
+						name: newName
+					});
+
+					if (created) {
+						for (const lang of TRANSLATION_LANGUAGES) {
+							const transName = formData.get(`new_value_${i}_name_${lang.code}`) as string;
+							await translationService.upsertFacetValueTranslation(created.id, lang.code, {
+								name: transName || ""
+							});
+						}
+					}
+				}
+			}
+
 			return { success: true, message: "Facet updated" };
 		} catch {
 			return fail(500, { error: "Failed to update facet" });
-		}
-	},
-
-	createValue: async ({ params, request }) => {
-		const facetId = Number(params.id);
-		const formData = await request.formData();
-		const code = formData.get("code") as string;
-		const nameEn = formData.get("name_en") as string;
-
-		if (!code || !nameEn) {
-			return fail(400, { error: "All fields are required" });
-		}
-
-		try {
-			await facetService.createValue({
-				facetId,
-				code: code.toLowerCase().replace(/\s+/g, "_"),
-				name: nameEn
-			});
-			return { success: true, message: "Value created" };
-		} catch {
-			return fail(500, { error: "Failed to create value" });
 		}
 	},
 
