@@ -227,3 +227,15 @@
 
   <Toaster />
 </div>
+
+<svelte:window
+  onkeydown={(e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+      const form = document.querySelector<HTMLFormElement>("main form[id][method='POST']");
+      if (form) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    }
+  }}
+/>
