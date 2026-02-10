@@ -72,6 +72,10 @@
     </Button>
   </div>
 
+  <!-- Two Column Layout -->
+  <div class="flex flex-col gap-6 lg:flex-row">
+    <!-- Main Content (Left) -->
+    <div class="flex-1 space-y-6">
   <form
     id="content-page-form"
     method="POST"
@@ -150,15 +154,6 @@
             />
           </div>
 
-          <div class="flex items-center gap-2">
-            <Checkbox id="published" bind:checked={published} />
-            {#if published}
-              <input type="hidden" name="published" value="on" />
-            {/if}
-            <label for="published" class="text-sm font-medium text-foreground-secondary">
-              Published
-            </label>
-          </div>
         </div>
       </div>
 
@@ -230,6 +225,31 @@
   >
     Delete this page
   </button>
+    </div>
+
+    <!-- Sidebar (Right) -->
+    <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
+          <h2 class="font-semibold">Visibility</h2>
+        </div>
+        <div class="p-4">
+          <div class="flex items-center gap-2">
+            <Checkbox id="published" bind:checked={published} />
+            {#if published}
+              <input type="hidden" name="published" value="on" form="content-page-form" />
+            {/if}
+            <label for="published" class="text-sm font-medium text-foreground-secondary">
+              Published
+            </label>
+          </div>
+          <p class="mt-3 text-xs text-foreground-secondary">
+            Set this to published to make it visible on the storefront
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <DeleteConfirmDialog
