@@ -97,7 +97,18 @@
         id="facet-form"
         method="POST"
         action="?/update"
-        use:enhance={() => {
+        use:enhance={({ cancel }) => {
+          if (!facetName.trim() || !facetCode.trim()) {
+            cancel();
+            toast.error("Facet name and code are required");
+            return;
+          }
+          const invalidValues = values.filter((v) => v.name.trim() || v.code.trim()).filter((v) => !v.name.trim() || !v.code.trim());
+          if (invalidValues.length > 0) {
+            cancel();
+            toast.error("All values must have both name and code");
+            return;
+          }
           isSubmitting = true;
           return async ({ result, update }) => {
             await update({ reset: false });
