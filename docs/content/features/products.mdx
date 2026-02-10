@@ -16,17 +16,18 @@ Product
 
 ## Multi-Language Support
 
-Products use translation tables:
+Products use translation tables. The `getTranslation()` helper finds the right translation with a fallback:
 
 ```typescript
-// Query with translations
-const product = await db.query.products.findFirst({
-	where: eq(products.id, 123),
-	with: { translations: true }
-});
+import { getTranslation } from "$lib/utils";
 
-// Get localized name
-const name = product.translations.find((t) => t.languageCode === "en")?.name;
+const product = await productService.getById(123);
+
+// Get localized name (defaults to DEFAULT_LANGUAGE)
+const name = getTranslation(product.translations)?.name;
+
+// Explicit language
+const fName = getTranslation(product.translations, "fi")?.name;
 ```
 
 ## Variants
@@ -68,16 +69,17 @@ Products and variants can have facet values assigned for:
 Full-text search using PostgreSQL:
 
 ```typescript
-const results = await productService.search("shirt", "en");
+const results = await productService.list({ search: "shirt" });
 ```
 
 ## Admin Operations
 
 ```typescript
+import { DEFAULT_LANGUAGE } from "$lib/utils";
+
 // Create product
 await productService.create({
-	slug: "blue-shirt",
-	translations: [{ languageCode: "en", name: "Blue Shirt", description: "..." }]
+	translations: [{ languageCode: DEFAULT_LANGUAGE, name: "Blue Shirt", slug: "blue-shirt", description: "..." }]
 });
 
 // Variant operations are handled through productService

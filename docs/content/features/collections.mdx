@@ -17,9 +17,10 @@ await collectionService.removeProduct(collectionId, productId);
 Define rules to automatically include products:
 
 ```typescript
+import { DEFAULT_LANGUAGE } from "$lib/utils";
+
 const collection = await collectionService.create({
-	slug: "summer-sale",
-	translations: [{ languageCode: "en", name: "Summer Sale" }],
+	translations: [{ languageCode: DEFAULT_LANGUAGE, name: "Summer Sale", slug: "summer-sale" }],
 	rules: {
 		conditions: [
 			{
@@ -68,13 +69,12 @@ const collection = await collectionService.create({
 ## Querying Collections
 
 ```typescript
-// Get collection with products
-const collection = await collectionService.getBySlug('summer-sale', {
-  languageCode: 'en',
-  page: 1,
-  limit: 20
-});
+// Get collection by slug (uses DEFAULT_LANGUAGE)
+const collection = await collectionService.getBySlug("summer-sale");
 
-// Returns products matching the rules
-collection.products = [{ ... }, { ... }];
+// Get products for a collection with pagination
+const { items, pagination } = await collectionService.getProductsForCollection(
+  collection.id,
+  { limit: 20, offset: 0 }
+);
 ```

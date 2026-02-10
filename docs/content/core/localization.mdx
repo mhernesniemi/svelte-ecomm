@@ -1,6 +1,18 @@
 # Localization
 
-The database schema fully supports multiple languages via separate translation tables. The UI currently operates in **English only**.
+The database schema fully supports multiple languages via separate translation tables. A centralized `DEFAULT_LANGUAGE` constant and `getTranslation()` helper keep language handling consistent across the codebase.
+
+## Language Configuration
+
+The default language is defined in `src/lib/utils.ts` alongside the `BASE_CURRENCY` constant:
+
+```typescript
+import { DEFAULT_LANGUAGE, getTranslation } from "$lib/utils";
+
+DEFAULT_LANGUAGE; // "en"
+```
+
+To change the default language for the entire application, update this single constant. All services and helpers derive their default from it.
 
 ## Translation Tables
 
@@ -12,15 +24,83 @@ The database schema fully supports multiple languages via separate translation t
 | `facet_values`     | `facet_value_translations`     | `name`                        |
 | `collections`      | `collection_translations`      | `name`, `slug`, `description` |
 | `categories`       | `category_translations`        | `name`                        |
+| `content_pages`    | `content_page_translations`    | `title`, `slug`, `body`       |
 
 Each translation table has a `languageCode` column (ISO 639-1, e.g. `"en"`, `"fi"`) with a unique index on `(parentId, languageCode)`.
 
-## Service Layer
+## The `getTranslation()` Helper
 
-Services accept an optional `language` parameter that defaults to `"en"`:
+A shared helper finds the translation for a given language, falling back to the first available translation:
 
 ```typescript
-const products = await productService.list({ language: "en" });
+import { getTranslation } from "$lib/utils";
+
+// Uses DEFAULT_LANGUAGE ("en") automatically
+const name = getTranslation(product.translations)?.name ?? "Untitled";
+
+// Explicit language override
+const fName = getTranslation(product.translations, "fi")?.name;
 ```
+
+This replaces the common pattern of writing `.find((t) => t.languageCode === "en")` manually, which was error-prone and scattered across the codebase.
+
+### Svelte Components
+
+```svelte
+<script lang="ts">
+  import { getTranslation } from "$lib/utils";
+
+  let { data } = $props();
+
+  const translation = $derived(getTranslation(data.product.translations));
+</script>
+
+<h1>{translation?.name ?? "Untitled"}</h1>
+```
+
+## Service Layer
+
+Services accept an optional `language` parameter that defaults to `DEFAULT_LANGUAGE`:
+
+```typescript
+// These are equivalent — both use DEFAULT_LANGUAGE
+const products = await productService.list({ limit: 20 });
+const products = await productService.list({ language: DEFAULT_LANGUAGE, limit: 20 });
+
+// Explicit language override
+const products = await productService.list({ language: "fi", limit: 20 });
+```
+
+## Creating Translations
+
+When creating or updating records, use `DEFAULT_LANGUAGE` for the language code:
+
+```typescript
+import { DEFAULT_LANGUAGE } from "$lib/utils";
+
+await productService.create({
+  translations: [{ languageCode: DEFAULT_LANGUAGE, name: "Blue Shirt", slug: "blue-shirt" }]
+});
+```
+
+## Adding a New Language
+
+1. No schema changes needed — translation tables already support any ISO 639-1 code
+2. Add translations for the new language to existing records:
+
+```typescript
+await productService.update(productId, {
+  translations: [{ languageCode: "fi", name: "Sininen paita", slug: "sininen-paita" }]
+});
+```
+
+3. Pass the language code to services and the `getTranslation()` helper where needed
+
+## Best Practices
+
+1. **Never hardcode `"en"`** — always use `DEFAULT_LANGUAGE` or `getTranslation()`
+2. **Use `getTranslation()` in components** — it handles the fallback to the first translation automatically
+3. **Omit the language parameter** in service calls when using the default language
+4. **Use `DEFAULT_LANGUAGE` in data objects** — when creating translations, reference the constant instead of a string literal
 
 See `src/lib/server/db/schema.ts` for the full translation table definitions.
