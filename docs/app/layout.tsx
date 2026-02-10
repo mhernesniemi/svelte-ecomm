@@ -1,18 +1,14 @@
-import { Footer, Layout, Navbar } from 'nextra-theme-docs';
-import { Head } from 'nextra/components';
-import { getPageMap } from 'nextra/page-map';
-import 'nextra-theme-docs/style.css';
-import './custom.css';
+import { Footer, Layout, Navbar } from "nextra-theme-docs";
+import { Head } from "nextra/components";
+import { getPageMap } from "nextra/page-map";
+import "nextra-theme-docs/style.css";
+import "./custom.css";
 
 export const metadata = {
-	title: 'Hoikka Documentation'
+	title: "Hoikka Documentation"
 };
 
-export default async function RootLayout({
-	children
-}: {
-	children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" dir="ltr" suppressHydrationWarning>
 			<Head
@@ -26,7 +22,12 @@ export default async function RootLayout({
 				<Layout
 					navbar={
 						<Navbar
-							logo={<><img src="/face.png" alt="" className="hoikka-face" /><span className="hoikka-logo">Hoikka</span></>}
+							logo={
+								<>
+									<img src="/pute.png" alt="" className="hoikka-face" />
+									<span className="hoikka-logo">Hoikka</span>
+								</>
+							}
 							projectLink="https://github.com/your-org/hoikka"
 						/>
 					}
