@@ -163,7 +163,7 @@
 <svelte:head><title>Promotions | Admin</title></svelte:head>
 
 <div>
-  <div class="mb-8 flex items-center justify-between">
+  <div class="mb-6 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-bold text-foreground">Promotions</h1>
     </div>
