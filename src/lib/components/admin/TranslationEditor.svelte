@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
-  import { toast } from "svelte-sonner";
-  import { Button } from "$lib/components/admin/ui/button";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import { TRANSLATION_LANGUAGES, DEFAULT_LANGUAGE, LANGUAGES } from "$lib/config/languages.js";
   import Globe from "@lucide/svelte/icons/globe";
@@ -15,14 +12,12 @@
   interface Props {
     fields: Field[];
     translations: Record<string, Record<string, string | null>>;
-    entityId: number;
-    action?: string;
+    formId: string;
   }
 
-  let { fields, translations, entityId, action = "?/saveTranslation" }: Props = $props();
+  let { fields, translations, formId }: Props = $props();
 
   let activeTab = $state(TRANSLATION_LANGUAGES[0]?.code ?? "fi");
-  let isSaving = $state(false);
 </script>
 
 <div class="overflow-hidden rounded-lg bg-surface shadow">
@@ -51,70 +46,49 @@
   <div class="p-6">
     {#each TRANSLATION_LANGUAGES as lang}
       {#if activeTab === lang.code}
-        <form
-          method="POST"
-          action={action}
-          use:enhance={() => {
-            isSaving = true;
-            return async ({ result, update }) => {
-              isSaving = false;
-              if (result.type === "success") {
-                toast.success(`${lang.name} translation saved`);
-              }
-              await update({ reset: false });
-            };
-          }}
-        >
-          <input type="hidden" name="entityId" value={entityId} />
-          <input type="hidden" name="languageCode" value={lang.code} />
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {#each fields as field}
+            <div class={field.type !== "text" ? "sm:col-span-2" : ""}>
+              <label
+                for="translation_{lang.code}_{field.name}"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
+                {field.label}
+              </label>
 
-          <div class="space-y-4">
-            {#each fields as field}
-              <div>
-                <label
-                  for="translation_{lang.code}_{field.name}"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+              {#if field.type === "text"}
+                <input
+                  type="text"
+                  id="translation_{lang.code}_{field.name}"
+                  name="{field.name}_{lang.code}"
+                  form={formId}
+                  value={translations[lang.code]?.[field.name] ?? ""}
+                  class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                />
+              {:else if field.type === "textarea"}
+                <textarea
+                  id="translation_{lang.code}_{field.name}"
+                  name="{field.name}_{lang.code}"
+                  form={formId}
+                  rows="4"
+                  class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                  >{translations[lang.code]?.[field.name] ?? ""}</textarea
                 >
-                  {field.label}
-                </label>
+              {:else if field.type === "richtext"}
+                <RichTextEditor
+                  name="{field.name}_{lang.code}"
+                  form={formId}
+                  content={translations[lang.code]?.[field.name] ?? ""}
+                  placeholder="Write {field.label.toLowerCase()}..."
+                />
+              {/if}
+            </div>
+          {/each}
+        </div>
 
-                {#if field.type === "text"}
-                  <input
-                    type="text"
-                    id="translation_{lang.code}_{field.name}"
-                    name={field.name}
-                    value={translations[lang.code]?.[field.name] ?? ""}
-                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                  />
-                {:else if field.type === "textarea"}
-                  <textarea
-                    id="translation_{lang.code}_{field.name}"
-                    name={field.name}
-                    rows="4"
-                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                    >{translations[lang.code]?.[field.name] ?? ""}</textarea
-                  >
-                {:else if field.type === "richtext"}
-                  <RichTextEditor
-                    name={field.name}
-                    content={translations[lang.code]?.[field.name] ?? ""}
-                    placeholder="Write {field.label.toLowerCase()}..."
-                  />
-                {/if}
-              </div>
-            {/each}
-          </div>
-
-          <p class="mt-3 text-xs text-muted-foreground">
-            Leave empty to use the default ({LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name}) value.
-          </p>
-
-          <div class="mt-4">
-            <Button type="submit" size="sm" disabled={isSaving}>
-              {isSaving ? "Saving..." : `Save ${lang.name}`}
-            </Button>
-          </div>
-        </form>
+        <p class="mt-3 text-xs text-muted-foreground">
+          Leave empty to use the default ({LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name}) value.
+        </p>
       {/if}
     {/each}
   </div>

@@ -148,7 +148,7 @@
       { name: "body", label: "Body", type: "richtext" }
     ]}
     translations={translationsToMap(data.translations)}
-    entityId={data.page.id}
+    formId="content-page-form"
   />
 
   <button

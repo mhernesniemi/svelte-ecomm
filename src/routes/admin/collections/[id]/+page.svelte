@@ -715,7 +715,7 @@
           { name: "description", label: "Description", type: "richtext" }
         ]}
         translations={translationsToMap(data.translations)}
-        entityId={data.collection.id}
+        formId="collection-form"
       />
 
       <button

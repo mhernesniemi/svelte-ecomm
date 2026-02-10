@@ -4,6 +4,7 @@ import { facetService } from "$lib/server/services/facets.js";
 import { productService } from "$lib/server/services/products.js";
 import { assetService } from "$lib/server/services/assets.js";
 import { translationService } from "$lib/server/services/translations.js";
+import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import { slugify } from "$lib/utils.js";
 
@@ -68,6 +69,19 @@ export const actions: Actions = {
 				await collectionService.replaceFilters(id, filters);
 			}
 
+			// Save translations
+			for (const lang of TRANSLATION_LANGUAGES) {
+				const tName = data.get(`name_${lang.code}`) as string;
+				const tSlug = data.get(`slug_${lang.code}`) as string;
+				const tDescription = data.get(`description_${lang.code}`) as string;
+
+				await translationService.upsertCollectionTranslation(id, lang.code, {
+					name: tName || "",
+					slug: tSlug || "",
+					description: tDescription || null
+				});
+			}
+
 			return { success: true, message: "Collection updated successfully" };
 		} catch (err) {
 			return fail(500, { error: "Failed to update collection" });
@@ -86,30 +100,6 @@ export const actions: Actions = {
 			return { preview: result.products, productCount: result.total };
 		} catch {
 			return fail(400, { error: "Invalid filters" });
-		}
-	},
-
-	saveTranslation: async ({ request }) => {
-		const formData = await request.formData();
-		const entityId = Number(formData.get("entityId"));
-		const languageCode = formData.get("languageCode") as string;
-		const name = formData.get("name") as string;
-		const slug = formData.get("slug") as string;
-		const description = formData.get("description") as string;
-
-		if (!entityId || !languageCode) {
-			return fail(400, { error: "Missing required fields" });
-		}
-
-		try {
-			await translationService.upsertCollectionTranslation(entityId, languageCode, {
-				name: name || "",
-				slug: slug || "",
-				description: description || null
-			});
-			return { success: true, message: "Translation saved" };
-		} catch {
-			return fail(500, { error: "Failed to save translation" });
 		}
 	},
 

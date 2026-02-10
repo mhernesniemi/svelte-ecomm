@@ -10,6 +10,7 @@
     content?: string;
     placeholder?: string;
     name?: string;
+    form?: string;
     class?: string;
     onchange?: (html: string) => void;
   }
@@ -18,6 +19,7 @@
     content = "",
     placeholder = "Write something...",
     name,
+    form: formId,
     class: className,
     onchange
   }: Props = $props();
@@ -223,7 +225,7 @@
 
   <!-- Hidden input to submit HTML content with form -->
   {#if name}
-    <input type="hidden" {name} value={html} />
+    <input type="hidden" {name} form={formId} value={html} />
   {/if}
 </div>
 

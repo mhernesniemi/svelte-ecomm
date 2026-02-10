@@ -5,6 +5,7 @@ import { categoryService } from "$lib/server/services/categories.js";
 import { collectionService } from "$lib/server/services/collections.js";
 import { taxService } from "$lib/server/services/tax.js";
 import { translationService } from "$lib/server/services/translations.js";
+import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -97,6 +98,19 @@ export const actions: Actions = {
 
 			// Update categories
 			await categoryService.setProductCategories(id, categoryIds);
+
+			// Save translations
+			for (const lang of TRANSLATION_LANGUAGES) {
+				const tName = formData.get(`name_${lang.code}`) as string;
+				const tSlug = formData.get(`slug_${lang.code}`) as string;
+				const tDescription = formData.get(`description_${lang.code}`) as string;
+
+				await translationService.upsertProductTranslation(id, lang.code, {
+					name: tName || "",
+					slug: tSlug || "",
+					description: tDescription || null
+				});
+			}
 
 			return { success: true };
 		} catch (e) {
@@ -225,30 +239,6 @@ export const actions: Actions = {
 			return { categorySuccess: true };
 		} catch (e) {
 			return fail(500, { categoryError: "Failed to update categories" });
-		}
-	},
-
-	saveTranslation: async ({ request }) => {
-		const formData = await request.formData();
-		const entityId = Number(formData.get("entityId"));
-		const languageCode = formData.get("languageCode") as string;
-		const name = formData.get("name") as string;
-		const slug = formData.get("slug") as string;
-		const description = formData.get("description") as string;
-
-		if (!entityId || !languageCode) {
-			return fail(400, { error: "Missing required fields" });
-		}
-
-		try {
-			await translationService.upsertProductTranslation(entityId, languageCode, {
-				name: name || "",
-				slug: slug || "",
-				description: description || null
-			});
-			return { translationSuccess: true };
-		} catch {
-			return fail(500, { error: "Failed to save translation" });
 		}
 	},
 

@@ -337,7 +337,7 @@
       <TranslationEditor
         fields={[{ name: "name", label: "Name", type: "text" }]}
         translations={translationsToMap(data.translations)}
-        entityId={data.variant.id}
+        formId="variant-form"
       />
     </div>
 

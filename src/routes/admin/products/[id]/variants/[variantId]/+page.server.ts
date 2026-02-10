@@ -2,6 +2,7 @@ import { productService } from "$lib/server/services/products.js";
 import { facetService } from "$lib/server/services/facets.js";
 import { customerGroupService } from "$lib/server/services/customerGroups.js";
 import { translationService } from "$lib/server/services/translations.js";
+import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -115,29 +116,18 @@ export const actions: Actions = {
 				}
 			}
 
+			// Save translations
+			for (const lang of TRANSLATION_LANGUAGES) {
+				const tName = formData.get(`name_${lang.code}`) as string;
+
+				await translationService.upsertVariantTranslation(variantId, lang.code, {
+					name: tName || null
+				});
+			}
+
 			return { success: true };
 		} catch (e) {
 			return fail(500, { error: "Failed to update variant" });
-		}
-	},
-
-	saveTranslation: async ({ request }) => {
-		const formData = await request.formData();
-		const entityId = Number(formData.get("entityId"));
-		const languageCode = formData.get("languageCode") as string;
-		const name = formData.get("name") as string;
-
-		if (!entityId || !languageCode) {
-			return fail(400, { error: "Missing required fields" });
-		}
-
-		try {
-			await translationService.upsertVariantTranslation(entityId, languageCode, {
-				name: name || null
-			});
-			return { translationSuccess: true };
-		} catch {
-			return fail(500, { error: "Failed to save translation" });
 		}
 	},
 

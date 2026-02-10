@@ -97,7 +97,7 @@
   <TranslationEditor
     fields={[{ name: "name", label: "Name", type: "text" }]}
     translations={translationsToMap(data.facetTranslations)}
-    entityId={data.facet.id}
+    formId="facet-form"
   />
 
   <!-- Values -->

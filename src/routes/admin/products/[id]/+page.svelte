@@ -399,7 +399,7 @@
           { name: "description", label: "Description", type: "richtext" }
         ]}
         translations={translationsToMap(data.translations)}
-        entityId={data.product.id}
+        formId="product-form"
       />
 
       <button

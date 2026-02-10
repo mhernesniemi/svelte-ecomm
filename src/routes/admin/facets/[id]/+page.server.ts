@@ -1,5 +1,6 @@
 import { facetService } from "$lib/server/services/facets.js";
 import { translationService } from "$lib/server/services/translations.js";
+import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
 import { error, fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -37,6 +38,16 @@ export const actions: Actions = {
 				code: code.toLowerCase().replace(/\s+/g, "_"),
 				name: nameEn
 			});
+
+			// Save translations
+			for (const lang of TRANSLATION_LANGUAGES) {
+				const tName = formData.get(`name_${lang.code}`) as string;
+
+				await translationService.upsertFacetTranslation(id, lang.code, {
+					name: tName || ""
+				});
+			}
+
 			return { success: true, message: "Facet updated" };
 		} catch {
 			return fail(500, { error: "Failed to update facet" });
@@ -99,26 +110,6 @@ export const actions: Actions = {
 			return { success: true, message: "Value deleted" };
 		} catch {
 			return fail(500, { error: "Failed to delete value" });
-		}
-	},
-
-	saveTranslation: async ({ request }) => {
-		const formData = await request.formData();
-		const entityId = Number(formData.get("entityId"));
-		const languageCode = formData.get("languageCode") as string;
-		const name = formData.get("name") as string;
-
-		if (!entityId || !languageCode) {
-			return fail(400, { error: "Missing required fields" });
-		}
-
-		try {
-			await translationService.upsertFacetTranslation(entityId, languageCode, {
-				name: name || ""
-			});
-			return { success: true, message: "Translation saved" };
-		} catch {
-			return fail(500, { error: "Failed to save translation" });
 		}
 	},
 
