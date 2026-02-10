@@ -21,7 +21,12 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
-  import { translationsToMap, LANGUAGES, DEFAULT_LANGUAGE, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import {
+    translationsToMap,
+    LANGUAGES,
+    DEFAULT_LANGUAGE,
+    TRANSLATION_LANGUAGES
+  } from "$lib/config/languages.js";
   import Check from "@lucide/svelte/icons/check";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import X from "@lucide/svelte/icons/x";
@@ -315,7 +320,6 @@
                 placeholder="Write product description..."
               />
             </div>
-
           </div>
         </div>
 
@@ -391,13 +395,13 @@
             disabled={isSavingImages}
           >
             <Plus class="h-4 w-4" />
-            Add
+            Add Image
           </Button>
         </div>
 
         <div class="p-6">
           {#if data.product.assets.length > 0}
-            <div class="grid grid-cols-3 gap-3">
+            <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
               {#each data.product.assets as asset}
                 <div class="group relative">
                   <img
@@ -582,7 +586,7 @@
             >
               {#each data.taxRates as rate}
                 <option value={rate.code} selected={data.product.taxCode === rate.code}>
-                  {rate.name} ({(rate.rate * 100).toFixed(0)}%)
+                  {rate.name}
                 </option>
               {/each}
             </select>

@@ -13,8 +13,8 @@
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
-  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
-  import { translationsToMap } from "$lib/config/languages.js";
+  import { translationsToMap, LANGUAGES, DEFAULT_LANGUAGE, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import { cn } from "$lib/utils";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -38,6 +38,8 @@
 
   let isSubmitting = $state(false);
   let showDelete = $state(false);
+  let activeLanguageTab = $state(DEFAULT_LANGUAGE);
+  const translationMap = $derived(translationsToMap(data.translations));
   let showImagePicker = $state(false);
   let isSavingImages = $state(false);
   let editingImageAlt = $state<{ id: number; alt: string } | null>(null);
@@ -368,10 +370,29 @@
         <input type="hidden" name="is_private" value={isPrivate ? "on" : ""} />
 
         <div class="overflow-hidden rounded-lg bg-surface shadow">
-          <div class="p-6">
-            <h2 class="mb-4 text-lg font-medium text-foreground">Basic Information</h2>
+          <!-- Language Tabs -->
+          {#if TRANSLATION_LANGUAGES.length > 0}
+            <div class="flex border-b border-border">
+              {#each LANGUAGES as lang}
+                <button
+                  type="button"
+                  class={cn(
+                    "px-4 py-2.5 text-sm font-medium",
+                    activeLanguageTab === lang.code
+                      ? "border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                  onclick={() => (activeLanguageTab = lang.code)}
+                >
+                  {lang.name}
+                </button>
+              {/each}
+            </div>
+          {/if}
 
-            <div class="space-y-4">
+          <!-- Default language fields -->
+          <div class={activeLanguageTab !== DEFAULT_LANGUAGE ? "hidden" : ""}>
+            <div class="space-y-4 p-6">
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label
@@ -422,6 +443,63 @@
               </div>
             </div>
           </div>
+
+          <!-- Translation language fields -->
+          {#each TRANSLATION_LANGUAGES as lang}
+            <div class={activeLanguageTab !== lang.code ? "hidden" : ""}>
+              <div class="space-y-4 p-6">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      for="translation_{lang.code}_name"
+                      class="mb-1 block text-sm font-medium text-foreground-secondary"
+                    >
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      id="translation_{lang.code}_name"
+                      name="name_{lang.code}"
+                      value={translationMap[lang.code]?.name ?? ""}
+                      class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="translation_{lang.code}_slug"
+                      class="mb-1 block text-sm font-medium text-foreground-secondary"
+                    >
+                      Slug
+                    </label>
+                    <input
+                      type="text"
+                      id="translation_{lang.code}_slug"
+                      name="slug_{lang.code}"
+                      value={translationMap[lang.code]?.slug ?? ""}
+                      class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    for="translation_{lang.code}_description"
+                    class="mb-1 block text-sm font-medium text-foreground-secondary"
+                  >
+                    Description
+                  </label>
+                  <RichTextEditor
+                    name="description_{lang.code}"
+                    content={translationMap[lang.code]?.description ?? ""}
+                    placeholder="Write collection description..."
+                  />
+                </div>
+
+                <p class="text-xs text-muted-foreground">
+                  Leave empty to use the {LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name} value.
+                </p>
+              </div>
+            </div>
+          {/each}
         </div>
       </form>
 
@@ -706,17 +784,6 @@
           />
         </div>
       </div>
-
-      <!-- Translations -->
-      <TranslationEditor
-        fields={[
-          { name: "name", label: "Name", type: "text" },
-          { name: "slug", label: "Slug", type: "text" },
-          { name: "description", label: "Description", type: "richtext" }
-        ]}
-        translations={translationsToMap(data.translations)}
-        formId="collection-form"
-      />
 
       <button
         type="button"

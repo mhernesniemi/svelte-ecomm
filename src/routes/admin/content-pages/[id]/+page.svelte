@@ -6,8 +6,8 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
-  import { translationsToMap } from "$lib/config/languages.js";
+  import { translationsToMap, LANGUAGES, DEFAULT_LANGUAGE, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import { cn } from "$lib/utils";
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
@@ -31,6 +31,8 @@
   let title = $state("");
   let slug = $state("");
   let published = $state(false);
+  let activeLanguageTab = $state(DEFAULT_LANGUAGE);
+  const translationMap = $derived(translationsToMap(data.translations));
 
   $effect(() => {
     title = data.page.title ?? "";
@@ -81,10 +83,29 @@
     class="space-y-6"
   >
     <div class="overflow-hidden rounded-lg bg-surface shadow">
-      <div class="p-6">
-        <h2 class="mb-4 text-lg font-medium text-foreground">Page Details</h2>
+      <!-- Language Tabs -->
+      {#if TRANSLATION_LANGUAGES.length > 0}
+        <div class="flex border-b border-border">
+          {#each LANGUAGES as lang}
+            <button
+              type="button"
+              class={cn(
+                "px-4 py-2.5 text-sm font-medium",
+                activeLanguageTab === lang.code
+                  ? "border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+              onclick={() => (activeLanguageTab = lang.code)}
+            >
+              {lang.name}
+            </button>
+          {/each}
+        </div>
+      {/if}
 
-        <div class="space-y-4">
+      <!-- Default language fields -->
+      <div class={activeLanguageTab !== DEFAULT_LANGUAGE ? "hidden" : ""}>
+        <div class="space-y-4 p-6">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary">
@@ -137,19 +158,67 @@
           </div>
         </div>
       </div>
+
+      <!-- Translation language fields -->
+      {#each TRANSLATION_LANGUAGES as lang}
+        <div class={activeLanguageTab !== lang.code ? "hidden" : ""}>
+          <div class="space-y-4 p-6">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="translation_{lang.code}_title"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
+                  Title
+                </label>
+                <input
+                  type="text"
+                  id="translation_{lang.code}_title"
+                  name="title_{lang.code}"
+                  value={translationMap[lang.code]?.title ?? ""}
+                  class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                />
+              </div>
+
+              <div>
+                <label
+                  for="translation_{lang.code}_slug"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  id="translation_{lang.code}_slug"
+                  name="slug_{lang.code}"
+                  value={translationMap[lang.code]?.slug ?? ""}
+                  class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="translation_{lang.code}_body"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
+                Body
+              </label>
+              <RichTextEditor
+                name="body_{lang.code}"
+                content={translationMap[lang.code]?.body ?? ""}
+                placeholder="Write page content..."
+              />
+            </div>
+
+            <p class="text-xs text-muted-foreground">
+              Leave empty to use the {LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name} value.
+            </p>
+          </div>
+        </div>
+      {/each}
     </div>
   </form>
-
-  <!-- Translations -->
-  <TranslationEditor
-    fields={[
-      { name: "title", label: "Title", type: "text" },
-      { name: "slug", label: "Slug", type: "text" },
-      { name: "body", label: "Body", type: "richtext" }
-    ]}
-    translations={translationsToMap(data.translations)}
-    formId="content-page-form"
-  />
 
   <button
     type="button"
