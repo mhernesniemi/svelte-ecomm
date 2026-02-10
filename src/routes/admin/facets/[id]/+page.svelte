@@ -165,10 +165,10 @@
             </p>
           </div>
         {:else}
-          <div>
+          <div class="pb-6">
             {#each values as _, i}
               <div class={i > 0 ? "border-t border-border" : ""}>
-                <div class="space-y-3 p-6">
+                <div class="space-y-3 px-6 py-3">
                   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label
@@ -185,20 +185,29 @@
                         class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
                       />
                     </div>
-                    <div>
-                      <label
-                        for="value_code_{i}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
+                    <div class="flex items-end gap-4">
+                      <div class="flex-1">
+                        <label
+                          for="value_code_{i}"
+                          class="mb-1 block text-sm font-medium text-foreground-secondary"
+                        >
+                          Code
+                        </label>
+                        <input
+                          type="text"
+                          id="value_code_{i}"
+                          bind:value={values[i].code}
+                          placeholder="e.g., red"
+                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-500"
+                        onclick={() => (values = values.filter((_, j) => j !== i))}
                       >
-                        Code
-                      </label>
-                      <input
-                        type="text"
-                        id="value_code_{i}"
-                        bind:value={values[i].code}
-                        placeholder="e.g., red"
-                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                      />
+                        <Trash class="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -219,17 +228,6 @@
                         />
                       </div>
                     {/each}
-                    <div class="flex items-end justify-end">
-                      <Button
-                        type="button"
-                        variant="destructive-ghost"
-                        size="icon"
-                        class="size-8"
-                        onclick={() => (values = values.filter((_, j) => j !== i))}
-                      >
-                        <Trash class="h-4 w-4" />
-                      </Button>
-                    </div>
                   </div>
                 </div>
               </div>
