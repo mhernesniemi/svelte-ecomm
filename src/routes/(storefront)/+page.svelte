@@ -42,7 +42,7 @@
             <span class="text-gray-900 italic">Built with SvelteKit.</span>
           </p>
           <div class="flex items-start gap-4">
-            <img src="/kuvitus2.png" alt="Svelte" class="h-20 w-20" />
+            <img src="/kuvitus2.png" alt="Svelte" class="h-20 w-auto" />
             <div class="pt-2">
               <a
                 href="https://hoikka-docs.vercel.app"
