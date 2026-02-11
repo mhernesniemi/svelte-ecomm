@@ -29,6 +29,7 @@ import type {
 	FacetValue,
 	PaginatedResult
 } from "$lib/types.js";
+import { DEFAULT_PRODUCT_TYPE } from "$lib/config/products.js";
 
 export class ProductService {
 
@@ -146,7 +147,7 @@ export class ProductService {
 				name: input.name,
 				slug: input.slug,
 				description: input.description,
-				type: input.type ?? "physical",
+				type: input.type ?? DEFAULT_PRODUCT_TYPE,
 				visibility: input.visibility ?? "public",
 				taxCode: input.taxCode ?? "standard"
 			})

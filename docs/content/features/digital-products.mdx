@@ -7,9 +7,19 @@ Hoikka supports both physical and digital products. The product `type` field (`p
 - **Physical products** require a shipping address and go through the shipping provider flow.
 - **Digital products** skip shipping entirely. After payment, they trigger email delivery with download links or access instructions.
 
-## Setting a Product as Digital
+## Changing the Default Product Type
 
-The product type is stored in the `products.type` column. To mark a product as digital, update it via the product service:
+The default type for new products is set in `src/lib/config/products.ts`:
+
+```typescript
+export const DEFAULT_PRODUCT_TYPE: ProductType = "physical";
+```
+
+Change this to `"digital"` if the store only sells digital products. All newly created products will then default to digital.
+
+## Setting a Single Product as Digital
+
+To change an individual product's type, update it via the product service:
 
 ```typescript
 await productService.update(123, { type: "digital" });
