@@ -114,6 +114,23 @@
               {/each}
             </select>
           </div>
+          <div>
+            <label
+              for="cat_tax_code"
+              class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >
+              Tax Rate
+            </label>
+            <select
+              id="cat_tax_code"
+              name="tax_code"
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+            >
+              {#each data.taxRates as rate}
+                <option value={rate.code} selected={rate.code === "standard"}>{rate.name}</option>
+              {/each}
+            </select>
+          </div>
         </div>
         <div class="mt-4 flex justify-end gap-2">
           <Button type="button" variant="outline" size="sm" onclick={() => (showCreate = false)}>
@@ -244,6 +261,25 @@
                         {#each flatCategories.filter((c) => c.id !== node.id) as category}
                           <option value={category.id} selected={category.id === node.parentId}>
                             {"— ".repeat(category.depth)}{category.name}
+                          </option>
+                        {/each}
+                      </select>
+                    </div>
+                    <div>
+                      <label
+                        for="edit_tax_code_{node.id}"
+                        class="mb-1 block text-sm font-medium text-foreground-secondary"
+                      >
+                        Tax Rate
+                      </label>
+                      <select
+                        id="edit_tax_code_{node.id}"
+                        name="tax_code"
+                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                      >
+                        {#each data.taxRates as rate}
+                          <option value={rate.code} selected={rate.code === node.taxCode}>
+                            {rate.name}
                           </option>
                         {/each}
                       </select>

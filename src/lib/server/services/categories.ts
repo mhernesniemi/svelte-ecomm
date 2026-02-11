@@ -31,6 +31,7 @@ export class CategoryService {
 		name: string;
 		parentId?: number | null;
 		position?: number;
+		taxCode?: string;
 	}): Promise<Category> {
 		const [category] = await db
 			.insert(categories)
@@ -38,7 +39,8 @@ export class CategoryService {
 				slug: input.slug,
 				name: input.name,
 				parentId: input.parentId ?? null,
-				position: input.position ?? 0
+				position: input.position ?? 0,
+				taxCode: input.taxCode ?? "standard"
 			})
 			.returning();
 
@@ -166,6 +168,7 @@ export class CategoryService {
 			name?: string;
 			parentId?: number | null;
 			position?: number;
+			taxCode?: string;
 		}
 	): Promise<Category | null> {
 		const updateData: Record<string, unknown> = {};
@@ -173,6 +176,7 @@ export class CategoryService {
 		if (input.name !== undefined) updateData.name = input.name;
 		if (input.parentId !== undefined) updateData.parentId = input.parentId;
 		if (input.position !== undefined) updateData.position = input.position;
+		if (input.taxCode !== undefined) updateData.taxCode = input.taxCode;
 
 		if (Object.keys(updateData).length > 0) {
 			await db.update(categories).set(updateData).where(eq(categories.id, id));
@@ -272,6 +276,23 @@ export class CategoryService {
 		return db.query.categories.findMany({
 			orderBy: [asc(categories.position), asc(categories.id)]
 		});
+	}
+
+	/**
+	 * Get tax code for a product based on its first assigned category.
+	 * Returns "standard" if the product has no categories.
+	 */
+	async getProductTaxCode(productId: number): Promise<string> {
+		const result = await db.query.productCategories.findFirst({
+			where: eq(productCategories.productId, productId),
+			with: {
+				category: {
+					columns: { taxCode: true }
+				}
+			}
+		});
+
+		return result?.category?.taxCode ?? "standard";
 	}
 }
 

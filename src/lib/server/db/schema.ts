@@ -801,6 +801,7 @@ export const categories = pgTable(
 		slug: varchar("slug", { length: 255 }).notNull().unique(),
 		position: integer("position").default(0).notNull(),
 		featuredAssetId: integer("featured_asset_id").references(() => assets.id),
+		taxCode: varchar("tax_code", { length: 20 }).default("standard").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
 			.defaultNow()

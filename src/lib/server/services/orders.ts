@@ -39,6 +39,7 @@ import { taxService } from "./tax.js";
 import { STATE_TRANSITIONS, isValidTransition } from "./order-utils.js";
 import { promotionService } from "./promotions.js";
 import { calculateDiscount, calculateProductDiscount } from "./promotion-utils.js";
+import { categoryService } from "./categories.js";
 
 // Generate a secure cart token for guest users
 function generateCartToken(): string {
@@ -318,8 +319,8 @@ export class OrderService {
 			.where(eq(productVariantTranslations.variantId, variant.id))
 			.limit(1);
 
-		// Get tax rate for this product
-		const taxCode = product?.taxCode ?? "standard";
+		// Get tax rate from product's category
+		const taxCode = await categoryService.getProductTaxCode(variant.productId);
 		const taxRate = await taxService.getTaxRate(taxCode);
 		const isTaxExempt = await taxService.isCustomerTaxExempt(order.customerId);
 

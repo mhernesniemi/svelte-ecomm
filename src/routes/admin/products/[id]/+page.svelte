@@ -570,40 +570,6 @@
         </div>
       </div>
 
-      <!-- Product Settings -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Settings</h2>
-        </div>
-        <div class="space-y-3 p-4">
-          <label class="block">
-            <span class="text-sm font-medium text-foreground-secondary">Product Type</span>
-            <select
-              form="product-form"
-              name="type"
-              class="mt-1 block w-full rounded-md border-input-border shadow-sm"
-            >
-              <option value="physical" selected={data.product.type === "physical"}>Physical</option>
-              <option value="digital" selected={data.product.type === "digital"}>Digital</option>
-            </select>
-          </label>
-          <label class="block">
-            <span class="text-sm font-medium text-foreground-secondary">Tax Rate</span>
-            <select
-              form="product-form"
-              name="taxCode"
-              class="mt-1 block w-full rounded-md border-input-border shadow-sm"
-            >
-              {#each data.taxRates as rate}
-                <option value={rate.code} selected={data.product.taxCode === rate.code}>
-                  {rate.name}
-                </option>
-              {/each}
-            </select>
-          </label>
-        </div>
-      </div>
-
       <!-- Facet Values Section -->
       <div class="rounded-lg bg-surface shadow">
         <div class="border-b border-border px-4 py-3">

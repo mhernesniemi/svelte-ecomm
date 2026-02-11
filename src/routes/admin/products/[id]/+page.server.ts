@@ -3,7 +3,6 @@ import { facetService } from "$lib/server/services/facets.js";
 import { assetService } from "$lib/server/services/assets.js";
 import { categoryService } from "$lib/server/services/categories.js";
 import { collectionService } from "$lib/server/services/collections.js";
-import { taxService } from "$lib/server/services/tax.js";
 import { translationService } from "$lib/server/services/translations.js";
 import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
 import { error, fail, redirect } from "@sveltejs/kit";
@@ -22,12 +21,11 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Product not found");
 	}
 
-	const [facets, categoryTree, productCategories, taxRates, productCollections, translations] =
+	const [facets, categoryTree, productCategories, productCollections, translations] =
 		await Promise.all([
 			facetService.list(),
 			categoryService.getTree(),
 			categoryService.getProductCategories(id),
-			taxService.getAllTaxRates(),
 			collectionService.getCollectionsForProduct(id),
 			translationService.getProductTranslations(id)
 		]);
@@ -37,7 +35,6 @@ export const load: PageServerLoad = async ({ params }) => {
 		facets,
 		categoryTree,
 		productCategories,
-		taxRates,
 		productCollections,
 		translations
 	};
@@ -51,9 +48,7 @@ export const actions: Actions = {
 		const name = formData.get("name") as string;
 		const slug = formData.get("slug") as string;
 		const description = formData.get("description") as string;
-		const type = formData.get("type") as "physical" | "digital";
 		const visibility = formData.get("visibility") as "public" | "private" | "draft";
-		const taxCode = formData.get("taxCode") as string;
 
 		// Facet values and categories
 		const facetValueIds = formData
@@ -72,9 +67,7 @@ export const actions: Actions = {
 		try {
 			// Update product
 			await productService.update(id, {
-				type,
 				visibility,
-				taxCode: taxCode || "standard",
 				name,
 				slug,
 				description: description || undefined
