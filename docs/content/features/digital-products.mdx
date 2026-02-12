@@ -13,13 +13,17 @@ The default type for new products is set in `src/lib/config/products.ts`:
 
 ```typescript
 export const DEFAULT_PRODUCT_TYPE: ProductType = "physical";
+export const PRODUCT_TYPES: ProductType[] = ["physical", "digital"];
 ```
 
-Change this to `"digital"` if the store only sells digital products. All newly created products will then default to digital.
+- Change `DEFAULT_PRODUCT_TYPE` to `"digital"` if the store primarily sells digital products.
+- The `PRODUCT_TYPES` array controls which types are available. If it contains two or more types, a **Product Type** selector is shown in the admin product page. If only one type is listed, the selector is hidden and all products use that type.
 
 ## Setting a Single Product as Digital
 
-To change an individual product's type, update it via the product service:
+When both product types are configured in `PRODUCT_TYPES`, a **Product Type** selector appears in the admin product page sidebar. Use it to switch any product between physical and digital.
+
+You can also update the type programmatically:
 
 ```typescript
 await productService.update(123, { type: "digital" });
