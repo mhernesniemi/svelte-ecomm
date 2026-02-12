@@ -1,6 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { Snippet } from "svelte";
+import { DATE_LOCALE } from "$lib/config/locale.js";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -121,6 +122,27 @@ export function convertPrice(centsInBaseCurrency: number, exchangeRate: number):
  */
 export function getCurrencySymbol(currencyCode: string): string {
 	return CURRENCY_CONFIG[currencyCode]?.symbol ?? currencyCode;
+}
+
+// ============================================================================
+// DATE UTILITIES
+// ============================================================================
+
+/**
+ * Format a date for display (e.g. "10.2.2026" with fi-FI locale).
+ */
+export function formatDate(date: Date | string): string {
+	return new Intl.DateTimeFormat(DATE_LOCALE, { dateStyle: "short" }).format(new Date(date));
+}
+
+/**
+ * Format a date with time (e.g. "10.2.2026 klo 14.30" with fi-FI locale).
+ */
+export function formatDateTime(date: Date | string): string {
+	return new Intl.DateTimeFormat(DATE_LOCALE, {
+		dateStyle: "short",
+		timeStyle: "short"
+	}).format(new Date(date));
 }
 
 /**

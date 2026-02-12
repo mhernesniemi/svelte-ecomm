@@ -8,6 +8,7 @@
   import type { PageData } from "./$types";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import { Badge } from "$lib/components/admin/ui/badge";
+  import { formatDate } from "$lib/utils";
 
   let { data }: { data: PageData } = $props();
 
@@ -58,7 +59,7 @@
     {
       accessorKey: "createdAt",
       header: "Created",
-      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
+      cell: ({ row }) => formatDate(row.original.createdAt)
     }
   ];
 </script>

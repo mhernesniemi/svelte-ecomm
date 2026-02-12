@@ -9,6 +9,7 @@
   import type { PageData } from "./$types";
   import Gift from "@lucide/svelte/icons/gift";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { formatDate } from "$lib/utils";
 
   let { data }: { data: PageData } = $props();
 
@@ -51,13 +52,9 @@
     return `${formatPrice(promo.discountValue)} EUR`;
   }
 
-  function formatDate(date: Date | null) {
+  function formatDateOrDash(date: Date | null) {
     if (!date) return "-";
-    return new Date(date).toLocaleDateString("fi-FI", {
-      day: "numeric",
-      month: "numeric",
-      year: "numeric"
-    });
+    return formatDate(date);
   }
 
   const columns: ColumnDef<PromoRow>[] = [
@@ -106,7 +103,7 @@
       header: "Discount"
     },
     {
-      accessorFn: (row) => `${formatDate(row.startsAt)} - ${formatDate(row.endsAt)}`,
+      accessorFn: (row) => `${formatDateOrDash(row.startsAt)} - ${formatDateOrDash(row.endsAt)}`,
       id: "dates",
       header: "Active Dates"
     },

@@ -11,6 +11,7 @@
   import { toast } from "svelte-sonner";
   import type { PageData, ActionData } from "./$types";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { formatDate } from "$lib/utils";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -68,7 +69,7 @@
     {
       accessorKey: "createdAt",
       header: "Created",
-      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
+      cell: ({ row }) => formatDate(row.original.createdAt)
     }
   ];
 </script>

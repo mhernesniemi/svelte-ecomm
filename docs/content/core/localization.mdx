@@ -135,6 +135,16 @@ The storefront resolves translations at the service layer. Services accept an op
 const product = await productService.getById(123, language);
 ```
 
+## Date Formatting
+
+Date display locale is configured in `src/lib/config/locale.ts`:
+
+```typescript
+export const DATE_LOCALE = "fi-FI"; // BCP 47 language tag
+```
+
+All dates in the admin and storefront use `formatDate()` and `formatDateTime()` from `$lib/utils`, which read this value.
+
 ## Adding a New Language
 
 1. Add the language to `LANGUAGES` in `src/lib/config/languages.ts`

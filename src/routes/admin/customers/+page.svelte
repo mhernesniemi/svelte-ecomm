@@ -8,6 +8,7 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import UsersRound from "@lucide/svelte/icons/users-round";
   import type { PageData, ActionData } from "./$types";
+  import { formatDate } from "$lib/utils";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -72,7 +73,7 @@
     {
       accessorKey: "createdAt",
       header: "Joined",
-      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
+      cell: ({ row }) => formatDate(row.original.createdAt)
     }
   ];
 
@@ -113,7 +114,7 @@
     {
       accessorKey: "createdAt",
       header: "Created",
-      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
+      cell: ({ row }) => formatDate(row.original.createdAt)
     }
   ];
 </script>

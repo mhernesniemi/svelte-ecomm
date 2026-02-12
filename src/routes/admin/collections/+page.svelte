@@ -7,6 +7,7 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { formatDate } from "$lib/utils";
 
   let { data } = $props();
 
@@ -62,7 +63,7 @@
     {
       accessorKey: "createdAt",
       header: "Created",
-      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
+      cell: ({ row }) => formatDate(row.original.createdAt)
     }
   ];
 </script>

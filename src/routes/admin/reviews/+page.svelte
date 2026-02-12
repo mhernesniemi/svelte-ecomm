@@ -8,7 +8,7 @@
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import type { PageData, ActionData } from "./$types";
-  import { cn } from "$lib/utils";
+  import { cn, formatDate } from "$lib/utils";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -86,7 +86,7 @@
     {
       accessorKey: "createdAt",
       header: "Date",
-      cell: ({ row }) => new Date(row.original.createdAt).toLocaleDateString()
+      cell: ({ row }) => formatDate(row.original.createdAt)
     }
   ];
 </script>

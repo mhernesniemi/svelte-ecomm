@@ -4,6 +4,7 @@
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { ActionData, PageData } from "./$types";
+  import { formatDateTime } from "$lib/utils";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -263,12 +264,12 @@
           </div>
           <div class="flex justify-between">
             <dt class="text-muted-foreground">Created</dt>
-            <dd>{new Date(data.order.createdAt).toLocaleString()}</dd>
+            <dd>{formatDateTime(data.order.createdAt)}</dd>
           </div>
           {#if data.order.orderPlacedAt}
             <div class="flex justify-between">
               <dt class="text-muted-foreground">Placed</dt>
-              <dd>{new Date(data.order.orderPlacedAt).toLocaleString()}</dd>
+              <dd>{formatDateTime(data.order.orderPlacedAt)}</dd>
             </div>
           {/if}
         </dl>

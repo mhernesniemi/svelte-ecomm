@@ -13,6 +13,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData, ActionData } from "./$types";
+  import { formatDate } from "$lib/utils";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -26,14 +27,6 @@
     if (form?.success) toast.success(form.message || "Saved");
     if (form?.error) toast.error(form.error);
   });
-
-  function formatDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric"
-    });
-  }
 
   function formatPrice(cents: number): string {
     return (cents / 100).toFixed(2);

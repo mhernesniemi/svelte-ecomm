@@ -6,6 +6,7 @@
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData, ActionData } from "./$types";
+  import { formatDate } from "$lib/utils";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -46,7 +47,7 @@
     <div>
       <h1 class="text-2xl font-bold">Review #{data.review.id}</h1>
       <p class="mt-1 text-sm text-foreground-tertiary">
-        by {data.review.nickname} on {new Date(data.review.createdAt).toLocaleDateString()}
+        by {data.review.nickname} on {formatDate(data.review.createdAt)}
       </p>
     </div>
     <Badge variant={getStatusVariant(data.review.status)} class="capitalize">
