@@ -687,7 +687,7 @@
                       {#if selected.length > 0}
                         <div class="mt-3 flex flex-wrap gap-1.5">
                           {#each selected as id}
-                            <Badge variant="secondary" class="gap-1 text-sm">
+                            <Badge class="gap-1 text-sm">
                               {getProductNameById(id)}
                               <button
                                 type="button"
