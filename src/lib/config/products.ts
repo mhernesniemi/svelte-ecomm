@@ -9,4 +9,4 @@ export const DEFAULT_PRODUCT_TYPE: ProductType = "digital";
 /**
  * All available product types matching the schema enum.
  */
-export const PRODUCT_TYPES: ProductType[] = ["physical", "digital"];
+export const PRODUCT_TYPES: ProductType[] = ["physical"];
