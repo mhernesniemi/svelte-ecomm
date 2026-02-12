@@ -1,8 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { page } from "$app/stores";
   import { toast } from "svelte-sonner";
-  import { onMount } from "svelte";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import type { ActionData } from "./$types";
@@ -14,13 +12,6 @@
 
   let isSubmitting = $state(false);
   let addAnother = $state(false);
-
-  onMount(() => {
-    if ($page.url.searchParams.has("created")) {
-      toast.success("Product created successfully");
-      history.replaceState({}, "", $page.url.pathname);
-    }
-  });
 
   $effect(() => {
     if (form?.error) toast.error(form.error);

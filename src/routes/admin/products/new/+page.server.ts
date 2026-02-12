@@ -25,10 +25,8 @@ export const actions: Actions = {
 				slug
 			});
 
-			const redirectUrl = addAnother
-				? "/admin/products/new?created"
-				: `/admin/products/${product.id}?created`;
-			throw redirect(303, redirectUrl);
+			const params = addAnother ? "?created&addAnother" : "?created";
+			throw redirect(303, `/admin/products/${product.id}${params}`);
 		} catch (error) {
 			if (isRedirect(error)) throw error;
 			return fail(500, {

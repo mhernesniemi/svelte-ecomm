@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
@@ -43,9 +44,12 @@
 
   let visibility = $state(data.product.visibility);
 
+  let addAnother = $state(false);
+
   // Show toast from URL params (created/variant redirects)
   onMount(() => {
     const url = $page.url;
+    addAnother = url.searchParams.has("addAnother");
     const messages: Record<string, string> = {
       created: "Product created successfully",
       variantCreated: "Variant created successfully",
@@ -247,7 +251,12 @@
             await update({ reset: false });
             isSavingProduct = false;
             if (result.type === "success") {
-              toast.success("Product updated successfully");
+              if (addAnother) {
+                toast.success("Product updated successfully");
+                goto("/admin/products/new");
+              } else {
+                toast.success("Product updated successfully");
+              }
             }
           };
         }}
