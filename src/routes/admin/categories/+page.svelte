@@ -117,7 +117,7 @@
         <Collapsible.Root open={isExpanded}>
           <div
             class={cn(
-              "group flex w-full items-center border-b border-border last:border-b-0",
+              "flex w-full items-center border-b border-border last:border-b-0",
               "hover:bg-hover"
             )}
             style="padding-left: {depth * 1.5 + 0.5}rem"
@@ -165,19 +165,19 @@
             <div class="flex shrink-0 items-center gap-1 pr-3 pl-4">
               <button
                 type="button"
-                class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+                class="group flex h-7 w-7 items-center justify-center rounded-md"
                 title="Add child category"
                 onclick={() => openCreateDialog(node.id)}
               >
-                <PlusIcon class="h-3.5 w-3.5 text-muted-foreground" />
+                <PlusIcon class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
               </button>
               <button
                 type="button"
-                class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+                class="group flex h-7 w-7 items-center justify-center rounded-md"
                 title="Edit category"
                 onclick={() => openEditDialog(node)}
               >
-                <Pencil class="h-3.5 w-3.5 text-muted-foreground" />
+                <Pencil class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
               </button>
             </div>
           </div>
