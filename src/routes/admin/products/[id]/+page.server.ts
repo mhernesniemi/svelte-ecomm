@@ -5,6 +5,7 @@ import { categoryService } from "$lib/server/services/categories.js";
 import { collectionService } from "$lib/server/services/collections.js";
 import { translationService } from "$lib/server/services/translations.js";
 import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+import { PRODUCT_TYPES } from "$lib/config/products.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -36,7 +37,8 @@ export const load: PageServerLoad = async ({ params }) => {
 		categoryTree,
 		productCategories,
 		productCollections,
-		translations
+		translations,
+		productTypes: PRODUCT_TYPES
 	};
 };
 
@@ -48,6 +50,7 @@ export const actions: Actions = {
 		const name = formData.get("name") as string;
 		const slug = formData.get("slug") as string;
 		const description = formData.get("description") as string;
+		const type = formData.get("type") as "physical" | "digital" | null;
 		const visibility = formData.get("visibility") as "public" | "private" | "draft";
 
 		// Facet values and categories
@@ -67,6 +70,7 @@ export const actions: Actions = {
 		try {
 			// Update product
 			await productService.update(id, {
+				...(type && { type }),
 				visibility,
 				name,
 				slug,

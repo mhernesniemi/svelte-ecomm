@@ -570,6 +570,28 @@
         </div>
       </div>
 
+      <!-- Product Type Section (only shown when multiple types exist) -->
+      {#if data.productTypes.length > 1}
+        <div class="rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-4 py-3">
+            <h2 class="font-semibold">Product Type</h2>
+          </div>
+          <div class="p-4">
+            <select
+              form="product-form"
+              name="type"
+              class="block w-full rounded-md border-input-border shadow-sm"
+            >
+              {#each data.productTypes as type}
+                <option value={type} selected={data.product.type === type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              {/each}
+            </select>
+          </div>
+        </div>
+      {/if}
+
       <!-- Facet Values Section -->
       <div class="rounded-lg bg-surface shadow">
         <div class="border-b border-border px-4 py-3">
