@@ -3,15 +3,16 @@
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
   import { Badge } from "$lib/components/admin/ui/badge";
-  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import CreateProductDialog from "$lib/components/admin/CreateProductDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Package from "@lucide/svelte/icons/package";
   import ImageIcon from "@lucide/svelte/icons/image";
-  import { toast } from "svelte-sonner";
-  import type { PageData, ActionData } from "./$types";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import { toast } from "svelte-sonner";
   import { formatDate } from "$lib/utils";
+  import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -22,6 +23,8 @@
   let showBulkDelete = $state(false);
   let pendingDeleteIds = $state<number[]>([]);
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
+
+  let createDialogOpen = $state(false);
 
   type ProductRow = (typeof data.products)[0];
 
@@ -105,9 +108,9 @@
       <h1 class="text-2xl font-bold text-foreground">Products</h1>
     </div>
     {#if data.products.length > 0}
-      <a href="/admin/products/new" class={buttonVariants()}
-        ><PlusIcon class="h-4 w-4" /> Add Product</a
-      >
+      <Button type="button" onclick={() => (createDialogOpen = true)}>
+        <PlusIcon class="h-4 w-4" /> Add Product
+      </Button>
     {/if}
   </div>
 
@@ -153,10 +156,12 @@
       </div>
     {/snippet}
     {#snippet emptyAction()}
-      <a href="/admin/products/new" class={buttonVariants()}>Add Product</a>
+      <Button type="button" onclick={() => (createDialogOpen = true)}>Add Product</Button>
     {/snippet}
   </DataTable>
 </div>
+
+<CreateProductDialog bind:open={createDialogOpen} />
 
 <DeleteConfirmDialog
   bind:open={showBulkDelete}

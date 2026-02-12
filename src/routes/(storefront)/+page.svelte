@@ -104,7 +104,7 @@
           {#if data.featuredProducts.length === 0}
             <div class="py-12 text-center text-gray-500">
               <p>No products yet.</p>
-              <a href="/admin/products/new" class="text-blue-600 hover:underline">
+              <a href="/admin/products" class="text-blue-600 hover:underline">
                 Add your first product
               </a>
             </div>

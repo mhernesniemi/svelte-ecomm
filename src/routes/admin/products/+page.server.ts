@@ -1,5 +1,5 @@
 import { productService } from "$lib/server/services/products.js";
-import { fail } from "@sveltejs/kit";
+import { fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
 export const load: PageServerLoad = async () => {
@@ -15,6 +15,30 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
+	create: async ({ request }) => {
+		const formData = await request.formData();
+		const name = formData.get("name") as string;
+		const slug = formData.get("slug") as string;
+
+		if (!name || !slug) {
+			return fail(400, { error: "Name and slug are required" });
+		}
+
+		try {
+			const product = await productService.create({
+				type: "physical",
+				visibility: "draft",
+				name,
+				slug
+			});
+
+			throw redirect(303, `/admin/products/${product.id}?created`);
+		} catch (error) {
+			if (isRedirect(error)) throw error;
+			return fail(500, { error: "Failed to create product" });
+		}
+	},
+
 	publish: async ({ request }) => {
 		const data = await request.formData();
 		const ids = data.getAll("ids").map(Number).filter(Boolean);

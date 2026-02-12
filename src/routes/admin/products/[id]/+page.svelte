@@ -1,12 +1,12 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { goto } from "$app/navigation";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import CreateProductDialog from "$lib/components/admin/CreateProductDialog.svelte";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
   import {
@@ -44,9 +44,16 @@
 
   let visibility = $state(data.product.visibility);
 
+  let cameFromCreate = $state(false);
+  let hasSaved = $state(false);
+  let createDialogOpen = $state(false);
+
   // Show toast from URL params (created/variant redirects)
   onMount(() => {
     const url = $page.url;
+    if (url.searchParams.has("created")) {
+      cameFromCreate = true;
+    }
     const messages: Record<string, string> = {
       created: "Product created successfully",
       variantCreated: "Variant created successfully",
@@ -227,9 +234,16 @@
     </div>
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">{productName || "Edit Product"}</h1>
-      <Button type="submit" form="product-form" disabled={isSavingProduct}>
-        {isSavingProduct ? "Saving..." : "Save Changes"}
-      </Button>
+      <div class="flex items-center gap-2">
+        {#if cameFromCreate && hasSaved}
+          <Button type="button" variant="outline" onclick={() => (createDialogOpen = true)}>
+            <Plus class="h-4 w-4" /> Add Product
+          </Button>
+        {/if}
+        <Button type="submit" form="product-form" disabled={isSavingProduct}>
+          {isSavingProduct ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
     </div>
   </div>
 
@@ -249,9 +263,7 @@
             isSavingProduct = false;
             if (result.type === "success") {
               toast.success("Product updated successfully");
-              if (localStorage.getItem("addAnotherProduct") === "1") {
-                goto("/admin/products/new");
-              }
+              hasSaved = true;
             }
           };
         }}
@@ -856,3 +868,5 @@
     </Dialog.Content>
   </Dialog.Root>
 </div>
+
+<CreateProductDialog bind:open={createDialogOpen} />
