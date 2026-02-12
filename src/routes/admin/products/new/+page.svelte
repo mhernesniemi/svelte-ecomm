@@ -1,6 +1,8 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { page } from "$app/stores";
   import { toast } from "svelte-sonner";
+  import { onMount } from "svelte";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import type { ActionData } from "./$types";
@@ -11,6 +13,14 @@
   let { form }: { form: ActionData } = $props();
 
   let isSubmitting = $state(false);
+  let addAnother = $state(false);
+
+  onMount(() => {
+    if ($page.url.searchParams.has("created")) {
+      toast.success("Product created successfully");
+      history.replaceState({}, "", $page.url.pathname);
+    }
+  });
 
   $effect(() => {
     if (form?.error) toast.error(form.error);
@@ -100,6 +110,12 @@
           </label>
         </div>
       </div>
+    </div>
+    <div class="border-t border-border px-10 py-4">
+      <label class="flex items-center gap-2 text-sm text-muted-foreground">
+        <Checkbox bind:checked={addAnother} name="addAnother" />
+        Add another product after saving
+      </label>
     </div>
   </form>
 </div>
