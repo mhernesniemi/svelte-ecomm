@@ -92,13 +92,8 @@
 <svelte:head><title>Categories | Admin</title></svelte:head>
 
 <div>
-  <div class="mb-6 flex items-center justify-between">
+  <div class="mb-6">
     <h1 class="text-2xl font-bold text-foreground">Categories</h1>
-    {#if data.tree.length > 0}
-      <Button type="button" onclick={() => openCreateDialog()}>
-        <PlusIcon class="h-4 w-4" /> Add Category
-      </Button>
-    {/if}
   </div>
 
   {#if data.tree.length === 0}
@@ -167,7 +162,9 @@
             </button>
 
             <!-- Action buttons (visible on hover) -->
-            <div class="flex shrink-0 items-center gap-1 pr-3 opacity-0 transition-opacity group-hover:opacity-100">
+            <div
+              class="flex shrink-0 items-center gap-1 pr-3 opacity-0 transition-opacity group-hover:opacity-100"
+            >
               <button
                 type="button"
                 class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
@@ -204,6 +201,13 @@
       {#each data.tree as rootNode}
         {@render categoryNode(rootNode, 0, "")}
       {/each}
+      <button
+        type="button"
+        class="flex w-full cursor-pointer items-center justify-center gap-2 py-2.5 text-sm text-foreground-secondary hover:bg-hover hover:text-foreground"
+        onclick={() => openCreateDialog()}
+      >
+        <PlusIcon class="h-4 w-4" /> Add Category
+      </button>
     </div>
   {/if}
 </div>
@@ -227,7 +231,10 @@
     >
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label for="create_name_en" class="mb-1 block text-sm font-medium text-foreground-secondary">
+          <label
+            for="create_name_en"
+            class="mb-1 block text-sm font-medium text-foreground-secondary"
+          >
             Name
           </label>
           <input
@@ -272,7 +279,10 @@
           </div>
         {/each}
         <div>
-          <label for="create_parent" class="mb-1 block text-sm font-medium text-foreground-secondary">
+          <label
+            for="create_parent"
+            class="mb-1 block text-sm font-medium text-foreground-secondary"
+          >
             Parent
           </label>
           <select
@@ -289,7 +299,10 @@
           </select>
         </div>
         <div>
-          <label for="create_tax_code" class="mb-1 block text-sm font-medium text-foreground-secondary">
+          <label
+            for="create_tax_code"
+            class="mb-1 block text-sm font-medium text-foreground-secondary"
+          >
             Tax Rate
           </label>
           <select
