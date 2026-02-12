@@ -135,6 +135,7 @@
     <div class="relative max-w-sm flex-1">
       <Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-placeholder" />
       <Input
+        id="table-search"
         placeholder={searchPlaceholder}
         value={globalFilter}
         oninput={(e: Event) => table.setGlobalFilter((e.target as HTMLInputElement).value)}

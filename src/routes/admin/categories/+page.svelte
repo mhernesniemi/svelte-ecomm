@@ -1,337 +1,465 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
-  import type { PageData } from "./$types";
+  import { Badge } from "$lib/components/admin/ui/badge";
+  import * as Dialog from "$lib/components/admin/ui/dialog";
+  import * as Collapsible from "$lib/components/admin/ui/collapsible";
+  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import { slugify, cn } from "$lib/utils.js";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
+  import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Pencil from "@lucide/svelte/icons/pencil";
   import PlusIcon from "@lucide/svelte/icons/plus";
+  import type { PageData } from "./$types";
+
   let { data }: { data: PageData } = $props();
 
-  let showCreate = $state(false);
-  let editingId = $state<number | null>(null);
-
+  type CategoryNode = (typeof data.tree)[0];
   type FlatCategory = { id: number; name: string; depth: number };
 
-  function flattenTree(nodes: typeof data.tree, depth = 0): FlatCategory[] {
+  function flattenTree(nodes: CategoryNode[], depth = 0): FlatCategory[] {
     return nodes.flatMap((node) => [
       { id: node.id, name: node.name, depth },
       ...flattenTree(node.children, depth + 1)
     ]);
   }
 
+  function collectIds(nodes: CategoryNode[]): number[] {
+    return nodes.flatMap((node) => [node.id, ...collectIds(node.children)]);
+  }
+
   const flatCategories = $derived(flattenTree(data.tree));
+  let expandedIds = $state(new Set<number>(collectIds(data.tree)));
+
+  // Dialog state
+  let createDialogOpen = $state(false);
+  let editDialogOpen = $state(false);
+  let editingCategory = $state<CategoryNode | null>(null);
+  let createParentId = $state<number | null>(null);
+
+  // Auto-slug for create dialog
+  let createName = $state("");
+  let createSlug = $state("");
+  let createSlugManual = $state(false);
+
+  // Delete state
+  let showDelete = $state(false);
+  let deleteTarget = $state<{ id: number; name: string; hasChildren: boolean } | null>(null);
+
+  function openCreateDialog(parentId: number | null = null) {
+    createParentId = parentId;
+    createName = "";
+    createSlug = "";
+    createSlugManual = false;
+    createDialogOpen = true;
+  }
+
+  function openEditDialog(node: CategoryNode) {
+    editingCategory = node;
+    editDialogOpen = true;
+  }
+
+  function toggleExpand(id: number) {
+    const next = new Set(expandedIds);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    expandedIds = next;
+  }
+
+  function handleCreateNameInput(e: Event) {
+    const value = (e.target as HTMLInputElement).value;
+    createName = value;
+    if (!createSlugManual) {
+      createSlug = slugify(value);
+    }
+  }
+
+  function handleCreateSlugInput(e: Event) {
+    createSlug = (e.target as HTMLInputElement).value;
+    createSlugManual = true;
+  }
+
+  // Re-expand all when tree changes (new data after create/update/delete)
+  $effect(() => {
+    expandedIds = new Set(collectIds(data.tree));
+  });
 </script>
 
 <svelte:head><title>Categories | Admin</title></svelte:head>
 
 <div>
   <div class="mb-6 flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-foreground">Categories</h1>
-    </div>
+    <h1 class="text-2xl font-bold text-foreground">Categories</h1>
     {#if data.tree.length > 0}
-      <Button type="button" onclick={() => (showCreate = !showCreate)}
-        ><PlusIcon class="h-4 w-4" /> Add Category</Button
-      >
+      <Button type="button" onclick={() => openCreateDialog()}>
+        <PlusIcon class="h-4 w-4" /> Add Category
+      </Button>
     {/if}
   </div>
 
-  <!-- Create Category Form -->
-  {#if showCreate}
-    <div class="mb-6 rounded-lg border border-border bg-surface p-6">
-      <h2 class="mb-4 text-sm font-semibold text-foreground">New Category</h2>
+  {#if data.tree.length === 0}
+    <!-- Empty state -->
+    <div class="rounded-lg border border-dashed border-input-border p-12 text-center">
+      <FolderOpen class="mx-auto h-12 w-12 text-placeholder" />
+      <h3 class="mt-2 text-sm font-medium text-foreground">No categories</h3>
+      <p class="mt-1 text-sm text-muted-foreground">Get started by creating a root category.</p>
+      <div class="mt-6">
+        <Button type="button" onclick={() => openCreateDialog()}>Add Category</Button>
+      </div>
+    </div>
+  {:else}
+    <!-- Category tree -->
+    <div class="overflow-hidden rounded-lg border border-border bg-surface">
+      {#snippet categoryNode(node: CategoryNode, depth: number, parentPath: string)}
+        {@const fullPath = `${parentPath}/${node.slug}`}
+        {@const hasChildren = node.children.length > 0}
+        {@const isExpanded = expandedIds.has(node.id)}
+        {@const taxRate = data.taxRates.find((r) => r.code === node.taxCode)}
+
+        <Collapsible.Root open={isExpanded}>
+          <div
+            class={cn(
+              "group flex w-full items-center border-b border-border last:border-b-0",
+              "hover:bg-hover"
+            )}
+            style="padding-left: {depth * 1.5 + 0.5}rem"
+          >
+            <!-- Chevron toggle -->
+            <button
+              type="button"
+              class={cn(
+                "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
+                hasChildren ? "cursor-pointer hover:bg-muted" : "cursor-default"
+              )}
+              onclick={(e) => {
+                e.stopPropagation();
+                if (hasChildren) toggleExpand(node.id);
+              }}
+              tabindex={hasChildren ? 0 : -1}
+            >
+              {#if hasChildren}
+                <ChevronRight
+                  class={cn(
+                    "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                    isExpanded && "rotate-90"
+                  )}
+                />
+              {/if}
+            </button>
+
+            <!-- Row content (clickable to edit) -->
+            <button
+              type="button"
+              class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 pr-4 text-left"
+              onclick={() => openEditDialog(node)}
+            >
+              <span class="text-sm font-medium text-foreground">{node.name}</span>
+              <span class="truncate text-sm text-placeholder">{fullPath}</span>
+              <span class="ml-auto flex shrink-0 items-center gap-2">
+                {#if taxRate}
+                  <Badge variant="outline">{taxRate.name}</Badge>
+                {/if}
+              </span>
+            </button>
+
+            <!-- Action buttons (visible on hover) -->
+            <div class="flex shrink-0 items-center gap-1 pr-3 opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                type="button"
+                class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+                title="Add child category"
+                onclick={(e) => {
+                  e.stopPropagation();
+                  openCreateDialog(node.id);
+                }}
+              >
+                <PlusIcon class="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+              <button
+                type="button"
+                class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+                title="Edit category"
+                onclick={(e) => {
+                  e.stopPropagation();
+                  openEditDialog(node);
+                }}
+              >
+                <Pencil class="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          </div>
+
+          <Collapsible.Content>
+            {#each node.children as child}
+              {@render categoryNode(child, depth + 1, fullPath)}
+            {/each}
+          </Collapsible.Content>
+        </Collapsible.Root>
+      {/snippet}
+
+      {#each data.tree as rootNode}
+        {@render categoryNode(rootNode, 0, "")}
+      {/each}
+    </div>
+  {/if}
+</div>
+
+<!-- Create Dialog -->
+<Dialog.Root bind:open={createDialogOpen}>
+  <Dialog.Content>
+    <Dialog.Header>
+      <Dialog.Title>New Category</Dialog.Title>
+      <Dialog.Description>Create a new category for your store.</Dialog.Description>
+    </Dialog.Header>
+    <form
+      method="POST"
+      action="?/create"
+      use:enhance={() => {
+        return async ({ update }) => {
+          await update();
+          createDialogOpen = false;
+        };
+      }}
+    >
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="create_name_en" class="mb-1 block text-sm font-medium text-foreground-secondary">
+            Name
+          </label>
+          <input
+            type="text"
+            id="create_name_en"
+            name="name_en"
+            value={createName}
+            oninput={handleCreateNameInput}
+            placeholder="e.g., Electronics"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label for="create_slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
+            Slug
+          </label>
+          <input
+            type="text"
+            id="create_slug"
+            name="slug"
+            value={createSlug}
+            oninput={handleCreateSlugInput}
+            placeholder="e.g., electronics"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+          />
+        </div>
+        {#each TRANSLATION_LANGUAGES as lang}
+          <div class="col-span-2">
+            <label
+              for="create_name_{lang.code}"
+              class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >
+              {lang.name} name
+            </label>
+            <input
+              type="text"
+              id="create_name_{lang.code}"
+              name="name_{lang.code}"
+              placeholder="Leave empty to use default"
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+            />
+          </div>
+        {/each}
+        <div>
+          <label for="create_parent" class="mb-1 block text-sm font-medium text-foreground-secondary">
+            Parent
+          </label>
+          <select
+            id="create_parent"
+            name="parent_id"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+          >
+            <option value="">None (Root)</option>
+            {#each flatCategories as category}
+              <option value={category.id} selected={category.id === createParentId}>
+                {"— ".repeat(category.depth)}{category.name}
+              </option>
+            {/each}
+          </select>
+        </div>
+        <div>
+          <label for="create_tax_code" class="mb-1 block text-sm font-medium text-foreground-secondary">
+            Tax Rate
+          </label>
+          <select
+            id="create_tax_code"
+            name="tax_code"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+          >
+            {#each data.taxRates as rate}
+              <option value={rate.code} selected={rate.code === "standard"}>{rate.name}</option>
+            {/each}
+          </select>
+        </div>
+      </div>
+      <Dialog.Footer class="mt-6">
+        <Button type="button" variant="outline" onclick={() => (createDialogOpen = false)}>
+          Cancel
+        </Button>
+        <Button type="submit">Create</Button>
+      </Dialog.Footer>
+    </form>
+  </Dialog.Content>
+</Dialog.Root>
+
+<!-- Edit Dialog -->
+<Dialog.Root bind:open={editDialogOpen}>
+  <Dialog.Content>
+    {#if editingCategory}
+      <Dialog.Header>
+        <Dialog.Title>Edit Category</Dialog.Title>
+        <Dialog.Description>Update category details.</Dialog.Description>
+      </Dialog.Header>
       <form
         method="POST"
-        action="?/create"
+        action="?/update"
         use:enhance={() => {
           return async ({ update }) => {
             await update();
-            showCreate = false;
+            editDialogOpen = false;
           };
         }}
       >
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <input type="hidden" name="id" value={editingCategory.id} />
+        <div class="grid grid-cols-2 gap-4">
           <div>
             <label
-              for="cat_name_en"
+              for="edit_name_{editingCategory.id}"
               class="mb-1 block text-sm font-medium text-foreground-secondary"
             >
               Name
             </label>
             <input
               type="text"
-              id="cat_name_en"
+              id="edit_name_{editingCategory.id}"
               name="name_en"
-              placeholder="e.g., Electronics"
+              value={editingCategory.name}
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label
+              for="edit_slug_{editingCategory.id}"
+              class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >
+              Slug
+            </label>
+            <input
+              type="text"
+              id="edit_slug_{editingCategory.id}"
+              name="slug"
+              value={editingCategory.slug}
               class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             />
           </div>
           {#each TRANSLATION_LANGUAGES as lang}
-            <div>
+            <div class="col-span-2">
               <label
-                for="cat_name_{lang.code}"
+                for="edit_name_{lang.code}_{editingCategory.id}"
                 class="mb-1 block text-sm font-medium text-foreground-secondary"
               >
                 {lang.name} name
               </label>
               <input
                 type="text"
-                id="cat_name_{lang.code}"
+                id="edit_name_{lang.code}_{editingCategory.id}"
                 name="name_{lang.code}"
-                placeholder="Leave empty to use default"
+                value={data.categoryTranslations[editingCategory.id]?.find(
+                  (t) => t.languageCode === lang.code
+                )?.name ?? ""}
                 class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
               />
             </div>
           {/each}
           <div>
-            <label for="cat_slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
-              Slug
-            </label>
-            <input
-              type="text"
-              id="cat_slug"
-              name="slug"
-              placeholder="e.g., electronics"
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
             <label
-              for="cat_parent"
+              for="edit_parent_{editingCategory.id}"
               class="mb-1 block text-sm font-medium text-foreground-secondary"
             >
               Parent
             </label>
             <select
-              id="cat_parent"
+              id="edit_parent_{editingCategory.id}"
               name="parent_id"
               class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             >
               <option value="">None (Root)</option>
-              {#each flatCategories as category}
-                <option value={category.id}>{"— ".repeat(category.depth)}{category.name}</option>
+              {#each flatCategories.filter((c) => c.id !== editingCategory!.id) as category}
+                <option value={category.id} selected={category.id === editingCategory!.parentId}>
+                  {"— ".repeat(category.depth)}{category.name}
+                </option>
               {/each}
             </select>
           </div>
           <div>
             <label
-              for="cat_tax_code"
+              for="edit_tax_code_{editingCategory.id}"
               class="mb-1 block text-sm font-medium text-foreground-secondary"
             >
               Tax Rate
             </label>
             <select
-              id="cat_tax_code"
+              id="edit_tax_code_{editingCategory.id}"
               name="tax_code"
               class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             >
               {#each data.taxRates as rate}
-                <option value={rate.code} selected={rate.code === "standard"}>{rate.name}</option>
+                <option value={rate.code} selected={rate.code === editingCategory!.taxCode}>
+                  {rate.name}
+                </option>
               {/each}
             </select>
           </div>
         </div>
-        <div class="mt-4 flex justify-end gap-2">
-          <Button type="button" variant="outline" size="sm" onclick={() => (showCreate = false)}>
+        <Dialog.Footer class="mt-6">
+          <Button type="button" variant="outline" onclick={() => (editDialogOpen = false)}>
             Cancel
           </Button>
-          <Button type="submit" size="sm">Create</Button>
-        </div>
+          <Button type="submit">Save Changes</Button>
+        </Dialog.Footer>
       </form>
-    </div>
-  {/if}
+      <div class="border-t border-border pt-4">
+        <button
+          type="button"
+          class="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+          onclick={() => {
+            deleteTarget = {
+              id: editingCategory!.id,
+              name: editingCategory!.name,
+              hasChildren: editingCategory!.children.length > 0
+            };
+            editDialogOpen = false;
+            showDelete = true;
+          }}
+        >
+          Delete this category{editingCategory.children.length > 0 ? " and all subcategories" : ""}
+        </button>
+      </div>
+    {/if}
+  </Dialog.Content>
+</Dialog.Root>
 
-  <!-- Categories Tree -->
-  {#if data.tree.length === 0}
-    <div class="rounded-lg border border-dashed border-input-border p-12 text-center">
-      <FolderOpen class="mx-auto h-12 w-12 text-placeholder" />
-      <h3 class="mt-2 text-sm font-medium text-foreground">No categories</h3>
-      <p class="mt-1 text-sm text-muted-foreground">Get started by creating a root category.</p>
-      <div class="mt-6">
-        <Button type="button" onclick={() => (showCreate = true)}>Add Category</Button>
-      </div>
-    </div>
-  {:else}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      <div class="overflow-hidden rounded-lg border border-border bg-surface py-2">
-        {#snippet categoryNode(node: (typeof data.tree)[0], depth: number, parentPath: string)}
-          {@const fullPath = `${parentPath}/${node.slug}`}
-          <div>
-            <!-- Display row -->
-            <button
-              type="button"
-              class="group flex w-full cursor-pointer items-center justify-between px-4 py-2 text-left {editingId ===
-              node.id
-                ? 'bg-background'
-                : 'hover:bg-hover'}"
-              onclick={() => (editingId = editingId === node.id ? null : node.id)}
-            >
-              <div class="flex items-center gap-2">
-                {#if depth > 0}
-                  <span class="whitespace-pre text-gray-300">{"— ".repeat(depth)}</span>
-                {/if}
-                <span class="text-sm font-medium text-foreground">{node.name}</span>
-                <span class="text-sm text-placeholder">{fullPath}</span>
-              </div>
-              <Pencil
-                class="h-4 w-4 text-placeholder opacity-0 transition-opacity group-hover:opacity-100 {editingId ===
-                node.id
-                  ? '!text-blue-600 !opacity-100 dark:text-blue-400'
-                  : ''}"
-              />
-            </button>
-            <!-- Edit panel -->
-            {#if editingId === node.id}
-              <div class="border-t border-border bg-background px-4 pt-3 pb-4">
-                <form
-                  method="POST"
-                  action="?/update"
-                  use:enhance={() => {
-                    return async ({ update }) => {
-                      await update();
-                      editingId = null;
-                    };
-                  }}
-                >
-                  <input type="hidden" name="id" value={node.id} />
-                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div>
-                      <label
-                        for="edit_name_{node.id}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
-                      >
-                        Name
-                      </label>
-                      <input
-                        type="text"
-                        id="edit_name_{node.id}"
-                        name="name_en"
-                        value={node.name}
-                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                      />
-                    </div>
-                    {#each TRANSLATION_LANGUAGES as lang}
-                      <div>
-                        <label
-                          for="edit_name_{lang.code}_{node.id}"
-                          class="mb-1 block text-sm font-medium text-foreground-secondary"
-                        >
-                          {lang.name} name
-                        </label>
-                        <input
-                          type="text"
-                          id="edit_name_{lang.code}_{node.id}"
-                          name="name_{lang.code}"
-                          value={data.categoryTranslations[node.id]?.find(
-                            (t) => t.languageCode === lang.code
-                          )?.name ?? ""}
-                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                        />
-                      </div>
-                    {/each}
-                    <div>
-                      <label
-                        for="edit_slug_{node.id}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
-                      >
-                        Slug
-                      </label>
-                      <input
-                        type="text"
-                        id="edit_slug_{node.id}"
-                        name="slug"
-                        value={node.slug}
-                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="edit_parent_{node.id}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
-                      >
-                        Parent
-                      </label>
-                      <select
-                        id="edit_parent_{node.id}"
-                        name="parent_id"
-                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                      >
-                        <option value="">None (Root)</option>
-                        {#each flatCategories.filter((c) => c.id !== node.id) as category}
-                          <option value={category.id} selected={category.id === node.parentId}>
-                            {"— ".repeat(category.depth)}{category.name}
-                          </option>
-                        {/each}
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        for="edit_tax_code_{node.id}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
-                      >
-                        Tax Rate
-                      </label>
-                      <select
-                        id="edit_tax_code_{node.id}"
-                        name="tax_code"
-                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                      >
-                        {#each data.taxRates as rate}
-                          <option value={rate.code} selected={rate.code === node.taxCode}>
-                            {rate.name}
-                          </option>
-                        {/each}
-                      </select>
-                    </div>
-                  </div>
-                  <div class="mt-4 flex items-center justify-between">
-                    <div class="flex gap-2">
-                      <Button type="submit" size="sm">Save Changes</Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onclick={() => (editingId = null)}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-                <div class="mt-3 border-t border-border pt-3">
-                  <form
-                    method="POST"
-                    action="?/delete"
-                    use:enhance={() => {
-                      return async ({ update }) => {
-                        await update();
-                        editingId = null;
-                      };
-                    }}
-                  >
-                    <input type="hidden" name="id" value={node.id} />
-                    <button
-                      type="submit"
-                      class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
-                    >
-                      Delete this category{node.children.length > 0 ? ` and all subcategories` : ""}
-                    </button>
-                  </form>
-                </div>
-              </div>
-            {/if}
-          </div>
-          {#each node.children as child}
-            {@render categoryNode(child, depth + 1, fullPath)}
-          {/each}
-        {/snippet}
-        {#each data.tree as rootNode, i}
-          <div>
-            {@render categoryNode(rootNode, 0, "")}
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/if}
-</div>
+<!-- Delete Confirmation Dialog -->
+{#if deleteTarget}
+  <DeleteConfirmDialog
+    bind:open={showDelete}
+    title="Delete {deleteTarget.name}?"
+    description={deleteTarget.hasChildren
+      ? "This will permanently delete this category and all its subcategories. This action cannot be undone."
+      : "This will permanently delete this category. This action cannot be undone."}
+    action="?/delete"
+  >
+    <input type="hidden" name="id" value={deleteTarget.id} />
+  </DeleteConfirmDialog>
+{/if}

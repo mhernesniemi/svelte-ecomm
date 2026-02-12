@@ -270,6 +270,7 @@
                     </div>
                     <div class="flex gap-2">
                       <input
+                        id="group-price-{gp.groupId}"
                         type="number"
                         step="0.01"
                         min="0"
@@ -293,6 +294,7 @@
                 {#if availableGroups.length > 0}
                   <div class="grid grid-cols-2 gap-4">
                     <select
+                      id="new-group-select"
                       bind:value={newGroupId}
                       class="h-10 w-full rounded-lg border border-input-border px-3 text-sm"
                     >
@@ -301,6 +303,7 @@
                       {/each}
                     </select>
                     <input
+                      id="new-group-price"
                       type="number"
                       step="0.01"
                       min="0"
