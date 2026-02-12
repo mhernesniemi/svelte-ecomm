@@ -34,8 +34,7 @@
 	--color-accent-subtle: var(--color-accent-subtle);
 }
 
-/* Cursor pointer for all clickable elements */
-button,
+/* Cursor pointer for clickable elements */
 [role="button"],
 [onclick],
 label[for],
