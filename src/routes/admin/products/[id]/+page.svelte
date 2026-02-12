@@ -44,12 +44,9 @@
 
   let visibility = $state(data.product.visibility);
 
-  let addAnother = $state(false);
-
   // Show toast from URL params (created/variant redirects)
   onMount(() => {
     const url = $page.url;
-    addAnother = url.searchParams.has("addAnother");
     const messages: Record<string, string> = {
       created: "Product created successfully",
       variantCreated: "Variant created successfully",
@@ -251,11 +248,9 @@
             await update({ reset: false });
             isSavingProduct = false;
             if (result.type === "success") {
-              if (addAnother) {
-                toast.success("Product updated successfully");
+              toast.success("Product updated successfully");
+              if (localStorage.getItem("addAnotherProduct") === "1") {
                 goto("/admin/products/new");
-              } else {
-                toast.success("Product updated successfully");
               }
             }
           };

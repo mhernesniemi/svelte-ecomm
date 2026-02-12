@@ -11,7 +11,13 @@
   let { form }: { form: ActionData } = $props();
 
   let isSubmitting = $state(false);
-  let addAnother = $state(false);
+  let addAnother = $state(
+    typeof localStorage !== "undefined" && localStorage.getItem("addAnotherProduct") === "1"
+  );
+
+  $effect(() => {
+    localStorage.setItem("addAnotherProduct", addAnother ? "1" : "0");
+  });
 
   $effect(() => {
     if (form?.error) toast.error(form.error);
@@ -104,7 +110,7 @@
     </div>
     <div class="border-t border-border px-10 py-4">
       <label class="flex items-center gap-2 text-sm text-muted-foreground">
-        <Checkbox bind:checked={addAnother} name="addAnother" />
+        <Checkbox bind:checked={addAnother} />
         Add another product after saving
       </label>
     </div>

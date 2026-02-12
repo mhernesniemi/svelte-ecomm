@@ -8,7 +8,6 @@ export const actions: Actions = {
 
 		const name = formData.get("name") as string;
 		const slug = formData.get("slug") as string;
-		const addAnother = formData.get("addAnother") === "on";
 
 		if (!name || !slug) {
 			return fail(400, {
@@ -25,8 +24,7 @@ export const actions: Actions = {
 				slug
 			});
 
-			const params = addAnother ? "?created&addAnother" : "?created";
-			throw redirect(303, `/admin/products/${product.id}${params}`);
+			throw redirect(303, `/admin/products/${product.id}?created`);
 		} catch (error) {
 			if (isRedirect(error)) throw error;
 			return fail(500, {
