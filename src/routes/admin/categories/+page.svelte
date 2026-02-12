@@ -42,7 +42,6 @@
   let createSlug = $state("");
   let createSlugManual = $state(false);
 
-
   function openCreateDialog(parentId: number | null = null) {
     createParentId = parentId;
     createName = "";
@@ -111,7 +110,9 @@
         {@const isExpanded = expandedIds.has(node.id)}
         {@const taxRate = data.taxRates.find((r) => r.code === node.taxCode)}
         {@const translations = data.categoryTranslations[node.id]}
-        {@const translatedLangs = TRANSLATION_LANGUAGES.filter((lang) => translations?.find((t) => t.languageCode === lang.code && t.name))}
+        {@const translatedLangs = TRANSLATION_LANGUAGES.filter((lang) =>
+          translations?.find((t) => t.languageCode === lang.code && t.name)
+        )}
 
         <Collapsible.Root open={isExpanded}>
           <div
@@ -161,7 +162,7 @@
             </div>
 
             <!-- Action buttons -->
-            <div class="flex shrink-0 items-center gap-1 pl-4 pr-3">
+            <div class="flex shrink-0 items-center gap-1 pr-3 pl-4">
               <button
                 type="button"
                 class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
@@ -220,7 +221,7 @@
         };
       }}
     >
-      <div class="grid grid-cols-2 gap-4">
+      <div class="my-4 grid grid-cols-2 gap-4">
         <div>
           <label
             for="create_name_en"
@@ -334,6 +335,7 @@
             editDialogOpen = false;
           };
         }}
+        class="my-4"
       >
         <input type="hidden" name="id" value={editingCategory.id} />
         <div class="grid grid-cols-2 gap-4">
