@@ -4,7 +4,6 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Collapsible from "$lib/components/admin/ui/collapsible";
-  import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import { slugify, cn } from "$lib/utils.js";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
@@ -43,9 +42,6 @@
   let createSlug = $state("");
   let createSlugManual = $state(false);
 
-  // Delete state
-  let showDelete = $state(false);
-  let deleteTarget = $state<{ id: number; name: string; hasChildren: boolean } | null>(null);
 
   function openCreateDialog(parentId: number | null = null) {
     createParentId = parentId;
@@ -114,6 +110,8 @@
         {@const hasChildren = node.children.length > 0}
         {@const isExpanded = expandedIds.has(node.id)}
         {@const taxRate = data.taxRates.find((r) => r.code === node.taxCode)}
+        {@const translations = data.categoryTranslations[node.id]}
+        {@const translatedLangs = TRANSLATION_LANGUAGES.filter((lang) => translations?.find((t) => t.languageCode === lang.code && t.name))}
 
         <Collapsible.Root open={isExpanded}>
           <div
@@ -146,33 +144,29 @@
               {/if}
             </button>
 
-            <!-- Row content (clickable to edit) -->
-            <button
-              type="button"
-              class="flex min-w-0 flex-1 cursor-pointer items-center gap-3 py-2.5 pr-4 text-left"
-              onclick={() => openEditDialog(node)}
-            >
+            <!-- Row content -->
+            <div class="flex min-w-0 flex-1 items-center gap-3 py-2.5 pr-4">
               <span class="text-sm font-medium text-foreground">{node.name}</span>
               <span class="truncate text-sm text-placeholder">{fullPath}</span>
-              <span class="ml-auto flex shrink-0 items-center gap-2">
+              <span class="ml-auto flex shrink-0 items-center gap-3">
+                <span class="flex items-center gap-1.5">
+                  {#each translatedLangs as lang}
+                    <Badge variant="outline">{lang.code.toUpperCase()}</Badge>
+                  {/each}
+                </span>
                 {#if taxRate}
                   <Badge variant="outline">{taxRate.name}</Badge>
                 {/if}
               </span>
-            </button>
+            </div>
 
-            <!-- Action buttons (visible on hover) -->
-            <div
-              class="flex shrink-0 items-center gap-1 pr-3 opacity-0 transition-opacity group-hover:opacity-100"
-            >
+            <!-- Action buttons -->
+            <div class="flex shrink-0 items-center gap-1 pl-4 pr-3">
               <button
                 type="button"
                 class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
                 title="Add child category"
-                onclick={(e) => {
-                  e.stopPropagation();
-                  openCreateDialog(node.id);
-                }}
+                onclick={() => openCreateDialog(node.id)}
               >
                 <PlusIcon class="h-3.5 w-3.5 text-muted-foreground" />
               </button>
@@ -180,10 +174,7 @@
                 type="button"
                 class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
                 title="Edit category"
-                onclick={(e) => {
-                  e.stopPropagation();
-                  openEditDialog(node);
-                }}
+                onclick={() => openEditDialog(node)}
               >
                 <Pencil class="h-3.5 w-3.5 text-muted-foreground" />
               </button>
@@ -442,37 +433,28 @@
           <Button type="submit">Save Changes</Button>
         </Dialog.Footer>
       </form>
-      <div class="border-t border-border pt-4">
-        <button
-          type="button"
-          class="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-          onclick={() => {
-            deleteTarget = {
-              id: editingCategory!.id,
-              name: editingCategory!.name,
-              hasChildren: editingCategory!.children.length > 0
-            };
-            editDialogOpen = false;
-            showDelete = true;
-          }}
-        >
-          Delete this category{editingCategory.children.length > 0 ? " and all subcategories" : ""}
-        </button>
-      </div>
+      {#if editingCategory.children.length === 0}
+        <div class="border-t border-border pt-4">
+          <form
+            method="POST"
+            action="?/delete"
+            use:enhance={() => {
+              return async ({ update }) => {
+                await update();
+                editDialogOpen = false;
+              };
+            }}
+          >
+            <input type="hidden" name="id" value={editingCategory.id} />
+            <button
+              type="submit"
+              class="text-sm text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+            >
+              Delete this category
+            </button>
+          </form>
+        </div>
+      {/if}
     {/if}
   </Dialog.Content>
 </Dialog.Root>
-
-<!-- Delete Confirmation Dialog -->
-{#if deleteTarget}
-  <DeleteConfirmDialog
-    bind:open={showDelete}
-    title="Delete {deleteTarget.name}?"
-    description={deleteTarget.hasChildren
-      ? "This will permanently delete this category and all its subcategories. This action cannot be undone."
-      : "This will permanently delete this category. This action cannot be undone."}
-    action="?/delete"
-  >
-    <input type="hidden" name="id" value={deleteTarget.id} />
-  </DeleteConfirmDialog>
-{/if}
