@@ -107,8 +107,11 @@
       <!-- Left Column -->
       <div class="flex-1 space-y-6">
         <!-- Type Selection -->
-        <div class="rounded-lg bg-surface p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Promotion Type</h2>
+        <div class="overflow-hidden rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-6 py-4">
+            <h2 class="text-lg font-semibold">Promotion Type</h2>
+          </div>
+          <div class="p-6">
           <div class="grid grid-cols-3 gap-3">
             {#each typeOptions as option}
               <label
@@ -133,11 +136,15 @@
               </label>
             {/each}
           </div>
+          </div>
         </div>
 
         <!-- Method + Code/Title -->
-        <div class="rounded-lg bg-surface p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Discount Method</h2>
+        <div class="overflow-hidden rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-6 py-4">
+            <h2 class="text-lg font-semibold">Discount Method</h2>
+          </div>
+          <div class="p-6">
           <input type="hidden" name="method" value={method} />
           <div class="mb-4 inline-flex rounded-lg border border-border p-0.5">
             <button
@@ -196,12 +203,16 @@
               </p>
             </div>
           {/if}
+          </div>
         </div>
 
         <!-- Discount (hidden for free_shipping) -->
         {#if promotionType !== "free_shipping"}
-          <div class="rounded-lg bg-surface p-6 shadow">
-            <h2 class="mb-4 text-lg font-semibold">Discount Value</h2>
+          <div class="overflow-hidden rounded-lg bg-surface shadow">
+            <div class="border-b border-border px-6 py-4">
+              <h2 class="text-lg font-semibold">Discount Value</h2>
+            </div>
+            <div class="p-6">
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label
@@ -239,6 +250,7 @@
                 />
               </div>
             </div>
+            </div>
           </div>
         {:else}
           <input type="hidden" name="discountType" value="fixed_amount" />
@@ -247,8 +259,11 @@
 
         <!-- Applies To (only for product type) -->
         {#if promotionType === "product"}
-          <div class="rounded-lg bg-surface p-6 shadow">
-            <h2 class="mb-4 text-lg font-semibold">Applies To</h2>
+          <div class="overflow-hidden rounded-lg bg-surface shadow">
+            <div class="border-b border-border px-6 py-4">
+              <h2 class="text-lg font-semibold">Applies To</h2>
+            </div>
+            <div class="p-6">
             <div class="space-y-3">
               <label class="flex items-center gap-2">
                 <input type="radio" name="appliesTo" value="all" bind:group={appliesTo} />
@@ -383,14 +398,18 @@
                 {/if}
               </div>
             {/if}
+            </div>
           </div>
         {:else}
           <input type="hidden" name="appliesTo" value="all" />
         {/if}
 
         <!-- Conditions -->
-        <div class="rounded-lg bg-surface p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Conditions</h2>
+        <div class="overflow-hidden rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-6 py-4">
+            <h2 class="text-lg font-semibold">Conditions</h2>
+          </div>
+          <div class="p-6">
           <div class="grid grid-cols-3 gap-4">
             <div>
               <label
@@ -442,11 +461,15 @@
               />
             </div>
           </div>
+          </div>
         </div>
 
         <!-- Active Dates -->
-        <div class="rounded-lg bg-surface p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Active Dates</h2>
+        <div class="overflow-hidden rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-6 py-4">
+            <h2 class="text-lg font-semibold">Active Dates</h2>
+          </div>
+          <div class="p-6">
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label
@@ -477,46 +500,58 @@
           <p class="mt-2 text-xs text-muted-foreground">
             Leave empty for no start/end date restrictions.
           </p>
+          </div>
         </div>
       </div>
 
       <!-- Right Sidebar -->
       <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
         <!-- Combination Settings -->
-        <div class="rounded-lg bg-surface p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Combinations</h2>
-          <label class="flex items-center gap-2">
-            <Checkbox bind:checked={combinesWithOtherPromotions} />
-            {#if combinesWithOtherPromotions}
-              <input type="hidden" name="combinesWithOtherPromotions" value="on" />
-            {/if}
-            <span class="text-sm">Combines with other promotions</span>
-          </label>
-          <p class="mt-2 text-xs text-muted-foreground">
-            When enabled, this promotion can be used alongside other promotions on the same order.
-          </p>
+        <div class="rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-4 py-3">
+            <h2 class="font-semibold">Combinations</h2>
+          </div>
+          <div class="p-4">
+            <label class="flex items-center gap-2">
+              <Checkbox bind:checked={combinesWithOtherPromotions} />
+              {#if combinesWithOtherPromotions}
+                <input type="hidden" name="combinesWithOtherPromotions" value="on" />
+              {/if}
+              <span class="text-sm">Combines with other promotions</span>
+            </label>
+            <p class="mt-2 text-xs text-muted-foreground">
+              When enabled, this promotion can be used alongside other promotions on the same order.
+            </p>
+          </div>
         </div>
 
         <!-- Customer Group -->
-        <div class="rounded-lg bg-surface p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Customer Group</h2>
-          <select
-            name="customerGroupId"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-          >
-            <option value="">Not restricted</option>
-            {#each data.customerGroups as group}
-              <option value={group.id}>{group.name}</option>
-            {/each}
-          </select>
-          <p class="mt-2 text-xs text-muted-foreground">
-            Restrict this promotion to customers in a specific group.
-          </p>
+        <div class="rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-4 py-3">
+            <h2 class="font-semibold">Customer Group</h2>
+          </div>
+          <div class="p-4">
+            <select
+              name="customerGroupId"
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+            >
+              <option value="">Not restricted</option>
+              {#each data.customerGroups as group}
+                <option value={group.id}>{group.name}</option>
+              {/each}
+            </select>
+            <p class="mt-2 text-xs text-muted-foreground">
+              Restrict this promotion to customers in a specific group.
+            </p>
+          </div>
         </div>
 
         <!-- Summary -->
-        <div class="rounded-lg bg-surface p-6 shadow">
-          <h2 class="mb-4 text-lg font-semibold">Summary</h2>
+        <div class="rounded-lg bg-surface shadow">
+          <div class="border-b border-border px-4 py-3">
+            <h2 class="font-semibold">Summary</h2>
+          </div>
+          <div class="p-4">
           <div class="space-y-2 text-sm text-foreground-tertiary">
             <p>
               <span class="font-medium text-foreground">Method:</span>
@@ -542,6 +577,7 @@
                     : `${selectedCollectionIds.length} collection(s)`}
               </p>
             {/if}
+          </div>
           </div>
         </div>
       </div>
