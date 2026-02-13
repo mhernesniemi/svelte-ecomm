@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import Check from "@lucide/svelte/icons/check";
@@ -22,9 +23,17 @@
   let isSubmitting = $state(false);
   let trackInventory = $state(true);
   let facetComboboxOpen = $state(false);
+  let variantName = $state("");
+  let variantSku = $state("");
+  let variantPrice = $state<number | string>("");
+  let variantStock = $state<number | string>(0);
 
   // Facet value selections
   let selectedFacetValues = $state<number[]>([]);
+
+  const hasUnsavedChanges = $derived(
+    variantName !== "" || variantSku !== "" || variantPrice !== "" || selectedFacetValues.length > 0
+  );
 
   // Flatten facet values for combobox display
   type FlatFacetValue = {
@@ -115,7 +124,7 @@
                 type="text"
                 id="variant_name"
                 name="variant_name"
-                value={form?.name ?? ""}
+                bind:value={variantName}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
@@ -127,7 +136,7 @@
                 type="text"
                 id="sku"
                 name="sku"
-                value={form?.sku ?? ""}
+                bind:value={variantSku}
                 required
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
@@ -152,6 +161,7 @@
                 form="variant-form"
                 step="0.01"
                 min="0"
+                bind:value={variantPrice}
                 required
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
@@ -167,7 +177,7 @@
                   name="stock"
                   form="variant-form"
                   min="0"
-                  value={form?.stock ?? 0}
+                  bind:value={variantStock}
                   class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               {:else}
@@ -294,3 +304,5 @@
     </div>
   </div>
 </div>
+
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />

@@ -39,7 +39,6 @@
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
   import { cn } from "$lib/utils";
-  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import type { ActionData, PageData } from "./$types";
 
@@ -168,16 +167,22 @@
   }
 
   let productName = $state("");
+  let productSlug = $state("");
+  let productDescription = $state("");
   let activeLanguageTab = $state(DEFAULT_LANGUAGE);
   const translationMap = $derived(translationsToMap(data.translations));
 
   $effect(() => {
     productName = data.product.name;
+    productSlug = data.product.slug;
+    productDescription = data.product.description ?? "";
   });
 
   const hasUnsavedChanges = $derived.by(() => {
     return (
       productName !== data.product.name ||
+      productSlug !== data.product.slug ||
+      productDescription !== (data.product.description ?? "") ||
       visibility !== data.product.visibility ||
       [...selectedProductFacets].sort().join() !==
         data.product.facetValues
@@ -191,11 +196,6 @@
           .join()
     );
   });
-
-  const unsavedChanges = useUnsavedChanges(
-    () => hasUnsavedChanges,
-    () => isSavingProduct
-  );
 
   async function handleImagesSelected(
     files: {
@@ -340,7 +340,7 @@
                   type="text"
                   id="slug"
                   name="slug"
-                  value={data.product.slug}
+                  bind:value={productSlug}
                   required
                   class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
@@ -358,6 +358,7 @@
                 name="description"
                 content={data.product.description ?? ""}
                 placeholder="Write product description..."
+                onchange={(html) => (productDescription = html)}
               />
             </div>
           </div>
@@ -861,11 +862,7 @@
   </Dialog.Root>
 </div>
 
-<UnsavedChangesDialog
-  bind:open={unsavedChanges.showDialog}
-  onconfirm={unsavedChanges.confirmLeave}
-  oncancel={unsavedChanges.cancelLeave}
-/>
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSavingProduct} />
 
 <CreateDialog
   bind:open={createDialogOpen}

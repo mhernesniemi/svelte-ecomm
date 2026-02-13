@@ -14,7 +14,6 @@
     TRANSLATION_LANGUAGES
   } from "$lib/config/languages.js";
   import { cn } from "$lib/utils";
-  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -38,6 +37,7 @@
   let title = $state("");
   let slug = $state("");
   let published = $state(false);
+  let body = $state("");
   let activeLanguageTab = $state(DEFAULT_LANGUAGE);
   const translationMap = $derived(translationsToMap(data.translations));
 
@@ -45,20 +45,17 @@
     title = data.page.title ?? "";
     slug = data.page.slug ?? "";
     published = data.page.published;
+    body = data.page.body ?? "";
   });
 
   const hasUnsavedChanges = $derived.by(() => {
     return (
       title !== (data.page.title ?? "") ||
       slug !== (data.page.slug ?? "") ||
+      body !== (data.page.body ?? "") ||
       published !== data.page.published
     );
   });
-
-  const unsavedChanges = useUnsavedChanges(
-    () => hasUnsavedChanges,
-    () => isSubmitting
-  );
 </script>
 
 <svelte:head><title>{title || "Edit Content Page"} | Admin</title></svelte:head>
@@ -175,6 +172,7 @@
                   name="body"
                   content={data.page.body ?? ""}
                   placeholder="Write page content..."
+                  onchange={(html) => (body = html)}
                 />
               </div>
             </div>
@@ -270,11 +268,7 @@
   </div>
 </div>
 
-<UnsavedChangesDialog
-  bind:open={unsavedChanges.showDialog}
-  onconfirm={unsavedChanges.confirmLeave}
-  oncancel={unsavedChanges.cancelLeave}
-/>
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />
 
 <DeleteConfirmDialog
   bind:open={showDelete}

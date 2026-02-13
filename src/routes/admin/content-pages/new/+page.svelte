@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -28,6 +29,8 @@
 
   let autoSlug = $state(true);
   let published = $state(true);
+
+  const hasUnsavedChanges = $derived(title !== "" || body !== "");
   $effect(() => {
     if (autoSlug && title) {
       slug = slugify(title);
@@ -134,3 +137,5 @@
     </div>
   </form>
 </div>
+
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />

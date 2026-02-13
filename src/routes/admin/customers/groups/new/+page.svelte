@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { ActionData } from "./$types";
 
@@ -13,6 +14,8 @@
 
   let isSubmitting = $state(false);
   let name = $state("");
+
+  const hasUnsavedChanges = $derived(name !== "");
 
   $effect(() => {
     if (form?.values?.name) name = form.values.name;
@@ -71,3 +74,5 @@
     </div>
   </form>
 </div>
+
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />

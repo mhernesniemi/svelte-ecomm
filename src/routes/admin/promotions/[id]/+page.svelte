@@ -9,7 +9,6 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
-  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import type { PageData, ActionData } from "./$types";
   import { toast } from "svelte-sonner";
@@ -28,6 +27,16 @@
   let selectedCollectionIds = $state<number[]>(promo.collections.map((c) => c.collectionId));
   let enabled = $state(promo.enabled);
   let combinesWithOtherPromotions = $state(promo.combinesWithOtherPromotions);
+  let promoTitle = $state(promo.title ?? "");
+  let discountValue = $state(
+    promo.discountType === "fixed_amount" ? promo.discountValue / 100 : promo.discountValue
+  );
+  let minOrderAmount = $state(promo.minOrderAmount ? promo.minOrderAmount / 100 : "");
+  let usageLimit = $state<number | string>(promo.usageLimit ?? "");
+  let usageLimitPerCustomer = $state<number | string>(promo.usageLimitPerCustomer ?? "");
+  let startsAt = $state(formatDateForInput(promo.startsAt));
+  let endsAt = $state(formatDateForInput(promo.endsAt));
+  let customerGroupId = $state(String(promo.customerGroupId ?? ""));
   let showDelete = $state(false);
   let productComboboxOpen = $state(false);
   let collectionComboboxOpen = $state(false);
@@ -100,8 +109,12 @@
   });
 
   const hasUnsavedChanges = $derived.by(() => {
+    const origDiscountValue =
+      promo.discountType === "fixed_amount" ? promo.discountValue / 100 : promo.discountValue;
     return (
+      promoTitle !== (promo.title ?? "") ||
       discountType !== promo.discountType ||
+      discountValue !== origDiscountValue ||
       appliesTo !== promo.appliesTo ||
       [...selectedProductIds].sort().join() !==
         promo.products
@@ -114,11 +127,15 @@
           .sort()
           .join() ||
       enabled !== promo.enabled ||
-      combinesWithOtherPromotions !== promo.combinesWithOtherPromotions
+      combinesWithOtherPromotions !== promo.combinesWithOtherPromotions ||
+      minOrderAmount !== (promo.minOrderAmount ? promo.minOrderAmount / 100 : "") ||
+      String(usageLimit) !== String(promo.usageLimit ?? "") ||
+      String(usageLimitPerCustomer) !== String(promo.usageLimitPerCustomer ?? "") ||
+      startsAt !== formatDateForInput(promo.startsAt) ||
+      endsAt !== formatDateForInput(promo.endsAt) ||
+      customerGroupId !== String(promo.customerGroupId ?? "")
     );
   });
-
-  const unsavedChanges = useUnsavedChanges(() => hasUnsavedChanges);
 </script>
 
 <svelte:head><title>Edit {promo.code} | Admin</title></svelte:head>
@@ -186,7 +203,7 @@
                 type="text"
                 id="title"
                 name="title"
-                value={promo.title ?? ""}
+                bind:value={promoTitle}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
               <p class="mt-1 text-xs text-muted-foreground">
@@ -228,9 +245,7 @@
                   type="number"
                   id="discountValue"
                   name="discountValue"
-                  value={promo.discountType === "fixed_amount"
-                    ? formatPrice(promo.discountValue)
-                    : promo.discountValue}
+                  bind:value={discountValue}
                   min="0"
                   step={discountType === "percentage" ? "1" : "0.01"}
                   class="w-full rounded-lg border border-input-border px-3 py-2"
@@ -399,7 +414,7 @@
                 type="number"
                 id="minOrderAmount"
                 name="minOrderAmount"
-                value={promo.minOrderAmount ? formatPrice(promo.minOrderAmount) : ""}
+                bind:value={minOrderAmount}
                 placeholder="Optional"
                 min="0"
                 step="0.01"
@@ -417,7 +432,7 @@
                 type="number"
                 id="usageLimit"
                 name="usageLimit"
-                value={promo.usageLimit ?? ""}
+                bind:value={usageLimit}
                 placeholder="Unlimited"
                 min="0"
                 class="w-full rounded-lg border border-input-border px-3 py-2"
@@ -434,7 +449,7 @@
                 type="number"
                 id="usageLimitPerCustomer"
                 name="usageLimitPerCustomer"
-                value={promo.usageLimitPerCustomer ?? ""}
+                bind:value={usageLimitPerCustomer}
                 placeholder="Unlimited"
                 min="0"
                 class="w-full rounded-lg border border-input-border px-3 py-2"
@@ -457,7 +472,7 @@
                 type="datetime-local"
                 id="startsAt"
                 name="startsAt"
-                value={formatDateForInput(promo.startsAt)}
+                bind:value={startsAt}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
@@ -469,7 +484,7 @@
                 type="datetime-local"
                 id="endsAt"
                 name="endsAt"
-                value={formatDateForInput(promo.endsAt)}
+                bind:value={endsAt}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
@@ -519,7 +534,7 @@
           <select
             name="customerGroupId"
             class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-            value={promo.customerGroupId ?? ""}
+            bind:value={customerGroupId}
           >
             <option value="">Not restricted</option>
             {#each data.customerGroups as group}
@@ -546,11 +561,7 @@
   </form>
 </div>
 
-<UnsavedChangesDialog
-  bind:open={unsavedChanges.showDialog}
-  onconfirm={unsavedChanges.confirmLeave}
-  oncancel={unsavedChanges.cancelLeave}
-/>
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} />
 
 <DeleteConfirmDialog
   bind:open={showDelete}

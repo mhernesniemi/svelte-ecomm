@@ -12,7 +12,6 @@
   import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
   import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import { slugify } from "$lib/utils";
-  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
@@ -95,11 +94,6 @@
       JSON.stringify(values) !== originalValuesJson
     );
   });
-
-  const unsavedChanges = useUnsavedChanges(
-    () => hasUnsavedChanges,
-    () => isSubmitting
-  );
 
   onMount(() => {
     if ($page.url.searchParams.has("created")) {
@@ -449,11 +443,7 @@
   slugField="code"
 />
 
-<UnsavedChangesDialog
-  bind:open={unsavedChanges.showDialog}
-  onconfirm={unsavedChanges.confirmLeave}
-  oncancel={unsavedChanges.cancelLeave}
-/>
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />
 
 <DeleteConfirmDialog
   bind:open={showDelete}

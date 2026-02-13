@@ -15,6 +15,7 @@
   import X from "@lucide/svelte/icons/x";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import { toast } from "svelte-sonner";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -23,6 +24,15 @@
   });
 
   let isSubmitting = $state(false);
+  let code = $state("");
+  let title = $state("");
+  let discountValue = $state<number | string>("");
+  let minOrderAmount = $state<number | string>("");
+  let usageLimit = $state<number | string>("");
+  let usageLimitPerCustomer = $state<number | string>("");
+  let startsAt = $state("");
+  let endsAt = $state("");
+
   let method = $state<"code" | "automatic">("code");
   let promotionType = $state<"order" | "product" | "free_shipping">("order");
   let discountType = $state<"percentage" | "fixed_amount">("percentage");
@@ -32,6 +42,20 @@
   let productComboboxOpen = $state(false);
   let collectionComboboxOpen = $state(false);
   let combinesWithOtherPromotions = $state(false);
+
+  const hasUnsavedChanges = $derived(
+    code !== "" ||
+      title !== "" ||
+      discountValue !== "" ||
+      selectedProductIds.length > 0 ||
+      selectedCollectionIds.length > 0 ||
+      minOrderAmount !== "" ||
+      usageLimit !== "" ||
+      usageLimitPerCustomer !== "" ||
+      startsAt !== "" ||
+      endsAt !== "" ||
+      combinesWithOtherPromotions
+  );
 
   function toggleProduct(id: number) {
     if (selectedProductIds.includes(id)) {
@@ -169,6 +193,7 @@
                 type="text"
                 id="code"
                 name="code"
+                bind:value={code}
                 placeholder="e.g., SUMMER20"
                 required
                 class="w-full rounded-lg border border-input-border px-3 py-2 uppercase"
@@ -186,6 +211,7 @@
                 type="text"
                 id="title"
                 name="title"
+                bind:value={title}
                 placeholder="e.g., Summer Sale 20% Off"
                 required
                 class="w-full rounded-lg border border-input-border px-3 py-2"
@@ -229,6 +255,7 @@
                   type="number"
                   id="discountValue"
                   name="discountValue"
+                  bind:value={discountValue}
                   placeholder={discountType === "percentage" ? "e.g., 20" : "e.g., 10.00"}
                   min="0"
                   step={discountType === "percentage" ? "1" : "0.01"}
@@ -399,6 +426,7 @@
                 type="number"
                 id="minOrderAmount"
                 name="minOrderAmount"
+                bind:value={minOrderAmount}
                 placeholder="Optional"
                 min="0"
                 step="0.01"
@@ -416,6 +444,7 @@
                 type="number"
                 id="usageLimit"
                 name="usageLimit"
+                bind:value={usageLimit}
                 placeholder="Unlimited"
                 min="0"
                 class="w-full rounded-lg border border-input-border px-3 py-2"
@@ -432,6 +461,7 @@
                 type="number"
                 id="usageLimitPerCustomer"
                 name="usageLimitPerCustomer"
+                bind:value={usageLimitPerCustomer}
                 placeholder="Unlimited"
                 min="0"
                 class="w-full rounded-lg border border-input-border px-3 py-2"
@@ -454,6 +484,7 @@
                 type="datetime-local"
                 id="startsAt"
                 name="startsAt"
+                bind:value={startsAt}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
@@ -465,6 +496,7 @@
                 type="datetime-local"
                 id="endsAt"
                 name="endsAt"
+                bind:value={endsAt}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
@@ -540,3 +572,5 @@
     </div>
   </form>
 </div>
+
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />

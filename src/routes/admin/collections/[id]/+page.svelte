@@ -23,7 +23,6 @@
     TRANSLATION_LANGUAGES
   } from "$lib/config/languages.js";
   import { cn, BASE_CURRENCY } from "$lib/utils";
-  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
@@ -115,11 +114,6 @@
       filtersJson !== savedFilters
     );
   });
-
-  const unsavedChanges = useUnsavedChanges(
-    () => hasUnsavedChanges,
-    () => isSubmitting
-  );
 
   // Live preview — debounce-fetch matching products when filters change
   let previewProducts = $state<PreviewProduct[] | null>(null);
@@ -974,11 +968,7 @@
   </Dialog.Root>
 </div>
 
-<UnsavedChangesDialog
-  bind:open={unsavedChanges.showDialog}
-  onconfirm={unsavedChanges.confirmLeave}
-  oncancel={unsavedChanges.cancelLeave}
-/>
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />
 
 <CreateDialog
   bind:open={createDialogOpen}

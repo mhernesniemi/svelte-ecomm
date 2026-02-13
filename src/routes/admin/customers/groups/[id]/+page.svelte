@@ -13,7 +13,6 @@
   import Check from "@lucide/svelte/icons/check";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Trash2 from "@lucide/svelte/icons/trash-2";
-  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import type { PageData, ActionData } from "./$types";
 
@@ -75,11 +74,6 @@
           .join()
     );
   });
-
-  const unsavedChanges = useUnsavedChanges(
-    () => hasUnsavedChanges,
-    () => isSubmitting
-  );
 
   const customerIdsInGroup = $derived(new Set(customers.map((c) => c.id)));
   const availableCustomers = $derived(
@@ -328,11 +322,7 @@
   </button>
 </div>
 
-<UnsavedChangesDialog
-  bind:open={unsavedChanges.showDialog}
-  onconfirm={unsavedChanges.confirmLeave}
-  oncancel={unsavedChanges.cancelLeave}
-/>
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />
 
 <DeleteConfirmDialog
   bind:open={showDelete}

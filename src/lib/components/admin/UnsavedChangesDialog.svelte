@@ -1,34 +1,35 @@
 <script lang="ts">
   import { Button } from "$lib/components/admin/ui/button";
   import * as Dialog from "$lib/components/admin/ui/dialog";
+  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
 
   let {
-    open = $bindable(false),
-    onconfirm,
-    oncancel
+    isDirty,
+    isSaving
   }: {
-    open: boolean;
-    onconfirm: () => void;
-    oncancel: () => void;
+    isDirty: () => boolean;
+    isSaving?: () => boolean;
   } = $props();
+
+  const unsaved = useUnsavedChanges(isDirty, isSaving);
 </script>
 
 <Dialog.Root
-  bind:open
+  open={unsaved.showDialog}
   onOpenChange={(v) => {
-    if (!v) oncancel();
+    if (!v) unsaved.cancelLeave();
   }}
 >
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>Unsaved changes</Dialog.Title>
-      <Dialog.Description class="mb-4">
+      <Dialog.Description>
         You have unsaved changes. Are you sure you want to leave?
       </Dialog.Description>
     </Dialog.Header>
     <Dialog.Footer>
-      <Button variant="outline" onclick={oncancel}>Stay on page</Button>
-      <Button variant="destructive" onclick={onconfirm}>Leave page</Button>
+      <Button variant="outline" onclick={unsaved.cancelLeave}>Stay on page</Button>
+      <Button variant="destructive" onclick={unsaved.confirmLeave}>Leave page</Button>
     </Dialog.Footer>
   </Dialog.Content>
 </Dialog.Root>

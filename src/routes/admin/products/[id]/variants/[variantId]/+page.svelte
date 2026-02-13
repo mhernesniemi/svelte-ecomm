@@ -14,7 +14,6 @@
   import X from "@lucide/svelte/icons/x";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
-  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import type { ActionData, PageData } from "./$types";
 
@@ -28,12 +27,20 @@
   let trackInventory = $state(data.variant.trackInventory);
   let showDelete = $state(false);
   let facetComboboxOpen = $state(false);
+  let variantName = $state("");
+  let variantSku = $state("");
+  let variantStock = $state(0);
+  let variantPrice = $state(0);
 
   // Facet value selections - initialize from current variant data
   let selectedFacetValues = $state<number[]>([]);
 
   $effect(() => {
     selectedFacetValues = data.variant.facetValues.map((fv) => fv.id);
+    variantName = data.variant.name ?? "";
+    variantSku = data.variant.sku;
+    variantStock = data.variant.stock;
+    variantPrice = data.variant.price / 100;
   });
 
   // Flatten facet values for combobox display
@@ -101,6 +108,10 @@
 
   const hasUnsavedChanges = $derived.by(() => {
     return (
+      variantName !== (data.variant.name ?? "") ||
+      variantSku !== data.variant.sku ||
+      variantStock !== data.variant.stock ||
+      variantPrice !== data.variant.price / 100 ||
       trackInventory !== data.variant.trackInventory ||
       [...selectedFacetValues].sort().join() !==
         data.variant.facetValues
@@ -111,11 +122,6 @@
       JSON.stringify(groupPrices) !== originalGroupPricesJson
     );
   });
-
-  const unsavedChanges = useUnsavedChanges(
-    () => hasUnsavedChanges,
-    () => isSubmitting
-  );
 </script>
 
 <svelte:head>
@@ -174,7 +180,7 @@
                 type="text"
                 id="variant_name"
                 name="variant_name"
-                value={data.variant.name}
+                bind:value={variantName}
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
@@ -186,7 +192,7 @@
                 type="text"
                 id="sku"
                 name="sku"
-                value={data.variant.sku}
+                bind:value={variantSku}
                 required
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
@@ -211,7 +217,7 @@
                   name="stock"
                   form="variant-form"
                   min="0"
-                  value={data.variant.stock}
+                  bind:value={variantStock}
                   class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               {:else}
@@ -235,7 +241,7 @@
                 form="variant-form"
                 step="0.01"
                 min="0"
-                value={(data.variant.price / 100).toFixed(2)}
+                bind:value={variantPrice}
                 required
                 class="w-full rounded-lg border border-input-border px-3 py-2"
               />
@@ -480,11 +486,7 @@
   </button>
 </div>
 
-<UnsavedChangesDialog
-  bind:open={unsavedChanges.showDialog}
-  onconfirm={unsavedChanges.confirmLeave}
-  oncancel={unsavedChanges.cancelLeave}
-/>
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />
 
 <DeleteConfirmDialog
   bind:open={showDelete}
