@@ -49,38 +49,137 @@
 
 <svelte:head><title>Customer Details | Admin</title></svelte:head>
 
-<div>
-  <div class="mb-8">
+<div class="space-y-6">
+  <div class="mb-6">
     <a
       href="/admin/customers"
       class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Customers</a
     >
-    <h1 class="mt-2 text-2xl font-bold">
-      {data.customer.firstName}
-      {data.customer.lastName}
-    </h1>
   </div>
+  <h1 class="text-2xl font-bold">
+    {data.customer.firstName}
+    {data.customer.lastName}
+  </h1>
 
-  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
-    <!-- Customer Info -->
-    <div class="space-y-8 lg:col-span-1">
-      <div class="rounded-lg bg-surface p-6 shadow">
-        <h2 class="mb-4 text-lg font-semibold">Customer Information</h2>
+  <div class="flex flex-col gap-6 lg:flex-row">
+    <!-- Main Content (Left) -->
+    <div class="flex-1 space-y-6">
+      <!-- Addresses Section -->
+      <div class="overflow-hidden rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Addresses</h2>
+        </div>
 
-        <div class="space-y-3 text-sm">
+        <div class="p-6">
+          {#if data.customer.addresses.length === 0}
+            <p class="text-sm text-muted-foreground">No addresses saved</p>
+          {:else}
+            <div class="space-y-4">
+              {#each data.customer.addresses as address}
+                <div class="relative rounded-lg border border-border p-4">
+                  {#if address.isDefault}
+                    <Badge class="absolute top-2 right-2">Default</Badge>
+                  {/if}
+                  <div class="pr-16">
+                    {#if address.fullName}
+                      <p class="font-medium">{address.fullName}</p>
+                    {/if}
+                    {#if address.company}
+                      <p class="text-sm text-foreground-tertiary">{address.company}</p>
+                    {/if}
+                    <p class="text-sm text-foreground-tertiary">{address.streetLine1}</p>
+                    {#if address.streetLine2}
+                      <p class="text-sm text-foreground-tertiary">{address.streetLine2}</p>
+                    {/if}
+                    <p class="text-sm text-foreground-tertiary">
+                      {address.postalCode}
+                      {address.city}
+                    </p>
+                    <p class="text-sm text-foreground-tertiary">{address.country}</p>
+                    {#if address.phoneNumber}
+                      <p class="mt-1 text-sm text-muted-foreground">{address.phoneNumber}</p>
+                    {/if}
+                  </div>
+                </div>
+              {/each}
+            </div>
+          {/if}
+        </div>
+      </div>
+
+      <!-- Recent Orders Section -->
+      <div class="overflow-hidden rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Recent Orders</h2>
+        </div>
+
+        <div>
+          {#if data.orders.length === 0}
+            <div class="p-6">
+              <p class="text-sm text-muted-foreground">No orders yet</p>
+            </div>
+          {:else}
+            <Table class="rounded-none border-0 shadow-none">
+              <TableHeader>
+                <TableRow class="hover:bg-transparent">
+                  <TableHead class="px-4 py-3 text-sm">Order</TableHead>
+                  <TableHead class="px-4 py-3 text-sm">Date</TableHead>
+                  <TableHead class="px-4 py-3 text-sm">Status</TableHead>
+                  <TableHead class="px-4 py-3 text-right text-sm">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {#each data.orders as order}
+                  <TableRow>
+                    <TableCell class="px-4 py-3 text-sm">
+                      <a
+                        href="/admin/orders/{order.id}"
+                        class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                      >
+                        #{order.code}
+                      </a>
+                    </TableCell>
+                    <TableCell class="px-4 py-3 text-sm text-muted-foreground">
+                      {formatDate(order.createdAt)}
+                    </TableCell>
+                    <TableCell class="px-4 py-3 text-sm">
+                      <Badge variant={getStateVariant(order.state)}>
+                        {order.state}
+                      </Badge>
+                    </TableCell>
+                    <TableCell class="px-4 py-3 text-right text-sm font-medium">
+                      {formatPrice(order.total)} EUR
+                    </TableCell>
+                  </TableRow>
+                {/each}
+              </TableBody>
+            </Table>
+          {/if}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar (Right) -->
+    <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
+      <!-- Customer Information -->
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
+          <h2 class="font-semibold">Customer Information</h2>
+        </div>
+        <div class="space-y-3 p-4 text-sm">
           <div>
-            <span class="text-muted-foreground">Email</span>
+            <span class="text-foreground-secondary">Email</span>
             <p class="font-medium">{data.customer.email}</p>
           </div>
           {#if data.customer.phone}
             <div>
-              <span class="text-muted-foreground">Phone</span>
+              <span class="text-foreground-secondary">Phone</span>
               <p class="font-medium">{data.customer.phone}</p>
             </div>
           {/if}
           <div>
-            <span class="text-muted-foreground">Customer since</span>
+            <span class="text-foreground-secondary">Customer since</span>
             <p class="font-medium">{formatDate(data.customer.createdAt)}</p>
           </div>
         </div>
@@ -95,111 +194,30 @@
             await update({ reset: false });
           };
         }}
-        class="rounded-lg bg-surface p-6 shadow"
+        class="rounded-lg bg-surface shadow"
       >
-        <h2 class="mb-4 text-lg font-semibold">VAT ID</h2>
-        <div class="flex items-end gap-3">
-          <div class="flex-1">
-            <label for="vatId" class="mb-1 block text-sm text-muted-foreground">VAT ID</label>
-            <input
-              type="text"
-              id="vatId"
-              name="vatId"
-              bind:value={vatId}
-              placeholder="e.g. FI12345678"
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-            />
+        <div class="border-b border-border px-4 py-3">
+          <h2 class="font-semibold">VAT ID</h2>
+        </div>
+        <div class="p-4">
+          <div class="flex items-end gap-3">
+            <div class="flex-1">
+              <label for="vatId" class="mb-1 block text-sm font-medium text-foreground-secondary">
+                VAT ID
+              </label>
+              <input
+                type="text"
+                id="vatId"
+                name="vatId"
+                bind:value={vatId}
+                placeholder="e.g. FI12345678"
+                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+              />
+            </div>
+            <Button type="submit" size="sm">Save</Button>
           </div>
-          <Button type="submit" size="sm">Save</Button>
         </div>
       </form>
-    </div>
-
-    <!-- Addresses and Orders -->
-    <div class="space-y-8 lg:col-span-2">
-      <!-- Addresses Section (Read-only) -->
-      <div class="rounded-lg bg-surface p-6 shadow">
-        <h2 class="mb-4 text-lg font-semibold">Addresses</h2>
-
-        {#if data.customer.addresses.length === 0}
-          <p class="text-sm text-muted-foreground">No addresses saved</p>
-        {:else}
-          <div class="space-y-4">
-            {#each data.customer.addresses as address}
-              <div class="relative rounded-lg border border-border p-4">
-                {#if address.isDefault}
-                  <Badge class="absolute top-2 right-2">Default</Badge>
-                {/if}
-                <div class="pr-16">
-                  {#if address.fullName}
-                    <p class="font-medium">{address.fullName}</p>
-                  {/if}
-                  {#if address.company}
-                    <p class="text-sm text-foreground-tertiary">{address.company}</p>
-                  {/if}
-                  <p class="text-sm text-foreground-tertiary">{address.streetLine1}</p>
-                  {#if address.streetLine2}
-                    <p class="text-sm text-foreground-tertiary">{address.streetLine2}</p>
-                  {/if}
-                  <p class="text-sm text-foreground-tertiary">
-                    {address.postalCode}
-                    {address.city}
-                  </p>
-                  <p class="text-sm text-foreground-tertiary">{address.country}</p>
-                  {#if address.phoneNumber}
-                    <p class="mt-1 text-sm text-muted-foreground">{address.phoneNumber}</p>
-                  {/if}
-                </div>
-              </div>
-            {/each}
-          </div>
-        {/if}
-      </div>
-
-      <!-- Recent Orders Section -->
-      <div class="rounded-lg bg-surface p-6 shadow">
-        <h2 class="mb-4 text-lg font-semibold">Recent Orders</h2>
-
-        {#if data.orders.length === 0}
-          <p class="text-sm text-muted-foreground">No orders yet</p>
-        {:else}
-          <Table class="rounded-none border-0 shadow-none">
-            <TableHeader>
-              <TableRow class="hover:bg-transparent">
-                <TableHead class="px-4 py-3 text-sm">Order</TableHead>
-                <TableHead class="px-4 py-3 text-sm">Date</TableHead>
-                <TableHead class="px-4 py-3 text-sm">Status</TableHead>
-                <TableHead class="px-4 py-3 text-right text-sm">Total</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {#each data.orders as order}
-                <TableRow>
-                  <TableCell class="px-4 py-3 text-sm">
-                    <a
-                      href="/admin/orders/{order.id}"
-                      class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                    >
-                      #{order.code}
-                    </a>
-                  </TableCell>
-                  <TableCell class="px-4 py-3 text-sm text-muted-foreground">
-                    {formatDate(order.createdAt)}
-                  </TableCell>
-                  <TableCell class="px-4 py-3 text-sm">
-                    <Badge variant={getStateVariant(order.state)}>
-                      {order.state}
-                    </Badge>
-                  </TableCell>
-                  <TableCell class="px-4 py-3 text-right text-sm font-medium">
-                    {formatPrice(order.total)} EUR
-                  </TableCell>
-                </TableRow>
-              {/each}
-            </TableBody>
-          </Table>
-        {/if}
-      </div>
     </div>
   </div>
 </div>
