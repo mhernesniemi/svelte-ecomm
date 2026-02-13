@@ -2,8 +2,7 @@
 
 ## Goals
 
-- Keep the codebase lightweight and easy to understand.
-- When adding a new feature, consider whether it is also needed in the admin panel and storefront.
+- When adding a new feature or data field, always implement it in **both** the admin panel and the storefront. For example, adding an image field to a model means updating the admin edit page, the server actions, **and** the storefront page that renders it (including relevant meta tags).
 - This project uses Svelte 5. Avoid outdated Svelte 4 patterns.
 - Add tests where appropriate when adding a new feature or modifying existing code.
 
@@ -18,4 +17,4 @@
 - Use shadcn/svelte for UI components and install new ones as needed.
 - Prefer existing UI components (e.g. `<Button>` over `<button>`).
 - Use `cn()` for conditional Tailwind classes.
-- Use `<AdminCard>` for card sections on admin detail pages. It supports `title`, `description`, `variant` (main/sidebar), `noPadding`, `headerActions`, `headerExtra`, and `children` snippets.
+- Use `<AdminCard>` for card sections on admin detail pages.
