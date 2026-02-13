@@ -19,7 +19,7 @@
   let isSubmitting = $state(false);
   let showDelete = $state(false);
   let comboboxOpen = $state(false);
-  let selectedCustomerId = $state<number | null>(null);
+  let selectedCustomerIds = $state<Set<number>>(new Set());
 
   onMount(() => {
     if ($page.url.searchParams.has("created")) {
@@ -63,25 +63,34 @@
   );
 
   const selectedCustomerLabel = $derived(() => {
-    if (!selectedCustomerId) return "Select a customer...";
-    const c = availableCustomers.find((c) => c.id === selectedCustomerId);
-    return c ? `${c.firstName} ${c.lastName} (${c.email})` : "Select a customer...";
+    if (selectedCustomerIds.size === 0) return "Select customers...";
+    return `${selectedCustomerIds.size} customer${selectedCustomerIds.size !== 1 ? "s" : ""} selected`;
   });
 
-  function addCustomer() {
-    if (!selectedCustomerId) return;
-    const customer = data.allCustomers.find((c) => c.id === selectedCustomerId);
-    if (!customer) return;
-    customers = [
-      ...customers,
-      {
-        id: customer.id,
-        firstName: customer.firstName,
-        lastName: customer.lastName,
-        email: customer.email
-      }
-    ].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
-    selectedCustomerId = null;
+  function toggleCustomerSelection(id: number) {
+    const next = new Set(selectedCustomerIds);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    selectedCustomerIds = next;
+  }
+
+  function addSelectedCustomers() {
+    if (selectedCustomerIds.size === 0) return;
+    const newCustomers = data.allCustomers
+      .filter((c) => selectedCustomerIds.has(c.id))
+      .map((c) => ({
+        id: c.id,
+        firstName: c.firstName,
+        lastName: c.lastName,
+        email: c.email
+      }));
+    customers = [...customers, ...newCustomers].sort((a, b) =>
+      `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`)
+    );
+    selectedCustomerIds = new Set();
   }
 
   function removeCustomer(id: number) {
@@ -184,7 +193,7 @@
                 <Popover.Trigger
                   class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                 >
-                  <span class={selectedCustomerId ? "text-foreground" : "text-muted-foreground"}>
+                  <span class={selectedCustomerIds.size > 0 ? "text-foreground" : "text-muted-foreground"}>
                     {selectedCustomerLabel()}
                   </span>
                   <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
@@ -197,13 +206,10 @@
                       {#each availableCustomers as customer}
                         <Command.Item
                           value="{customer.firstName} {customer.lastName} {customer.email}"
-                          onSelect={() => {
-                            selectedCustomerId = customer.id;
-                            comboboxOpen = false;
-                          }}
+                          onSelect={() => toggleCustomerSelection(customer.id)}
                         >
                           <Check
-                            class="mr-2 h-4 w-4 {selectedCustomerId === customer.id
+                            class="mr-2 h-4 w-4 {selectedCustomerIds.has(customer.id)
                               ? 'opacity-100'
                               : 'opacity-0'}"
                           />
@@ -222,11 +228,11 @@
                 type="button"
                 variant="outline"
                 size="sm"
-                disabled={!selectedCustomerId}
-                onclick={addCustomer}
+                disabled={selectedCustomerIds.size === 0}
+                onclick={addSelectedCustomers}
                 class="shrink-0"
               >
-                Add
+                Add{#if selectedCustomerIds.size > 0} ({selectedCustomerIds.size}){/if}
               </Button>
             </div>
           {/if}
