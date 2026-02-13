@@ -131,7 +131,7 @@
 
 <div>
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-foreground">Categories</h1>
+    <h1 class="text-2xl leading-[40px] font-bold text-foreground">Categories</h1>
   </div>
 
   {#if data.tree.length === 0}

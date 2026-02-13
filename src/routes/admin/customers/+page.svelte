@@ -143,7 +143,7 @@
 <svelte:head><title>Customers | Admin</title></svelte:head>
 
 <div>
-  <h1 class="mb-6 text-2xl font-bold">Customers</h1>
+  <h1 class="mb-6 text-2xl leading-[40px] font-bold">Customers</h1>
 
   <!-- Tabs -->
   <div class="mb-6 border-b border-border">

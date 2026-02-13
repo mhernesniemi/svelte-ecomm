@@ -75,7 +75,7 @@
 <svelte:head><title>Orders | Admin</title></svelte:head>
 
 <div>
-  <h1 class="mb-8 text-2xl font-bold">Orders</h1>
+  <h1 class="mb-8 text-2xl leading-[40px] font-bold">Orders</h1>
 
   <!-- State Filter -->
   <div class="mb-6 flex flex-wrap gap-2">
