@@ -16,12 +16,11 @@
   import { cn } from "$lib/utils";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import { onMount } from "svelte";
+  import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
+  import Plus from "@lucide/svelte/icons/plus";
+  import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
-  import Upload from "@lucide/svelte/icons/upload";
-  import Loader2 from "@lucide/svelte/icons/loader-2";
-  import X from "@lucide/svelte/icons/x";
-  import ImageIcon from "@lucide/svelte/icons/image";
   let { data, form } = $props();
 
   onMount(() => {
@@ -43,7 +42,7 @@
   let published = $state(false);
   let body = $state("");
   let imageUrl = $state<string | null>(null);
-  let isUploadingImage = $state(false);
+  let showImagePicker = $state(false);
   let activeLanguageTab = $state(DEFAULT_LANGUAGE);
   const translationMap = $derived(translationsToMap(data.translations));
 
@@ -65,39 +64,19 @@
     );
   });
 
-  async function handleImageUpload(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-
-    isUploadingImage = true;
-    try {
-      const authResponse = await fetch("/api/assets/auth");
-      const auth = await authResponse.json();
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("publicKey", auth.publicKey);
-      formData.append("signature", auth.signature);
-      formData.append("expire", auth.expire.toString());
-      formData.append("token", auth.token);
-      formData.append("fileName", file.name);
-      formData.append("folder", "/pages");
-
-      const uploadResponse = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!uploadResponse.ok) throw new Error("Upload failed");
-
-      const result = await uploadResponse.json();
-      imageUrl = result.url;
-    } catch {
-      toast.error("Failed to upload image");
-    } finally {
-      isUploadingImage = false;
-      input.value = "";
+  function handleImageSelected(
+    files: {
+      url: string;
+      name: string;
+      fileId: string;
+      width: number;
+      height: number;
+      size: number;
+      alt: string;
+    }[]
+  ) {
+    if (files.length > 0) {
+      imageUrl = files[0].url;
     }
   }
 </script>
@@ -310,6 +289,19 @@
       </AdminCard>
 
       <AdminCard title="Image" variant="sidebar">
+        {#snippet headerActions()}
+          {#if !imageUrl}
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onclick={() => (showImagePicker = true)}
+            >
+              <Plus class="h-4 w-4" />
+              Add
+            </Button>
+          {/if}
+        {/snippet}
         {#if imageUrl}
           <div class="group relative">
             <img
@@ -327,29 +319,12 @@
                 class="h-7 w-7 p-0"
                 onclick={() => (imageUrl = null)}
               >
-                <X class="h-3.5 w-3.5" />
+                <Trash2 class="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>
         {:else}
-          <label
-            class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-input-border py-8 hover:border-blue-500 hover:bg-hover"
-          >
-            <input
-              type="file"
-              accept="image/*"
-              class="hidden"
-              onchange={handleImageUpload}
-              disabled={isUploadingImage}
-            />
-            {#if isUploadingImage}
-              <Loader2 class="mb-2 h-8 w-8 animate-spin text-blue-500" />
-              <span class="text-xs text-foreground-tertiary">Uploading...</span>
-            {:else}
-              <Upload class="mb-2 h-8 w-8 text-placeholder" />
-              <span class="text-xs font-medium text-foreground-tertiary">Click to upload</span>
-            {/if}
-          </label>
+          <p class="py-4 text-center text-sm text-muted-foreground">No image yet</p>
         {/if}
         <input type="hidden" name="imageUrl" value={imageUrl ?? ""} form="content-page-form" />
       </AdminCard>
@@ -358,6 +333,13 @@
 </div>
 
 <UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />
+
+<ImagePicker
+  bind:open={showImagePicker}
+  onClose={() => (showImagePicker = false)}
+  onSelect={handleImageSelected}
+  folder="/pages"
+/>
 
 <DeleteConfirmDialog
   bind:open={showDelete}

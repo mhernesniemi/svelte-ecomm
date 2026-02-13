@@ -33,9 +33,10 @@
     open: boolean;
     onClose: () => void;
     onSelect: (files: SelectedImage[]) => void;
+    folder?: string;
   }
 
-  let { open = $bindable(), onClose, onSelect }: Props = $props();
+  let { open = $bindable(), onClose, onSelect, folder = "/products" }: Props = $props();
 
   let activeTab = $state<"upload" | "existing">("upload");
   let existingImages = $state<ImageKitFile[]>([]);
@@ -53,7 +54,7 @@
 
     isLoadingImages = true;
     try {
-      const response = await fetch("/api/assets/list?folder=/products");
+      const response = await fetch(`/api/assets/list?folder=${folder}`);
       if (response.ok) {
         existingImages = await response.json();
       }
@@ -122,7 +123,7 @@
         formData.append("expire", auth.expire.toString());
         formData.append("token", auth.token);
         formData.append("fileName", file.name);
-        formData.append("folder", "/products");
+        formData.append("folder", folder);
 
         const uploadResponse = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
           method: "POST",
