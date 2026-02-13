@@ -45,7 +45,12 @@
     >
   </div>
   <div class="flex items-center justify-between">
-    <h1 class="text-2xl font-bold">Review #{data.review.id}</h1>
+    <div class="flex items-center gap-4">
+      <h1 class="text-2xl font-bold">Review #{data.review.id}</h1>
+      <Badge variant={getStatusVariant(data.review.status)} class="capitalize">
+        {data.review.status}
+      </Badge>
+    </div>
   </div>
 
   <div class="flex flex-col gap-6 lg:flex-row">
@@ -100,13 +105,6 @@
 
     <!-- Sidebar -->
     <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
-      <!-- Status -->
-      <AdminCard title="Status" variant="sidebar">
-        <Badge variant={getStatusVariant(data.review.status)} class="capitalize">
-          {data.review.status}
-        </Badge>
-      </AdminCard>
-
       <!-- Details -->
       <AdminCard title="Details" variant="sidebar">
         <div class="space-y-3 text-sm">
