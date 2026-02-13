@@ -9,6 +9,7 @@
   import type { PageData } from "./$types";
   import { Badge } from "$lib/components/admin/ui/badge";
   import { formatDate } from "$lib/utils";
+  import PlusIcon from "@lucide/svelte/icons/plus";
 
   let { data }: { data: PageData } = $props();
 
@@ -87,7 +88,7 @@
       <h1 class="text-2xl font-bold text-foreground">Content Pages</h1>
     </div>
     {#if data.pages.length > 0}
-      <Button onclick={() => (showCreatePage = true)}>Add Page</Button>
+      <Button onclick={() => (showCreatePage = true)}><PlusIcon class="h-4 w-4" /> Add Page</Button>
     {/if}
   </div>
 
