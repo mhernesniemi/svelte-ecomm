@@ -36,11 +36,23 @@ type FilterHandler = (
 /** Collection with product count */
 export interface CollectionWithCount extends Collection {
 	productCount: number;
-	featuredAsset?: { id: number; name: string; type: string; mimeType: string; width: number | null; height: number | null; fileSize: number | null; source: string; preview: string | null; alt: string | null; imagekitFileId: string | null; createdAt: Date } | null;
+	featuredAsset?: {
+		id: number;
+		name: string;
+		type: string;
+		mimeType: string;
+		width: number | null;
+		height: number | null;
+		fileSize: number | null;
+		source: string;
+		preview: string | null;
+		alt: string | null;
+		imagekitFileId: string | null;
+		createdAt: Date;
+	} | null;
 }
 
 export class CollectionService {
-
 	// =========================================================================
 	// FILTER HANDLERS - Strategy pattern for filter compilation
 	// =========================================================================
@@ -303,9 +315,7 @@ export class CollectionService {
 			.from(collections)
 			.orderBy(collections.position, desc(collections.createdAt));
 
-		return Promise.all(
-			collectionList.map((c) => this.loadCollectionRelations(c))
-		);
+		return Promise.all(collectionList.map((c) => this.loadCollectionRelations(c)));
 	}
 
 	/**
@@ -487,9 +497,7 @@ export class CollectionService {
 			.offset(offset);
 
 		// Load full relations
-		const items = await Promise.all(
-			productList.map((p) => this.loadProductRelations(p))
-		);
+		const items = await Promise.all(productList.map((p) => this.loadProductRelations(p)));
 
 		return {
 			items,
@@ -565,9 +573,7 @@ export class CollectionService {
 			.orderBy(desc(products.createdAt))
 			.limit(limit);
 
-		const items = await Promise.all(
-			productList.map((p) => this.loadProductRelations(p))
-		);
+		const items = await Promise.all(productList.map((p) => this.loadProductRelations(p)));
 
 		return { products: items, total };
 	}
@@ -586,9 +592,7 @@ export class CollectionService {
 	/**
 	 * Get all collections that contain a given product
 	 */
-	async getCollectionsForProduct(
-		productId: number
-	): Promise<CollectionWithRelations[]> {
+	async getCollectionsForProduct(productId: number): Promise<CollectionWithRelations[]> {
 		const allCollections = await db
 			.select()
 			.from(collections)

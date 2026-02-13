@@ -14,14 +14,16 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, "Invalid ID");
 	}
 
-	const [product, variant, facets, customerGroups, groupPrices, translations] = await Promise.all([
-		productService.getById(productId),
-		productService.getVariantById(variantId),
-		facetService.list(),
-		customerGroupService.list(),
-		productService.getGroupPrices(variantId),
-		translationService.getVariantTranslations(variantId)
-	]);
+	const [product, variant, facets, customerGroups, groupPrices, translations] = await Promise.all(
+		[
+			productService.getById(productId),
+			productService.getVariantById(variantId),
+			facetService.list(),
+			customerGroupService.list(),
+			productService.getGroupPrices(variantId),
+			translationService.getVariantTranslations(variantId)
+		]
+	);
 
 	if (!product) {
 		throw error(404, "Product not found");

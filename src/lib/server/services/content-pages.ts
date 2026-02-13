@@ -66,10 +66,7 @@ export class ContentPageService {
 		if (input.body !== undefined) updateData.body = input.body;
 
 		if (Object.keys(updateData).length > 0) {
-			await db
-				.update(contentPages)
-				.set(updateData)
-				.where(eq(contentPages.id, id));
+			await db.update(contentPages).set(updateData).where(eq(contentPages.id, id));
 		}
 
 		return this.getById(id);

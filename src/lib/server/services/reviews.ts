@@ -9,14 +9,7 @@
  */
 import { eq, and, desc, sql, count } from "drizzle-orm";
 import { db } from "../db/index.js";
-import {
-	reviews,
-	products,
-	customers,
-	orders,
-	orderLines,
-	productVariants
-} from "../db/schema.js";
+import { reviews, products, customers, orders, orderLines, productVariants } from "../db/schema.js";
 import type {
 	Review,
 	ReviewWithCustomer,

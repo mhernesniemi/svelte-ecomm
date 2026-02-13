@@ -75,158 +75,163 @@
   <div class="flex flex-col gap-6 lg:flex-row">
     <!-- Main Content (Left) -->
     <div class="flex-1 space-y-6">
-  <form
-    id="content-page-form"
-    method="POST"
-    action="?/update"
-    use:enhance={() => {
-      isSubmitting = true;
-      return async ({ result, update }) => {
-        await update({ reset: false });
-        isSubmitting = false;
-        if (result.type === "success") {
-          toast.success("Page updated");
-        }
-      };
-    }}
-    class="space-y-6"
-  >
-    <div class="overflow-hidden rounded-lg bg-surface shadow">
-      <!-- Language Tabs -->
-      {#if TRANSLATION_LANGUAGES.length > 0}
-        <div class="flex border-b border-border">
-          {#each LANGUAGES as lang}
-            <button
-              type="button"
-              class={cn(
-                "border-b-2 border-transparent px-4 py-2.5 text-sm font-medium",
-                activeLanguageTab === lang.code
-                  ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
-                  : "text-muted-foreground hover:text-foreground"
-              )}
-              onclick={() => (activeLanguageTab = lang.code)}
-            >
-              {lang.name}
-            </button>
+      <form
+        id="content-page-form"
+        method="POST"
+        action="?/update"
+        use:enhance={() => {
+          isSubmitting = true;
+          return async ({ result, update }) => {
+            await update({ reset: false });
+            isSubmitting = false;
+            if (result.type === "success") {
+              toast.success("Page updated");
+            }
+          };
+        }}
+        class="space-y-6"
+      >
+        <div class="overflow-hidden rounded-lg bg-surface shadow">
+          <!-- Language Tabs -->
+          {#if TRANSLATION_LANGUAGES.length > 0}
+            <div class="flex border-b border-border">
+              {#each LANGUAGES as lang}
+                <button
+                  type="button"
+                  class={cn(
+                    "border-b-2 border-transparent px-4 py-2.5 text-sm font-medium",
+                    activeLanguageTab === lang.code
+                      ? "border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                  onclick={() => (activeLanguageTab = lang.code)}
+                >
+                  {lang.name}
+                </button>
+              {/each}
+            </div>
+          {/if}
+
+          <!-- Default language fields -->
+          <div class={activeLanguageTab !== DEFAULT_LANGUAGE ? "hidden" : ""}>
+            <div class="space-y-4 p-6">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    for="title"
+                    class="mb-1 block text-sm font-medium text-foreground-secondary"
+                  >
+                    Title <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    bind:value={title}
+                    required
+                    class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="slug"
+                    class="mb-1 block text-sm font-medium text-foreground-secondary"
+                  >
+                    Slug <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="slug"
+                    name="slug"
+                    bind:value={slug}
+                    required
+                    class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label for="body" class="mb-1 block text-sm font-medium text-foreground-secondary">
+                  Body
+                </label>
+                <RichTextEditor
+                  name="body"
+                  content={data.page.body ?? ""}
+                  placeholder="Write page content..."
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Translation language fields -->
+          {#each TRANSLATION_LANGUAGES as lang}
+            <div class={activeLanguageTab !== lang.code ? "hidden" : ""}>
+              <div class="space-y-4 p-6">
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      for="translation_{lang.code}_title"
+                      class="mb-1 block text-sm font-medium text-foreground-secondary"
+                    >
+                      Title
+                    </label>
+                    <input
+                      type="text"
+                      id="translation_{lang.code}_title"
+                      name="title_{lang.code}"
+                      value={translationMap[lang.code]?.title ?? ""}
+                      class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      for="translation_{lang.code}_slug"
+                      class="mb-1 block text-sm font-medium text-foreground-secondary"
+                    >
+                      Slug
+                    </label>
+                    <input
+                      type="text"
+                      id="translation_{lang.code}_slug"
+                      name="slug_{lang.code}"
+                      value={translationMap[lang.code]?.slug ?? ""}
+                      class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    for="translation_{lang.code}_body"
+                    class="mb-1 block text-sm font-medium text-foreground-secondary"
+                  >
+                    Body
+                  </label>
+                  <RichTextEditor
+                    name="body_{lang.code}"
+                    content={translationMap[lang.code]?.body ?? ""}
+                    placeholder="Write page content..."
+                  />
+                </div>
+
+                <p class="text-xs text-muted-foreground">
+                  Leave empty to use the {LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name} value.
+                </p>
+              </div>
+            </div>
           {/each}
         </div>
-      {/if}
+      </form>
 
-      <!-- Default language fields -->
-      <div class={activeLanguageTab !== DEFAULT_LANGUAGE ? "hidden" : ""}>
-        <div class="space-y-4 p-6">
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                Title <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                bind:value={title}
-                required
-                class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-              />
-            </div>
-
-            <div>
-              <label for="slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                Slug <span class="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="slug"
-                name="slug"
-                bind:value={slug}
-                required
-                class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label for="body" class="mb-1 block text-sm font-medium text-foreground-secondary">
-              Body
-            </label>
-            <RichTextEditor
-              name="body"
-              content={data.page.body ?? ""}
-              placeholder="Write page content..."
-            />
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Translation language fields -->
-      {#each TRANSLATION_LANGUAGES as lang}
-        <div class={activeLanguageTab !== lang.code ? "hidden" : ""}>
-          <div class="space-y-4 p-6">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  for="translation_{lang.code}_title"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="translation_{lang.code}_title"
-                  name="title_{lang.code}"
-                  value={translationMap[lang.code]?.title ?? ""}
-                  class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-                />
-              </div>
-
-              <div>
-                <label
-                  for="translation_{lang.code}_slug"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Slug
-                </label>
-                <input
-                  type="text"
-                  id="translation_{lang.code}_slug"
-                  name="slug_{lang.code}"
-                  value={translationMap[lang.code]?.slug ?? ""}
-                  class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                for="translation_{lang.code}_body"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                Body
-              </label>
-              <RichTextEditor
-                name="body_{lang.code}"
-                content={translationMap[lang.code]?.body ?? ""}
-                placeholder="Write page content..."
-              />
-            </div>
-
-            <p class="text-xs text-muted-foreground">
-              Leave empty to use the {LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name} value.
-            </p>
-          </div>
-        </div>
-      {/each}
-    </div>
-  </form>
-
-  <button
-    type="button"
-    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
-    onclick={() => (showDelete = true)}
-  >
-    Delete this page
-  </button>
+      <button
+        type="button"
+        class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
+        onclick={() => (showDelete = true)}
+      >
+        Delete this page
+      </button>
     </div>
 
     <!-- Sidebar (Right) -->

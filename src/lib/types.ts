@@ -320,7 +320,6 @@ export type NewContentPage = InferInsertModel<typeof contentPages>;
 export type ContentPageTranslation = InferSelectModel<typeof contentPageTranslations>;
 export type NewContentPageTranslation = InferInsertModel<typeof contentPageTranslations>;
 
-
 // ============================================================================
 // FILTER & QUERY TYPES
 // ============================================================================

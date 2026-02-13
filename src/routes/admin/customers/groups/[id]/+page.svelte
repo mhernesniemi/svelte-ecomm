@@ -195,7 +195,11 @@
                 <Popover.Trigger
                   class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                 >
-                  <span class={selectedCustomerIds.size > 0 ? "text-foreground" : "text-muted-foreground"}>
+                  <span
+                    class={selectedCustomerIds.size > 0
+                      ? "text-foreground"
+                      : "text-muted-foreground"}
+                  >
                     {selectedCustomerLabel()}
                   </span>
                   <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
@@ -234,7 +238,8 @@
                 onclick={addSelectedCustomers}
                 class="shrink-0"
               >
-                Add{#if selectedCustomerIds.size > 0} ({selectedCustomerIds.size}){/if}
+                Add{#if selectedCustomerIds.size > 0}
+                  ({selectedCustomerIds.size}){/if}
               </Button>
             </div>
           {/if}

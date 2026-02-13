@@ -22,7 +22,11 @@ function translationOps<TRow>(table: any, fkColumn: any, fkProp: string) {
 		get: (entityId: number): Promise<TRow[]> =>
 			db.select().from(table).where(eq(fkColumn, entityId)) as any,
 
-		upsert: async (entityId: number, languageCode: string, data: Record<string, string | null>) => {
+		upsert: async (
+			entityId: number,
+			languageCode: string,
+			data: Record<string, string | null>
+		) => {
 			await db
 				.insert(table)
 				.values({ ...data, [fkProp]: entityId, languageCode })
@@ -32,13 +36,41 @@ function translationOps<TRow>(table: any, fkColumn: any, fkProp: string) {
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-const product = translationOps<typeof productTranslations.$inferSelect>(productTranslations, productTranslations.productId, "productId");
-const variant = translationOps<typeof productVariantTranslations.$inferSelect>(productVariantTranslations, productVariantTranslations.variantId, "variantId");
-const facet = translationOps<typeof facetTranslations.$inferSelect>(facetTranslations, facetTranslations.facetId, "facetId");
-const facetValueOps = translationOps<typeof facetValueTranslations.$inferSelect>(facetValueTranslations, facetValueTranslations.facetValueId, "facetValueId");
-const collection = translationOps<typeof collectionTranslations.$inferSelect>(collectionTranslations, collectionTranslations.collectionId, "collectionId");
-const categoryOps = translationOps<typeof categoryTranslations.$inferSelect>(categoryTranslations, categoryTranslations.categoryId, "categoryId");
-const contentPage = translationOps<typeof contentPageTranslations.$inferSelect>(contentPageTranslations, contentPageTranslations.contentPageId, "contentPageId");
+const product = translationOps<typeof productTranslations.$inferSelect>(
+	productTranslations,
+	productTranslations.productId,
+	"productId"
+);
+const variant = translationOps<typeof productVariantTranslations.$inferSelect>(
+	productVariantTranslations,
+	productVariantTranslations.variantId,
+	"variantId"
+);
+const facet = translationOps<typeof facetTranslations.$inferSelect>(
+	facetTranslations,
+	facetTranslations.facetId,
+	"facetId"
+);
+const facetValueOps = translationOps<typeof facetValueTranslations.$inferSelect>(
+	facetValueTranslations,
+	facetValueTranslations.facetValueId,
+	"facetValueId"
+);
+const collection = translationOps<typeof collectionTranslations.$inferSelect>(
+	collectionTranslations,
+	collectionTranslations.collectionId,
+	"collectionId"
+);
+const categoryOps = translationOps<typeof categoryTranslations.$inferSelect>(
+	categoryTranslations,
+	categoryTranslations.categoryId,
+	"categoryId"
+);
+const contentPage = translationOps<typeof contentPageTranslations.$inferSelect>(
+	contentPageTranslations,
+	contentPageTranslations.contentPageId,
+	"contentPageId"
+);
 
 // ── Service ─────────────────────────────────────────────────────────
 
@@ -67,7 +99,11 @@ export class TranslationService {
 		return variant.get(variantId);
 	}
 
-	upsertVariantTranslation(variantId: number, languageCode: string, data: { name?: string | null }) {
+	upsertVariantTranslation(
+		variantId: number,
+		languageCode: string,
+		data: { name?: string | null }
+	) {
 		return variant.upsert(variantId, languageCode, { name: data.name ?? null });
 	}
 
@@ -83,7 +119,11 @@ export class TranslationService {
 
 	// ── Facet Values ─────────────────────────────────────────────────────
 
-	upsertFacetValueTranslation(facetValueId: number, languageCode: string, data: { name: string }) {
+	upsertFacetValueTranslation(
+		facetValueId: number,
+		languageCode: string,
+		data: { name: string }
+	) {
 		return facetValueOps.upsert(facetValueId, languageCode, { name: data.name });
 	}
 

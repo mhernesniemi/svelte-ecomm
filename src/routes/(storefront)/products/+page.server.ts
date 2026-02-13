@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url }) => {
 		facets: Object.keys(facetFilters).length > 0 ? facetFilters : undefined,
 		search,
 		limit,
-		offset,
+		offset
 	});
 
 	// Fetch all facets for filter sidebar

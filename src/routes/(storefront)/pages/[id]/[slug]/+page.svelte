@@ -6,7 +6,10 @@
 
 <svelte:head>
   <title>{data.page.title} | Hoikka</title>
-  <meta name="description" content={stripHtml(data.page.body)?.slice(0, 160) || data.page.title || ""} />
+  <meta
+    name="description"
+    content={stripHtml(data.page.body)?.slice(0, 160) || data.page.title || ""}
+  />
   <meta property="og:title" content="{data.page.title} | Hoikka" />
   <meta
     property="og:description"

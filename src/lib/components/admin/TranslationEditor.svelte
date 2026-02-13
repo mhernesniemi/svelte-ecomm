@@ -21,78 +21,87 @@
 </script>
 
 {#if TRANSLATION_LANGUAGES.length > 0}
-<div class="overflow-hidden rounded-lg bg-surface shadow">
-  <div class="flex items-center gap-2 border-b border-border px-4 py-3">
-    <Globe class="h-4 w-4 text-muted-foreground" />
-    <h2 class="font-semibold">Translations{TRANSLATION_LANGUAGES.length === 1 ? ` (${TRANSLATION_LANGUAGES[0].name})` : ""}</h2>
-  </div>
+  <div class="overflow-hidden rounded-lg bg-surface shadow">
+    <div class="flex items-center gap-2 border-b border-border px-4 py-3">
+      <Globe class="h-4 w-4 text-muted-foreground" />
+      <h2 class="font-semibold">
+        Translations{TRANSLATION_LANGUAGES.length === 1
+          ? ` (${TRANSLATION_LANGUAGES[0].name})`
+          : ""}
+      </h2>
+    </div>
 
-  <!-- Language Tabs -->
-  {#if TRANSLATION_LANGUAGES.length > 1}
-    <div class="flex border-b border-border">
+    <!-- Language Tabs -->
+    {#if TRANSLATION_LANGUAGES.length > 1}
+      <div class="flex border-b border-border">
+        {#each TRANSLATION_LANGUAGES as lang}
+          <button
+            type="button"
+            class="px-4 py-2 text-sm font-medium {activeTab === lang.code
+              ? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
+              : 'text-muted-foreground hover:text-foreground'}"
+            onclick={() => (activeTab = lang.code)}
+          >
+            {lang.name}
+          </button>
+        {/each}
+      </div>
+    {/if}
+
+    <div class="p-4">
       {#each TRANSLATION_LANGUAGES as lang}
-        <button
-          type="button"
-          class="px-4 py-2 text-sm font-medium {activeTab === lang.code
-            ? 'border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400'
-            : 'text-muted-foreground hover:text-foreground'}"
-          onclick={() => (activeTab = lang.code)}
-        >
-          {lang.name}
-        </button>
+        {#if activeTab === lang.code}
+          {@const textFieldCount = fields.filter((f) => f.type === "text").length}
+          <div
+            class={textFieldCount > 1
+              ? "grid grid-cols-1 gap-4 sm:grid-cols-2"
+              : "grid grid-cols-1 gap-4"}
+          >
+            {#each fields as field}
+              <div class={field.type !== "text" && textFieldCount > 1 ? "sm:col-span-2" : ""}>
+                <label
+                  for="translation_{lang.code}_{field.name}"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
+                  {field.label}
+                </label>
+
+                {#if field.type === "text"}
+                  <input
+                    type="text"
+                    id="translation_{lang.code}_{field.name}"
+                    name="{field.name}_{lang.code}"
+                    form={formId}
+                    value={translations[lang.code]?.[field.name] ?? ""}
+                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                  />
+                {:else if field.type === "textarea"}
+                  <textarea
+                    id="translation_{lang.code}_{field.name}"
+                    name="{field.name}_{lang.code}"
+                    form={formId}
+                    rows="4"
+                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                    >{translations[lang.code]?.[field.name] ?? ""}</textarea
+                  >
+                {:else if field.type === "richtext"}
+                  <RichTextEditor
+                    name="{field.name}_{lang.code}"
+                    form={formId}
+                    content={translations[lang.code]?.[field.name] ?? ""}
+                    placeholder="Write {field.label.toLowerCase()}..."
+                  />
+                {/if}
+              </div>
+            {/each}
+          </div>
+
+          <p class="mt-3 text-xs text-muted-foreground">
+            Leave empty to use the default ({LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)
+              ?.name}) value.
+          </p>
+        {/if}
       {/each}
     </div>
-  {/if}
-
-  <div class="p-4">
-    {#each TRANSLATION_LANGUAGES as lang}
-      {#if activeTab === lang.code}
-        {@const textFieldCount = fields.filter((f) => f.type === "text").length}
-        <div class={textFieldCount > 1 ? "grid grid-cols-1 gap-4 sm:grid-cols-2" : "grid grid-cols-1 gap-4"}>
-          {#each fields as field}
-            <div class={field.type !== "text" && textFieldCount > 1 ? "sm:col-span-2" : ""}>
-              <label
-                for="translation_{lang.code}_{field.name}"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                {field.label}
-              </label>
-
-              {#if field.type === "text"}
-                <input
-                  type="text"
-                  id="translation_{lang.code}_{field.name}"
-                  name="{field.name}_{lang.code}"
-                  form={formId}
-                  value={translations[lang.code]?.[field.name] ?? ""}
-                  class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                />
-              {:else if field.type === "textarea"}
-                <textarea
-                  id="translation_{lang.code}_{field.name}"
-                  name="{field.name}_{lang.code}"
-                  form={formId}
-                  rows="4"
-                  class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                  >{translations[lang.code]?.[field.name] ?? ""}</textarea
-                >
-              {:else if field.type === "richtext"}
-                <RichTextEditor
-                  name="{field.name}_{lang.code}"
-                  form={formId}
-                  content={translations[lang.code]?.[field.name] ?? ""}
-                  placeholder="Write {field.label.toLowerCase()}..."
-                />
-              {/if}
-            </div>
-          {/each}
-        </div>
-
-        <p class="mt-3 text-xs text-muted-foreground">
-          Leave empty to use the default ({LANGUAGES.find((l) => l.code === DEFAULT_LANGUAGE)?.name}) value.
-        </p>
-      {/if}
-    {/each}
   </div>
-</div>
 {/if}

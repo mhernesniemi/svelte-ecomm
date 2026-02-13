@@ -266,112 +266,120 @@
               {#if appliesTo === "specific_products"}
                 <div class="mt-4">
                   <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Products</p>
-                <Popover.Root bind:open={productComboboxOpen}>
-                  <Popover.Trigger
-                    class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                  >
-                    <span class="text-muted-foreground">
-                      {selectedProductIds.length > 0
-                        ? `${selectedProductIds.length} product(s) selected`
-                        : "Search products..."}
-                    </span>
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
-                  </Popover.Trigger>
-                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
-                    <Command.Root>
-                      <Command.Input placeholder="Search products..." />
-                      <Command.List class="max-h-60">
-                        <Command.Empty>No products found.</Command.Empty>
-                        {#each data.products as product}
-                          <Command.Item
-                            value={product.name}
-                            onSelect={() => toggleProduct(product.id)}
+                  <Popover.Root bind:open={productComboboxOpen}>
+                    <Popover.Trigger
+                      class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                    >
+                      <span class="text-muted-foreground">
+                        {selectedProductIds.length > 0
+                          ? `${selectedProductIds.length} product(s) selected`
+                          : "Search products..."}
+                      </span>
+                      <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
+                    </Popover.Trigger>
+                    <Popover.Content
+                      class="w-[var(--bits-popover-trigger-width)] p-0"
+                      align="start"
+                    >
+                      <Command.Root>
+                        <Command.Input placeholder="Search products..." />
+                        <Command.List class="max-h-60">
+                          <Command.Empty>No products found.</Command.Empty>
+                          {#each data.products as product}
+                            <Command.Item
+                              value={product.name}
+                              onSelect={() => toggleProduct(product.id)}
+                            >
+                              <Check
+                                class="mr-2 h-4 w-4 {selectedProductIds.includes(product.id)
+                                  ? 'opacity-100'
+                                  : 'opacity-0'}"
+                              />
+                              {product.name}
+                            </Command.Item>
+                          {/each}
+                        </Command.List>
+                      </Command.Root>
+                    </Popover.Content>
+                  </Popover.Root>
+                  {#if selectedProductIds.length > 0}
+                    <div class="mt-2 flex flex-wrap gap-1">
+                      {#each selectedProductIds as id}
+                        <Badge variant="secondary" class="gap-1">
+                          {getProductName(id)}
+                          <button
+                            type="button"
+                            onclick={() => toggleProduct(id)}
+                            class="ml-0.5 rounded-full hover:bg-muted-strong"
                           >
-                            <Check
-                              class="mr-2 h-4 w-4 {selectedProductIds.includes(product.id)
-                                ? 'opacity-100'
-                                : 'opacity-0'}"
-                            />
-                            {product.name}
-                          </Command.Item>
-                        {/each}
-                      </Command.List>
-                    </Command.Root>
-                  </Popover.Content>
-                </Popover.Root>
-                {#if selectedProductIds.length > 0}
-                  <div class="mt-2 flex flex-wrap gap-1">
-                    {#each selectedProductIds as id}
-                      <Badge variant="secondary" class="gap-1">
-                        {getProductName(id)}
-                        <button
-                          type="button"
-                          onclick={() => toggleProduct(id)}
-                          class="ml-0.5 rounded-full hover:bg-muted-strong"
-                        >
-                          <X class="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    {/each}
-                  </div>
-                {/if}
-              </div>
-            {/if}
+                            <X class="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+              {/if}
 
-            {#if appliesTo === "specific_collections"}
-              <div class="mt-4">
-                <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Collections</p>
-                <Popover.Root bind:open={collectionComboboxOpen}>
-                  <Popover.Trigger
-                    class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                  >
-                    <span class="text-muted-foreground">
-                      {selectedCollectionIds.length > 0
-                        ? `${selectedCollectionIds.length} collection(s) selected`
-                        : "Search collections..."}
-                    </span>
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
-                  </Popover.Trigger>
-                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
-                    <Command.Root>
-                      <Command.Input placeholder="Search collections..." />
-                      <Command.List class="max-h-60">
-                        <Command.Empty>No collections found.</Command.Empty>
-                        {#each data.collections as collection}
-                          <Command.Item
-                            value={collection.name}
-                            onSelect={() => toggleCollection(collection.id)}
+              {#if appliesTo === "specific_collections"}
+                <div class="mt-4">
+                  <p class="mb-2 text-sm font-medium text-foreground-secondary">
+                    Select Collections
+                  </p>
+                  <Popover.Root bind:open={collectionComboboxOpen}>
+                    <Popover.Trigger
+                      class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                    >
+                      <span class="text-muted-foreground">
+                        {selectedCollectionIds.length > 0
+                          ? `${selectedCollectionIds.length} collection(s) selected`
+                          : "Search collections..."}
+                      </span>
+                      <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
+                    </Popover.Trigger>
+                    <Popover.Content
+                      class="w-[var(--bits-popover-trigger-width)] p-0"
+                      align="start"
+                    >
+                      <Command.Root>
+                        <Command.Input placeholder="Search collections..." />
+                        <Command.List class="max-h-60">
+                          <Command.Empty>No collections found.</Command.Empty>
+                          {#each data.collections as collection}
+                            <Command.Item
+                              value={collection.name}
+                              onSelect={() => toggleCollection(collection.id)}
+                            >
+                              <Check
+                                class="mr-2 h-4 w-4 {selectedCollectionIds.includes(collection.id)
+                                  ? 'opacity-100'
+                                  : 'opacity-0'}"
+                              />
+                              {collection.name}
+                            </Command.Item>
+                          {/each}
+                        </Command.List>
+                      </Command.Root>
+                    </Popover.Content>
+                  </Popover.Root>
+                  {#if selectedCollectionIds.length > 0}
+                    <div class="mt-2 flex flex-wrap gap-1">
+                      {#each selectedCollectionIds as id}
+                        <Badge variant="secondary" class="gap-1">
+                          {getCollectionName(id)}
+                          <button
+                            type="button"
+                            onclick={() => toggleCollection(id)}
+                            class="ml-0.5 rounded-full hover:bg-muted-strong"
                           >
-                            <Check
-                              class="mr-2 h-4 w-4 {selectedCollectionIds.includes(collection.id)
-                                ? 'opacity-100'
-                                : 'opacity-0'}"
-                            />
-                            {collection.name}
-                          </Command.Item>
-                        {/each}
-                      </Command.List>
-                    </Command.Root>
-                  </Popover.Content>
-                </Popover.Root>
-                {#if selectedCollectionIds.length > 0}
-                  <div class="mt-2 flex flex-wrap gap-1">
-                    {#each selectedCollectionIds as id}
-                      <Badge variant="secondary" class="gap-1">
-                        {getCollectionName(id)}
-                        <button
-                          type="button"
-                          onclick={() => toggleCollection(id)}
-                          class="ml-0.5 rounded-full hover:bg-muted-strong"
-                        >
-                          <X class="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    {/each}
-                  </div>
-                {/if}
-              </div>
-            {/if}
+                            <X class="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+              {/if}
             </div>
           </div>
         {:else}
@@ -464,7 +472,10 @@
                 />
               </div>
               <div>
-                <label for="endsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
+                <label
+                  for="endsAt"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
                   Ends At
                 </label>
                 <input

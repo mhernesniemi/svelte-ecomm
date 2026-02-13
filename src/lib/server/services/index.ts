@@ -14,10 +14,6 @@ export { reviewService, ReviewService } from "./reviews.js";
 export { authService } from "./auth.js";
 export type { User, Session } from "./auth.js";
 export { categoryService, CategoryService } from "./categories.js";
-export type {
-	Category,
-	CategoryTreeNode,
-	CategoryBreadcrumb
-} from "./categories.js";
+export type { Category, CategoryTreeNode, CategoryBreadcrumb } from "./categories.js";
 export { contentPageService, ContentPageService } from "./content-pages.js";
 export { translationService, TranslationService } from "./translations.js";

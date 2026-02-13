@@ -4,10 +4,7 @@
  */
 import { eq, and, isNull, asc, inArray, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
-import {
-	categories,
-	productCategories
-} from "../db/schema.js";
+import { categories, productCategories } from "../db/schema.js";
 
 export type Category = typeof categories.$inferSelect;
 
@@ -22,7 +19,6 @@ export type CategoryBreadcrumb = {
 };
 
 export class CategoryService {
-
 	/**
 	 * Create a new category
 	 */
@@ -100,10 +96,7 @@ export class CategoryService {
 		return this.buildTree(allCategories, null);
 	}
 
-	private buildTree(
-		allCategories: Category[],
-		parentId: number | null
-	): CategoryTreeNode[] {
+	private buildTree(allCategories: Category[], parentId: number | null): CategoryTreeNode[] {
 		return allCategories
 			.filter((c) => c.parentId === parentId)
 			.map((c) => ({

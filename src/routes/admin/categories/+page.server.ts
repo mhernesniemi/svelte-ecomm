@@ -40,7 +40,9 @@ export const actions: Actions = {
 				for (const lang of TRANSLATION_LANGUAGES) {
 					const name = formData.get(`name_${lang.code}`) as string;
 					if (name) {
-						await translationService.upsertCategoryTranslation(category.id, lang.code, { name });
+						await translationService.upsertCategoryTranslation(category.id, lang.code, {
+							name
+						});
 					}
 				}
 			}

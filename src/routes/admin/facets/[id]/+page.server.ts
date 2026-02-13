@@ -49,7 +49,12 @@ export const actions: Actions = {
 
 			// Sync values from client state
 			const valuesJson = formData.get("values_json") as string;
-			const submittedValues: { id: number | null; name: string; code: string; translations: Record<string, string> }[] = JSON.parse(valuesJson || "[]");
+			const submittedValues: {
+				id: number | null;
+				name: string;
+				code: string;
+				translations: Record<string, string>;
+			}[] = JSON.parse(valuesJson || "[]");
 			const submittedIds = new Set(submittedValues.filter((v) => v.id).map((v) => v.id));
 
 			// Delete removed values
@@ -72,7 +77,11 @@ export const actions: Actions = {
 					await facetService.updateValue(v.id, { name: v.name, code: normalizedCode });
 					valueId = v.id;
 				} else {
-					const created = await facetService.createValue({ facetId: id, name: v.name, code: normalizedCode });
+					const created = await facetService.createValue({
+						facetId: id,
+						name: v.name,
+						code: normalizedCode
+					});
 					valueId = created.id;
 				}
 

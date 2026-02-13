@@ -67,7 +67,10 @@
     >
       <input type="hidden" name={slugField} value={slug} />
       <div class="my-4">
-        <label for="create_dialog_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
+        <label
+          for="create_dialog_name"
+          class="mb-1 block text-sm font-medium text-foreground-secondary"
+        >
           Name
         </label>
         <input
@@ -81,9 +84,7 @@
         />
       </div>
       <Dialog.Footer>
-        <Button type="button" variant="outline" onclick={() => (open = false)}>
-          Cancel
-        </Button>
+        <Button type="button" variant="outline" onclick={() => (open = false)}>Cancel</Button>
         <Button type="submit" disabled={!name.trim()}>Create</Button>
       </Dialog.Footer>
     </form>

@@ -32,7 +32,6 @@ import type {
 import { DEFAULT_PRODUCT_TYPE } from "$lib/config/products.js";
 
 export class ProductService {
-
 	/**
 	 * List products with filtering and pagination
 	 */
@@ -92,9 +91,7 @@ export class ProductService {
 			.offset(offset);
 
 		// Load relations for each product
-		const items = await Promise.all(
-			productList.map((p) => this.loadProductRelations(p))
-		);
+		const items = await Promise.all(productList.map((p) => this.loadProductRelations(p)));
 
 		return {
 			items,
@@ -388,9 +385,7 @@ export class ProductService {
 	// PRIVATE HELPERS
 	// ============================================================================
 
-	private async loadProductRelations(
-		product: Product
-	): Promise<ProductWithRelations> {
+	private async loadProductRelations(product: Product): Promise<ProductWithRelations> {
 		// Load variants
 		const variantList = await db
 			.select()
@@ -399,9 +394,7 @@ export class ProductService {
 				and(eq(productVariants.productId, product.id), isNull(productVariants.deletedAt))
 			);
 
-		const variants = await Promise.all(
-			variantList.map((v) => this.loadVariantRelations(v))
-		);
+		const variants = await Promise.all(variantList.map((v) => this.loadVariantRelations(v)));
 
 		// Load facet values
 		const facetValueIds = await db

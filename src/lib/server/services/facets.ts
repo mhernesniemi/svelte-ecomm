@@ -4,28 +4,14 @@
  */
 import { eq, and, desc, sql } from "drizzle-orm";
 import { db } from "../db/index.js";
-import {
-	facets,
-	facetValues,
-	productFacetValues
-} from "../db/schema.js";
-import type {
-	Facet,
-	FacetValue,
-	FacetWithValues,
-	PaginatedResult
-} from "$lib/types.js";
+import { facets, facetValues, productFacetValues } from "../db/schema.js";
+import type { Facet, FacetValue, FacetWithValues, PaginatedResult } from "$lib/types.js";
 
 export class FacetService {
-
 	/**
 	 * Create a new facet
 	 */
-	async create(input: {
-		code: string;
-		name: string;
-		isPrivate?: boolean;
-	}): Promise<Facet> {
+	async create(input: { code: string; name: string; isPrivate?: boolean }): Promise<Facet> {
 		const [facet] = await db
 			.insert(facets)
 			.values({
@@ -113,11 +99,7 @@ export class FacetService {
 	/**
 	 * Create a facet value
 	 */
-	async createValue(input: {
-		facetId: number;
-		code: string;
-		name: string;
-	}): Promise<FacetValue> {
+	async createValue(input: { facetId: number; code: string; name: string }): Promise<FacetValue> {
 		const [value] = await db
 			.insert(facetValues)
 			.values({
