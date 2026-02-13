@@ -22,6 +22,7 @@ This is a **full-stack e-commerce platform** built with:
 ## Tools
 
 - Use Bun everywhere when possible.
+- Run `./scripts/svelte-check.sh --threshold error` for type checking. This wrapper prevents the Vite dev server from crashing by preserving `.svelte-kit/generated/` timestamps that `svelte-check` would otherwise overwrite.
 
 ## UI Guidelines
 

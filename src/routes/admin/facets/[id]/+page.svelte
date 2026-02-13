@@ -204,8 +204,10 @@
         class="overflow-hidden rounded-lg bg-surface shadow"
       >
         <input type="hidden" name="values_json" value={valuesJson} />
+        <div class="border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Facet Details</h2>
+        </div>
         <div class="p-6">
-          <h2 class="mb-4 text-lg font-medium text-foreground">Facet Details</h2>
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
