@@ -1,5 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { browser } from "$app/environment";
+  import { untrack } from "svelte";
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Dialog from "$lib/components/admin/ui/dialog";
@@ -28,8 +30,28 @@
     return nodes.flatMap((node) => [node.id, ...collectIds(node.children)]);
   }
 
+  const STORAGE_KEY = "admin:categories:expanded";
+
+  function loadExpandedIds(): Set<number> {
+    if (browser) {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) return new Set(JSON.parse(stored));
+      } catch {}
+    }
+    return new Set(collectIds(data.tree));
+  }
+
+  function saveExpandedIds(ids: Set<number>) {
+    if (browser) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
+    }
+  }
+
   const flatCategories = $derived(flattenTree(data.tree));
-  let expandedIds = $state(new Set<number>(collectIds(data.tree)));
+  let expandedIds = $state(loadExpandedIds());
+  const allIds = $derived(collectIds(data.tree));
+  const allExpanded = $derived(allIds.length > 0 && allIds.every((id) => expandedIds.has(id)));
 
   // Dialog state
   let createDialogOpen = $state(false);
@@ -63,6 +85,16 @@
       next.add(id);
     }
     expandedIds = next;
+    saveExpandedIds(next);
+  }
+
+  function toggleAll() {
+    if (allExpanded) {
+      expandedIds = new Set();
+    } else {
+      expandedIds = new Set(allIds);
+    }
+    saveExpandedIds(expandedIds);
   }
 
   function handleCreateNameInput(e: Event) {
@@ -78,9 +110,20 @@
     createSlugManual = true;
   }
 
-  // Re-expand all when tree changes (new data after create/update/delete)
+  // When tree data changes (create/update/delete), expand any new nodes
+  let prevIds = new Set(collectIds(data.tree));
   $effect(() => {
-    expandedIds = new Set(collectIds(data.tree));
+    const currentIds = collectIds(data.tree);
+    untrack(() => {
+      const newIds = currentIds.filter((id) => !prevIds.has(id));
+      if (newIds.length > 0) {
+        const next = new Set(expandedIds);
+        for (const id of newIds) next.add(id);
+        expandedIds = next;
+        saveExpandedIds(next);
+      }
+      prevIds = new Set(currentIds);
+    });
   });
 </script>
 
@@ -102,6 +145,14 @@
       </div>
     </div>
   {:else}
+    <button
+      type="button"
+      class="mb-2 text-sm text-foreground-secondary hover:text-foreground"
+      onclick={toggleAll}
+    >
+      {allExpanded ? "Collapse all" : "Expand all"}
+    </button>
+
     <!-- Category tree -->
     <div class="overflow-hidden rounded-lg border border-border bg-surface">
       {#snippet categoryNode(node: CategoryNode, depth: number, parentPath: string)}
