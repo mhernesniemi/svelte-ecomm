@@ -166,12 +166,18 @@
         )}
 
         <Collapsible.Root open={isExpanded}>
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div
             class={cn(
               "flex w-full items-center border-b border-border last:border-b-0",
-              "hover:bg-hover"
+              "hover:bg-hover",
+              hasChildren && "cursor-pointer"
             )}
             style="padding-left: {depth * 1.5 + 0.5}rem"
+            onclick={() => {
+              if (hasChildren) toggleExpand(node.id);
+            }}
           >
             <!-- Chevron toggle -->
             <button
@@ -213,10 +219,15 @@
             </div>
 
             <!-- Action buttons -->
-            <div class="flex shrink-0 items-center gap-1 pr-3 pl-4">
+            <!-- svelte-ignore a11y_click_events_have_key_events -->
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div
+              class="flex shrink-0 items-center gap-1 pr-3 pl-4"
+              onclick={(e) => e.stopPropagation()}
+            >
               <button
                 type="button"
-                class="group flex h-7 w-7 items-center justify-center rounded-md"
+                class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
                 title="Add child category"
                 onclick={() => openCreateDialog(node.id)}
               >
@@ -224,7 +235,7 @@
               </button>
               <button
                 type="button"
-                class="group flex h-7 w-7 items-center justify-center rounded-md"
+                class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
                 title="Edit category"
                 onclick={() => openEditDialog(node)}
               >
