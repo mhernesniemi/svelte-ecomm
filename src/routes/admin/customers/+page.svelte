@@ -10,6 +10,7 @@
   import UsersRound from "@lucide/svelte/icons/users-round";
   import type { PageData, ActionData } from "./$types";
   import { formatDate } from "$lib/utils";
+  import PlusIcon from "@lucide/svelte/icons/plus";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -147,7 +148,16 @@
 <svelte:head><title>Customers | Admin</title></svelte:head>
 
 <div>
-  <h1 class="mb-6 text-2xl leading-[40px] font-bold">Customers</h1>
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl leading-[40px] font-bold">Customers</h1>
+    {#if activeTab === "groups"}
+      <div class="flex items-center justify-end">
+        <Button onclick={() => (showCreateGroup = true)}>
+          <PlusIcon class="h-4 w-4" /> Add Group
+        </Button>
+      </div>
+    {/if}
+  </div>
 
   <!-- Tabs -->
   <div class="mb-6 border-b border-border">
@@ -197,9 +207,6 @@
 
   <!-- Customer Groups Tab -->
   {#if activeTab === "groups"}
-    <div class="mb-4 flex items-center justify-end">
-      <Button onclick={() => (showCreateGroup = true)}>Add Group</Button>
-    </div>
     <DataTable
       data={data.groups}
       columns={groupColumns}
