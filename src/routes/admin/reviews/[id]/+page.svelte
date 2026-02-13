@@ -44,100 +44,138 @@
     >
   </div>
   <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-bold">Review #{data.review.id}</h1>
-      <p class="mt-1 text-sm text-foreground-tertiary">
-        by {data.review.nickname} on {formatDate(data.review.createdAt)}
-      </p>
-    </div>
-    <Badge variant={getStatusVariant(data.review.status)} class="capitalize">
-      {data.review.status}
-    </Badge>
+    <h1 class="text-2xl font-bold">Review #{data.review.id}</h1>
   </div>
 
-  <!-- Review Content -->
-  <div class="overflow-hidden rounded-lg bg-surface shadow">
-    <div class="p-6">
-      <div class="mb-6">
-        <h2 class="mb-1 text-sm font-medium text-muted-foreground">Rating</h2>
-        <span class="text-2xl text-yellow-500">{formatRating(data.review.rating)}</span>
+  <div class="flex flex-col gap-6 lg:flex-row">
+    <!-- Main Content -->
+    <div class="flex-1 space-y-6">
+      <!-- Review Content -->
+      <div class="overflow-hidden rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Review</h2>
+        </div>
+        <div class="p-6">
+          <div class="mb-6">
+            <h3 class="mb-1 text-sm font-medium text-foreground-secondary">Rating</h3>
+            <span class="text-2xl text-yellow-500">{formatRating(data.review.rating)}</span>
+          </div>
+
+          <div>
+            <h3 class="mb-1 text-sm font-medium text-foreground-secondary">Comment</h3>
+            {#if data.review.comment}
+              <p class="whitespace-pre-wrap text-foreground">{data.review.comment}</p>
+            {:else}
+              <p class="text-placeholder">No comment</p>
+            {/if}
+          </div>
+        </div>
       </div>
 
-      <div class="mb-6">
-        <h2 class="mb-1 text-sm font-medium text-muted-foreground">Comment</h2>
-        {#if data.review.comment}
-          <p class="whitespace-pre-wrap text-foreground">{data.review.comment}</p>
-        {:else}
-          <p class="text-placeholder">No comment</p>
-        {/if}
+      <!-- Moderation -->
+      <div class="overflow-hidden rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Moderation</h2>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center gap-3">
+            {#if data.review.status !== "approved"}
+              <form method="POST" action="?/approve" use:enhance>
+                <Button type="submit">Approve</Button>
+              </form>
+            {/if}
+            {#if data.review.status !== "rejected"}
+              <form method="POST" action="?/reject" use:enhance>
+                <Button type="submit" variant="outline">Reject</Button>
+              </form>
+            {/if}
+            {#if data.review.status === "approved" || data.review.status === "rejected"}
+              <span class="text-sm text-foreground-tertiary">
+                This review is currently <span class="font-medium">{data.review.status}</span>.
+              </span>
+            {/if}
+          </div>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 gap-6 border-t border-border pt-6 sm:grid-cols-3">
-        <div>
-          <h2 class="mb-1 text-sm font-medium text-muted-foreground">Product</h2>
-          {#if data.product}
-            <a
-              href="/admin/products/{data.product.id}"
-              class="text-blue-600 hover:text-blue-800 dark:text-blue-400"
-            >
-              {data.product?.name ?? "Unknown product"}
-            </a>
-          {:else}
-            <span class="text-placeholder">Deleted product</span>
-          {/if}
-        </div>
+      <button
+        type="button"
+        class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
+        onclick={() => (showDelete = true)}
+      >
+        Delete this review
+      </button>
+    </div>
 
-        <div>
-          <h2 class="mb-1 text-sm font-medium text-muted-foreground">Customer</h2>
-          {#if data.customer}
-            <a
-              href="/admin/customers/{data.customer.id}"
-              class="text-blue-600 hover:text-blue-800 dark:text-blue-400"
-            >
-              {data.customer.firstName}
-              {data.customer.lastName}
-            </a>
-          {:else}
-            <span class="text-placeholder">Deleted customer</span>
-          {/if}
+    <!-- Sidebar -->
+    <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
+      <!-- Status -->
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
+          <h2 class="font-semibold">Status</h2>
         </div>
+        <div class="p-4">
+          <Badge variant={getStatusVariant(data.review.status)} class="capitalize">
+            {data.review.status}
+          </Badge>
+        </div>
+      </div>
 
-        <div>
-          <h2 class="mb-1 text-sm font-medium text-muted-foreground">Verified Purchase</h2>
-          <span class={data.review.isVerifiedPurchase ? "text-green-600" : "text-muted-foreground"}>
-            {data.review.isVerifiedPurchase ? "Yes" : "No"}
-          </span>
+      <!-- Details -->
+      <div class="rounded-lg bg-surface shadow">
+        <div class="border-b border-border px-4 py-3">
+          <h2 class="font-semibold">Details</h2>
+        </div>
+        <div class="space-y-3 p-4 text-sm">
+          <div>
+            <span class="text-foreground-secondary">Product</span>
+            {#if data.product}
+              <p>
+                <a
+                  href="/admin/products/{data.product.id}"
+                  class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                >
+                  {data.product.name ?? "Unknown product"}
+                </a>
+              </p>
+            {:else}
+              <p class="text-placeholder">Deleted product</p>
+            {/if}
+          </div>
+          <div>
+            <span class="text-foreground-secondary">Customer</span>
+            {#if data.customer}
+              <p>
+                <a
+                  href="/admin/customers/{data.customer.id}"
+                  class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400"
+                >
+                  {data.customer.firstName}
+                  {data.customer.lastName}
+                </a>
+              </p>
+            {:else}
+              <p class="text-placeholder">Deleted customer</p>
+            {/if}
+          </div>
+          <div>
+            <span class="text-foreground-secondary">Verified purchase</span>
+            <p class="font-medium {data.review.isVerifiedPurchase ? 'text-green-600' : ''}">
+              {data.review.isVerifiedPurchase ? "Yes" : "No"}
+            </p>
+          </div>
+          <div>
+            <span class="text-foreground-secondary">Submitted by</span>
+            <p class="font-medium">{data.review.nickname}</p>
+          </div>
+          <div>
+            <span class="text-foreground-secondary">Date</span>
+            <p class="font-medium">{formatDate(data.review.createdAt)}</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Actions -->
-  <div class="overflow-hidden rounded-lg bg-surface shadow">
-    <div class="p-6">
-      <h2 class="mb-4 text-lg font-medium text-foreground">Actions</h2>
-      <div class="flex gap-3">
-        {#if data.review.status !== "approved"}
-          <form method="POST" action="?/approve" use:enhance>
-            <Button type="submit">Approve</Button>
-          </form>
-        {/if}
-        {#if data.review.status !== "rejected"}
-          <form method="POST" action="?/reject" use:enhance>
-            <Button type="submit" variant="outline">Reject</Button>
-          </form>
-        {/if}
-      </div>
-    </div>
-  </div>
-
-  <button
-    type="button"
-    class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
-    onclick={() => (showDelete = true)}
-  >
-    Delete this review
-  </button>
 </div>
 
 <DeleteConfirmDialog
