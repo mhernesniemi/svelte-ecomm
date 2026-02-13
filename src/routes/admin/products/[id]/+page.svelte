@@ -6,7 +6,7 @@
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import CreateProductDialog from "$lib/components/admin/CreateProductDialog.svelte";
+  import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
   import {
@@ -869,4 +869,9 @@
   </Dialog.Root>
 </div>
 
-<CreateProductDialog bind:open={createDialogOpen} />
+<CreateDialog
+  bind:open={createDialogOpen}
+  title="New Product"
+  action="/admin/products?/create"
+  placeholder="e.g., Winter Jacket"
+/>

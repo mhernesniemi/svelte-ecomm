@@ -14,7 +14,7 @@
   import { Label } from "$lib/components/admin/ui/label";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import CreateCollectionDialog from "$lib/components/admin/CreateCollectionDialog.svelte";
+  import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
   import {
     translationsToMap,
@@ -1002,4 +1002,9 @@
   </Dialog.Root>
 </div>
 
-<CreateCollectionDialog bind:open={createDialogOpen} />
+<CreateDialog
+  bind:open={createDialogOpen}
+  title="New Collection"
+  action="/admin/collections?/create"
+  placeholder="e.g., Summer Sale"
+/>

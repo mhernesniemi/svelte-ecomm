@@ -81,11 +81,7 @@
   }
 </script>
 
-<div
-  class="min-h-screen bg-background font-sans text-foreground antialiased"
-  data-admin
-  class:dark={dark}
->
+<div class="min-h-screen bg-background font-sans text-foreground antialiased" data-admin class:dark>
   <!-- Sidebar -->
   <aside
     class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transition-transform duration-200 lg:translate-x-0 {sidebarOpen

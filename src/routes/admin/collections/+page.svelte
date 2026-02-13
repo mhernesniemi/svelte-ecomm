@@ -4,7 +4,7 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import CreateCollectionDialog from "$lib/components/admin/CreateCollectionDialog.svelte";
+  import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import PlusIcon from "@lucide/svelte/icons/plus";
@@ -127,7 +127,12 @@
   </DataTable>
 </div>
 
-<CreateCollectionDialog bind:open={createDialogOpen} />
+<CreateDialog
+  bind:open={createDialogOpen}
+  title="New Collection"
+  action="/admin/collections?/create"
+  placeholder="e.g., Summer Sale"
+/>
 
 <DeleteConfirmDialog
   bind:open={showBulkDelete}

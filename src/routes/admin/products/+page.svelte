@@ -5,7 +5,7 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import CreateProductDialog from "$lib/components/admin/CreateProductDialog.svelte";
+  import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Package from "@lucide/svelte/icons/package";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -161,7 +161,12 @@
   </DataTable>
 </div>
 
-<CreateProductDialog bind:open={createDialogOpen} />
+<CreateDialog
+  bind:open={createDialogOpen}
+  title="New Product"
+  action="/admin/products?/create"
+  placeholder="e.g., Winter Jacket"
+/>
 
 <DeleteConfirmDialog
   bind:open={showBulkDelete}

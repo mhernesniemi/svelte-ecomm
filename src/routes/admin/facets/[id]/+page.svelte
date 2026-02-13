@@ -7,7 +7,7 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import CreateFacetDialog from "$lib/components/admin/CreateFacetDialog.svelte";
+  import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
   import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import { slugify } from "$lib/utils";
@@ -400,7 +400,14 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<CreateFacetDialog bind:open={createDialogOpen} />
+<CreateDialog
+  bind:open={createDialogOpen}
+  title="New Facet"
+  action="/admin/facets?/create"
+  placeholder="e.g., Color"
+  fieldName="name_en"
+  slugField="code"
+/>
 
 <DeleteConfirmDialog
   bind:open={showDelete}

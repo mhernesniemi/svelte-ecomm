@@ -5,9 +5,21 @@
   import { slugify } from "$lib/utils";
 
   let {
-    open = $bindable(false)
+    open = $bindable(false),
+    title,
+    description = "You'll be redirected to edit its details.",
+    action,
+    placeholder = "",
+    fieldName = "name",
+    slugField = "slug"
   }: {
     open: boolean;
+    title: string;
+    description?: string;
+    action: string;
+    placeholder?: string;
+    fieldName?: string;
+    slugField?: string;
   } = $props();
 
   let name = $state("");
@@ -20,17 +32,32 @@
   $effect(() => {
     if (open) reset();
   });
+
+  function handleKeydown(e: KeyboardEvent) {
+    if (
+      e.key === "c" &&
+      !e.metaKey &&
+      !e.ctrlKey &&
+      !e.altKey &&
+      !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)
+    ) {
+      e.preventDefault();
+      open = true;
+    }
+  }
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <Dialog.Root bind:open>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>New Product</Dialog.Title>
-      <Dialog.Description>Create a new product. You'll be redirected to edit its details.</Dialog.Description>
+      <Dialog.Title>{title}</Dialog.Title>
+      <Dialog.Description>{description}</Dialog.Description>
     </Dialog.Header>
     <form
       method="POST"
-      action="/admin/products?/create"
+      {action}
       use:enhance={() => {
         return async ({ update }) => {
           open = false;
@@ -38,18 +65,18 @@
         };
       }}
     >
-      <input type="hidden" name="slug" value={slug} />
+      <input type="hidden" name={slugField} value={slug} />
       <div class="my-4">
-        <label for="create_product_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
+        <label for="create_dialog_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
           Name
         </label>
         <input
           type="text"
-          id="create_product_name"
-          name="name"
+          id="create_dialog_name"
+          name={fieldName}
           bind:value={name}
           required
-          placeholder="e.g., Winter Jacket"
+          {placeholder}
           class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
         />
       </div>

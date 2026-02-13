@@ -3,7 +3,7 @@
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
   import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
-  import CreateFacetDialog from "$lib/components/admin/CreateFacetDialog.svelte";
+  import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Tag from "@lucide/svelte/icons/tag";
   import PlusIcon from "@lucide/svelte/icons/plus";
@@ -109,7 +109,14 @@
   </DataTable>
 </div>
 
-<CreateFacetDialog bind:open={createDialogOpen} />
+<CreateDialog
+  bind:open={createDialogOpen}
+  title="New Facet"
+  action="/admin/facets?/create"
+  placeholder="e.g., Color"
+  fieldName="name_en"
+  slugField="code"
+/>
 
 <DeleteConfirmDialog
   bind:open={showBulkDelete}
