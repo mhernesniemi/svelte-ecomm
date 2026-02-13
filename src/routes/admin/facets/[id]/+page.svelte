@@ -62,7 +62,7 @@
           return [lang.code, t?.name ?? ""];
         })
       )
-    }));
+    })).sort((a, b) => a.name.localeCompare(b.name));
   });
 
   onMount(() => {
@@ -92,7 +92,7 @@
       translations: Object.fromEntries(TRANSLATION_LANGUAGES.map((l) => [l.code, ""]))
     }));
 
-    values = [...values, ...newValues];
+    values = [...values, ...newValues].sort((a, b) => a.name.localeCompare(b.name));
     bulkInput = "";
   }
 
