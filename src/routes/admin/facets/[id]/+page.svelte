@@ -52,17 +52,19 @@
   $effect(() => {
     facetName = data.facet.name ?? "";
     facetCode = data.facet.code;
-    values = data.facet.values.map((v) => ({
-      id: v.id,
-      name: v.name ?? "",
-      code: v.code,
-      translations: Object.fromEntries(
-        TRANSLATION_LANGUAGES.map((lang) => {
-          const t = data.valueTranslations[v.id]?.find((t) => t.languageCode === lang.code);
-          return [lang.code, t?.name ?? ""];
-        })
-      )
-    })).sort((a, b) => a.name.localeCompare(b.name));
+    values = data.facet.values
+      .map((v) => ({
+        id: v.id,
+        name: v.name ?? "",
+        code: v.code,
+        translations: Object.fromEntries(
+          TRANSLATION_LANGUAGES.map((lang) => {
+            const t = data.valueTranslations[v.id]?.find((t) => t.languageCode === lang.code);
+            return [lang.code, t?.name ?? ""];
+          })
+        )
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   });
 
   onMount(() => {
@@ -280,7 +282,7 @@
                 (lang) => value.translations[lang.code]
               )}
               <div
-                class="group flex items-center border-b border-border px-6 py-2.5 last:border-b-0 hover:bg-hover"
+                class="flex items-center border-b border-border px-6 py-2.5 last:border-b-0 hover:bg-hover"
               >
                 <div class="flex min-w-0 flex-1 items-center gap-3">
                   <span class="text-sm font-medium text-foreground">{value.name}</span>
@@ -296,19 +298,19 @@
                 <div class="flex shrink-0 items-center gap-1 pl-4">
                   <button
                     type="button"
-                    class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
                     title="Edit value"
                     onclick={() => openEditDialog(i)}
                   >
-                    <Pencil class="h-3.5 w-3.5 text-muted-foreground" />
+                    <Pencil class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
                   </button>
                   <button
                     type="button"
-                    class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
                     title="Remove value"
                     onclick={() => removeValue(i)}
                   >
-                    <Trash2 class="h-3.5 w-3.5 text-muted-foreground" />
+                    <Trash2 class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
                   </button>
                 </div>
               </div>
@@ -348,7 +350,10 @@
     </Dialog.Header>
     <div class="my-4 grid grid-cols-2 gap-4">
       <div>
-        <label for="edit_value_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
+        <label
+          for="edit_value_name"
+          class="mb-1 block text-sm font-medium text-foreground-secondary"
+        >
           Name <span class="text-red-500">*</span>
         </label>
         <input
@@ -361,7 +366,10 @@
         />
       </div>
       <div>
-        <label for="edit_value_code" class="mb-1 block text-sm font-medium text-foreground-secondary">
+        <label
+          for="edit_value_code"
+          class="mb-1 block text-sm font-medium text-foreground-secondary"
+        >
           Code <span class="text-red-500">*</span>
         </label>
         <input
