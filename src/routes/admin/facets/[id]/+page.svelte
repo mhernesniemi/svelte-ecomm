@@ -1,14 +1,17 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { page } from "$app/stores";
-  import { onMount, tick } from "svelte";
+  import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Badge } from "$lib/components/admin/ui/badge";
+  import * as Dialog from "$lib/components/admin/ui/dialog";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
   import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
-  import Plus from "@lucide/svelte/icons/plus";
-  import Trash from "@lucide/svelte/icons/trash-2";
+  import { slugify } from "$lib/utils";
+  import Pencil from "@lucide/svelte/icons/pencil";
+  import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData, ActionData } from "./$types";
 
@@ -28,6 +31,17 @@
   let facetCode = $state("");
   let values = $state<ValueEntry[]>([]);
   let valuesJson = $derived(JSON.stringify(values));
+
+  // Bulk add input
+  let bulkInput = $state("");
+
+  // Edit value dialog
+  let editDialogOpen = $state(false);
+  let editingIndex = $state<number | null>(null);
+  let editName = $state("");
+  let editCode = $state("");
+  let editCodeManual = $state(false);
+  let editTranslations = $state<Record<string, string>>({});
 
   $effect(() => {
     facetName = data.facet.name ?? "";
@@ -56,18 +70,67 @@
     if (form?.error) toast.error(form.error);
   });
 
-  async function addValue() {
-    values = [
-      ...values,
-      {
-        id: null,
-        name: "",
-        code: "",
-        translations: Object.fromEntries(TRANSLATION_LANGUAGES.map((l) => [l.code, ""]))
-      }
-    ];
-    await tick();
-    document.getElementById(`value_name_${values.length - 1}`)?.focus();
+  function addBulkValues() {
+    const names = bulkInput
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (names.length === 0) return;
+
+    const newValues: ValueEntry[] = names.map((name) => ({
+      id: null,
+      name,
+      code: slugify(name),
+      translations: Object.fromEntries(TRANSLATION_LANGUAGES.map((l) => [l.code, ""]))
+    }));
+
+    values = [...values, ...newValues];
+    bulkInput = "";
+  }
+
+  function handleBulkKeydown(e: KeyboardEvent) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addBulkValues();
+    }
+  }
+
+  function openEditDialog(index: number) {
+    editingIndex = index;
+    editName = values[index].name;
+    editCode = values[index].code;
+    editCodeManual = !!values[index].id;
+    editTranslations = { ...values[index].translations };
+    editDialogOpen = true;
+  }
+
+  function handleEditNameInput(e: Event) {
+    editName = (e.target as HTMLInputElement).value;
+    if (!editCodeManual) {
+      editCode = slugify(editName);
+    }
+  }
+
+  function handleEditCodeInput(e: Event) {
+    editCode = (e.target as HTMLInputElement).value;
+    editCodeManual = true;
+  }
+
+  const canSaveEdit = $derived(editName.trim() !== "" && editCode.trim() !== "");
+
+  function saveEdit() {
+    if (editingIndex === null || !canSaveEdit) return;
+    values[editingIndex] = {
+      ...values[editingIndex],
+      name: editName,
+      code: editCode,
+      translations: { ...editTranslations }
+    };
+    editDialogOpen = false;
+  }
+
+  function removeValue(index: number) {
+    values = values.filter((_, j) => j !== index);
   }
 </script>
 
@@ -103,7 +166,9 @@
             toast.error("Facet name and code are required");
             return;
           }
-          const invalidValues = values.filter((v) => v.name.trim() || v.code.trim()).filter((v) => !v.name.trim() || !v.code.trim());
+          const invalidValues = values
+            .filter((v) => v.name.trim() || v.code.trim())
+            .filter((v) => !v.name.trim() || !v.code.trim());
           if (invalidValues.length > 0) {
             cancel();
             toast.error("All values must have both name and code");
@@ -160,17 +225,29 @@
 
       <!-- Values -->
       <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="flex items-center justify-between border-b border-border p-6">
-          <div>
-            <h2 class="text-lg font-medium text-foreground">Values</h2>
-            <p class="mt-1 text-sm text-foreground-tertiary">
-              {values.length} value{values.length !== 1 ? "s" : ""}
-            </p>
+        <div class="border-b border-border p-6">
+          <h2 class="text-lg font-medium text-foreground">Values</h2>
+          <p class="mt-1 text-sm text-foreground-tertiary">
+            Add multiple values at once, separated by commas.
+          </p>
+          <div class="mt-3 flex gap-2">
+            <input
+              type="text"
+              bind:value={bulkInput}
+              onkeydown={handleBulkKeydown}
+              placeholder="e.g., Red, Blue, Yellow"
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onclick={addBulkValues}
+              class="shrink-0"
+            >
+              Add
+            </Button>
           </div>
-          <Button type="button" variant="outline" size="sm" onclick={addValue}>
-            <Plus class="h-4 w-4" />
-            Add Value
-          </Button>
         </div>
 
         {#if values.length === 0}
@@ -181,69 +258,41 @@
           </div>
         {:else}
           <div>
-            {#each values as _, i}
-              <div class={i > 0 ? "border-t border-border" : ""}>
-                <div class="space-y-3 px-6 pt-3 pb-5">
-                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                      <label
-                        for="value_name_{i}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
-                      >
-                        Name <span class="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        id="value_name_{i}"
-                        bind:value={values[i].name}
-                        placeholder="e.g., Red"
-                        class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="value_code_{i}"
-                        class="mb-1 block text-sm font-medium text-foreground-secondary"
-                      >
-                        Code <span class="text-red-500">*</span>
-                      </label>
-                      <div class="flex items-center gap-4">
-                        <input
-                          type="text"
-                          id="value_code_{i}"
-                          bind:value={values[i].code}
-                          placeholder="e.g., red"
-                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                        />
-                        <button
-                          type="button"
-                          class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground transition-colors hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950 dark:hover:text-red-500"
-                          onclick={() => (values = values.filter((_, j) => j !== i))}
-                        >
-                          <Trash class="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {#each TRANSLATION_LANGUAGES as lang}
-                      <div>
-                        <label
-                          for="value_name_{lang.code}_{i}"
-                          class="mb-1 block text-sm font-medium text-foreground-secondary"
-                        >
-                          Name ({lang.name})
-                        </label>
-                        <input
-                          type="text"
-                          id="value_name_{lang.code}_{i}"
-                          bind:value={values[i].translations[lang.code]}
-                          placeholder={values[i].name}
-                          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-                        />
-                      </div>
-                    {/each}
-                  </div>
+            {#each values as value, i}
+              {@const translatedLangs = TRANSLATION_LANGUAGES.filter(
+                (lang) => value.translations[lang.code]
+              )}
+              <div
+                class="group flex items-center border-b border-border px-6 py-2.5 last:border-b-0 hover:bg-hover"
+              >
+                <div class="flex min-w-0 flex-1 items-center gap-3">
+                  <span class="text-sm font-medium text-foreground">{value.name}</span>
+                  <span class="text-sm text-placeholder">{value.code}</span>
+                  <span class="ml-auto flex shrink-0 items-center gap-3">
+                    <span class="flex items-center gap-1.5">
+                      {#each translatedLangs as lang}
+                        <Badge variant="outline">{lang.code.toUpperCase()}</Badge>
+                      {/each}
+                    </span>
+                  </span>
+                </div>
+                <div class="flex shrink-0 items-center gap-1 pl-4">
+                  <button
+                    type="button"
+                    class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+                    title="Edit value"
+                    onclick={() => openEditDialog(i)}
+                  >
+                    <Pencil class="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
+                  <button
+                    type="button"
+                    class="flex h-7 w-7 items-center justify-center rounded-md hover:bg-muted"
+                    title="Remove value"
+                    onclick={() => removeValue(i)}
+                  >
+                    <Trash2 class="h-3.5 w-3.5 text-muted-foreground" />
+                  </button>
                 </div>
               </div>
             {/each}
@@ -272,6 +321,67 @@
     {/if}
   </div>
 </div>
+
+<!-- Edit Value Dialog -->
+<Dialog.Root bind:open={editDialogOpen}>
+  <Dialog.Content>
+    <Dialog.Header>
+      <Dialog.Title>Edit Value</Dialog.Title>
+      <Dialog.Description>Update the value details.</Dialog.Description>
+    </Dialog.Header>
+    <div class="my-4 grid grid-cols-2 gap-4">
+      <div>
+        <label for="edit_value_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
+          Name <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="edit_value_name"
+          value={editName}
+          oninput={handleEditNameInput}
+          placeholder="e.g., Red"
+          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+        />
+      </div>
+      <div>
+        <label for="edit_value_code" class="mb-1 block text-sm font-medium text-foreground-secondary">
+          Code <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="edit_value_code"
+          value={editCode}
+          oninput={handleEditCodeInput}
+          placeholder="e.g., red"
+          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+        />
+      </div>
+      {#each TRANSLATION_LANGUAGES as lang}
+        <div class="col-span-2">
+          <label
+            for="edit_value_name_{lang.code}"
+            class="mb-1 block text-sm font-medium text-foreground-secondary"
+          >
+            {lang.name} name
+          </label>
+          <input
+            type="text"
+            id="edit_value_name_{lang.code}"
+            bind:value={editTranslations[lang.code]}
+            placeholder={editName}
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+          />
+        </div>
+      {/each}
+    </div>
+    <Dialog.Footer>
+      <Button type="button" variant="outline" onclick={() => (editDialogOpen = false)}>
+        Cancel
+      </Button>
+      <Button type="button" onclick={saveEdit} disabled={!canSaveEdit}>Save</Button>
+    </Dialog.Footer>
+  </Dialog.Content>
+</Dialog.Root>
 
 <DeleteConfirmDialog
   bind:open={showDelete}
