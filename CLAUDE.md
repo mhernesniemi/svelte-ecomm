@@ -14,7 +14,7 @@
 
 ## UI Guidelines
 
-- Use shadcn/svelte for UI components and install new ones as needed.
+- Use shadcn/svelte for UI components and install new ones as needed. The project has **two separate UI component sets**: `src/lib/components/admin/ui/` (admin panel) and `src/lib/components/storefront/ui/` (storefront). The `components.json` `ui` alias points to storefront, so `bunx shadcn-svelte@next add <component>` installs there by default. After installing, copy the component to the correct path (admin or storefront) and delete the copy you don't need.
 - Prefer existing UI components (e.g. `<Button>` over `<button>`).
 - Use `cn()` for conditional Tailwind classes.
 - Use `<AdminCard>` for card sections on admin detail pages.
