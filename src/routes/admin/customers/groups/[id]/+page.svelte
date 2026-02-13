@@ -135,8 +135,10 @@
         }}
         class="overflow-hidden rounded-lg bg-surface shadow"
       >
+        <div class="border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Group Details</h2>
+        </div>
         <div class="p-6">
-          <h2 class="mb-4 text-lg font-medium text-foreground">Group Details</h2>
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
@@ -178,8 +180,8 @@
 
       <!-- Customers Section -->
       <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="border-b border-border p-6">
-          <h2 class="text-lg font-medium text-foreground">Customers</h2>
+        <div class="border-b border-border px-6 py-4">
+          <h2 class="text-lg font-semibold">Customers</h2>
           <p class="mt-1 text-sm text-foreground-tertiary">
             {#if availableCustomers.length === 0 && customers.length > 0}
               All customers have been added to this group.
