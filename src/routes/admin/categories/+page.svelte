@@ -125,7 +125,17 @@
       prevIds = new Set(currentIds);
     });
   });
+  function handleKeydown(e: KeyboardEvent) {
+    if (e.key === "c" && !createDialogOpen && !editDialogOpen) {
+      const tag = (e.target as HTMLElement).tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      e.preventDefault();
+      openCreateDialog();
+    }
+  }
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <svelte:head><title>Categories | Admin</title></svelte:head>
 
