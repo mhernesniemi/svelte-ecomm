@@ -6,6 +6,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Dialog from "$lib/components/admin/ui/dialog";
+  import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
@@ -201,13 +202,9 @@
             }
           };
         }}
-        class="overflow-hidden rounded-lg bg-surface shadow"
       >
         <input type="hidden" name="values_json" value={valuesJson} />
-        <div class="border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Facet Details</h2>
-        </div>
-        <div class="p-6">
+        <AdminCard title="Facet Details">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
@@ -240,37 +237,37 @@
               />
             </div>
           </div>
-        </div>
+        </AdminCard>
       </form>
 
       <!-- Values -->
-      <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="border-b border-border p-6">
-          <h2 class="text-lg font-medium text-foreground">Values</h2>
-          <p class="mt-1 text-sm text-foreground-tertiary">
-            Add multiple values at once, separated by commas.
-          </p>
-          <div class="mt-3 flex gap-2">
-            <input
-              type="text"
-              bind:this={bulkInputEl}
-              bind:value={bulkInput}
-              onkeydown={handleBulkKeydown}
-              placeholder="e.g., Red, Blue, Yellow"
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onclick={addBulkValues}
-              class="shrink-0"
-            >
-              Add
-            </Button>
+      <AdminCard title="Values" noPadding>
+        {#snippet headerExtra()}
+          <div class="border-b border-border px-6 py-4">
+            <p class="text-sm text-foreground-tertiary">
+              Add multiple values at once, separated by commas.
+            </p>
+            <div class="mt-3 flex gap-2">
+              <input
+                type="text"
+                bind:this={bulkInputEl}
+                bind:value={bulkInput}
+                onkeydown={handleBulkKeydown}
+                placeholder="e.g., Red, Blue, Yellow"
+                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onclick={addBulkValues}
+                class="shrink-0"
+              >
+                Add
+              </Button>
+            </div>
           </div>
-        </div>
-
+        {/snippet}
         {#if values.length === 0}
           <div class="p-12 text-center">
             <p class="text-sm text-muted-foreground">
@@ -319,7 +316,7 @@
             {/each}
           </div>
         {/if}
-      </div>
+      </AdminCard>
 
       <button
         type="button"

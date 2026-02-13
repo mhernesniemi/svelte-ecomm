@@ -2,6 +2,7 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
+  import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { ActionData, PageData } from "./$types";
   import { formatDateTime } from "$lib/utils";
@@ -42,44 +43,36 @@
     <!-- Main Content (Left) -->
     <div class="flex-1 space-y-6">
       <!-- Status -->
-      <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Order Status</h2>
-        </div>
-        <div class="p-6">
-          <div class="flex items-center gap-4">
-            <Badge
-              variant={data.order.state === "paid"
-                ? "success"
-                : data.order.state === "cancelled"
-                  ? "destructive"
-                  : "secondary"}
-              class="capitalize"
-            >
-              {data.order.state.replace("_", " ")}
-            </Badge>
+      <AdminCard title="Order Status">
+        <div class="flex items-center gap-4">
+          <Badge
+            variant={data.order.state === "paid"
+              ? "success"
+              : data.order.state === "cancelled"
+                ? "destructive"
+                : "secondary"}
+            class="capitalize"
+          >
+            {data.order.state.replace("_", " ")}
+          </Badge>
 
-            {#if nextStates.length > 0}
-              <div class="flex gap-2">
-                {#each nextStates as state}
-                  <form method="POST" action="?/transition" class="inline">
-                    <input type="hidden" name="state" value={state} />
-                    <Button type="submit" variant="outline" size="sm" class="capitalize">
-                      Mark as {state.replace("_", " ")}
-                    </Button>
-                  </form>
-                {/each}
-              </div>
-            {/if}
-          </div>
+          {#if nextStates.length > 0}
+            <div class="flex gap-2">
+              {#each nextStates as state}
+                <form method="POST" action="?/transition" class="inline">
+                  <input type="hidden" name="state" value={state} />
+                  <Button type="submit" variant="outline" size="sm" class="capitalize">
+                    Mark as {state.replace("_", " ")}
+                  </Button>
+                </form>
+              {/each}
+            </div>
+          {/if}
         </div>
-      </div>
+      </AdminCard>
 
       <!-- Line Items -->
-      <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Items</h2>
-        </div>
+      <AdminCard title="Items" noPadding>
         <div class="divide-y divide-border">
           {#each data.order.lines as line}
             <div class="flex items-center justify-between px-6 py-4">
@@ -99,210 +92,185 @@
             </div>
           {/each}
         </div>
-      </div>
+      </AdminCard>
     </div>
 
     <!-- Sidebar (Right) -->
     <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
       <!-- Summary -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Summary</h2>
-        </div>
-        <div class="p-4">
-          <dl class="space-y-2 text-sm">
-            <div class="flex justify-between">
-              <dt class="text-foreground-secondary">Subtotal</dt>
-              <dd>{(data.order.subtotal / 100).toFixed(2)} EUR</dd>
+      <AdminCard title="Summary" variant="sidebar">
+        <dl class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-foreground-secondary">Subtotal</dt>
+            <dd>{(data.order.subtotal / 100).toFixed(2)} EUR</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-foreground-secondary">Shipping</dt>
+            <dd>{(data.order.shipping / 100).toFixed(2)} EUR</dd>
+          </div>
+          {#if data.order.discount > 0}
+            <div class="flex justify-between text-green-600">
+              <dt>Discount</dt>
+              <dd>-{(data.order.discount / 100).toFixed(2)} EUR</dd>
             </div>
-            <div class="flex justify-between">
-              <dt class="text-foreground-secondary">Shipping</dt>
-              <dd>{(data.order.shipping / 100).toFixed(2)} EUR</dd>
-            </div>
-            {#if data.order.discount > 0}
-              <div class="flex justify-between text-green-600">
-                <dt>Discount</dt>
-                <dd>-{(data.order.discount / 100).toFixed(2)} EUR</dd>
-              </div>
-            {/if}
-            <div class="flex justify-between border-t border-border pt-2 font-bold">
-              <dt>Total</dt>
-              <dd>{(data.order.total / 100).toFixed(2)} {data.order.currencyCode}</dd>
-            </div>
-          </dl>
-        </div>
-      </div>
+          {/if}
+          <div class="flex justify-between border-t border-border pt-2 font-bold">
+            <dt>Total</dt>
+            <dd>{(data.order.total / 100).toFixed(2)} {data.order.currencyCode}</dd>
+          </div>
+        </dl>
+      </AdminCard>
 
       {#if data.order.shippingFullName}
         <!-- Shipping Address -->
-        <div class="rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-4 py-3">
-            <h2 class="font-semibold">Shipping Address</h2>
-          </div>
-          <div class="p-4">
-            <address class="text-sm text-foreground-tertiary not-italic">
-              <p class="font-medium text-foreground">{data.order.shippingFullName}</p>
-              <p>{data.order.shippingStreetLine1}</p>
-              {#if data.order.shippingStreetLine2}
-                <p>{data.order.shippingStreetLine2}</p>
-              {/if}
-              <p>{data.order.shippingPostalCode} {data.order.shippingCity}</p>
-              <p>{data.order.shippingCountry}</p>
-            </address>
-          </div>
-        </div>
+        <AdminCard title="Shipping Address" variant="sidebar">
+          <address class="text-sm text-foreground-tertiary not-italic">
+            <p class="font-medium text-foreground">{data.order.shippingFullName}</p>
+            <p>{data.order.shippingStreetLine1}</p>
+            {#if data.order.shippingStreetLine2}
+              <p>{data.order.shippingStreetLine2}</p>
+            {/if}
+            <p>{data.order.shippingPostalCode} {data.order.shippingCity}</p>
+            <p>{data.order.shippingCountry}</p>
+          </address>
+        </AdminCard>
       {/if}
 
       {#if data.orderShipping && data.shippingMethod}
         <!-- Shipping Information -->
-        <div class="rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-4 py-3">
-            <h2 class="font-semibold">Shipping Information</h2>
-          </div>
-          <div class="p-4">
-            <dl class="space-y-2 text-sm">
-              <div class="flex justify-between">
-                <dt class="text-foreground-secondary">Method</dt>
-                <dd class="font-medium">{data.shippingMethod.name}</dd>
-              </div>
-              <div class="flex justify-between">
-                <dt class="text-foreground-secondary">Status</dt>
-                <dd>
-                  <Badge
-                    variant={data.orderShipping.status === "delivered"
-                      ? "success"
-                      : data.orderShipping.status === "shipped" ||
-                          data.orderShipping.status === "in_transit"
-                        ? "default"
-                        : "secondary"}
-                    class="capitalize"
-                  >
-                    {data.orderShipping.status.replace("_", " ")}
-                  </Badge>
-                </dd>
-              </div>
-              {#if data.orderShipping.trackingNumber}
-                <div class="flex justify-between">
-                  <dt class="text-foreground-secondary">Tracking</dt>
-                  <dd class="font-mono text-xs">{data.orderShipping.trackingNumber}</dd>
-                </div>
-              {/if}
-              <div class="flex justify-between">
-                <dt class="text-foreground-secondary">Cost</dt>
-                <dd>{(data.orderShipping.price / 100).toFixed(2)} EUR</dd>
-              </div>
-            </dl>
-
+        <AdminCard title="Shipping Information" variant="sidebar">
+          <dl class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <dt class="text-foreground-secondary">Method</dt>
+              <dd class="font-medium">{data.shippingMethod.name}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-foreground-secondary">Status</dt>
+              <dd>
+                <Badge
+                  variant={data.orderShipping.status === "delivered"
+                    ? "success"
+                    : data.orderShipping.status === "shipped" ||
+                        data.orderShipping.status === "in_transit"
+                      ? "default"
+                      : "secondary"}
+                  class="capitalize"
+                >
+                  {data.orderShipping.status.replace("_", " ")}
+                </Badge>
+              </dd>
+            </div>
             {#if data.orderShipping.trackingNumber}
-              <form method="POST" action="?/trackShipment" class="mt-4">
-                <Button type="submit" variant="outline" class="w-full">
-                  Refresh Tracking Status
-                </Button>
-              </form>
+              <div class="flex justify-between">
+                <dt class="text-foreground-secondary">Tracking</dt>
+                <dd class="font-mono text-xs">{data.orderShipping.trackingNumber}</dd>
+              </div>
             {/if}
+            <div class="flex justify-between">
+              <dt class="text-foreground-secondary">Cost</dt>
+              <dd>{(data.orderShipping.price / 100).toFixed(2)} EUR</dd>
+            </div>
+          </dl>
 
-            {#if data.order.state === "paid" && data.orderShipping.status === "pending"}
-              <form method="POST" action="?/updateShippingStatus" class="mt-4">
-                <input type="hidden" name="status" value="shipped" />
-                <Button type="submit" class="w-full">Mark as Shipped</Button>
-              </form>
-            {/if}
-          </div>
-        </div>
+          {#if data.orderShipping.trackingNumber}
+            <form method="POST" action="?/trackShipment" class="mt-4">
+              <Button type="submit" variant="outline" class="w-full">
+                Refresh Tracking Status
+              </Button>
+            </form>
+          {/if}
+
+          {#if data.order.state === "paid" && data.orderShipping.status === "pending"}
+            <form method="POST" action="?/updateShippingStatus" class="mt-4">
+              <input type="hidden" name="status" value="shipped" />
+              <Button type="submit" class="w-full">Mark as Shipped</Button>
+            </form>
+          {/if}
+        </AdminCard>
       {/if}
 
       {#if data.payment && data.paymentMethod}
         <!-- Payment Information -->
-        <div class="rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-4 py-3">
-            <h2 class="font-semibold">Payment Information</h2>
-          </div>
-          <div class="p-4">
-            <dl class="space-y-2 text-sm">
-              <div class="flex justify-between">
-                <dt class="text-foreground-secondary">Method</dt>
-                <dd class="font-medium">{data.paymentMethod.name}</dd>
-              </div>
-              <div class="flex justify-between">
-                <dt class="text-foreground-secondary">Status</dt>
-                <dd>
-                  <Badge
-                    variant={data.payment.state === "settled"
-                      ? "success"
-                      : data.payment.state === "declined"
-                        ? "destructive"
-                        : data.payment.state === "refunded"
-                          ? "warning"
-                          : "secondary"}
-                    class="capitalize"
-                  >
-                    {data.payment.state}
-                  </Badge>
-                </dd>
-              </div>
-              <div class="flex justify-between">
-                <dt class="text-foreground-secondary">Amount</dt>
-                <dd>{(data.payment.amount / 100).toFixed(2)} EUR</dd>
-              </div>
-              {#if data.payment.transactionId}
-                <div class="flex justify-between">
-                  <dt class="text-foreground-secondary">Transaction ID</dt>
-                  <dd class="font-mono text-xs break-all">{data.payment.transactionId}</dd>
-                </div>
-              {/if}
-              {#if data.payment.errorMessage}
-                <div class="flex justify-between">
-                  <dt class="text-foreground-secondary">Error</dt>
-                  <dd class="text-xs text-red-600">{data.payment.errorMessage}</dd>
-                </div>
-              {/if}
-            </dl>
-
-            {#if data.payment.state === "pending" || data.payment.state === "authorized"}
-              <form method="POST" action="?/confirmPayment" class="mt-4">
-                <Button type="submit" class="w-full">Confirm Payment Status</Button>
-              </form>
-            {/if}
-
-            {#if data.payment.state === "settled" && data.payment.transactionId}
-              <form method="POST" action="?/refundPayment" class="mt-4">
-                <Button
-                  type="submit"
-                  variant="secondary"
-                  class="w-full bg-yellow-600 text-white hover:bg-yellow-700"
-                >
-                  Refund Payment
-                </Button>
-              </form>
-            {/if}
-          </div>
-        </div>
-      {/if}
-
-      <!-- Details -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Details</h2>
-        </div>
-        <div class="p-4">
+        <AdminCard title="Payment Information" variant="sidebar">
           <dl class="space-y-2 text-sm">
             <div class="flex justify-between">
-              <dt class="text-foreground-secondary">Order ID</dt>
-              <dd>{data.order.id}</dd>
+              <dt class="text-foreground-secondary">Method</dt>
+              <dd class="font-medium">{data.paymentMethod.name}</dd>
             </div>
             <div class="flex justify-between">
-              <dt class="text-foreground-secondary">Created</dt>
-              <dd>{formatDateTime(data.order.createdAt)}</dd>
+              <dt class="text-foreground-secondary">Status</dt>
+              <dd>
+                <Badge
+                  variant={data.payment.state === "settled"
+                    ? "success"
+                    : data.payment.state === "declined"
+                      ? "destructive"
+                      : data.payment.state === "refunded"
+                        ? "warning"
+                        : "secondary"}
+                  class="capitalize"
+                >
+                  {data.payment.state}
+                </Badge>
+              </dd>
             </div>
-            {#if data.order.orderPlacedAt}
+            <div class="flex justify-between">
+              <dt class="text-foreground-secondary">Amount</dt>
+              <dd>{(data.payment.amount / 100).toFixed(2)} EUR</dd>
+            </div>
+            {#if data.payment.transactionId}
               <div class="flex justify-between">
-                <dt class="text-foreground-secondary">Placed</dt>
-                <dd>{formatDateTime(data.order.orderPlacedAt)}</dd>
+                <dt class="text-foreground-secondary">Transaction ID</dt>
+                <dd class="font-mono text-xs break-all">{data.payment.transactionId}</dd>
+              </div>
+            {/if}
+            {#if data.payment.errorMessage}
+              <div class="flex justify-between">
+                <dt class="text-foreground-secondary">Error</dt>
+                <dd class="text-xs text-red-600">{data.payment.errorMessage}</dd>
               </div>
             {/if}
           </dl>
-        </div>
-      </div>
+
+          {#if data.payment.state === "pending" || data.payment.state === "authorized"}
+            <form method="POST" action="?/confirmPayment" class="mt-4">
+              <Button type="submit" class="w-full">Confirm Payment Status</Button>
+            </form>
+          {/if}
+
+          {#if data.payment.state === "settled" && data.payment.transactionId}
+            <form method="POST" action="?/refundPayment" class="mt-4">
+              <Button
+                type="submit"
+                variant="secondary"
+                class="w-full bg-yellow-600 text-white hover:bg-yellow-700"
+              >
+                Refund Payment
+              </Button>
+            </form>
+          {/if}
+        </AdminCard>
+      {/if}
+
+      <!-- Details -->
+      <AdminCard title="Details" variant="sidebar">
+        <dl class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-foreground-secondary">Order ID</dt>
+            <dd>{data.order.id}</dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-foreground-secondary">Created</dt>
+            <dd>{formatDateTime(data.order.createdAt)}</dd>
+          </div>
+          {#if data.order.orderPlacedAt}
+            <div class="flex justify-between">
+              <dt class="text-foreground-secondary">Placed</dt>
+              <dd>{formatDateTime(data.order.orderPlacedAt)}</dd>
+            </div>
+          {/if}
+        </dl>
+      </AdminCard>
     </div>
   </div>
 </div>

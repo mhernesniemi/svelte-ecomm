@@ -8,6 +8,7 @@
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import Check from "@lucide/svelte/icons/check";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -133,12 +134,8 @@
             }
           };
         }}
-        class="overflow-hidden rounded-lg bg-surface shadow"
       >
-        <div class="border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Group Details</h2>
-        </div>
-        <div class="p-6">
+        <AdminCard title="Group Details">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label
@@ -175,76 +172,76 @@
           {#each customers as customer}
             <input type="hidden" name="customerIds" value={customer.id} />
           {/each}
-        </div>
+        </AdminCard>
       </form>
 
       <!-- Customers Section -->
-      <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Customers</h2>
-          <p class="mt-1 text-sm text-foreground-tertiary">
-            {#if availableCustomers.length === 0 && customers.length > 0}
-              All customers have been added to this group.
-            {:else}
-              Add customers to this group.
-            {/if}
-          </p>
-          {#if availableCustomers.length > 0}
-            <div class="mt-3 flex gap-2">
-              <Popover.Root bind:open={comboboxOpen}>
-                <Popover.Trigger
-                  class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                >
-                  <span
-                    class={selectedCustomerIds.size > 0
-                      ? "text-foreground"
-                      : "text-muted-foreground"}
+      <AdminCard title="Customers" noPadding>
+        {#snippet headerExtra()}
+          <div class="border-b border-border px-6 py-4">
+            <p class="text-sm text-foreground-tertiary">
+              {#if availableCustomers.length === 0 && customers.length > 0}
+                All customers have been added to this group.
+              {:else}
+                Add customers to this group.
+              {/if}
+            </p>
+            {#if availableCustomers.length > 0}
+              <div class="mt-3 flex gap-2">
+                <Popover.Root bind:open={comboboxOpen}>
+                  <Popover.Trigger
+                    class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
                   >
-                    {selectedCustomerLabel()}
-                  </span>
-                  <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
-                </Popover.Trigger>
-                <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
-                  <Command.Root>
-                    <Command.Input placeholder="Search customers..." />
-                    <Command.List class="max-h-60">
-                      <Command.Empty>No customers found.</Command.Empty>
-                      {#each availableCustomers as customer}
-                        <Command.Item
-                          value="{customer.firstName} {customer.lastName} {customer.email}"
-                          onSelect={() => toggleCustomerSelection(customer.id)}
-                        >
-                          <Check
-                            class="mr-2 h-4 w-4 {selectedCustomerIds.has(customer.id)
-                              ? 'opacity-100'
-                              : 'opacity-0'}"
-                          />
-                          <span>
-                            {customer.firstName}
-                            {customer.lastName}
-                            <span class="text-muted-foreground">({customer.email})</span>
-                          </span>
-                        </Command.Item>
-                      {/each}
-                    </Command.List>
-                  </Command.Root>
-                </Popover.Content>
-              </Popover.Root>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={selectedCustomerIds.size === 0}
-                onclick={addSelectedCustomers}
-                class="shrink-0"
-              >
-                Add{#if selectedCustomerIds.size > 0}
-                  ({selectedCustomerIds.size}){/if}
-              </Button>
-            </div>
-          {/if}
-        </div>
-
+                    <span
+                      class={selectedCustomerIds.size > 0
+                        ? "text-foreground"
+                        : "text-muted-foreground"}
+                    >
+                      {selectedCustomerLabel()}
+                    </span>
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
+                  </Popover.Trigger>
+                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+                    <Command.Root>
+                      <Command.Input placeholder="Search customers..." />
+                      <Command.List class="max-h-60">
+                        <Command.Empty>No customers found.</Command.Empty>
+                        {#each availableCustomers as customer}
+                          <Command.Item
+                            value="{customer.firstName} {customer.lastName} {customer.email}"
+                            onSelect={() => toggleCustomerSelection(customer.id)}
+                          >
+                            <Check
+                              class="mr-2 h-4 w-4 {selectedCustomerIds.has(customer.id)
+                                ? 'opacity-100'
+                                : 'opacity-0'}"
+                            />
+                            <span>
+                              {customer.firstName}
+                              {customer.lastName}
+                              <span class="text-muted-foreground">({customer.email})</span>
+                            </span>
+                          </Command.Item>
+                        {/each}
+                      </Command.List>
+                    </Command.Root>
+                  </Popover.Content>
+                </Popover.Root>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={selectedCustomerIds.size === 0}
+                  onclick={addSelectedCustomers}
+                  class="shrink-0"
+                >
+                  Add{#if selectedCustomerIds.size > 0}
+                    ({selectedCustomerIds.size}){/if}
+                </Button>
+              </div>
+            {/if}
+          </div>
+        {/snippet}
         {#if customers.length === 0}
           <div class="p-12 text-center">
             <p class="text-sm text-muted-foreground">No customers in this group yet.</p>
@@ -279,28 +276,23 @@
             {/each}
           </div>
         {/if}
-      </div>
+      </AdminCard>
     </div>
 
     <!-- Sidebar -->
     <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
       <!-- Tax Exempt -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Tax</h2>
+      <AdminCard title="Tax" variant="sidebar">
+        <div class="flex items-center gap-2">
+          <Checkbox id="is_tax_exempt" bind:checked={isTaxExempt} />
+          <label for="is_tax_exempt" class="text-sm font-medium text-foreground">
+            Tax exempt
+          </label>
         </div>
-        <div class="p-4">
-          <div class="flex items-center gap-2">
-            <Checkbox id="is_tax_exempt" bind:checked={isTaxExempt} />
-            <label for="is_tax_exempt" class="text-sm font-medium text-foreground">
-              Tax exempt
-            </label>
-          </div>
-          <p class="mt-2 text-xs text-muted-foreground">
-            Customers in this group will not be charged VAT
-          </p>
-        </div>
-      </div>
+        <p class="mt-2 text-xs text-muted-foreground">
+          Customers in this group will not be charged VAT
+        </p>
+      </AdminCard>
     </div>
   </div>
 

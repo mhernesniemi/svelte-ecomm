@@ -5,6 +5,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import {
     translationsToMap,
@@ -236,25 +237,20 @@
 
     <!-- Sidebar (Right) -->
     <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Visibility</h2>
+      <AdminCard title="Visibility" variant="sidebar">
+        <div class="flex items-center gap-2">
+          <Checkbox id="published" bind:checked={published} />
+          {#if published}
+            <input type="hidden" name="published" value="on" form="content-page-form" />
+          {/if}
+          <label for="published" class="text-sm font-medium text-foreground-secondary">
+            Published
+          </label>
         </div>
-        <div class="p-4">
-          <div class="flex items-center gap-2">
-            <Checkbox id="published" bind:checked={published} />
-            {#if published}
-              <input type="hidden" name="published" value="on" form="content-page-form" />
-            {/if}
-            <label for="published" class="text-sm font-medium text-foreground-secondary">
-              Published
-            </label>
-          </div>
-          <p class="mt-3 text-xs text-foreground-secondary">
-            Set this to published to make it visible on the storefront
-          </p>
-        </div>
-      </div>
+        <p class="mt-3 text-xs text-foreground-secondary">
+          Set this to published to make it visible on the storefront
+        </p>
+      </AdminCard>
     </div>
   </div>
 </div>

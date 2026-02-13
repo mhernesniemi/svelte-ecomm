@@ -5,6 +5,7 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
+  import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import type { PageData, ActionData } from "./$types";
   import ShoppingCart from "@lucide/svelte/icons/shopping-cart";
   import Tag from "@lucide/svelte/icons/tag";
@@ -107,152 +108,136 @@
       <!-- Left Column -->
       <div class="flex-1 space-y-6">
         <!-- Type Selection -->
-        <div class="overflow-hidden rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-6 py-4">
-            <h2 class="text-lg font-semibold">Promotion Type</h2>
+        <AdminCard title="Promotion Type">
+          <div class="grid grid-cols-3 gap-3">
+            {#each typeOptions as option}
+              <label
+                class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-colors {promotionType ===
+                option.value
+                  ? 'border-blue-500 bg-accent-subtle'
+                  : 'border-border hover:border-input-border'}"
+              >
+                <input
+                  type="radio"
+                  name="promotionType"
+                  value={option.value}
+                  bind:group={promotionType}
+                  class="sr-only"
+                />
+                <option.icon
+                  class="h-6 w-6 {promotionType === option.value
+                    ? 'text-blue-600 dark:text-blue-400'
+                    : 'text-placeholder'}"
+                />
+                <span class="text-sm font-medium">{option.label}</span>
+              </label>
+            {/each}
           </div>
-          <div class="p-6">
-            <div class="grid grid-cols-3 gap-3">
-              {#each typeOptions as option}
-                <label
-                  class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 p-4 text-center transition-colors {promotionType ===
-                  option.value
-                    ? 'border-blue-500 bg-accent-subtle'
-                    : 'border-border hover:border-input-border'}"
-                >
-                  <input
-                    type="radio"
-                    name="promotionType"
-                    value={option.value}
-                    bind:group={promotionType}
-                    class="sr-only"
-                  />
-                  <option.icon
-                    class="h-6 w-6 {promotionType === option.value
-                      ? 'text-blue-600 dark:text-blue-400'
-                      : 'text-placeholder'}"
-                  />
-                  <span class="text-sm font-medium">{option.label}</span>
-                </label>
-              {/each}
-            </div>
-          </div>
-        </div>
+        </AdminCard>
 
         <!-- Method + Code/Title -->
-        <div class="overflow-hidden rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-6 py-4">
-            <h2 class="text-lg font-semibold">Discount Method</h2>
+        <AdminCard title="Discount Method">
+          <input type="hidden" name="method" value={method} />
+          <div class="mb-4 inline-flex rounded-lg border border-border p-0.5">
+            <button
+              type="button"
+              class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors {method === 'code'
+                ? 'bg-gray-900 text-white'
+                : 'text-foreground-tertiary hover:text-foreground'}"
+              onclick={() => (method = "code")}
+            >
+              Discount code
+            </button>
+            <button
+              type="button"
+              class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors {method ===
+              'automatic'
+                ? 'bg-gray-900 text-white'
+                : 'text-foreground-tertiary hover:text-foreground'}"
+              onclick={() => (method = "automatic")}
+            >
+              Automatic discount
+            </button>
           </div>
-          <div class="p-6">
-            <input type="hidden" name="method" value={method} />
-            <div class="mb-4 inline-flex rounded-lg border border-border p-0.5">
-              <button
-                type="button"
-                class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors {method ===
-                'code'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-foreground-tertiary hover:text-foreground'}"
-                onclick={() => (method = "code")}
-              >
-                Discount code
-              </button>
-              <button
-                type="button"
-                class="rounded-md px-4 py-1.5 text-sm font-medium transition-colors {method ===
-                'automatic'
-                  ? 'bg-gray-900 text-white'
-                  : 'text-foreground-tertiary hover:text-foreground'}"
-                onclick={() => (method = "automatic")}
-              >
-                Automatic discount
-              </button>
-            </div>
 
-            {#if method === "code"}
-              <div>
-                <label for="code" class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >Code</label
-                >
-                <input
-                  type="text"
-                  id="code"
-                  name="code"
-                  placeholder="e.g., SUMMER20"
-                  required
-                  class="w-full rounded-lg border border-input-border px-3 py-2 uppercase"
-                />
-                <p class="mt-1 text-xs text-muted-foreground">
-                  Customers will enter this code at checkout.
-                </p>
-              </div>
-            {:else}
-              <div>
-                <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >Title</label
-                >
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  placeholder="e.g., Summer Sale 20% Off"
-                  required
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                />
-                <p class="mt-1 text-xs text-muted-foreground">
-                  Customers will see this in their cart and at checkout.
-                </p>
-              </div>
-            {/if}
-          </div>
-        </div>
+          {#if method === "code"}
+            <div>
+              <label for="code" class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >Code</label
+              >
+              <input
+                type="text"
+                id="code"
+                name="code"
+                placeholder="e.g., SUMMER20"
+                required
+                class="w-full rounded-lg border border-input-border px-3 py-2 uppercase"
+              />
+              <p class="mt-1 text-xs text-muted-foreground">
+                Customers will enter this code at checkout.
+              </p>
+            </div>
+          {:else}
+            <div>
+              <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >Title</label
+              >
+              <input
+                type="text"
+                id="title"
+                name="title"
+                placeholder="e.g., Summer Sale 20% Off"
+                required
+                class="w-full rounded-lg border border-input-border px-3 py-2"
+              />
+              <p class="mt-1 text-xs text-muted-foreground">
+                Customers will see this in their cart and at checkout.
+              </p>
+            </div>
+          {/if}
+        </AdminCard>
 
         <!-- Discount (hidden for free_shipping) -->
         {#if promotionType !== "free_shipping"}
-          <div class="overflow-hidden rounded-lg bg-surface shadow">
-            <div class="border-b border-border px-6 py-4">
-              <h2 class="text-lg font-semibold">Discount Value</h2>
-            </div>
-            <div class="p-6">
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label
-                    for="discountType"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Discount Type
-                  </label>
-                  <select
-                    id="discountType"
-                    name="discountType"
-                    bind:value={discountType}
-                    class="w-full rounded-lg border border-input-border px-3 py-2"
-                  >
-                    <option value="percentage">Percentage (%)</option>
-                    <option value="fixed_amount">Fixed Amount (EUR)</option>
-                  </select>
-                </div>
-                <div>
-                  <label
-                    for="discountValue"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Value
-                  </label>
-                  <input
-                    type="number"
-                    id="discountValue"
-                    name="discountValue"
-                    placeholder={discountType === "percentage" ? "e.g., 20" : "e.g., 10.00"}
-                    min="0"
-                    step={discountType === "percentage" ? "1" : "0.01"}
-                    required
-                    class="w-full rounded-lg border border-input-border px-3 py-2"
-                  />
-                </div>
+          <AdminCard title="Discount Value">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="discountType"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
+                  Discount Type
+                </label>
+                <select
+                  id="discountType"
+                  name="discountType"
+                  bind:value={discountType}
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
+                >
+                  <option value="percentage">Percentage (%)</option>
+                  <option value="fixed_amount">Fixed Amount (EUR)</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="discountValue"
+                  class="mb-1 block text-sm font-medium text-foreground-secondary"
+                >
+                  Value
+                </label>
+                <input
+                  type="number"
+                  id="discountValue"
+                  name="discountValue"
+                  placeholder={discountType === "percentage" ? "e.g., 20" : "e.g., 10.00"}
+                  min="0"
+                  step={discountType === "percentage" ? "1" : "0.01"}
+                  required
+                  class="w-full rounded-lg border border-input-border px-3 py-2"
+                />
               </div>
             </div>
-          </div>
+          </AdminCard>
         {:else}
           <input type="hidden" name="discountType" value="fixed_amount" />
           <input type="hidden" name="discountValue" value="0" />
@@ -260,338 +245,297 @@
 
         <!-- Applies To (only for product type) -->
         {#if promotionType === "product"}
-          <div class="overflow-hidden rounded-lg bg-surface shadow">
-            <div class="border-b border-border px-6 py-4">
-              <h2 class="text-lg font-semibold">Applies To</h2>
+          <AdminCard title="Applies To">
+            <div class="space-y-3">
+              <label class="flex items-center gap-2">
+                <input type="radio" name="appliesTo" value="all" bind:group={appliesTo} />
+                <span class="text-sm">All products</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="appliesTo"
+                  value="specific_products"
+                  bind:group={appliesTo}
+                />
+                <span class="text-sm">Specific products</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="appliesTo"
+                  value="specific_collections"
+                  bind:group={appliesTo}
+                />
+                <span class="text-sm">Specific collections</span>
+              </label>
             </div>
-            <div class="p-6">
-              <div class="space-y-3">
-                <label class="flex items-center gap-2">
-                  <input type="radio" name="appliesTo" value="all" bind:group={appliesTo} />
-                  <span class="text-sm">All products</span>
-                </label>
-                <label class="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="appliesTo"
-                    value="specific_products"
-                    bind:group={appliesTo}
-                  />
-                  <span class="text-sm">Specific products</span>
-                </label>
-                <label class="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="appliesTo"
-                    value="specific_collections"
-                    bind:group={appliesTo}
-                  />
-                  <span class="text-sm">Specific collections</span>
-                </label>
+
+            {#if appliesTo === "specific_products"}
+              <div class="mt-4">
+                <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Products</p>
+                <Popover.Root bind:open={productComboboxOpen}>
+                  <Popover.Trigger
+                    class="flex h-9 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                  >
+                    <span class="text-muted-foreground">
+                      {selectedProductIds.length > 0
+                        ? `${selectedProductIds.length} product(s) selected`
+                        : "Search products..."}
+                    </span>
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
+                  </Popover.Trigger>
+                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+                    <Command.Root>
+                      <Command.Input placeholder="Search products..." />
+                      <Command.List class="max-h-60">
+                        <Command.Empty>No products found.</Command.Empty>
+                        {#each data.products as product}
+                          <Command.Item
+                            value={product.name}
+                            onSelect={() => toggleProduct(product.id)}
+                          >
+                            <Check
+                              class="mr-2 h-4 w-4 {selectedProductIds.includes(product.id)
+                                ? 'opacity-100'
+                                : 'opacity-0'}"
+                            />
+                            {product.name}
+                          </Command.Item>
+                        {/each}
+                      </Command.List>
+                    </Command.Root>
+                  </Popover.Content>
+                </Popover.Root>
+                {#if selectedProductIds.length > 0}
+                  <div class="mt-4 flex flex-wrap gap-1">
+                    {#each selectedProductIds as id}
+                      <Badge variant="secondary" class="gap-1 text-sm">
+                        {getProductName(id)}
+                        <button
+                          type="button"
+                          onclick={() => toggleProduct(id)}
+                          class="ml-0.5 rounded-full hover:bg-muted-strong"
+                        >
+                          <X class="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    {/each}
+                  </div>
+                {/if}
               </div>
+            {/if}
 
-              {#if appliesTo === "specific_products"}
-                <div class="mt-4">
-                  <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Products</p>
-                  <Popover.Root bind:open={productComboboxOpen}>
-                    <Popover.Trigger
-                      class="flex h-9 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                    >
-                      <span class="text-muted-foreground">
-                        {selectedProductIds.length > 0
-                          ? `${selectedProductIds.length} product(s) selected`
-                          : "Search products..."}
-                      </span>
-                      <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
-                    </Popover.Trigger>
-                    <Popover.Content
-                      class="w-[var(--bits-popover-trigger-width)] p-0"
-                      align="start"
-                    >
-                      <Command.Root>
-                        <Command.Input placeholder="Search products..." />
-                        <Command.List class="max-h-60">
-                          <Command.Empty>No products found.</Command.Empty>
-                          {#each data.products as product}
-                            <Command.Item
-                              value={product.name}
-                              onSelect={() => toggleProduct(product.id)}
-                            >
-                              <Check
-                                class="mr-2 h-4 w-4 {selectedProductIds.includes(product.id)
-                                  ? 'opacity-100'
-                                  : 'opacity-0'}"
-                              />
-                              {product.name}
-                            </Command.Item>
-                          {/each}
-                        </Command.List>
-                      </Command.Root>
-                    </Popover.Content>
-                  </Popover.Root>
-                  {#if selectedProductIds.length > 0}
-                    <div class="mt-4 flex flex-wrap gap-1">
-                      {#each selectedProductIds as id}
-                        <Badge variant="secondary" class="gap-1 text-sm">
-                          {getProductName(id)}
-                          <button
-                            type="button"
-                            onclick={() => toggleProduct(id)}
-                            class="ml-0.5 rounded-full hover:bg-muted-strong"
+            {#if appliesTo === "specific_collections"}
+              <div class="mt-4">
+                <p class="mb-2 text-sm font-medium text-foreground-secondary">Select Collections</p>
+                <Popover.Root bind:open={collectionComboboxOpen}>
+                  <Popover.Trigger
+                    class="flex h-9 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                  >
+                    <span class="text-muted-foreground">
+                      {selectedCollectionIds.length > 0
+                        ? `${selectedCollectionIds.length} collection(s) selected`
+                        : "Search collections..."}
+                    </span>
+                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
+                  </Popover.Trigger>
+                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+                    <Command.Root>
+                      <Command.Input placeholder="Search collections..." />
+                      <Command.List class="max-h-60">
+                        <Command.Empty>No collections found.</Command.Empty>
+                        {#each data.collections as collection}
+                          <Command.Item
+                            value={collection.name}
+                            onSelect={() => toggleCollection(collection.id)}
                           >
-                            <X class="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-              {/if}
-
-              {#if appliesTo === "specific_collections"}
-                <div class="mt-4">
-                  <p class="mb-2 text-sm font-medium text-foreground-secondary">
-                    Select Collections
-                  </p>
-                  <Popover.Root bind:open={collectionComboboxOpen}>
-                    <Popover.Trigger
-                      class="flex h-9 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                    >
-                      <span class="text-muted-foreground">
-                        {selectedCollectionIds.length > 0
-                          ? `${selectedCollectionIds.length} collection(s) selected`
-                          : "Search collections..."}
-                      </span>
-                      <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
-                    </Popover.Trigger>
-                    <Popover.Content
-                      class="w-[var(--bits-popover-trigger-width)] p-0"
-                      align="start"
-                    >
-                      <Command.Root>
-                        <Command.Input placeholder="Search collections..." />
-                        <Command.List class="max-h-60">
-                          <Command.Empty>No collections found.</Command.Empty>
-                          {#each data.collections as collection}
-                            <Command.Item
-                              value={collection.name}
-                              onSelect={() => toggleCollection(collection.id)}
-                            >
-                              <Check
-                                class="mr-2 h-4 w-4 {selectedCollectionIds.includes(collection.id)
-                                  ? 'opacity-100'
-                                  : 'opacity-0'}"
-                              />
-                              {collection.name}
-                            </Command.Item>
-                          {/each}
-                        </Command.List>
-                      </Command.Root>
-                    </Popover.Content>
-                  </Popover.Root>
-                  {#if selectedCollectionIds.length > 0}
-                    <div class="mt-4 flex flex-wrap gap-1">
-                      {#each selectedCollectionIds as id}
-                        <Badge variant="secondary" class="gap-1 text-sm">
-                          {getCollectionName(id)}
-                          <button
-                            type="button"
-                            onclick={() => toggleCollection(id)}
-                            class="ml-0.5 rounded-full hover:bg-muted-strong"
-                          >
-                            <X class="h-3 w-3" />
-                          </button>
-                        </Badge>
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-              {/if}
-            </div>
-          </div>
+                            <Check
+                              class="mr-2 h-4 w-4 {selectedCollectionIds.includes(collection.id)
+                                ? 'opacity-100'
+                                : 'opacity-0'}"
+                            />
+                            {collection.name}
+                          </Command.Item>
+                        {/each}
+                      </Command.List>
+                    </Command.Root>
+                  </Popover.Content>
+                </Popover.Root>
+                {#if selectedCollectionIds.length > 0}
+                  <div class="mt-4 flex flex-wrap gap-1">
+                    {#each selectedCollectionIds as id}
+                      <Badge variant="secondary" class="gap-1 text-sm">
+                        {getCollectionName(id)}
+                        <button
+                          type="button"
+                          onclick={() => toggleCollection(id)}
+                          class="ml-0.5 rounded-full hover:bg-muted-strong"
+                        >
+                          <X class="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    {/each}
+                  </div>
+                {/if}
+              </div>
+            {/if}
+          </AdminCard>
         {:else}
           <input type="hidden" name="appliesTo" value="all" />
         {/if}
 
         <!-- Conditions -->
-        <div class="overflow-hidden rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-6 py-4">
-            <h2 class="text-lg font-semibold">Conditions</h2>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-3 gap-4">
-              <div>
-                <label
-                  for="minOrderAmount"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Min Order (EUR)
-                </label>
-                <input
-                  type="number"
-                  id="minOrderAmount"
-                  name="minOrderAmount"
-                  placeholder="Optional"
-                  min="0"
-                  step="0.01"
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                />
-              </div>
-              <div>
-                <label
-                  for="usageLimit"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Total Usage Limit
-                </label>
-                <input
-                  type="number"
-                  id="usageLimit"
-                  name="usageLimit"
-                  placeholder="Unlimited"
-                  min="0"
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                />
-              </div>
-              <div>
-                <label
-                  for="usageLimitPerCustomer"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Per Customer Limit
-                </label>
-                <input
-                  type="number"
-                  id="usageLimitPerCustomer"
-                  name="usageLimitPerCustomer"
-                  placeholder="Unlimited"
-                  min="0"
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                />
-              </div>
+        <AdminCard title="Conditions">
+          <div class="grid grid-cols-3 gap-4">
+            <div>
+              <label
+                for="minOrderAmount"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
+                Min Order (EUR)
+              </label>
+              <input
+                type="number"
+                id="minOrderAmount"
+                name="minOrderAmount"
+                placeholder="Optional"
+                min="0"
+                step="0.01"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
+              />
+            </div>
+            <div>
+              <label
+                for="usageLimit"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
+                Total Usage Limit
+              </label>
+              <input
+                type="number"
+                id="usageLimit"
+                name="usageLimit"
+                placeholder="Unlimited"
+                min="0"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
+              />
+            </div>
+            <div>
+              <label
+                for="usageLimitPerCustomer"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
+                Per Customer Limit
+              </label>
+              <input
+                type="number"
+                id="usageLimitPerCustomer"
+                name="usageLimitPerCustomer"
+                placeholder="Unlimited"
+                min="0"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
+              />
             </div>
           </div>
-        </div>
+        </AdminCard>
 
         <!-- Active Dates -->
-        <div class="overflow-hidden rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-6 py-4">
-            <h2 class="text-lg font-semibold">Active Dates</h2>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label
-                  for="startsAt"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Starts At
-                </label>
-                <input
-                  type="datetime-local"
-                  id="startsAt"
-                  name="startsAt"
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                />
-              </div>
-              <div>
-                <label
-                  for="endsAt"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Ends At
-                </label>
-                <input
-                  type="datetime-local"
-                  id="endsAt"
-                  name="endsAt"
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                />
-              </div>
+        <AdminCard title="Active Dates">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label
+                for="startsAt"
+                class="mb-1 block text-sm font-medium text-foreground-secondary"
+              >
+                Starts At
+              </label>
+              <input
+                type="datetime-local"
+                id="startsAt"
+                name="startsAt"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
+              />
             </div>
-            <p class="mt-2 text-xs text-muted-foreground">
-              Leave empty for no start/end date restrictions.
-            </p>
+            <div>
+              <label for="endsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
+                Ends At
+              </label>
+              <input
+                type="datetime-local"
+                id="endsAt"
+                name="endsAt"
+                class="w-full rounded-lg border border-input-border px-3 py-2"
+              />
+            </div>
           </div>
-        </div>
+          <p class="mt-2 text-xs text-muted-foreground">
+            Leave empty for no start/end date restrictions.
+          </p>
+        </AdminCard>
       </div>
 
       <!-- Right Sidebar -->
       <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
         <!-- Combination Settings -->
-        <div class="rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-4 py-3">
-            <h2 class="font-semibold">Combinations</h2>
-          </div>
-          <div class="p-4">
-            <label class="flex items-center gap-2">
-              <Checkbox bind:checked={combinesWithOtherPromotions} />
-              {#if combinesWithOtherPromotions}
-                <input type="hidden" name="combinesWithOtherPromotions" value="on" />
-              {/if}
-              <span class="text-sm">Combines with other promotions</span>
-            </label>
-            <p class="mt-2 text-xs text-muted-foreground">
-              When enabled, this promotion can be used alongside other promotions on the same order.
-            </p>
-          </div>
-        </div>
+        <AdminCard title="Combinations" variant="sidebar">
+          <label class="flex items-center gap-2">
+            <Checkbox bind:checked={combinesWithOtherPromotions} />
+            {#if combinesWithOtherPromotions}
+              <input type="hidden" name="combinesWithOtherPromotions" value="on" />
+            {/if}
+            <span class="text-sm">Combines with other promotions</span>
+          </label>
+          <p class="mt-2 text-xs text-muted-foreground">
+            When enabled, this promotion can be used alongside other promotions on the same order.
+          </p>
+        </AdminCard>
 
         <!-- Customer Group -->
-        <div class="rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-4 py-3">
-            <h2 class="font-semibold">Customer Group</h2>
-          </div>
-          <div class="p-4">
-            <select
-              name="customerGroupId"
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-            >
-              <option value="">Not restricted</option>
-              {#each data.customerGroups as group}
-                <option value={group.id}>{group.name}</option>
-              {/each}
-            </select>
-            <p class="mt-2 text-xs text-muted-foreground">
-              Restrict this promotion to customers in a specific group.
-            </p>
-          </div>
-        </div>
+        <AdminCard title="Customer Group" variant="sidebar">
+          <select
+            name="customerGroupId"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+          >
+            <option value="">Not restricted</option>
+            {#each data.customerGroups as group}
+              <option value={group.id}>{group.name}</option>
+            {/each}
+          </select>
+          <p class="mt-2 text-xs text-muted-foreground">
+            Restrict this promotion to customers in a specific group.
+          </p>
+        </AdminCard>
 
         <!-- Summary -->
-        <div class="rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-4 py-3">
-            <h2 class="font-semibold">Summary</h2>
-          </div>
-          <div class="p-4">
-            <div class="space-y-2 text-sm text-foreground-tertiary">
+        <AdminCard title="Summary" variant="sidebar">
+          <div class="space-y-2 text-sm text-foreground-tertiary">
+            <p>
+              <span class="font-medium text-foreground">Method:</span>
+              <Badge variant="outline">{method === "code" ? "Discount code" : "Automatic"}</Badge>
+            </p>
+            <p>
+              <span class="font-medium text-foreground">Type:</span>
+              <Badge variant="outline">{typeLabels[promotionType]}</Badge>
+            </p>
+            {#if promotionType !== "free_shipping"}
               <p>
-                <span class="font-medium text-foreground">Method:</span>
-                <Badge variant="outline">{method === "code" ? "Discount code" : "Automatic"}</Badge>
+                <span class="font-medium text-foreground">Discount:</span>
+                {discountType === "percentage" ? "Percentage off" : "Fixed amount off"}
               </p>
+            {/if}
+            {#if promotionType === "product"}
               <p>
-                <span class="font-medium text-foreground">Type:</span>
-                <Badge variant="outline">{typeLabels[promotionType]}</Badge>
+                <span class="font-medium text-foreground">Applies to:</span>
+                {appliesTo === "all"
+                  ? "All products"
+                  : appliesTo === "specific_products"
+                    ? `${selectedProductIds.length} product(s)`
+                    : `${selectedCollectionIds.length} collection(s)`}
               </p>
-              {#if promotionType !== "free_shipping"}
-                <p>
-                  <span class="font-medium text-foreground">Discount:</span>
-                  {discountType === "percentage" ? "Percentage off" : "Fixed amount off"}
-                </p>
-              {/if}
-              {#if promotionType === "product"}
-                <p>
-                  <span class="font-medium text-foreground">Applies to:</span>
-                  {appliesTo === "all"
-                    ? "All products"
-                    : appliesTo === "specific_products"
-                      ? `${selectedProductIds.length} product(s)`
-                      : `${selectedCollectionIds.length} collection(s)`}
-                </p>
-              {/if}
-            </div>
+            {/if}
           </div>
-        </div>
+        </AdminCard>
       </div>
     </div>
   </form>

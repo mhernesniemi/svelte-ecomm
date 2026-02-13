@@ -7,6 +7,7 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
+  import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
   import {
@@ -399,9 +400,8 @@
       </form>
 
       <!-- Images Section -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Images</h2>
+      <AdminCard title="Images">
+        {#snippet headerActions()}
           <Button
             type="button"
             size="sm"
@@ -412,82 +412,77 @@
             <Plus class="h-4 w-4" />
             Add Image
           </Button>
-        </div>
-
-        <div class="p-6">
-          {#if data.product.assets.length > 0}
-            <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
-              {#each data.product.assets as asset}
-                <div class="group relative">
-                  <img
-                    src="{asset.source}?tr=w-200,h-200,fo-auto"
-                    alt={asset.alt || asset.name}
-                    class={cn(
-                      "h-36 w-full rounded-lg border border-border object-cover",
-                      data.product.featuredAssetId === asset.id && "ring-2 ring-blue-500"
-                    )}
-                  />
-                  <div
-                    class="absolute inset-0 flex items-center justify-center gap-1 rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+        {/snippet}
+        {#if data.product.assets.length > 0}
+          <div class="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+            {#each data.product.assets as asset}
+              <div class="group relative">
+                <img
+                  src="{asset.source}?tr=w-200,h-200,fo-auto"
+                  alt={asset.alt || asset.name}
+                  class={cn(
+                    "h-36 w-full rounded-lg border border-border object-cover",
+                    data.product.featuredAssetId === asset.id && "ring-2 ring-blue-500"
+                  )}
+                />
+                <div
+                  class="absolute inset-0 flex items-center justify-center gap-1 rounded-lg bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    class="h-8 w-8 p-0"
+                    onclick={() =>
+                      (editingImageAlt = {
+                        id: asset.id,
+                        alt: asset.alt || "",
+                        isFeatured: data.product.featuredAssetId === asset.id
+                      })}
                   >
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="secondary"
-                      class="h-8 w-8 p-0"
-                      onclick={() =>
-                        (editingImageAlt = {
-                          id: asset.id,
-                          alt: asset.alt || "",
-                          isFeatured: data.product.featuredAssetId === asset.id
-                        })}
-                    >
-                      <Pencil class="h-4 w-4" />
+                    <Pencil class="h-4 w-4" />
+                  </Button>
+                  <form
+                    method="POST"
+                    action="?/removeImage"
+                    use:enhance={() => {
+                      return async ({ result, update }) => {
+                        await update();
+                        if (result.type === "success") {
+                          toast.success("Image removed");
+                        }
+                      };
+                    }}
+                  >
+                    <input type="hidden" name="assetId" value={asset.id} />
+                    <Button type="submit" variant="destructive" size="sm" class="h-8 w-8 p-0">
+                      <Trash2 class="h-4 w-4" />
                     </Button>
-                    <form
-                      method="POST"
-                      action="?/removeImage"
-                      use:enhance={() => {
-                        return async ({ result, update }) => {
-                          await update();
-                          if (result.type === "success") {
-                            toast.success("Image removed");
-                          }
-                        };
-                      }}
-                    >
-                      <input type="hidden" name="assetId" value={asset.id} />
-                      <Button type="submit" variant="destructive" size="sm" class="h-8 w-8 p-0">
-                        <Trash2 class="h-4 w-4" />
-                      </Button>
-                    </form>
-                  </div>
-                  {#if data.product.featuredAssetId === asset.id}
-                    <span
-                      class="absolute top-1 left-1 rounded bg-blue-600 px-1.5 py-0.5 text-xs text-white"
-                      >Featured</span
-                    >
-                  {/if}
+                  </form>
                 </div>
-              {/each}
-            </div>
-          {:else}
-            <p class="py-4 text-center text-sm text-muted-foreground">No images yet</p>
-          {/if}
-        </div>
-      </div>
+                {#if data.product.featuredAssetId === asset.id}
+                  <span
+                    class="absolute top-1 left-1 rounded bg-blue-600 px-1.5 py-0.5 text-xs text-white"
+                    >Featured</span
+                  >
+                {/if}
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <p class="py-4 text-center text-sm text-muted-foreground">No images yet</p>
+        {/if}
+      </AdminCard>
 
       <!-- Variants Section -->
-      <div class="rounded-lg bg-surface pb-4 shadow">
-        <div class="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Variants</h2>
+      <AdminCard title="Variants" noPadding>
+        {#snippet headerActions()}
           <a
             href="/admin/products/{data.product.id}/variants/new"
             class={buttonVariants({ variant: "outline", size: "sm" })}
             ><Plus class="h-4 w-4" /> Add Variant</a
           >
-        </div>
-
+        {/snippet}
         <!-- Variants Table -->
         <Table class="rounded-none border-0 shadow-none">
           <TableHeader>
@@ -540,7 +535,7 @@
             {/if}
           </TableBody>
         </Table>
-      </div>
+      </AdminCard>
       <button
         type="button"
         class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
@@ -553,228 +548,201 @@
     <!-- Sidebar (Right) -->
     <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
       <!-- Visibility Section -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Visibility</h2>
+      <AdminCard title="Visibility" variant="sidebar">
+        <div class="relative">
+          <span
+            class={cn(
+              "pointer-events-none absolute top-1/2 left-3 h-2 w-2 -translate-y-1/2 rounded-full",
+              visibility === "public"
+                ? "bg-green-500"
+                : visibility === "private"
+                  ? "bg-yellow-500"
+                  : "bg-gray-400"
+            )}
+          ></span>
+          <select
+            form="product-form"
+            name="visibility"
+            class="block w-full rounded-md border-input-border pl-7 shadow-sm"
+            bind:value={visibility}
+          >
+            <option value="draft">Draft</option>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
         </div>
-        <div class="p-4">
-          <div class="relative">
-            <span
-              class={cn(
-                "pointer-events-none absolute top-1/2 left-3 h-2 w-2 -translate-y-1/2 rounded-full",
-                visibility === "public"
-                  ? "bg-green-500"
-                  : visibility === "private"
-                    ? "bg-yellow-500"
-                    : "bg-gray-400"
-              )}
-            ></span>
-            <select
-              form="product-form"
-              name="visibility"
-              class="block w-full rounded-md border-input-border pl-7 shadow-sm"
-              bind:value={visibility}
-            >
-              <option value="draft">Draft</option>
-              <option value="public">Public</option>
-              <option value="private">Private</option>
-            </select>
-          </div>
-          <p class="mt-3 text-xs text-muted-foreground">
-            Set this to Public to make it available in the store
-          </p>
-        </div>
-      </div>
+        <p class="mt-3 text-xs text-muted-foreground">
+          Set this to Public to make it available in the store
+        </p>
+      </AdminCard>
 
       <!-- Product Type Section (only shown when multiple types exist) -->
       {#if data.productTypes.length > 1}
-        <div class="rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-4 py-3">
-            <h2 class="font-semibold">Product Type</h2>
-          </div>
-          <div class="p-4">
-            <select
-              form="product-form"
-              name="type"
-              class="block w-full rounded-md border-input-border shadow-sm"
-            >
-              {#each data.productTypes as type}
-                <option value={type} selected={data.product.type === type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
-              {/each}
-            </select>
-          </div>
-        </div>
+        <AdminCard title="Product Type" variant="sidebar">
+          <select
+            form="product-form"
+            name="type"
+            class="block w-full rounded-md border-input-border shadow-sm"
+          >
+            {#each data.productTypes as type}
+              <option value={type} selected={data.product.type === type}>
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </option>
+            {/each}
+          </select>
+        </AdminCard>
       {/if}
 
       <!-- Facet Values Section -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Facet Values</h2>
-        </div>
-
-        <div class="p-4">
-          {#if data.facets.length === 0}
-            <p class="text-sm text-muted-foreground">No facets defined.</p>
-          {:else}
-            <!-- Combobox -->
-            <Popover.Root bind:open={facetComboboxOpen}>
-              <Popover.Trigger
-                class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                aria-expanded={facetComboboxOpen}
-                aria-controls="facet-listbox"
-                aria-haspopup="listbox"
-              >
-                <span class="text-muted-foreground">Select facet values...</span>
-                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Popover.Trigger>
-              <Popover.Content class="w-72 p-0" align="start">
-                <Command.Root>
-                  <Command.Input placeholder="Search facet values..." />
-                  <Command.List id="facet-listbox" class="max-h-64">
-                    <Command.Empty>No facet value found.</Command.Empty>
-                    {#each data.facets as facet}
-                      {#if facet.values.length > 0}
-                        <Command.Group heading={facet.name}>
-                          {#each facet.values as value}
-                            <Command.Item
-                              value="{facet.name} {value.name}"
-                              onSelect={() => toggleFacetValue(value.id)}
-                              class="cursor-pointer"
-                            >
-                              <div class="flex w-full items-center gap-2">
-                                <div class="flex h-4 w-4 items-center justify-center">
-                                  {#if selectedProductFacets.includes(value.id)}
-                                    <Check class="h-4 w-4" />
-                                  {/if}
-                                </div>
-                                <span>{value.name}</span>
+      <AdminCard title="Facet Values" variant="sidebar">
+        {#if data.facets.length === 0}
+          <p class="text-sm text-muted-foreground">No facets defined.</p>
+        {:else}
+          <!-- Combobox -->
+          <Popover.Root bind:open={facetComboboxOpen}>
+            <Popover.Trigger
+              class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+              aria-expanded={facetComboboxOpen}
+              aria-controls="facet-listbox"
+              aria-haspopup="listbox"
+            >
+              <span class="text-muted-foreground">Select facet values...</span>
+              <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Popover.Trigger>
+            <Popover.Content class="w-72 p-0" align="start">
+              <Command.Root>
+                <Command.Input placeholder="Search facet values..." />
+                <Command.List id="facet-listbox" class="max-h-64">
+                  <Command.Empty>No facet value found.</Command.Empty>
+                  {#each data.facets as facet}
+                    {#if facet.values.length > 0}
+                      <Command.Group heading={facet.name}>
+                        {#each facet.values as value}
+                          <Command.Item
+                            value="{facet.name} {value.name}"
+                            onSelect={() => toggleFacetValue(value.id)}
+                            class="cursor-pointer"
+                          >
+                            <div class="flex w-full items-center gap-2">
+                              <div class="flex h-4 w-4 items-center justify-center">
+                                {#if selectedProductFacets.includes(value.id)}
+                                  <Check class="h-4 w-4" />
+                                {/if}
                               </div>
-                            </Command.Item>
-                          {/each}
-                        </Command.Group>
-                      {/if}
-                    {/each}
-                  </Command.List>
-                </Command.Root>
-              </Popover.Content>
-            </Popover.Root>
+                              <span>{value.name}</span>
+                            </div>
+                          </Command.Item>
+                        {/each}
+                      </Command.Group>
+                    {/if}
+                  {/each}
+                </Command.List>
+              </Command.Root>
+            </Popover.Content>
+          </Popover.Root>
 
-            <!-- Selected facet values -->
-            {#if selectedProductFacets.length > 0}
-              <div class="mt-3 flex flex-wrap gap-1.5">
-                {#each getSelectedFacetValueObjects() as fv}
-                  <Badge class="gap-1">
-                    {fv.facetName}: {fv.name}
-                    <button
-                      type="button"
-                      onclick={() => removeFacetValue(fv.id)}
-                      class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-500/20"
-                      aria-label="Remove {fv.name}"
-                    >
-                      <X class="h-3 w-3" />
-                    </button>
-                  </Badge>
-                  <input form="product-form" type="hidden" name="facetValueIds" value={fv.id} />
-                {/each}
-              </div>
-            {/if}
+          <!-- Selected facet values -->
+          {#if selectedProductFacets.length > 0}
+            <div class="mt-3 flex flex-wrap gap-1.5">
+              {#each getSelectedFacetValueObjects() as fv}
+                <Badge class="gap-1">
+                  {fv.facetName}: {fv.name}
+                  <button
+                    type="button"
+                    onclick={() => removeFacetValue(fv.id)}
+                    class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-500/20"
+                    aria-label="Remove {fv.name}"
+                  >
+                    <X class="h-3 w-3" />
+                  </button>
+                </Badge>
+                <input form="product-form" type="hidden" name="facetValueIds" value={fv.id} />
+              {/each}
+            </div>
           {/if}
-        </div>
-      </div>
+        {/if}
+      </AdminCard>
 
       <!-- Categories Section -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Categories</h2>
-        </div>
-
-        <div class="p-4">
-          {#if data.categoryTree.length === 0}
-            <p class="text-sm text-muted-foreground">No categories defined.</p>
-          {:else}
-            <!-- Combobox -->
-            <Popover.Root bind:open={categoryComboboxOpen}>
-              <Popover.Trigger
-                class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                aria-expanded={categoryComboboxOpen}
-                aria-controls="category-listbox"
-                aria-haspopup="listbox"
-              >
-                <span class="text-muted-foreground">Select categories...</span>
-                <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Popover.Trigger>
-              <Popover.Content class="w-72 p-0" align="start">
-                <Command.Root>
-                  <Command.Input placeholder="Search categories..." />
-                  <Command.List id="category-listbox" class="max-h-64">
-                    <Command.Empty>No category found.</Command.Empty>
-                    <Command.Group>
-                      {#each flatCategories as category}
-                        <Command.Item
-                          value={category.name}
-                          onSelect={() => toggleCategory(category.id)}
-                          class="cursor-pointer"
-                        >
-                          <div class="flex w-full items-center gap-2">
-                            <div class="flex h-4 w-4 items-center justify-center">
-                              {#if selectedCategories.includes(category.id)}
-                                <Check class="h-4 w-4" />
-                              {/if}
-                            </div>
-                            <span>{"— ".repeat(category.depth)}{category.name}</span>
+      <AdminCard title="Categories" variant="sidebar">
+        {#if data.categoryTree.length === 0}
+          <p class="text-sm text-muted-foreground">No categories defined.</p>
+        {:else}
+          <!-- Combobox -->
+          <Popover.Root bind:open={categoryComboboxOpen}>
+            <Popover.Trigger
+              class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+              aria-expanded={categoryComboboxOpen}
+              aria-controls="category-listbox"
+              aria-haspopup="listbox"
+            >
+              <span class="text-muted-foreground">Select categories...</span>
+              <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            </Popover.Trigger>
+            <Popover.Content class="w-72 p-0" align="start">
+              <Command.Root>
+                <Command.Input placeholder="Search categories..." />
+                <Command.List id="category-listbox" class="max-h-64">
+                  <Command.Empty>No category found.</Command.Empty>
+                  <Command.Group>
+                    {#each flatCategories as category}
+                      <Command.Item
+                        value={category.name}
+                        onSelect={() => toggleCategory(category.id)}
+                        class="cursor-pointer"
+                      >
+                        <div class="flex w-full items-center gap-2">
+                          <div class="flex h-4 w-4 items-center justify-center">
+                            {#if selectedCategories.includes(category.id)}
+                              <Check class="h-4 w-4" />
+                            {/if}
                           </div>
-                        </Command.Item>
-                      {/each}
-                    </Command.Group>
-                  </Command.List>
-                </Command.Root>
-              </Popover.Content>
-            </Popover.Root>
+                          <span>{"— ".repeat(category.depth)}{category.name}</span>
+                        </div>
+                      </Command.Item>
+                    {/each}
+                  </Command.Group>
+                </Command.List>
+              </Command.Root>
+            </Popover.Content>
+          </Popover.Root>
 
-            <!-- Selected categories -->
-            {#if selectedCategories.length > 0}
-              <div class="mt-3 flex flex-wrap gap-1.5">
-                {#each getSelectedCategoryObjects() as category}
-                  <Badge class="gap-1">
-                    {category.name}
-                    <button
-                      type="button"
-                      onclick={() => removeCategory(category.id)}
-                      class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-500/20"
-                      aria-label="Remove {category.name}"
-                    >
-                      <X class="h-3 w-3" />
-                    </button>
-                  </Badge>
-                  <input form="product-form" type="hidden" name="categoryIds" value={category.id} />
-                {/each}
-              </div>
-            {/if}
+          <!-- Selected categories -->
+          {#if selectedCategories.length > 0}
+            <div class="mt-3 flex flex-wrap gap-1.5">
+              {#each getSelectedCategoryObjects() as category}
+                <Badge class="gap-1">
+                  {category.name}
+                  <button
+                    type="button"
+                    onclick={() => removeCategory(category.id)}
+                    class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-500/20"
+                    aria-label="Remove {category.name}"
+                  >
+                    <X class="h-3 w-3" />
+                  </button>
+                </Badge>
+                <input form="product-form" type="hidden" name="categoryIds" value={category.id} />
+              {/each}
+            </div>
           {/if}
-        </div>
-      </div>
+        {/if}
+      </AdminCard>
 
       <!-- Collections Section -->
       {#if data.productCollections.length > 0}
-        <div class="rounded-lg bg-surface shadow">
-          <div class="border-b border-border px-4 py-3">
-            <h2 class="font-semibold">Collections</h2>
+        <AdminCard title="Collections" variant="sidebar">
+          <div class="space-y-1.5">
+            {#each data.productCollections as collection}
+              <a
+                href="/admin/collections/{collection.id}"
+                class="block text-sm text-blue-600 hover:underline dark:text-blue-400"
+              >
+                {collection.name}
+              </a>
+            {/each}
           </div>
-          <div class="p-4">
-            <div class="space-y-1.5">
-              {#each data.productCollections as collection}
-                <a
-                  href="/admin/collections/{collection.id}"
-                  class="block text-sm text-blue-600 hover:underline dark:text-blue-400"
-                >
-                  {collection.name}
-                </a>
-              {/each}
-            </div>
-          </div>
-        </div>
+        </AdminCard>
       {/if}
     </div>
   </div>

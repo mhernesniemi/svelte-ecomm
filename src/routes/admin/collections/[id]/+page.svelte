@@ -13,6 +13,7 @@
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
@@ -534,9 +535,8 @@
       </form>
 
       <!-- Collection Filters -->
-      <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="flex items-center justify-between border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Filters</h2>
+      <AdminCard title="Filters">
+        {#snippet headerActions()}
           <!-- Add filter dropdown -->
           <DropdownMenu.Root bind:open={addFilterOpen}>
             <DropdownMenu.Trigger>
@@ -560,262 +560,253 @@
               {/each}
             </DropdownMenu.Content>
           </DropdownMenu.Root>
-        </div>
+        {/snippet}
 
-        <div class="p-6">
-          {#if localFilters.length > 0}
-            <div class="space-y-3">
-              {#each localFilters as filter, index (filter.key)}
-                {#if index > 0}
-                  <div class="flex justify-center">
-                    <span
-                      class="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground-secondary"
-                      >AND</span
-                    >
-                  </div>
-                {/if}
-                <div class="rounded-lg border border-border">
-                  <!-- Card header -->
-                  <div class="flex items-center justify-between border-b border-border px-4 py-2.5">
-                    <span class="text-sm font-medium text-foreground"
-                      >{getFieldLabel(filter.field)}</span
-                    >
-                    <button
-                      type="button"
-                      onclick={() => removeFilter(index)}
-                      class="rounded p-1 text-muted-foreground hover:bg-destructive-subtle hover:text-red-600"
-                      aria-label="Remove filter"
-                    >
-                      <X class="h-4 w-4" />
-                    </button>
-                  </div>
+        {#if localFilters.length > 0}
+          <div class="space-y-3">
+            {#each localFilters as filter, index (filter.key)}
+              {#if index > 0}
+                <div class="flex justify-center">
+                  <span
+                    class="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground-secondary"
+                    >AND</span
+                  >
+                </div>
+              {/if}
+              <div class="rounded-lg border border-border">
+                <!-- Card header -->
+                <div class="flex items-center justify-between border-b border-border px-4 py-2.5">
+                  <span class="text-sm font-medium text-foreground"
+                    >{getFieldLabel(filter.field)}</span
+                  >
+                  <button
+                    type="button"
+                    onclick={() => removeFilter(index)}
+                    class="rounded p-1 text-muted-foreground hover:bg-destructive-subtle hover:text-red-600"
+                    aria-label="Remove filter"
+                  >
+                    <X class="h-4 w-4" />
+                  </button>
+                </div>
 
-                  <!-- Card body -->
-                  <div class="p-4">
-                    {#if filter.field === "facet"}
-                      {@const selected = Array.isArray(filter.value)
-                        ? (filter.value as number[])
-                        : []}
-                      <Popover.Root
-                        open={openPopover === filter.key}
-                        onOpenChange={(open) => (openPopover = open ? filter.key : null)}
+                <!-- Card body -->
+                <div class="p-4">
+                  {#if filter.field === "facet"}
+                    {@const selected = Array.isArray(filter.value)
+                      ? (filter.value as number[])
+                      : []}
+                    <Popover.Root
+                      open={openPopover === filter.key}
+                      onOpenChange={(open) => (openPopover = open ? filter.key : null)}
+                    >
+                      <Popover.Trigger
+                        class="flex items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                        aria-expanded={openPopover === filter.key}
+                        aria-haspopup="listbox"
                       >
-                        <Popover.Trigger
-                          class="flex items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                          aria-expanded={openPopover === filter.key}
-                          aria-haspopup="listbox"
-                        >
-                          <span class="text-muted-foreground">Select facet values</span>
-                          <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Popover.Trigger>
-                        <Popover.Content class="w-72 p-0" align="start">
-                          <Command.Root>
-                            <Command.Input placeholder="Search facet values..." />
-                            <Command.List class="max-h-64">
-                              <Command.Empty>No facet values found.</Command.Empty>
-                              {#each data.facets as facet}
-                                <Command.Group heading={facet.name ?? facet.code}>
-                                  {#each facet.values as value}
-                                    <Command.Item
-                                      value="{facet.name ?? facet.code} {value.name ?? value.code}"
-                                      onSelect={() => toggleArrayValue(index, value.id)}
-                                      class="cursor-pointer"
-                                    >
-                                      <div class="flex w-full items-center gap-2">
-                                        <div class="flex h-4 w-4 items-center justify-center">
-                                          {#if selected.includes(value.id)}
-                                            <Check class="h-4 w-4" />
-                                          {/if}
-                                        </div>
-                                        <span>{value.name ?? value.code}</span>
+                        <span class="text-muted-foreground">Select facet values</span>
+                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Popover.Trigger>
+                      <Popover.Content class="w-72 p-0" align="start">
+                        <Command.Root>
+                          <Command.Input placeholder="Search facet values..." />
+                          <Command.List class="max-h-64">
+                            <Command.Empty>No facet values found.</Command.Empty>
+                            {#each data.facets as facet}
+                              <Command.Group heading={facet.name ?? facet.code}>
+                                {#each facet.values as value}
+                                  <Command.Item
+                                    value="{facet.name ?? facet.code} {value.name ?? value.code}"
+                                    onSelect={() => toggleArrayValue(index, value.id)}
+                                    class="cursor-pointer"
+                                  >
+                                    <div class="flex w-full items-center gap-2">
+                                      <div class="flex h-4 w-4 items-center justify-center">
+                                        {#if selected.includes(value.id)}
+                                          <Check class="h-4 w-4" />
+                                        {/if}
                                       </div>
-                                    </Command.Item>
-                                  {/each}
-                                </Command.Group>
-                              {/each}
-                            </Command.List>
-                          </Command.Root>
-                        </Popover.Content>
-                      </Popover.Root>
-                      {#if selected.length > 0}
-                        <div class="mt-3 flex flex-wrap gap-1.5">
-                          {#each selected as id}
-                            <Badge class="gap-1 text-sm">
-                              {getFacetValueName(id)}
-                              <button
-                                type="button"
-                                onclick={() => toggleArrayValue(index, id)}
-                                class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-500/20"
-                                aria-label="Remove {getFacetValueName(id)}"
-                              >
-                                <X class="h-3 w-3" />
-                              </button>
-                            </Badge>
-                          {/each}
-                        </div>
-                      {/if}
-                    {:else if filter.field === "product"}
-                      {@const selected = Array.isArray(filter.value)
-                        ? (filter.value as number[])
-                        : []}
-                      <Popover.Root
-                        open={openPopover === filter.key}
-                        onOpenChange={(open) => (openPopover = open ? filter.key : null)}
-                      >
-                        <Popover.Trigger
-                          class="flex items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                          aria-expanded={openPopover === filter.key}
-                          aria-haspopup="listbox"
-                        >
-                          <span class="text-muted-foreground">Select products</span>
-                          <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Popover.Trigger>
-                        <Popover.Content
-                          class="w-[var(--bits-popover-trigger-width)] p-0"
-                          align="start"
-                        >
-                          <Command.Root>
-                            <Command.Input placeholder="Search products..." />
-                            <Command.List class="max-h-60">
-                              <Command.Empty>No products found.</Command.Empty>
-                              {#each data.products as product}
-                                <Command.Item
-                                  value={getProductName(product)}
-                                  onSelect={() => toggleArrayValue(index, product.id)}
-                                  class="cursor-pointer"
-                                >
-                                  <div class="flex w-full items-center gap-2">
-                                    <div class="flex h-4 w-4 items-center justify-center">
-                                      {#if selected.includes(product.id)}
-                                        <Check class="h-4 w-4" />
-                                      {/if}
+                                      <span>{value.name ?? value.code}</span>
                                     </div>
-                                    <span>{getProductName(product)}</span>
-                                  </div>
-                                </Command.Item>
-                              {/each}
-                            </Command.List>
-                          </Command.Root>
-                        </Popover.Content>
-                      </Popover.Root>
-                      {#if selected.length > 0}
-                        <div class="mt-3 flex flex-wrap gap-1.5">
-                          {#each selected as id}
-                            <Badge class="gap-1 text-sm">
-                              {getProductNameById(id)}
-                              <button
-                                type="button"
-                                onclick={() => toggleArrayValue(index, id)}
-                                class="ml-0.5 rounded-full p-0.5 hover:bg-muted-strong"
-                                aria-label="Remove {getProductNameById(id)}"
+                                  </Command.Item>
+                                {/each}
+                              </Command.Group>
+                            {/each}
+                          </Command.List>
+                        </Command.Root>
+                      </Popover.Content>
+                    </Popover.Root>
+                    {#if selected.length > 0}
+                      <div class="mt-3 flex flex-wrap gap-1.5">
+                        {#each selected as id}
+                          <Badge class="gap-1 text-sm">
+                            {getFacetValueName(id)}
+                            <button
+                              type="button"
+                              onclick={() => toggleArrayValue(index, id)}
+                              class="ml-0.5 rounded-full p-0.5 hover:bg-blue-200 dark:hover:bg-blue-500/20"
+                              aria-label="Remove {getFacetValueName(id)}"
+                            >
+                              <X class="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        {/each}
+                      </div>
+                    {/if}
+                  {:else if filter.field === "product"}
+                    {@const selected = Array.isArray(filter.value)
+                      ? (filter.value as number[])
+                      : []}
+                    <Popover.Root
+                      open={openPopover === filter.key}
+                      onOpenChange={(open) => (openPopover = open ? filter.key : null)}
+                    >
+                      <Popover.Trigger
+                        class="flex items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                        aria-expanded={openPopover === filter.key}
+                        aria-haspopup="listbox"
+                      >
+                        <span class="text-muted-foreground">Select products</span>
+                        <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Popover.Trigger>
+                      <Popover.Content
+                        class="w-[var(--bits-popover-trigger-width)] p-0"
+                        align="start"
+                      >
+                        <Command.Root>
+                          <Command.Input placeholder="Search products..." />
+                          <Command.List class="max-h-60">
+                            <Command.Empty>No products found.</Command.Empty>
+                            {#each data.products as product}
+                              <Command.Item
+                                value={getProductName(product)}
+                                onSelect={() => toggleArrayValue(index, product.id)}
+                                class="cursor-pointer"
                               >
-                                <X class="h-3 w-3" />
-                              </button>
-                            </Badge>
-                          {/each}
-                        </div>
-                      {/if}
-                    {:else if filter.field === "price"}
-                      <div class="flex items-center gap-3">
-                        <select
-                          class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
-                          value={filter.operator}
-                          onchange={(e) => {
-                            localFilters[index] = {
-                              ...filter,
-                              operator: (e.target as HTMLSelectElement).value
-                            };
-                          }}
-                        >
-                          <option value="gte">at least</option>
-                          <option value="lte">at most</option>
-                        </select>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                          value={typeof filter.value === "number"
-                            ? (filter.value / 100).toFixed(2)
-                            : ""}
-                          placeholder="0.00"
-                          onchange={(e) => {
-                            localFilters[index] = {
-                              ...filter,
-                              value: Math.round(Number((e.target as HTMLInputElement).value) * 100)
-                            };
-                          }}
-                        />
-                        <span class="text-sm text-muted-foreground">{BASE_CURRENCY}</span>
+                                <div class="flex w-full items-center gap-2">
+                                  <div class="flex h-4 w-4 items-center justify-center">
+                                    {#if selected.includes(product.id)}
+                                      <Check class="h-4 w-4" />
+                                    {/if}
+                                  </div>
+                                  <span>{getProductName(product)}</span>
+                                </div>
+                              </Command.Item>
+                            {/each}
+                          </Command.List>
+                        </Command.Root>
+                      </Popover.Content>
+                    </Popover.Root>
+                    {#if selected.length > 0}
+                      <div class="mt-3 flex flex-wrap gap-1.5">
+                        {#each selected as id}
+                          <Badge class="gap-1 text-sm">
+                            {getProductNameById(id)}
+                            <button
+                              type="button"
+                              onclick={() => toggleArrayValue(index, id)}
+                              class="ml-0.5 rounded-full p-0.5 hover:bg-muted-strong"
+                              aria-label="Remove {getProductNameById(id)}"
+                            >
+                              <X class="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        {/each}
                       </div>
-                    {:else if filter.field === "stock"}
-                      <div class="flex items-center gap-3">
-                        <select
-                          class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
-                          value={filter.operator}
-                          onchange={(e) => {
-                            localFilters[index] = {
-                              ...filter,
-                              operator: (e.target as HTMLSelectElement).value
-                            };
-                          }}
-                        >
-                          <option value="gt">more than</option>
-                          <option value="gte">at least</option>
-                        </select>
-                        <input
-                          type="number"
-                          class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                          value={filter.value}
-                          placeholder="Stock level"
-                          onchange={(e) => {
-                            localFilters[index] = {
-                              ...filter,
-                              value: Number((e.target as HTMLInputElement).value)
-                            };
-                          }}
-                        />
-                      </div>
-                    {:else if filter.field === "visibility"}
+                    {/if}
+                  {:else if filter.field === "price"}
+                    <div class="flex items-center gap-3">
                       <select
-                        name="visibility"
                         class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
-                        value={filter.value}
+                        value={filter.operator}
                         onchange={(e) => {
                           localFilters[index] = {
                             ...filter,
-                            value: (e.target as HTMLSelectElement).value
+                            operator: (e.target as HTMLSelectElement).value
                           };
                         }}
                       >
-                        <option value="public">Public</option>
-                        <option value="private">Private</option>
-                        <option value="draft">Draft</option>
+                        <option value="gte">at least</option>
+                        <option value="lte">at most</option>
                       </select>
-                    {/if}
-                  </div>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                        value={typeof filter.value === "number"
+                          ? (filter.value / 100).toFixed(2)
+                          : ""}
+                        placeholder="0.00"
+                        onchange={(e) => {
+                          localFilters[index] = {
+                            ...filter,
+                            value: Math.round(Number((e.target as HTMLInputElement).value) * 100)
+                          };
+                        }}
+                      />
+                      <span class="text-sm text-muted-foreground">{BASE_CURRENCY}</span>
+                    </div>
+                  {:else if filter.field === "stock"}
+                    <div class="flex items-center gap-3">
+                      <select
+                        class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
+                        value={filter.operator}
+                        onchange={(e) => {
+                          localFilters[index] = {
+                            ...filter,
+                            operator: (e.target as HTMLSelectElement).value
+                          };
+                        }}
+                      >
+                        <option value="gt">more than</option>
+                        <option value="gte">at least</option>
+                      </select>
+                      <input
+                        type="number"
+                        class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                        value={filter.value}
+                        placeholder="Stock level"
+                        onchange={(e) => {
+                          localFilters[index] = {
+                            ...filter,
+                            value: Number((e.target as HTMLInputElement).value)
+                          };
+                        }}
+                      />
+                    </div>
+                  {:else if filter.field === "visibility"}
+                    <select
+                      name="visibility"
+                      class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
+                      value={filter.value}
+                      onchange={(e) => {
+                        localFilters[index] = {
+                          ...filter,
+                          value: (e.target as HTMLSelectElement).value
+                        };
+                      }}
+                    >
+                      <option value="public">Public</option>
+                      <option value="private">Private</option>
+                      <option value="draft">Draft</option>
+                    </select>
+                  {/if}
                 </div>
-              {/each}
-            </div>
-          {:else}
-            <div class="rounded-lg border border-dashed border-input-border p-6 text-center">
-              <p class="text-sm text-muted-foreground">
-                No filters defined. Add a filter to populate this collection.
-              </p>
-            </div>
-          {/if}
-        </div>
-      </div>
+              </div>
+            {/each}
+          </div>
+        {:else}
+          <div class="rounded-lg border border-dashed border-input-border p-6 text-center">
+            <p class="text-sm text-muted-foreground">
+              No filters defined. Add a filter to populate this collection.
+            </p>
+          </div>
+        {/if}
+      </AdminCard>
 
       <!-- Products -->
-      <div class="overflow-hidden rounded-lg bg-surface pb-4 shadow">
-        <div class="border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">
-            Preview Products <span class="text-base font-normal text-foreground-secondary"
-              >({previewCount ?? data.productCount})</span
-            >
-          </h2>
-        </div>
+      <AdminCard title="Preview Products ({previewCount ?? data.productCount})" noPadding>
         <div class="px-6 pt-4">
           <DataTable
             data={previewProducts ?? data.preview}
@@ -826,7 +817,7 @@
             emptyDescription="Add filters above to populate this collection."
           />
         </div>
-      </div>
+      </AdminCard>
 
       <button
         type="button"
@@ -840,27 +831,21 @@
     <!-- Sidebar (Right) -->
     <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
       <!-- Private Section -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Visibility</h2>
+      <AdminCard title="Visibility" variant="sidebar">
+        <div class="flex items-center gap-2">
+          <Checkbox id="is_private" bind:checked={isPrivate} />
+          <label for="is_private" class="text-sm font-medium text-foreground-secondary">
+            Private collection
+          </label>
         </div>
-        <div class="p-4">
-          <div class="flex items-center gap-2">
-            <Checkbox id="is_private" bind:checked={isPrivate} />
-            <label for="is_private" class="text-sm font-medium text-foreground-secondary">
-              Private collection
-            </label>
-          </div>
-          <p class="mt-3 text-xs text-muted-foreground">
-            Private collections are not visible in the shop
-          </p>
-        </div>
-      </div>
+        <p class="mt-3 text-xs text-muted-foreground">
+          Private collections are not visible in the shop
+        </p>
+      </AdminCard>
 
       <!-- Images Section -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Image</h2>
+      <AdminCard title="Image" variant="sidebar">
+        {#snippet headerActions()}
           {#if !data.collection.featuredAsset}
             <Button
               type="button"
@@ -873,57 +858,54 @@
               Add
             </Button>
           {/if}
-        </div>
-
-        <div class="p-4">
-          {#if data.collection.featuredAsset}
-            {@const asset = data.collection.featuredAsset}
-            <div class="group relative">
-              <img
-                src="{asset.source}?tr=w-400,h-400,fo-auto"
-                alt={asset.alt || asset.name}
-                class="h-48 w-full rounded border border-border object-cover"
-              />
-              <div
-                class="absolute inset-0 flex items-center justify-center gap-1 rounded bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+        {/snippet}
+        {#if data.collection.featuredAsset}
+          {@const asset = data.collection.featuredAsset}
+          <div class="group relative">
+            <img
+              src="{asset.source}?tr=w-400,h-400,fo-auto"
+              alt={asset.alt || asset.name}
+              class="h-48 w-full rounded border border-border object-cover"
+            />
+            <div
+              class="absolute inset-0 flex items-center justify-center gap-1 rounded bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                class="h-7 w-7 p-0"
+                onclick={() =>
+                  (editingImageAlt = {
+                    id: asset.id,
+                    alt: asset.alt || ""
+                  })}
               >
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="secondary"
-                  class="h-7 w-7 p-0"
-                  onclick={() =>
-                    (editingImageAlt = {
-                      id: asset.id,
-                      alt: asset.alt || ""
-                    })}
-                >
-                  <Pencil class="h-3.5 w-3.5" />
+                <Pencil class="h-3.5 w-3.5" />
+              </Button>
+              <form
+                method="POST"
+                action="?/removeImage"
+                use:enhance={() => {
+                  return async ({ result, update }) => {
+                    await update();
+                    if (result.type === "success") {
+                      toast.success("Image removed");
+                    }
+                  };
+                }}
+              >
+                <input type="hidden" name="assetId" value={asset.id} />
+                <Button type="submit" variant="destructive" size="sm" class="h-7 w-7 p-0">
+                  <Trash2 class="h-3.5 w-3.5" />
                 </Button>
-                <form
-                  method="POST"
-                  action="?/removeImage"
-                  use:enhance={() => {
-                    return async ({ result, update }) => {
-                      await update();
-                      if (result.type === "success") {
-                        toast.success("Image removed");
-                      }
-                    };
-                  }}
-                >
-                  <input type="hidden" name="assetId" value={asset.id} />
-                  <Button type="submit" variant="destructive" size="sm" class="h-7 w-7 p-0">
-                    <Trash2 class="h-3.5 w-3.5" />
-                  </Button>
-                </form>
-              </div>
+              </form>
             </div>
-          {:else}
-            <p class="py-4 text-center text-sm text-muted-foreground">No image yet</p>
-          {/if}
-        </div>
-      </div>
+          </div>
+        {:else}
+          <p class="py-4 text-center text-sm text-muted-foreground">No image yet</p>
+        {/if}
+      </AdminCard>
     </div>
   </div>
 

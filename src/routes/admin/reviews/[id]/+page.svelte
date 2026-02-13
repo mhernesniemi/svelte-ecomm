@@ -3,6 +3,7 @@
   import { toast } from "svelte-sonner";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
+  import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import type { PageData, ActionData } from "./$types";
@@ -51,52 +52,42 @@
     <!-- Main Content -->
     <div class="flex-1 space-y-6">
       <!-- Review Content -->
-      <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Review</h2>
+      <AdminCard title="Review">
+        <div class="mb-6">
+          <h3 class="mb-1 text-sm font-medium text-foreground-secondary">Rating</h3>
+          <span class="text-2xl text-yellow-500">{formatRating(data.review.rating)}</span>
         </div>
-        <div class="p-6">
-          <div class="mb-6">
-            <h3 class="mb-1 text-sm font-medium text-foreground-secondary">Rating</h3>
-            <span class="text-2xl text-yellow-500">{formatRating(data.review.rating)}</span>
-          </div>
 
-          <div>
-            <h3 class="mb-1 text-sm font-medium text-foreground-secondary">Comment</h3>
-            {#if data.review.comment}
-              <p class="whitespace-pre-wrap text-foreground">{data.review.comment}</p>
-            {:else}
-              <p class="text-placeholder">No comment</p>
-            {/if}
-          </div>
+        <div>
+          <h3 class="mb-1 text-sm font-medium text-foreground-secondary">Comment</h3>
+          {#if data.review.comment}
+            <p class="whitespace-pre-wrap text-foreground">{data.review.comment}</p>
+          {:else}
+            <p class="text-placeholder">No comment</p>
+          {/if}
         </div>
-      </div>
+      </AdminCard>
 
       <!-- Moderation -->
-      <div class="overflow-hidden rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-6 py-4">
-          <h2 class="text-lg font-semibold">Moderation</h2>
+      <AdminCard title="Moderation">
+        <div class="flex items-center gap-3">
+          {#if data.review.status !== "approved"}
+            <form method="POST" action="?/approve" use:enhance>
+              <Button type="submit">Approve</Button>
+            </form>
+          {/if}
+          {#if data.review.status !== "rejected"}
+            <form method="POST" action="?/reject" use:enhance>
+              <Button type="submit" variant="outline">Reject</Button>
+            </form>
+          {/if}
+          {#if data.review.status === "approved" || data.review.status === "rejected"}
+            <span class="text-sm text-foreground-tertiary">
+              This review is currently <span class="font-medium">{data.review.status}</span>.
+            </span>
+          {/if}
         </div>
-        <div class="p-6">
-          <div class="flex items-center gap-3">
-            {#if data.review.status !== "approved"}
-              <form method="POST" action="?/approve" use:enhance>
-                <Button type="submit">Approve</Button>
-              </form>
-            {/if}
-            {#if data.review.status !== "rejected"}
-              <form method="POST" action="?/reject" use:enhance>
-                <Button type="submit" variant="outline">Reject</Button>
-              </form>
-            {/if}
-            {#if data.review.status === "approved" || data.review.status === "rejected"}
-              <span class="text-sm text-foreground-tertiary">
-                This review is currently <span class="font-medium">{data.review.status}</span>.
-              </span>
-            {/if}
-          </div>
-        </div>
-      </div>
+      </AdminCard>
 
       <button
         type="button"
@@ -110,23 +101,15 @@
     <!-- Sidebar -->
     <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
       <!-- Status -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Status</h2>
-        </div>
-        <div class="p-4">
-          <Badge variant={getStatusVariant(data.review.status)} class="capitalize">
-            {data.review.status}
-          </Badge>
-        </div>
-      </div>
+      <AdminCard title="Status" variant="sidebar">
+        <Badge variant={getStatusVariant(data.review.status)} class="capitalize">
+          {data.review.status}
+        </Badge>
+      </AdminCard>
 
       <!-- Details -->
-      <div class="rounded-lg bg-surface shadow">
-        <div class="border-b border-border px-4 py-3">
-          <h2 class="font-semibold">Details</h2>
-        </div>
-        <div class="space-y-3 p-4 text-sm">
+      <AdminCard title="Details" variant="sidebar">
+        <div class="space-y-3 text-sm">
           <div>
             <span class="text-foreground-secondary">Product</span>
             {#if data.product}
@@ -173,7 +156,7 @@
             <p class="font-medium">{formatDate(data.review.createdAt)}</p>
           </div>
         </div>
-      </div>
+      </AdminCard>
     </div>
   </div>
 </div>
