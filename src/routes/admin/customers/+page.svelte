@@ -3,7 +3,8 @@
   import { toast } from "svelte-sonner";
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
-  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Button } from "$lib/components/admin/ui/button";
+  import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import UsersRound from "@lucide/svelte/icons/users-round";
@@ -18,6 +19,9 @@
   let showBulkDelete = $state(false);
   let pendingDeleteIds = $state<number[]>([]);
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
+
+  // Group create dialog
+  let showCreateGroup = $state(false);
 
   // Group bulk delete
   let showGroupBulkDelete = $state(false);
@@ -194,9 +198,7 @@
   <!-- Customer Groups Tab -->
   {#if activeTab === "groups"}
     <div class="mb-4 flex items-center justify-end">
-      <a href="/admin/customers/groups/new" class={buttonVariants({ variant: "default" })}>
-        Add Group
-      </a>
+      <Button onclick={() => (showCreateGroup = true)}>Add Group</Button>
     </div>
     <DataTable
       data={data.groups}
@@ -221,13 +223,18 @@
         </Button>
       {/snippet}
       {#snippet emptyAction()}
-        <a href="/admin/customers/groups/new" class={buttonVariants({ variant: "default" })}>
-          Add Group
-        </a>
+        <Button onclick={() => (showCreateGroup = true)}>Add Group</Button>
       {/snippet}
     </DataTable>
   {/if}
 </div>
+
+<CreateDialog
+  bind:open={showCreateGroup}
+  title="New Customer Group"
+  action="?/createGroup"
+  placeholder="e.g., Wholesale"
+/>
 
 <DeleteConfirmDialog
   bind:open={showBulkDelete}

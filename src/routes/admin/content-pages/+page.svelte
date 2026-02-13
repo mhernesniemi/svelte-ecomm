@@ -1,17 +1,18 @@
 <script lang="ts">
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
-  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Button } from "$lib/components/admin/ui/button";
+  import CreateDialog from "$lib/components/admin/CreateDialog.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FileText from "@lucide/svelte/icons/file-text";
   import type { PageData } from "./$types";
-  import PlusIcon from "@lucide/svelte/icons/plus";
   import { Badge } from "$lib/components/admin/ui/badge";
   import { formatDate } from "$lib/utils";
 
   let { data }: { data: PageData } = $props();
 
+  let showCreatePage = $state(false);
   let showBulkDelete = $state(false);
   let pendingDeleteIds = $state<number[]>([]);
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
@@ -86,9 +87,7 @@
       <h1 class="text-2xl font-bold text-foreground">Content Pages</h1>
     </div>
     {#if data.pages.length > 0}
-      <a href="/admin/content-pages/new" class={buttonVariants()}
-        ><PlusIcon class="h-4 w-4" /> Add Page</a
-      >
+      <Button onclick={() => (showCreatePage = true)}>Add Page</Button>
     {/if}
   </div>
 
@@ -115,10 +114,17 @@
       </Button>
     {/snippet}
     {#snippet emptyAction()}
-      <a href="/admin/content-pages/new" class={buttonVariants()}>Create Page</a>
+      <Button onclick={() => (showCreatePage = true)}>Create Page</Button>
     {/snippet}
   </DataTable>
 </div>
+
+<CreateDialog
+  bind:open={showCreatePage}
+  title="New Content Page"
+  action="?/createPage"
+  placeholder="e.g., About Us"
+/>
 
 <DeleteConfirmDialog
   bind:open={showBulkDelete}

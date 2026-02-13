@@ -1393,6 +1393,7 @@ export const contentPages = pgTable("content_pages", {
 	title: varchar("title", { length: 255 }).default("").notNull(),
 	slug: varchar("slug", { length: 255 }).default("").notNull(),
 	body: text("body"),
+	imageUrl: varchar("image_url", { length: 500 }),
 	published: boolean("published").default(false).notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at")

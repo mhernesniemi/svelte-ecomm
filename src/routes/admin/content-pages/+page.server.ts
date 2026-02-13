@@ -1,5 +1,6 @@
 import { contentPageService } from "$lib/server/services/content-pages.js";
-import { fail } from "@sveltejs/kit";
+import { fail, redirect, isRedirect } from "@sveltejs/kit";
+import { slugify } from "$lib/utils.js";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
@@ -8,6 +9,27 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
+	createPage: async ({ request }) => {
+		const formData = await request.formData();
+		const name = formData.get("name") as string;
+		const slug = formData.get("slug") as string;
+
+		if (!name) {
+			return fail(400, { error: "Title is required" });
+		}
+
+		try {
+			const page = await contentPageService.create({
+				title: name,
+				slug: slugify(slug || name)
+			});
+			throw redirect(303, `/admin/content-pages/${page.id}?created=1`);
+		} catch (err) {
+			if (isRedirect(err)) throw err;
+			return fail(500, { error: "Failed to create page" });
+		}
+	},
+
 	deleteSelected: async ({ request }) => {
 		const formData = await request.formData();
 		const ids = formData.getAll("ids").map(Number).filter(Boolean);

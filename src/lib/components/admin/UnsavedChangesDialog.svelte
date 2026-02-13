@@ -23,7 +23,7 @@
   <Dialog.Content>
     <Dialog.Header>
       <Dialog.Title>Unsaved changes</Dialog.Title>
-      <Dialog.Description>
+      <Dialog.Description class="mt-1 mb-6">
         You have unsaved changes. Are you sure you want to leave?
       </Dialog.Description>
     </Dialog.Header>

@@ -30,6 +30,7 @@ export const actions: Actions = {
 		const title = data.get("title") as string;
 		const slug = data.get("slug") as string;
 		const body = data.get("body") as string;
+		const imageUrl = data.get("imageUrl") as string | null;
 		const published = data.get("published") === "on";
 
 		if (!title || !slug) {
@@ -41,7 +42,8 @@ export const actions: Actions = {
 				published,
 				title,
 				slug: slugify(slug),
-				body: body || undefined
+				body: body || undefined,
+				imageUrl: imageUrl || null
 			});
 
 			// Save translations

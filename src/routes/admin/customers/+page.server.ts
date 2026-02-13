@@ -1,6 +1,6 @@
 import { customerService } from "$lib/server/services/customers.js";
 import { customerGroupService } from "$lib/server/services/customerGroups.js";
-import { fail } from "@sveltejs/kit";
+import { fail, redirect, isRedirect } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
 export const load: PageServerLoad = async () => {
@@ -29,6 +29,23 @@ export const actions: Actions = {
 			return { success: true, message: "Customers deleted" };
 		} catch {
 			return fail(500, { error: "Failed to delete customers" });
+		}
+	},
+
+	createGroup: async ({ request }) => {
+		const formData = await request.formData();
+		const name = formData.get("name") as string;
+
+		if (!name) {
+			return fail(400, { error: "Name is required" });
+		}
+
+		try {
+			const group = await customerGroupService.create({ name });
+			throw redirect(303, `/admin/customers/groups/${group.id}?created`);
+		} catch (error) {
+			if (isRedirect(error)) throw error;
+			return fail(500, { error: "Failed to create group" });
 		}
 	},
 

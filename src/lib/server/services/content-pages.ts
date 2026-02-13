@@ -32,6 +32,7 @@ export class ContentPageService {
 		title: string;
 		slug: string;
 		body?: string;
+		imageUrl?: string | null;
 		published?: boolean;
 	}): Promise<ContentPage> {
 		const [page] = await db
@@ -40,6 +41,7 @@ export class ContentPageService {
 				title: input.title,
 				slug: input.slug,
 				body: input.body ?? null,
+				imageUrl: input.imageUrl ?? null,
 				published: input.published ?? false
 			})
 			.returning();
@@ -53,6 +55,7 @@ export class ContentPageService {
 			title?: string;
 			slug?: string;
 			body?: string;
+			imageUrl?: string | null;
 			published?: boolean;
 		}
 	): Promise<ContentPage | null> {
@@ -64,6 +67,7 @@ export class ContentPageService {
 		if (input.title !== undefined) updateData.title = input.title;
 		if (input.slug !== undefined) updateData.slug = input.slug;
 		if (input.body !== undefined) updateData.body = input.body;
+		if (input.imageUrl !== undefined) updateData.imageUrl = input.imageUrl;
 
 		if (Object.keys(updateData).length > 0) {
 			await db.update(contentPages).set(updateData).where(eq(contentPages.id, id));

@@ -18,6 +18,10 @@
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
+  import Upload from "@lucide/svelte/icons/upload";
+  import Loader2 from "@lucide/svelte/icons/loader-2";
+  import X from "@lucide/svelte/icons/x";
+  import ImageIcon from "@lucide/svelte/icons/image";
   let { data, form } = $props();
 
   onMount(() => {
@@ -38,6 +42,8 @@
   let slug = $state("");
   let published = $state(false);
   let body = $state("");
+  let imageUrl = $state<string | null>(null);
+  let isUploadingImage = $state(false);
   let activeLanguageTab = $state(DEFAULT_LANGUAGE);
   const translationMap = $derived(translationsToMap(data.translations));
 
@@ -46,6 +52,7 @@
     slug = data.page.slug ?? "";
     published = data.page.published;
     body = data.page.body ?? "";
+    imageUrl = data.page.imageUrl ?? null;
   });
 
   const hasUnsavedChanges = $derived.by(() => {
@@ -53,9 +60,46 @@
       title !== (data.page.title ?? "") ||
       slug !== (data.page.slug ?? "") ||
       body !== (data.page.body ?? "") ||
-      published !== data.page.published
+      published !== data.page.published ||
+      imageUrl !== (data.page.imageUrl ?? null)
     );
   });
+
+  async function handleImageUpload(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    isUploadingImage = true;
+    try {
+      const authResponse = await fetch("/api/assets/auth");
+      const auth = await authResponse.json();
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("publicKey", auth.publicKey);
+      formData.append("signature", auth.signature);
+      formData.append("expire", auth.expire.toString());
+      formData.append("token", auth.token);
+      formData.append("fileName", file.name);
+      formData.append("folder", "/pages");
+
+      const uploadResponse = await fetch("https://upload.imagekit.io/api/v1/files/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!uploadResponse.ok) throw new Error("Upload failed");
+
+      const result = await uploadResponse.json();
+      imageUrl = result.url;
+    } catch {
+      toast.error("Failed to upload image");
+    } finally {
+      isUploadingImage = false;
+      input.value = "";
+    }
+  }
 </script>
 
 <svelte:head><title>{title || "Edit Content Page"} | Admin</title></svelte:head>
@@ -260,9 +304,54 @@
             Published
           </label>
         </div>
-        <p class="mt-3 text-xs text-foreground-secondary">
+        <p class="mt-3 text-xs text-muted-foreground">
           Set this to published to make it visible on the storefront
         </p>
+      </AdminCard>
+
+      <AdminCard title="Image" variant="sidebar">
+        {#if imageUrl}
+          <div class="group relative">
+            <img
+              src="{imageUrl}?tr=w-400,h-400,fo-auto"
+              alt={title}
+              class="h-48 w-full rounded border border-border object-cover"
+            />
+            <div
+              class="absolute inset-0 flex items-center justify-center rounded bg-black/50 opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              <Button
+                type="button"
+                size="sm"
+                variant="destructive"
+                class="h-7 w-7 p-0"
+                onclick={() => (imageUrl = null)}
+              >
+                <X class="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        {:else}
+          <label
+            class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-input-border py-8 hover:border-blue-500 hover:bg-hover"
+          >
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              onchange={handleImageUpload}
+              disabled={isUploadingImage}
+            />
+            {#if isUploadingImage}
+              <Loader2 class="mb-2 h-8 w-8 animate-spin text-blue-500" />
+              <span class="text-xs text-foreground-tertiary">Uploading...</span>
+            {:else}
+              <Upload class="mb-2 h-8 w-8 text-placeholder" />
+              <span class="text-xs font-medium text-foreground-tertiary">Click to upload</span>
+            {/if}
+          </label>
+        {/if}
+        <input type="hidden" name="imageUrl" value={imageUrl ?? ""} form="content-page-form" />
       </AdminCard>
     </div>
   </div>
