@@ -40,6 +40,7 @@
   import ExternalLink from "@lucide/svelte/icons/external-link";
   import { cn } from "$lib/utils";
   import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -191,7 +192,7 @@
     );
   });
 
-  useUnsavedChanges(
+  const unsavedChanges = useUnsavedChanges(
     () => hasUnsavedChanges,
     () => isSavingProduct
   );
@@ -859,6 +860,12 @@
     </Dialog.Content>
   </Dialog.Root>
 </div>
+
+<UnsavedChangesDialog
+  bind:open={unsavedChanges.showDialog}
+  onconfirm={unsavedChanges.confirmLeave}
+  oncancel={unsavedChanges.cancelLeave}
+/>
 
 <CreateDialog
   bind:open={createDialogOpen}

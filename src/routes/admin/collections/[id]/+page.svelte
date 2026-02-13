@@ -24,6 +24,7 @@
   } from "$lib/config/languages.js";
   import { cn, BASE_CURRENCY } from "$lib/utils";
   import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -115,7 +116,7 @@
     );
   });
 
-  useUnsavedChanges(
+  const unsavedChanges = useUnsavedChanges(
     () => hasUnsavedChanges,
     () => isSubmitting
   );
@@ -972,6 +973,12 @@
     </Dialog.Content>
   </Dialog.Root>
 </div>
+
+<UnsavedChangesDialog
+  bind:open={unsavedChanges.showDialog}
+  onconfirm={unsavedChanges.confirmLeave}
+  oncancel={unsavedChanges.cancelLeave}
+/>
 
 <CreateDialog
   bind:open={createDialogOpen}

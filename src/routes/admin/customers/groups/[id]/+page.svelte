@@ -14,6 +14,7 @@
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -75,7 +76,7 @@
     );
   });
 
-  useUnsavedChanges(
+  const unsavedChanges = useUnsavedChanges(
     () => hasUnsavedChanges,
     () => isSubmitting
   );
@@ -326,6 +327,12 @@
     Delete this group
   </button>
 </div>
+
+<UnsavedChangesDialog
+  bind:open={unsavedChanges.showDialog}
+  onconfirm={unsavedChanges.confirmLeave}
+  oncancel={unsavedChanges.cancelLeave}
+/>
 
 <DeleteConfirmDialog
   bind:open={showDelete}

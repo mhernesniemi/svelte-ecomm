@@ -15,6 +15,7 @@
   } from "$lib/config/languages.js";
   import { cn } from "$lib/utils";
   import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
@@ -54,7 +55,7 @@
     );
   });
 
-  useUnsavedChanges(
+  const unsavedChanges = useUnsavedChanges(
     () => hasUnsavedChanges,
     () => isSubmitting
   );
@@ -268,6 +269,12 @@
     </div>
   </div>
 </div>
+
+<UnsavedChangesDialog
+  bind:open={unsavedChanges.showDialog}
+  onconfirm={unsavedChanges.confirmLeave}
+  oncancel={unsavedChanges.cancelLeave}
+/>
 
 <DeleteConfirmDialog
   bind:open={showDelete}

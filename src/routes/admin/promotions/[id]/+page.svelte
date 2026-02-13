@@ -10,6 +10,7 @@
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import type { PageData, ActionData } from "./$types";
   import { toast } from "svelte-sonner";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
@@ -117,7 +118,7 @@
     );
   });
 
-  useUnsavedChanges(() => hasUnsavedChanges);
+  const unsavedChanges = useUnsavedChanges(() => hasUnsavedChanges);
 </script>
 
 <svelte:head><title>Edit {promo.code} | Admin</title></svelte:head>
@@ -544,6 +545,12 @@
     </div>
   </form>
 </div>
+
+<UnsavedChangesDialog
+  bind:open={unsavedChanges.showDialog}
+  onconfirm={unsavedChanges.confirmLeave}
+  oncancel={unsavedChanges.cancelLeave}
+/>
 
 <DeleteConfirmDialog
   bind:open={showDelete}

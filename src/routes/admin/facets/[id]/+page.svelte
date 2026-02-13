@@ -13,6 +13,7 @@
   import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import { slugify } from "$lib/utils";
   import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
+  import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash2 from "@lucide/svelte/icons/trash-2";
@@ -95,7 +96,7 @@
     );
   });
 
-  useUnsavedChanges(
+  const unsavedChanges = useUnsavedChanges(
     () => hasUnsavedChanges,
     () => isSubmitting
   );
@@ -446,6 +447,12 @@
   placeholder="e.g., Color"
   fieldName="name_en"
   slugField="code"
+/>
+
+<UnsavedChangesDialog
+  bind:open={unsavedChanges.showDialog}
+  onconfirm={unsavedChanges.confirmLeave}
+  oncancel={unsavedChanges.cancelLeave}
 />
 
 <DeleteConfirmDialog
