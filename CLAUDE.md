@@ -1,51 +1,21 @@
-# Project Overview: Hoikka
+# Hoikka
 
-This is a **full-stack e-commerce platform** built with:
+## Goals
 
-- **Framework:** SvelteKit 2.49 + Svelte 5
-- **Database:** PostgreSQL with Drizzle ORM
-- **Auth:** Clerk
-- **Payments:** Stripe
-- **Shipping:** Posti, Matkahuolto (Finnish carriers)
-- **Styling:** TailwindCSS 4
-
-## Implementation Goals
-
-- This should be lightweight and easy to understand and maintain.
-- When adding a new feature, consider that it's probably needed also in the admin panel and storefront.
-
-## Important to note
-
-- This project uses Svelte 5, so look at the Svelte 5 documentation for the best practices. Avoid using outdated Svelte 4 specific code.
-- Add tests where needed when adding a new feature or modifying existing code.
+- Keep the codebase lightweight and easy to understand.
+- When adding a new feature, consider whether it is also needed in the admin panel and storefront.
+- This project uses Svelte 5. Avoid outdated Svelte 4 patterns.
+- Add tests where appropriate when adding a new feature or modifying existing code.
 
 ## Tools
 
-- Use Bun everywhere when possible.
+- Use Bun APIs when possible.
 - Run `./scripts/svelte-check.sh --threshold error` for type checking. This wrapper prevents the Vite dev server from crashing by preserving `.svelte-kit/generated/` timestamps that `svelte-check` would otherwise overwrite.
 - After modifying files, run `bunx prettier --write <files>` on the changed files to format them.
 
 ## UI Guidelines
 
-- Use shadcn/svelte for UI components where they provide value and install a new shadcn/svelte component if it's not available.
-- Prefer to use existing UI components if possible, for example `<Button>` instead of `<button>`.
-- Use global focus styles for all interactive elements
-- Use cn utility function always for conditional tailwind classes
-
-## Key Structure
-
-| Directory                  | Purpose                                            |
-| -------------------------- | -------------------------------------------------- |
-| `src/lib/server/db/`       | Database schema & client                           |
-| `src/lib/server/services/` | Business logic (products, orders, customers, etc.) |
-| `src/routes/(storefront)/` | Customer-facing store                              |
-| `src/routes/admin/`        | Admin dashboard                                    |
-
-## Architecture Highlights
-
-- Service-oriented with singleton services
-- Multi-language support via translation tables
-- Smart Collections with facet-based filtering
-- Guest carts with cookie-based tokens
-- Provider pattern for payments/shipping
-- See ARCHITECTURE.md for more details.
+- Use shadcn/svelte for UI components and install new ones as needed.
+- Prefer existing UI components (e.g. `<Button>` over `<button>`).
+- Use `cn()` for conditional Tailwind classes.
+- Use `<AdminCard>` for card sections on admin detail pages. It supports `title`, `description`, `variant` (main/sidebar), `noPadding`, `headerActions`, `headerExtra`, and `children` snippets.
