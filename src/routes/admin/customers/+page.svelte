@@ -150,7 +150,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <h1 class="text-2xl leading-[40px] font-bold">Customers</h1>
-    {#if activeTab === "groups"}
+    {#if activeTab === "groups" && data.groups.length > 0}
       <div class="flex items-center justify-end">
         <Button onclick={() => (showCreateGroup = true)}>
           <PlusIcon class="h-4 w-4" /> Add Group
