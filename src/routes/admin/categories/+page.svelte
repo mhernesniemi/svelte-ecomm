@@ -7,6 +7,7 @@
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Collapsible from "$lib/components/admin/ui/collapsible";
   import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+  import * as Tooltip from "$lib/components/admin/ui/tooltip";
   import { slugify, cn } from "$lib/utils.js";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
@@ -235,22 +236,32 @@
               class="flex shrink-0 items-center gap-1 pr-3 pl-4"
               onclick={(e) => e.stopPropagation()}
             >
-              <button
-                type="button"
-                class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
-                title="Add child category"
-                onclick={() => openCreateDialog(node.id)}
-              >
-                <PlusIcon class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
-              </button>
-              <button
-                type="button"
-                class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
-                title="Edit category"
-                onclick={() => openEditDialog(node)}
-              >
-                <Pencil class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
-              </button>
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    type="button"
+                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
+                    onclick={() => openCreateDialog(node.id)}
+                  >
+                    <PlusIcon
+                      class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground"
+                    />
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>Add child category</Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
+              <Tooltip.Provider>
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    type="button"
+                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
+                    onclick={() => openEditDialog(node)}
+                  >
+                    <Pencil class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>Edit category</Tooltip.Content>
+                </Tooltip.Root>
+              </Tooltip.Provider>
             </div>
           </div>
 

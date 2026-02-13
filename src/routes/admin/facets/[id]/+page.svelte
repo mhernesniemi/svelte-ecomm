@@ -13,6 +13,7 @@
   import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import { slugify } from "$lib/utils";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
+  import * as Tooltip from "$lib/components/admin/ui/tooltip";
   import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash2 from "@lucide/svelte/icons/trash-2";
@@ -322,22 +323,34 @@
                   </span>
                 </div>
                 <div class="flex shrink-0 items-center gap-1 pl-4">
-                  <button
-                    type="button"
-                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
-                    title="Edit value"
-                    onclick={() => openEditDialog(i)}
-                  >
-                    <Pencil class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
-                  </button>
-                  <button
-                    type="button"
-                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
-                    title="Remove value"
-                    onclick={() => removeValue(i)}
-                  >
-                    <Trash2 class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
-                  </button>
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger
+                        type="button"
+                        class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
+                        onclick={() => openEditDialog(i)}
+                      >
+                        <Pencil
+                          class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground"
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Content>Edit value</Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
+                  <Tooltip.Provider>
+                    <Tooltip.Root>
+                      <Tooltip.Trigger
+                        type="button"
+                        class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
+                        onclick={() => removeValue(i)}
+                      >
+                        <Trash2
+                          class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground"
+                        />
+                      </Tooltip.Trigger>
+                      <Tooltip.Content>Remove value</Tooltip.Content>
+                    </Tooltip.Root>
+                  </Tooltip.Provider>
                 </div>
               </div>
             {/each}
