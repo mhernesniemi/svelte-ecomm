@@ -14,6 +14,7 @@
     TRANSLATION_LANGUAGES
   } from "$lib/config/languages.js";
   import { cn } from "$lib/utils";
+  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import { onMount } from "svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
@@ -44,6 +45,19 @@
     slug = data.page.slug ?? "";
     published = data.page.published;
   });
+
+  const hasUnsavedChanges = $derived.by(() => {
+    return (
+      title !== (data.page.title ?? "") ||
+      slug !== (data.page.slug ?? "") ||
+      published !== data.page.published
+    );
+  });
+
+  useUnsavedChanges(
+    () => hasUnsavedChanges,
+    () => isSubmitting
+  );
 </script>
 
 <svelte:head><title>{title || "Edit Content Page"} | Admin</title></svelte:head>

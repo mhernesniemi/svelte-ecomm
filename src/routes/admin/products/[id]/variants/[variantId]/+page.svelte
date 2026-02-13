@@ -14,6 +14,7 @@
   import X from "@lucide/svelte/icons/x";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -90,6 +91,30 @@
   function removeGroupPrice(groupId: number) {
     groupPrices = groupPrices.filter((gp) => gp.groupId !== groupId);
   }
+
+  const originalGroupPricesJson = $derived(
+    JSON.stringify(
+      data.groupPrices.map((gp) => ({ groupId: gp.groupId, price: (gp.price / 100).toFixed(2) }))
+    )
+  );
+
+  const hasUnsavedChanges = $derived.by(() => {
+    return (
+      trackInventory !== data.variant.trackInventory ||
+      [...selectedFacetValues].sort().join() !==
+        data.variant.facetValues
+          .map((fv) => fv.id)
+          .sort()
+          .join() ||
+      groupPricingEnabled !== (data.groupPrices.length > 0) ||
+      JSON.stringify(groupPrices) !== originalGroupPricesJson
+    );
+  });
+
+  useUnsavedChanges(
+    () => hasUnsavedChanges,
+    () => isSubmitting
+  );
 </script>
 
 <svelte:head>

@@ -39,6 +39,7 @@
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
   import { cn } from "$lib/utils";
+  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import type { ActionData, PageData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -172,6 +173,28 @@
   $effect(() => {
     productName = data.product.name;
   });
+
+  const hasUnsavedChanges = $derived.by(() => {
+    return (
+      productName !== data.product.name ||
+      visibility !== data.product.visibility ||
+      [...selectedProductFacets].sort().join() !==
+        data.product.facetValues
+          .map((fv) => fv.id)
+          .sort()
+          .join() ||
+      [...selectedCategories].sort().join() !==
+        data.productCategories
+          .map((c) => c.id)
+          .sort()
+          .join()
+    );
+  });
+
+  useUnsavedChanges(
+    () => hasUnsavedChanges,
+    () => isSavingProduct
+  );
 
   async function handleImagesSelected(
     files: {

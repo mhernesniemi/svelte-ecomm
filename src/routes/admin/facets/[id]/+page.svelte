@@ -12,6 +12,7 @@
   import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
   import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import { slugify } from "$lib/utils";
+  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash2 from "@lucide/svelte/icons/trash-2";
@@ -67,6 +68,37 @@
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
   });
+
+  const originalValuesJson = $derived(
+    JSON.stringify(
+      data.facet.values
+        .map((v) => ({
+          id: v.id,
+          name: v.name ?? "",
+          code: v.code,
+          translations: Object.fromEntries(
+            TRANSLATION_LANGUAGES.map((lang) => {
+              const t = data.valueTranslations[v.id]?.find((t) => t.languageCode === lang.code);
+              return [lang.code, t?.name ?? ""];
+            })
+          )
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name))
+    )
+  );
+
+  const hasUnsavedChanges = $derived.by(() => {
+    return (
+      facetName !== (data.facet.name ?? "") ||
+      facetCode !== data.facet.code ||
+      JSON.stringify(values) !== originalValuesJson
+    );
+  });
+
+  useUnsavedChanges(
+    () => hasUnsavedChanges,
+    () => isSubmitting
+  );
 
   onMount(() => {
     if ($page.url.searchParams.has("created")) {

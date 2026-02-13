@@ -1,6 +1,5 @@
 <script lang="ts">
   import { deserialize, enhance } from "$app/forms";
-  import { beforeNavigate } from "$app/navigation";
   import { invalidateAll } from "$app/navigation";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
@@ -24,6 +23,7 @@
     TRANSLATION_LANGUAGES
   } from "$lib/config/languages.js";
   import { cn, BASE_CURRENCY } from "$lib/utils";
+  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -115,21 +115,10 @@
     );
   });
 
-  // Warn on browser refresh / tab close
-  $effect(() => {
-    const handler = (e: BeforeUnloadEvent) => {
-      if (hasUnsavedChanges) e.preventDefault();
-    };
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  });
-
-  // Warn on in-app navigation
-  beforeNavigate(({ cancel }) => {
-    if (hasUnsavedChanges && !confirm("You have unsaved changes. Leave anyway?")) {
-      cancel();
-    }
-  });
+  useUnsavedChanges(
+    () => hasUnsavedChanges,
+    () => isSubmitting
+  );
 
   // Live preview — debounce-fetch matching products when filters change
   let previewProducts = $state<PreviewProduct[] | null>(null);

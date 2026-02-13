@@ -9,6 +9,7 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
+  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import type { PageData, ActionData } from "./$types";
   import { toast } from "svelte-sonner";
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
@@ -96,6 +97,27 @@
   $effect(() => {
     if (form?.error) toast.error(form.error);
   });
+
+  const hasUnsavedChanges = $derived.by(() => {
+    return (
+      discountType !== promo.discountType ||
+      appliesTo !== promo.appliesTo ||
+      [...selectedProductIds].sort().join() !==
+        promo.products
+          .map((p) => p.productId)
+          .sort()
+          .join() ||
+      [...selectedCollectionIds].sort().join() !==
+        promo.collections
+          .map((c) => c.collectionId)
+          .sort()
+          .join() ||
+      enabled !== promo.enabled ||
+      combinesWithOtherPromotions !== promo.combinesWithOtherPromotions
+    );
+  });
+
+  useUnsavedChanges(() => hasUnsavedChanges);
 </script>
 
 <svelte:head><title>Edit {promo.code} | Admin</title></svelte:head>

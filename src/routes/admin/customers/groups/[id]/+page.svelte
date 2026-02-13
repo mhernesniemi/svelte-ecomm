@@ -13,6 +13,7 @@
   import Check from "@lucide/svelte/icons/check";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import Trash2 from "@lucide/svelte/icons/trash-2";
+  import { useUnsavedChanges } from "$lib/unsaved-changes.svelte";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -57,6 +58,27 @@
       email: c.email
     }));
   });
+
+  const hasUnsavedChanges = $derived.by(() => {
+    return (
+      groupName !== data.group.name ||
+      groupDescription !== (data.group.description ?? "") ||
+      isTaxExempt !== data.group.isTaxExempt ||
+      customers
+        .map((c) => c.id)
+        .sort()
+        .join() !==
+        data.groupCustomers
+          .map((c) => c.id)
+          .sort()
+          .join()
+    );
+  });
+
+  useUnsavedChanges(
+    () => hasUnsavedChanges,
+    () => isSubmitting
+  );
 
   const customerIdsInGroup = $derived(new Set(customers.map((c) => c.id)));
   const availableCustomers = $derived(
