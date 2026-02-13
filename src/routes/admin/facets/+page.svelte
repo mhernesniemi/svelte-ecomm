@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
-  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import CreateFacetDialog from "$lib/components/admin/CreateFacetDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import Tag from "@lucide/svelte/icons/tag";
   import PlusIcon from "@lucide/svelte/icons/plus";
@@ -13,6 +14,8 @@
   let showBulkDelete = $state(false);
   let pendingDeleteIds = $state<number[]>([]);
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
+
+  let createDialogOpen = $state(false);
 
   type FacetRow = (typeof data.facets)[0];
 
@@ -72,8 +75,9 @@
       <h1 class="text-2xl font-bold text-foreground">Facets</h1>
     </div>
     {#if data.facets.length > 0}
-      <a href="/admin/facets/new" class={buttonVariants()}><PlusIcon class="h-4 w-4" /> Add Facet</a
-      >
+      <Button type="button" onclick={() => (createDialogOpen = true)}>
+        <PlusIcon class="h-4 w-4" /> Add Facet
+      </Button>
     {/if}
   </div>
 
@@ -100,10 +104,12 @@
       </Button>
     {/snippet}
     {#snippet emptyAction()}
-      <a href="/admin/facets/new" class={buttonVariants()}>Add Facet</a>
+      <Button type="button" onclick={() => (createDialogOpen = true)}>Add Facet</Button>
     {/snippet}
   </DataTable>
 </div>
+
+<CreateFacetDialog bind:open={createDialogOpen} />
 
 <DeleteConfirmDialog
   bind:open={showBulkDelete}

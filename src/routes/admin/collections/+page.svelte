@@ -2,8 +2,9 @@
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
   import { Badge } from "$lib/components/admin/ui/badge";
-  import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Button } from "$lib/components/admin/ui/button";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import CreateCollectionDialog from "$lib/components/admin/CreateCollectionDialog.svelte";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import FolderOpen from "@lucide/svelte/icons/folder-open";
   import PlusIcon from "@lucide/svelte/icons/plus";
@@ -14,6 +15,8 @@
   let showBulkDelete = $state(false);
   let pendingDeleteIds = $state<number[]>([]);
   let bulkDeleteTable: { resetRowSelection: () => void } | null = null;
+
+  let createDialogOpen = $state(false);
 
   type CollectionRow = (typeof data.collections)[0];
 
@@ -90,9 +93,9 @@
       <h1 class="text-2xl font-bold text-foreground">Collections</h1>
     </div>
     {#if data.collections.length > 0}
-      <a href="/admin/collections/new" class={buttonVariants()}>
-        <PlusIcon class="h-4 w-4" /> Add Collection</a
-      >
+      <Button type="button" onclick={() => (createDialogOpen = true)}>
+        <PlusIcon class="h-4 w-4" /> Add Collection
+      </Button>
     {/if}
   </div>
 
@@ -119,10 +122,12 @@
       </Button>
     {/snippet}
     {#snippet emptyAction()}
-      <a href="/admin/collections/new" class={buttonVariants()}>Create Collection</a>
+      <Button type="button" onclick={() => (createDialogOpen = true)}>Create Collection</Button>
     {/snippet}
   </DataTable>
 </div>
+
+<CreateCollectionDialog bind:open={createDialogOpen} />
 
 <DeleteConfirmDialog
   bind:open={showBulkDelete}

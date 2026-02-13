@@ -14,6 +14,7 @@
   import { Label } from "$lib/components/admin/ui/label";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import CreateCollectionDialog from "$lib/components/admin/CreateCollectionDialog.svelte";
   import ImagePicker from "$lib/components/admin/ImagePicker.svelte";
   import {
     translationsToMap,
@@ -38,8 +39,13 @@
   import Trash2 from "@lucide/svelte/icons/trash-2";
   let { data, form } = $props();
 
+  let cameFromCreate = $state(false);
+  let hasSaved = $state(false);
+  let createDialogOpen = $state(false);
+
   onMount(() => {
     if ($page.url.searchParams.has("created")) {
+      cameFromCreate = true;
       toast.success("Collection created successfully");
       history.replaceState({}, "", $page.url.pathname);
     }
@@ -355,9 +361,16 @@
     </div>
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">{name || "Edit Collection"}</h1>
-      <Button type="submit" form="collection-form" disabled={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Save Changes"}
-      </Button>
+      <div class="flex items-center gap-2">
+        {#if cameFromCreate && hasSaved}
+          <Button type="button" variant="outline" onclick={() => (createDialogOpen = true)}>
+            <Plus class="h-4 w-4" /> Add Collection
+          </Button>
+        {/if}
+        <Button type="submit" form="collection-form" disabled={isSubmitting}>
+          {isSubmitting ? "Saving..." : "Save Changes"}
+        </Button>
+      </div>
     </div>
   </div>
 
@@ -377,6 +390,7 @@
             isSubmitting = false;
             if (result.type === "success") {
               toast.success("Collection updated");
+              hasSaved = true;
             }
           };
         }}
@@ -987,3 +1001,5 @@
     </Dialog.Content>
   </Dialog.Root>
 </div>
+
+<CreateCollectionDialog bind:open={createDialogOpen} />

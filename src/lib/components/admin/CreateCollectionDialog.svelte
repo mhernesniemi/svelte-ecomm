@@ -25,12 +25,12 @@
 <Dialog.Root bind:open>
   <Dialog.Content>
     <Dialog.Header>
-      <Dialog.Title>New Product</Dialog.Title>
-      <Dialog.Description>Create a new product. You'll be redirected to edit its details.</Dialog.Description>
+      <Dialog.Title>New Collection</Dialog.Title>
+      <Dialog.Description>Create a new collection. You'll be redirected to edit its details.</Dialog.Description>
     </Dialog.Header>
     <form
       method="POST"
-      action="/admin/products?/create"
+      action="/admin/collections?/create"
       use:enhance={() => {
         return async ({ update }) => {
           open = false;
@@ -40,16 +40,16 @@
     >
       <input type="hidden" name="slug" value={slug} />
       <div class="my-4">
-        <label for="create_product_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
+        <label for="create_collection_name" class="mb-1 block text-sm font-medium text-foreground-secondary">
           Name
         </label>
         <input
           type="text"
-          id="create_product_name"
+          id="create_collection_name"
           name="name"
           bind:value={name}
           required
-          placeholder="e.g., Winter Jacket"
+          placeholder="e.g., Summer Sale"
           class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
         />
       </div>

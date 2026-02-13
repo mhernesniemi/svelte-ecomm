@@ -7,9 +7,11 @@
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
+  import CreateFacetDialog from "$lib/components/admin/CreateFacetDialog.svelte";
   import TranslationEditor from "$lib/components/admin/TranslationEditor.svelte";
   import { translationsToMap, TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import { slugify } from "$lib/utils";
+  import Plus from "@lucide/svelte/icons/plus";
   import Pencil from "@lucide/svelte/icons/pencil";
   import Trash2 from "@lucide/svelte/icons/trash-2";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -19,6 +21,9 @@
 
   let isSubmitting = $state(false);
   let showDelete = $state(false);
+  let cameFromCreate = $state(false);
+  let hasSaved = $state(false);
+  let createDialogOpen = $state(false);
 
   type ValueEntry = {
     id: number | null;
@@ -34,6 +39,7 @@
 
   // Bulk add input
   let bulkInput = $state("");
+  let bulkInputEl = $state<HTMLInputElement | null>(null);
 
   // Edit value dialog
   let editDialogOpen = $state(false);
@@ -61,8 +67,10 @@
 
   onMount(() => {
     if ($page.url.searchParams.has("created")) {
+      cameFromCreate = true;
       toast.success("Facet created successfully");
       history.replaceState({}, "", $page.url.pathname);
+      requestAnimationFrame(() => bulkInputEl?.focus());
     }
   });
 
@@ -146,9 +154,16 @@
   </div>
   <div class="flex items-center justify-between">
     <h1 class="text-2xl font-bold">{data.facet.name}</h1>
-    <Button type="submit" form="facet-form" disabled={isSubmitting}>
-      {isSubmitting ? "Saving..." : "Save Changes"}
-    </Button>
+    <div class="flex items-center gap-2">
+      {#if cameFromCreate && hasSaved}
+        <Button type="button" variant="outline" onclick={() => (createDialogOpen = true)}>
+          <Plus class="h-4 w-4" /> Add Facet
+        </Button>
+      {/if}
+      <Button type="submit" form="facet-form" disabled={isSubmitting}>
+        {isSubmitting ? "Saving..." : "Save Changes"}
+      </Button>
+    </div>
   </div>
 
   <!-- Two Column Layout -->
@@ -179,6 +194,7 @@
             await update({ reset: false });
             isSubmitting = false;
             if (result.type === "success") {
+              hasSaved = true;
               toast.success("Facet updated");
             }
           };
@@ -233,6 +249,7 @@
           <div class="mt-3 flex gap-2">
             <input
               type="text"
+              bind:this={bulkInputEl}
               bind:value={bulkInput}
               onkeydown={handleBulkKeydown}
               placeholder="e.g., Red, Blue, Yellow"
@@ -382,6 +399,8 @@
     </Dialog.Footer>
   </Dialog.Content>
 </Dialog.Root>
+
+<CreateFacetDialog bind:open={createDialogOpen} />
 
 <DeleteConfirmDialog
   bind:open={showDelete}

@@ -1,6 +1,7 @@
 import type { PageServerLoad, Actions } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
-import { fail, redirect } from "@sveltejs/kit";
+import { fail, redirect, isRedirect } from "@sveltejs/kit";
+import { slugify } from "$lib/utils.js";
 
 export const load: PageServerLoad = async () => {
 	const collections = await collectionService.listAll();
@@ -17,6 +18,29 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
+	create: async ({ request }) => {
+		const data = await request.formData();
+		const name = data.get("name") as string;
+		const slug = data.get("slug") as string;
+
+		if (!name || !slug) {
+			return fail(400, { error: "Name and slug are required" });
+		}
+
+		try {
+			const collection = await collectionService.create({
+				isPrivate: false,
+				name,
+				slug: slugify(slug)
+			});
+
+			throw redirect(303, `/admin/collections/${collection.id}?created`);
+		} catch (err) {
+			if (isRedirect(err)) throw err;
+			return fail(500, { error: "Failed to create collection" });
+		}
+	},
+
 	delete: async ({ request }) => {
 		const data = await request.formData();
 		const id = Number(data.get("id"));
