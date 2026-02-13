@@ -851,7 +851,7 @@
               Private collection
             </label>
           </div>
-          <p class="mt-3 text-xs text-foreground-secondary">
+          <p class="mt-3 text-xs text-muted-foreground">
             Private collections are not visible in the shop
           </p>
         </div>

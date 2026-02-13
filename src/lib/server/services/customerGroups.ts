@@ -190,6 +190,19 @@ export class CustomerGroupService {
 	}
 
 	/**
+	 * Set the full list of customers in a group (sync)
+	 */
+	async setCustomers(groupId: number, customerIds: number[]): Promise<void> {
+		await db.delete(customerGroupMembers).where(eq(customerGroupMembers.groupId, groupId));
+		if (customerIds.length > 0) {
+			await db
+				.insert(customerGroupMembers)
+				.values(customerIds.map((customerId) => ({ groupId, customerId })))
+				.onConflictDoNothing();
+		}
+	}
+
+	/**
 	 * Check if customer is in group
 	 */
 	async isCustomerInGroup(groupId: number, customerId: number): Promise<boolean> {

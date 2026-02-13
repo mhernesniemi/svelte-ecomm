@@ -580,7 +580,7 @@
               <option value="private">Private</option>
             </select>
           </div>
-          <p class="mt-3 text-xs text-foreground-secondary">
+          <p class="mt-3 text-xs text-muted-foreground">
             Set this to Public to make it available in the store
           </p>
         </div>

@@ -11,6 +11,7 @@
   import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
   import Check from "@lucide/svelte/icons/check";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import Trash2 from "@lucide/svelte/icons/trash-2";
   import type { PageData, ActionData } from "./$types";
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -35,13 +36,28 @@
   let groupDescription = $state("");
   let isTaxExempt = $state(false);
 
+  type CustomerEntry = {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+
+  let customers = $state<CustomerEntry[]>([]);
+
   $effect(() => {
     groupName = data.group.name;
     groupDescription = data.group.description ?? "";
     isTaxExempt = data.group.isTaxExempt;
+    customers = data.groupCustomers.map((c) => ({
+      id: c.id,
+      firstName: c.firstName,
+      lastName: c.lastName,
+      email: c.email
+    }));
   });
 
-  const customerIdsInGroup = $derived(new Set(data.groupCustomers.map((c) => c.id)));
+  const customerIdsInGroup = $derived(new Set(customers.map((c) => c.id)));
   const availableCustomers = $derived(
     data.allCustomers.filter((c) => !customerIdsInGroup.has(c.id))
   );
@@ -51,6 +67,26 @@
     const c = availableCustomers.find((c) => c.id === selectedCustomerId);
     return c ? `${c.firstName} ${c.lastName} (${c.email})` : "Select a customer...";
   });
+
+  function addCustomer() {
+    if (!selectedCustomerId) return;
+    const customer = data.allCustomers.find((c) => c.id === selectedCustomerId);
+    if (!customer) return;
+    customers = [
+      ...customers,
+      {
+        id: customer.id,
+        firstName: customer.firstName,
+        lastName: customer.lastName,
+        email: customer.email
+      }
+    ].sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
+    selectedCustomerId = null;
+  }
+
+  function removeCustomer(id: number) {
+    customers = customers.filter((c) => c.id !== id);
+  }
 </script>
 
 <svelte:head><title>{data.group.name} | Customer Groups | Admin</title></svelte:head>
@@ -125,6 +161,9 @@
             </div>
           </div>
           <input type="hidden" name="isTaxExempt" value={isTaxExempt ? "true" : "false"} />
+          {#each customers as customer}
+            <input type="hidden" name="customerIds" value={customer.id} />
+          {/each}
         </div>
       </form>
 
@@ -133,120 +172,100 @@
         <div class="border-b border-border p-6">
           <h2 class="text-lg font-medium text-foreground">Customers</h2>
           <p class="mt-1 text-sm text-foreground-tertiary">
-            {data.groupCustomers.length} customer{data.groupCustomers.length !== 1 ? "s" : ""} in this
-            group
+            {#if availableCustomers.length === 0 && customers.length > 0}
+              All customers have been added to this group.
+            {:else}
+              Add customers to this group.
+            {/if}
           </p>
-        </div>
-
-        <!-- Add Customer -->
-        <div class="border-b border-border bg-background px-6 py-4">
-          <h3 class="mb-3 text-sm font-medium text-foreground-secondary">Add Customer to Group</h3>
-          {#if availableCustomers.length === 0}
-            <p class="text-sm text-muted-foreground">All customers are already in this group</p>
-          {:else}
-            <form
-              method="POST"
-              action="?/addCustomer"
-              use:enhance={() => {
-                return async ({ result, update }) => {
-                  await update();
-                  if (result.type === "success") {
-                    toast.success("Customer added");
-                    selectedCustomerId = null;
-                  }
-                };
-              }}
-              class="flex items-end gap-4"
-            >
-              <input type="hidden" name="customerId" value={selectedCustomerId ?? ""} />
-              <div>
-                <Popover.Root bind:open={comboboxOpen}>
-                  <Popover.Trigger
-                    class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-                  >
-                    <span class={selectedCustomerId ? "text-foreground" : "text-muted-foreground"}>
-                      {selectedCustomerLabel()}
-                    </span>
-                    <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
-                  </Popover.Trigger>
-                  <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
-                    <Command.Root>
-                      <Command.Input placeholder="Search customers..." />
-                      <Command.List class="max-h-60">
-                        <Command.Empty>No customers found.</Command.Empty>
-                        {#each availableCustomers as customer}
-                          <Command.Item
-                            value="{customer.firstName} {customer.lastName} {customer.email}"
-                            onSelect={() => {
-                              selectedCustomerId = customer.id;
-                              comboboxOpen = false;
-                            }}
-                          >
-                            <Check
-                              class="mr-2 h-4 w-4 {selectedCustomerId === customer.id
-                                ? 'opacity-100'
-                                : 'opacity-0'}"
-                            />
-                            <span>
-                              {customer.firstName}
-                              {customer.lastName}
-                              <span class="text-muted-foreground">({customer.email})</span>
-                            </span>
-                          </Command.Item>
-                        {/each}
-                      </Command.List>
-                    </Command.Root>
-                  </Popover.Content>
-                </Popover.Root>
-              </div>
-              <Button type="submit" size="sm" disabled={!selectedCustomerId}>Add</Button>
-            </form>
-          {/if}
-        </div>
-
-        <!-- Customers List -->
-        <div class="px-6 py-4">
-          {#if data.groupCustomers.length === 0}
-            <p class="text-sm text-muted-foreground">No customers in this group yet</p>
-          {:else}
-            <div class="space-y-2">
-              {#each data.groupCustomers as customer}
-                <div class="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
-                  <div>
-                    <a
-                      href="/admin/customers/{customer.id}"
-                      class="font-medium hover:text-blue-600 dark:text-blue-400"
-                    >
-                      {customer.firstName}
-                      {customer.lastName}
-                    </a>
-                    <span class="ml-2 text-sm text-muted-foreground">{customer.email}</span>
-                  </div>
-                  <form
-                    method="POST"
-                    action="?/removeCustomer"
-                    use:enhance={() => {
-                      return async ({ result, update }) => {
-                        await update();
-                        if (result.type === "success") {
-                          toast.success("Customer removed");
-                        }
-                      };
-                    }}
-                  >
-                    <input type="hidden" name="customerId" value={customer.id} />
-                    <button
-                      type="submit"
-                      class="text-sm text-red-600 hover:text-red-800 dark:text-red-700"
-                    >
-                      Remove
-                    </button>
-                  </form>
-                </div>
-              {/each}
+          {#if availableCustomers.length > 0}
+            <div class="mt-3 flex gap-2">
+              <Popover.Root bind:open={comboboxOpen}>
+                <Popover.Trigger
+                  class="flex h-9 w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+                >
+                  <span class={selectedCustomerId ? "text-foreground" : "text-muted-foreground"}>
+                    {selectedCustomerLabel()}
+                  </span>
+                  <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 text-placeholder" />
+                </Popover.Trigger>
+                <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+                  <Command.Root>
+                    <Command.Input placeholder="Search customers..." />
+                    <Command.List class="max-h-60">
+                      <Command.Empty>No customers found.</Command.Empty>
+                      {#each availableCustomers as customer}
+                        <Command.Item
+                          value="{customer.firstName} {customer.lastName} {customer.email}"
+                          onSelect={() => {
+                            selectedCustomerId = customer.id;
+                            comboboxOpen = false;
+                          }}
+                        >
+                          <Check
+                            class="mr-2 h-4 w-4 {selectedCustomerId === customer.id
+                              ? 'opacity-100'
+                              : 'opacity-0'}"
+                          />
+                          <span>
+                            {customer.firstName}
+                            {customer.lastName}
+                            <span class="text-muted-foreground">({customer.email})</span>
+                          </span>
+                        </Command.Item>
+                      {/each}
+                    </Command.List>
+                  </Command.Root>
+                </Popover.Content>
+              </Popover.Root>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!selectedCustomerId}
+                onclick={addCustomer}
+                class="shrink-0"
+              >
+                Add
+              </Button>
             </div>
           {/if}
         </div>
+
+        {#if customers.length === 0}
+          <div class="p-12 text-center">
+            <p class="text-sm text-muted-foreground">No customers in this group yet.</p>
+          </div>
+        {:else}
+          <div>
+            {#each customers as customer}
+              <div
+                class="flex items-center border-b border-border px-6 py-2.5 last:border-b-0 hover:bg-hover"
+              >
+                <div class="flex min-w-0 flex-1 items-center gap-3">
+                  <a
+                    href="/admin/customers/{customer.id}"
+                    class="text-sm font-medium text-foreground hover:underline"
+                  >
+                    {customer.firstName}
+                    {customer.lastName}
+                  </a>
+                  <span class="text-sm text-placeholder">{customer.email}</span>
+                </div>
+                <div class="flex shrink-0 items-center pl-4">
+                  <button
+                    type="button"
+                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
+                    title="Remove customer"
+                    onclick={() => removeCustomer(customer.id)}
+                  >
+                    <Trash2 class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
+                  </button>
+                </div>
+              </div>
+            {/each}
+          </div>
+        {/if}
       </div>
     </div>
 

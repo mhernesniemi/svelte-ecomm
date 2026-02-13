@@ -33,6 +33,7 @@ export const actions: Actions = {
 		const name = formData.get("name") as string;
 		const description = formData.get("description") as string;
 		const isTaxExempt = formData.get("isTaxExempt") === "true";
+		const customerIds = formData.getAll("customerIds").map(Number).filter(Boolean);
 
 		if (!name) {
 			return fail(400, { error: "Name is required" });
@@ -44,43 +45,10 @@ export const actions: Actions = {
 				description: description || undefined,
 				isTaxExempt
 			});
+			await customerGroupService.setCustomers(id, customerIds);
 			return { success: true, message: "Group updated" };
 		} catch {
 			return fail(500, { error: "Failed to update group" });
-		}
-	},
-
-	addCustomer: async ({ params, request }) => {
-		const groupId = Number(params.id);
-		const formData = await request.formData();
-		const customerId = Number(formData.get("customerId"));
-
-		if (!customerId) {
-			return fail(400, { error: "Customer is required" });
-		}
-
-		try {
-			await customerGroupService.addCustomer(groupId, customerId);
-			return { success: true, message: "Customer added to group" };
-		} catch {
-			return fail(500, { error: "Failed to add customer" });
-		}
-	},
-
-	removeCustomer: async ({ params, request }) => {
-		const groupId = Number(params.id);
-		const formData = await request.formData();
-		const customerId = Number(formData.get("customerId"));
-
-		if (!customerId) {
-			return fail(400, { error: "Customer ID is required" });
-		}
-
-		try {
-			await customerGroupService.removeCustomer(groupId, customerId);
-			return { success: true, message: "Customer removed from group" };
-		} catch {
-			return fail(500, { error: "Failed to remove customer" });
 		}
 	},
 
