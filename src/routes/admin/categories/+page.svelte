@@ -189,7 +189,7 @@
             inlineTaxCode = "standard";
           };
         }}
-        class="mt-3 flex gap-2"
+        class="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto_auto]"
       >
         <Input
           type="text"
@@ -200,7 +200,7 @@
         <input type="hidden" name="parent_id" value={inlineParentId} />
         <Popover.Root bind:open={parentComboboxOpen}>
           <Popover.Trigger
-            class="flex w-48 shrink-0 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+            class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover sm:w-48"
           >
             <span>{selectedParentName}</span>
             <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -254,14 +254,14 @@
         </Popover.Root>
         <SelectNative
           name="tax_code"
-          class="w-48 shrink-0 hover:border-input-border hover:bg-hover"
+          class="w-full hover:border-input-border hover:bg-hover sm:w-48"
           bind:value={inlineTaxCode}
         >
           {#each data.taxRates as rate}
             <option value={rate.code}>{rate.name}</option>
           {/each}
         </SelectNative>
-        <Button type="submit" variant="secondary" class="shrink-0">Add</Button>
+        <Button type="submit" variant="secondary">Add</Button>
       </form>
     </div>
     {#snippet categoryNode(node: CategoryNode, depth: number, parentPath: string)}

@@ -21,3 +21,4 @@
 - Use `cn()` for conditional Tailwind classes. Never use string interpolation in `class` attributes — always use `cn()` instead.
 - Use `<AdminCard>` for card sections on admin detail pages.
 - Admin UI components that use portals (dialogs, tooltips, popovers, etc.) must portal into `[data-admin]` (e.g. `to="[data-admin]"`) so that the admin theme CSS variables are available.
+- Remember to include responsiveness.
