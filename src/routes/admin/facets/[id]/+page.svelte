@@ -331,7 +331,7 @@
                 </div>
                 <div class="flex shrink-0 items-center gap-1 pl-4">
                   <Tooltip.Provider>
-                    <Tooltip.Root>
+                    <Tooltip.Root ignoreNonKeyboardFocus>
                       <Tooltip.Trigger
                         type="button"
                         class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
@@ -345,7 +345,7 @@
                     </Tooltip.Root>
                   </Tooltip.Provider>
                   <Tooltip.Provider>
-                    <Tooltip.Root>
+                    <Tooltip.Root ignoreNonKeyboardFocus>
                       <Tooltip.Trigger
                         type="button"
                         class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
@@ -394,63 +394,70 @@
       <Dialog.Title>Edit Value</Dialog.Title>
       <Dialog.Description>Update the value details.</Dialog.Description>
     </Dialog.Header>
-    <div class="my-4 grid grid-cols-2 gap-4">
-      <div>
-        <label
-          for="edit_value_name"
-          class="mb-1 block text-sm font-medium text-foreground-secondary"
-        >
-          Name <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          id="edit_value_name"
-          value={editName}
-          oninput={handleEditNameInput}
-          placeholder="e.g., Red"
-          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-        />
-      </div>
-      <div>
-        <label
-          for="edit_value_code"
-          class="mb-1 block text-sm font-medium text-foreground-secondary"
-        >
-          Code <span class="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          id="edit_value_code"
-          value={editCode}
-          oninput={handleEditCodeInput}
-          placeholder="e.g., red"
-          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-        />
-      </div>
-      {#each TRANSLATION_LANGUAGES as lang}
-        <div class="col-span-2">
+    <form
+      onsubmit={(e) => {
+        e.preventDefault();
+        saveEdit();
+      }}
+    >
+      <div class="my-4 grid grid-cols-2 gap-4">
+        <div>
           <label
-            for="edit_value_name_{lang.code}"
+            for="edit_value_name"
             class="mb-1 block text-sm font-medium text-foreground-secondary"
           >
-            {lang.name} name
+            Name <span class="text-red-500">*</span>
           </label>
           <input
             type="text"
-            id="edit_value_name_{lang.code}"
-            bind:value={editTranslations[lang.code]}
-            placeholder={editName}
+            id="edit_value_name"
+            value={editName}
+            oninput={handleEditNameInput}
+            placeholder="e.g., Red"
             class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
-      {/each}
-    </div>
-    <Dialog.Footer>
-      <Button type="button" variant="outline" onclick={() => (editDialogOpen = false)}>
-        Cancel
-      </Button>
-      <Button type="button" onclick={saveEdit} disabled={!canSaveEdit}>Save</Button>
-    </Dialog.Footer>
+        <div>
+          <label
+            for="edit_value_code"
+            class="mb-1 block text-sm font-medium text-foreground-secondary"
+          >
+            Code <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            id="edit_value_code"
+            value={editCode}
+            oninput={handleEditCodeInput}
+            placeholder="e.g., red"
+            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+          />
+        </div>
+        {#each TRANSLATION_LANGUAGES as lang}
+          <div class="col-span-2">
+            <label
+              for="edit_value_name_{lang.code}"
+              class="mb-1 block text-sm font-medium text-foreground-secondary"
+            >
+              {lang.name} name
+            </label>
+            <input
+              type="text"
+              id="edit_value_name_{lang.code}"
+              bind:value={editTranslations[lang.code]}
+              placeholder={editName}
+              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+            />
+          </div>
+        {/each}
+      </div>
+      <Dialog.Footer>
+        <Button type="button" variant="outline" onclick={() => (editDialogOpen = false)}>
+          Cancel
+        </Button>
+        <Button type="submit" disabled={!canSaveEdit}>Save</Button>
+      </Dialog.Footer>
+    </form>
   </Dialog.Content>
 </Dialog.Root>
 

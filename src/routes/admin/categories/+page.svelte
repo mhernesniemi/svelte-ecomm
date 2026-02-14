@@ -237,7 +237,7 @@
               onclick={(e) => e.stopPropagation()}
             >
               <Tooltip.Provider>
-                <Tooltip.Root>
+                <Tooltip.Root ignoreNonKeyboardFocus>
                   <Tooltip.Trigger
                     type="button"
                     class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
@@ -251,7 +251,7 @@
                 </Tooltip.Root>
               </Tooltip.Provider>
               <Tooltip.Provider>
-                <Tooltip.Root>
+                <Tooltip.Root ignoreNonKeyboardFocus>
                   <Tooltip.Trigger
                     type="button"
                     class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
