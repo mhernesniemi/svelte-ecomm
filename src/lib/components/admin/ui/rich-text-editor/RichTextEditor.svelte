@@ -120,7 +120,7 @@
   )}
 >
   <!-- Toolbar -->
-  <div class="flex flex-wrap gap-1 border-b border-input-border px-2 py-1.5">
+  <div class="flex flex-wrap gap-1 border-b border-border bg-background px-2 py-1.5">
     <button
       type="button"
       onclick={toggleBold}
