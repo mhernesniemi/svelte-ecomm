@@ -1010,7 +1010,10 @@ export class OrderService {
 		const linesWithImages = await db
 			.select({
 				line: orderLines,
-				imageUrl: assets.source
+				imageUrl: assets.source,
+				productId: productVariants.productId,
+				currentProductName: sql<string>`(SELECT name FROM product_translations WHERE product_id = ${products.id} LIMIT 1)`,
+				currentVariantName: productVariants.name
 			})
 			.from(orderLines)
 			.leftJoin(productVariants, eq(orderLines.variantId, productVariants.id))
@@ -1020,11 +1023,16 @@ export class OrderService {
 
 		return {
 			...order,
-			lines: linesWithImages.map(({ line, imageUrl }) => ({
-				...line,
-				variant: null,
-				imageUrl: imageUrl ?? null
-			})),
+			lines: linesWithImages.map(
+				({ line, imageUrl, productId, currentProductName, currentVariantName }) => ({
+					...line,
+					productName: line.productName || currentProductName || "",
+					variantName: line.variantName || currentVariantName || null,
+					variant: null,
+					imageUrl: imageUrl ?? null,
+					productId: productId ?? null
+				})
+			),
 			payments: [], // Load payments separately if needed
 			customer: null
 		};

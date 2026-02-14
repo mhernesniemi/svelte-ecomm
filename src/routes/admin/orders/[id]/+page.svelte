@@ -4,8 +4,13 @@
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
+  import ImageIcon from "@lucide/svelte/icons/image";
   import type { ActionData, PageData } from "./$types";
   import { formatDateTime } from "$lib/utils";
+
+  function formatPrice(cents: number): string {
+    return (cents / 100).toFixed(2);
+  }
 
   let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -75,52 +80,67 @@
       <AdminCard title="Items" noPadding>
         <div class="divide-y divide-border">
           {#each data.order.lines as line}
-            <div class="flex items-center justify-between px-6 py-4">
-              <div>
-                <p class="font-medium">{line.productName}</p>
+            <div class="flex items-center gap-4 px-6 py-4">
+              {#if line.imageUrl}
+                <img src={line.imageUrl} alt="" class="h-12 w-12 shrink-0 rounded object-cover" />
+              {:else}
+                <div
+                  class="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-muted-strong"
+                >
+                  <ImageIcon class="h-5 w-5 text-placeholder" />
+                </div>
+              {/if}
+              <div class="min-w-0 flex-1">
+                {#if line.productId}
+                  <a href="/admin/products/{line.productId}" class="font-medium hover:underline">
+                    {line.productName || "Untitled product"}
+                  </a>
+                {:else}
+                  <p class="font-medium">{line.productName || "Untitled product"}</p>
+                {/if}
                 {#if line.variantName}
                   <p class="text-sm text-muted-foreground">{line.variantName}</p>
                 {/if}
                 <p class="text-sm text-muted-foreground">SKU: {line.sku}</p>
               </div>
-              <div class="text-right">
+              <div class="shrink-0 text-right">
+                <p class="font-medium">{formatPrice(line.lineTotal)} EUR</p>
                 <p class="text-sm text-muted-foreground">
-                  {(line.unitPrice / 100).toFixed(2)} x {line.quantity}
+                  {formatPrice(line.unitPrice)} x {line.quantity}
                 </p>
-                <p class="font-medium">{(line.lineTotal / 100).toFixed(2)} EUR</p>
               </div>
             </div>
           {/each}
+        </div>
+
+        <!-- Totals -->
+        <div class="border-t border-border px-6 py-4">
+          <dl class="space-y-1.5 text-sm">
+            <div class="flex justify-between">
+              <dt class="text-foreground-secondary">Subtotal</dt>
+              <dd>{formatPrice(data.order.subtotal)} EUR</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-foreground-secondary">Shipping</dt>
+              <dd>{formatPrice(data.order.shipping)} EUR</dd>
+            </div>
+            {#if data.order.discount > 0}
+              <div class="flex justify-between text-green-600">
+                <dt>Discount</dt>
+                <dd>-{formatPrice(data.order.discount)} EUR</dd>
+              </div>
+            {/if}
+            <div class="flex justify-between border-t border-border pt-1.5 text-base font-bold">
+              <dt>Total</dt>
+              <dd>{formatPrice(data.order.total)} {data.order.currencyCode}</dd>
+            </div>
+          </dl>
         </div>
       </AdminCard>
     </div>
 
     <!-- Sidebar (Right) -->
     <div class="w-full space-y-6 lg:w-80 lg:shrink-0">
-      <!-- Summary -->
-      <AdminCard title="Summary" variant="sidebar">
-        <dl class="space-y-2 text-sm">
-          <div class="flex justify-between">
-            <dt class="text-foreground-secondary">Subtotal</dt>
-            <dd>{(data.order.subtotal / 100).toFixed(2)} EUR</dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-foreground-secondary">Shipping</dt>
-            <dd>{(data.order.shipping / 100).toFixed(2)} EUR</dd>
-          </div>
-          {#if data.order.discount > 0}
-            <div class="flex justify-between text-green-600">
-              <dt>Discount</dt>
-              <dd>-{(data.order.discount / 100).toFixed(2)} EUR</dd>
-            </div>
-          {/if}
-          <div class="flex justify-between border-t border-border pt-2 font-bold">
-            <dt>Total</dt>
-            <dd>{(data.order.total / 100).toFixed(2)} {data.order.currencyCode}</dd>
-          </div>
-        </dl>
-      </AdminCard>
-
       {#if data.order.shippingFullName}
         <!-- Shipping Address -->
         <AdminCard title="Shipping Address" variant="sidebar">

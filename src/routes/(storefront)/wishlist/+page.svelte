@@ -28,8 +28,10 @@
     return item.product.variants[0]?.price ?? 0;
   }
 
-  function getStock(item: (typeof items)[0]): number {
-    return item.product.variants[0]?.stock ?? 0;
+  function isInStock(item: (typeof items)[0]): boolean {
+    const variant = item.product.variants[0];
+    if (!variant) return false;
+    return !variant.trackInventory || variant.stock > 0;
   }
 
   function getVariantId(item: (typeof items)[0]): number | null {
@@ -85,7 +87,7 @@
         {@const slug = getSlug(item)}
         {@const productId = getProductId(item)}
         {@const price = getPrice(item)}
-        {@const stock = getStock(item)}
+        {@const available = isInStock(item)}
         {@const variantId = getVariantId(item)}
         {@const image = getImage(item)}
 
@@ -113,8 +115,8 @@
             </div>
 
             <div class="mt-auto flex items-center justify-between pt-4">
-              <span class={cn("text-sm", stock > 0 ? "text-green-600" : "text-red-600")}>
-                {stock > 0 ? "In stock" : "Out of stock"}
+              <span class={cn("text-sm", available ? "text-green-600" : "text-red-600")}>
+                {available ? "In stock" : "Out of stock"}
               </span>
 
               <div class="flex items-center gap-3">
@@ -139,7 +141,7 @@
                   </button>
                 </form>
 
-                {#if variantId && stock > 0}
+                {#if variantId && available}
                   <form
                     method="POST"
                     action="?/addToCart"

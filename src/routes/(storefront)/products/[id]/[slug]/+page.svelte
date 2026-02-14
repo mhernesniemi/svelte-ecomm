@@ -165,7 +165,7 @@
       lowPrice: (Math.min(...product.variants.map((v) => v.price)) / 100).toFixed(2),
       highPrice: (Math.max(...product.variants.map((v) => v.price)) / 100).toFixed(2),
       offerCount: product.variants.length,
-      availability: product.variants.some((v) => v.stock > 0)
+      availability: product.variants.some((v) => !v.trackInventory || v.stock > 0)
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock"
     },
@@ -335,7 +335,7 @@
       <!-- Stock Status -->
       {#if selectedVariant}
         <div class="mb-3 text-sm">
-          {#if selectedVariant.stock > 0}
+          {#if !selectedVariant.trackInventory || selectedVariant.stock > 0}
             <div class="flex items-center gap-2">
               <CheckIcon class="h-4 w-4 text-green-600" />
               <span class="text-green-600">In stock</span>
@@ -347,7 +347,7 @@
       {/if}
 
       <!-- Add to Cart -->
-      {#if selectedVariant && selectedVariant.stock > 0}
+      {#if selectedVariant && (!selectedVariant.trackInventory || selectedVariant.stock > 0)}
         <Button type="button" size="xl" onclick={handleAddToCart} class="flex-1 py-3">
           Add to Cart
         </Button>
