@@ -322,7 +322,7 @@
                 {/each}
               </span>
               {#if taxRate}
-                <Badge variant="outline">{taxRate.name}</Badge>
+                <Badge variant="outline" class="hidden sm:inline-block">{taxRate.name}</Badge>
               {/if}
             </span>
           </div>
