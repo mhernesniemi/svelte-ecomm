@@ -37,7 +37,6 @@
   });
 
   let isSubmitting = $state(false);
-  let isDeleting = $state(false);
   let showDelete = $state(false);
 
   let title = $state("");
@@ -107,7 +106,9 @@
     <h1 class="text-2xl font-bold">{title || "Edit Content Page"}</h1>
     <div class="flex items-center gap-2">
       {#if showCancelDelete}
-        <Button type="button" variant="outline" onclick={() => (showDelete = true)}>Cancel</Button>
+        <form method="POST" action="?/delete" use:enhance>
+          <Button type="submit" variant="outline">Cancel</Button>
+        </form>
       {/if}
       <Button type="submit" form="content-page-form" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Changes"}
@@ -341,10 +342,7 @@
   </div>
 </div>
 
-<UnsavedChangesDialog
-  isDirty={() => hasUnsavedChanges}
-  isSaving={() => isSubmitting || isDeleting}
-/>
+<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />
 
 <ImagePicker
   bind:open={showImagePicker}
@@ -357,5 +355,4 @@
   bind:open={showDelete}
   title="Delete Page?"
   description="Are you sure you want to delete this page? This action cannot be undone."
-  ondeleted={() => (isDeleting = true)}
 />
