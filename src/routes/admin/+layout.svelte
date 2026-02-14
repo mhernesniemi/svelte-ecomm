@@ -13,6 +13,7 @@
     getTheme,
     type Theme
   } from "$lib/stores/admin-theme.svelte";
+  import { cn } from "$lib/utils";
   import type { LayoutData } from "./$types";
   import LayoutGrid from "@lucide/svelte/icons/layout-grid";
   import Filter from "@lucide/svelte/icons/filter";
@@ -84,24 +85,38 @@
 <div class="min-h-screen bg-background font-sans text-foreground antialiased" data-admin class:dark>
   <!-- Sidebar -->
   <aside
-    class="fixed inset-y-0 left-0 z-40 w-64 bg-gray-900 text-white transition-transform duration-200 lg:translate-x-0 {sidebarOpen
-      ? 'translate-x-0'
-      : 'max-lg:-translate-x-full'}"
+    class={cn(
+      "fixed inset-y-0 left-0 z-40 w-64 border-r transition-transform duration-200 lg:translate-x-0",
+      dark ? "border-gray-800 bg-gray-900 text-white" : "border-gray-200 bg-gray-50 text-gray-900",
+      sidebarOpen ? "translate-x-0" : "max-lg:-translate-x-full"
+    )}
   >
     <div class="p-6">
-      <h1 class="font-italic font-mono text-xl font-bold text-blue-300">Hoikka</h1>
-      <p class="text-sm text-gray-400">Store Dashboard</p>
+      <h1
+        class={cn(
+          "font-italic font-mono text-xl font-bold",
+          dark ? "text-blue-300" : "text-blue-600"
+        )}
+      >
+        Hoikka
+      </h1>
+      <p class={cn("text-sm", dark ? "text-gray-400" : "text-gray-500")}>Store Dashboard</p>
     </div>
 
     <nav class="mt-6">
       {#each navItems as item}
         <a
           href={item.href}
-          class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-gray-800/60 hover:text-white {isActive(
-            item.href
-          )
-            ? 'border-l-4 border-blue-500 bg-gray-800/60 text-white'
-            : ''}"
+          class={cn(
+            "flex items-center gap-3 px-6 py-3",
+            dark
+              ? "text-gray-300 hover:bg-gray-800/60 hover:text-white"
+              : "text-gray-600 hover:bg-gray-200/60 hover:text-gray-900",
+            isActive(item.href) &&
+              (dark
+                ? "border-l-4 border-blue-500 bg-gray-800/60 text-white"
+                : "border-l-4 border-blue-500 bg-gray-200/60 text-gray-900")
+          )}
         >
           <span class="h-5 w-5 opacity-60">
             {#if item.icon === "shopping-cart"}
@@ -129,22 +144,39 @@
       {/each}
     </nav>
 
-    <div class="absolute right-0 bottom-0 left-0 bg-gray-900">
-      <div class="border-t border-gray-800">
+    <div class={cn("absolute right-0 bottom-0 left-0", dark ? "bg-gray-900" : "bg-gray-50")}>
+      <div class={cn("border-t", dark ? "border-gray-800" : "border-gray-200")}>
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          class="group flex items-center gap-2 p-4 text-sm hover:bg-gray-800/60"
+          class={cn(
+            "group flex items-center gap-2 p-4 text-sm",
+            dark ? "hover:bg-gray-800/60" : "hover:bg-gray-200/60"
+          )}
         >
-          <ExternalLink class="h-4 w-4 text-gray-300" strokeWidth={1.6} />
-          <span class="text-gray-300 group-hover:text-white">Storefront</span>
+          <ExternalLink
+            class={cn("h-4 w-4", dark ? "text-gray-300" : "text-gray-500")}
+            strokeWidth={1.6}
+          />
+          <span
+            class={cn(
+              dark
+                ? "text-gray-300 group-hover:text-white"
+                : "text-gray-600 group-hover:text-gray-900"
+            )}>Storefront</span
+          >
         </a>
       </div>
-      <div class="mb-1 border-t border-gray-800">
+      <div class={cn("mb-1 border-t", dark ? "border-gray-800" : "border-gray-200")}>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger
-            class="flex w-full items-center justify-between p-4 text-gray-300 hover:bg-gray-800/60 hover:text-white"
+            class={cn(
+              "flex w-full items-center justify-between p-4",
+              dark
+                ? "text-gray-300 hover:bg-gray-800/60 hover:text-white"
+                : "text-gray-600 hover:bg-gray-200/60 hover:text-gray-900"
+            )}
           >
             <span class="truncate text-sm">{data.adminUser?.email ?? "Admin"}</span>
             <ChevronsUpDown class="h-5 w-5 shrink-0 text-gray-400" strokeWidth={1.6} />
