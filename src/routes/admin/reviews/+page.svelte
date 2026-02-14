@@ -109,7 +109,9 @@
 <svelte:head><title>Reviews | Admin</title></svelte:head>
 
 <div>
-  <h1 class="mb-8 text-2xl leading-[40px] font-bold">Reviews</h1>
+  <div class="mb-6 flex items-center justify-between">
+    <h1 class="text-2xl leading-[40px] font-bold">Reviews</h1>
+  </div>
 
   <!-- Status Filter -->
   <div class="mb-6 flex flex-wrap gap-2">

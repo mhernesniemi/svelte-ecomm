@@ -162,7 +162,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-foreground">Promotions</h1>
+      <h1 class="text-2xl leading-[40px] font-bold text-foreground">Promotions</h1>
     </div>
     {#if data.promotions.length > 0}
       <a href="/admin/promotions/new" class={buttonVariants()}
