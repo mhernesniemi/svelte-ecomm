@@ -31,6 +31,22 @@ export const actions: Actions = {
 		}
 	},
 
+	publish: async ({ request }) => {
+		const formData = await request.formData();
+		const ids = formData.getAll("ids").map(Number).filter(Boolean);
+
+		if (ids.length === 0) {
+			return fail(400, { error: "No pages selected" });
+		}
+
+		try {
+			await Promise.all(ids.map((id) => contentPageService.update(id, { published: true })));
+			return { success: true };
+		} catch {
+			return fail(500, { error: "Failed to publish pages" });
+		}
+	},
+
 	deleteSelected: async ({ request }) => {
 		const formData = await request.formData();
 		const ids = formData.getAll("ids").map(Number).filter(Boolean);

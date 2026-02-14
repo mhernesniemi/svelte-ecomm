@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
   import type { ColumnDef } from "@tanstack/table-core";
   import { DataTable, renderSnippet, renderComponent } from "$lib/components/admin/data-table";
   import { Button } from "$lib/components/admin/ui/button";
@@ -102,17 +103,36 @@
     emptyDescription="Get started by creating a new page."
   >
     {#snippet bulkActions({ selectedRows, table })}
-      <Button
-        variant="destructive"
-        size="sm"
-        onclick={() => {
-          pendingDeleteIds = selectedRows.map((r) => r.id);
-          bulkDeleteTable = table;
-          showBulkDelete = true;
-        }}
-      >
-        Delete ({selectedRows.length})
-      </Button>
+      <div class="flex gap-2">
+        <form
+          method="POST"
+          action="?/publish"
+          use:enhance={() => {
+            return async ({ update }) => {
+              table.resetRowSelection();
+              await update();
+            };
+          }}
+        >
+          {#each selectedRows as row}
+            <input type="hidden" name="ids" value={row.id} />
+          {/each}
+          <Button type="submit" variant="outline" size="sm">
+            Publish ({selectedRows.length})
+          </Button>
+        </form>
+        <Button
+          variant="destructive"
+          size="sm"
+          onclick={() => {
+            pendingDeleteIds = selectedRows.map((r) => r.id);
+            bulkDeleteTable = table;
+            showBulkDelete = true;
+          }}
+        >
+          Delete ({selectedRows.length})
+        </Button>
+      </div>
     {/snippet}
     {#snippet emptyAction()}
       <Button onclick={() => (showCreatePage = true)}>Create Page</Button>
