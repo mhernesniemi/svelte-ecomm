@@ -13,7 +13,7 @@
 
 <select
   class={cn(
-    "w-full rounded-lg border border-input-border bg-surface px-3 py-2 text-sm text-foreground hover:border-foreground/20 disabled:cursor-not-allowed disabled:opacity-50",
+    "w-full truncate rounded-lg border border-input-border bg-surface py-2 pr-8 pl-3 text-sm text-foreground hover:border-foreground/20 disabled:cursor-not-allowed disabled:opacity-50",
     className
   )}
   bind:value

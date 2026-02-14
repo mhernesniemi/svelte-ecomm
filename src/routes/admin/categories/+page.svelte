@@ -200,11 +200,9 @@
         <input type="hidden" name="parent_id" value={inlineParentId} />
         <Popover.Root bind:open={parentComboboxOpen}>
           <Popover.Trigger
-            class="flex w-40 shrink-0 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+            class="flex w-48 shrink-0 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
           >
-            <span class={cn(!inlineParentId && "text-muted-foreground")}>
-              {selectedParentName}
-            </span>
+            <span>{selectedParentName}</span>
             <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Popover.Trigger>
           <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
@@ -254,7 +252,11 @@
             </Command.Root>
           </Popover.Content>
         </Popover.Root>
-        <SelectNative name="tax_code" class="w-auto shrink-0" bind:value={inlineTaxCode}>
+        <SelectNative
+          name="tax_code"
+          class="w-48 shrink-0 hover:border-input-border hover:bg-hover"
+          bind:value={inlineTaxCode}
+        >
           {#each data.taxRates as rate}
             <option value={rate.code}>{rate.name}</option>
           {/each}
