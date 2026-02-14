@@ -24,6 +24,7 @@
   import { Input } from "$lib/components/admin/ui/input/index.js";
   import { Button } from "$lib/components/admin/ui/button/index.js";
   import DataTableColumnHeader from "./DataTableColumnHeader.svelte";
+  import { cn } from "$lib/utils";
   import Search from "@lucide/svelte/icons/search";
   import type { Snippet, Component } from "svelte";
 
@@ -156,7 +157,7 @@
       {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
         <TableRow class="hover:bg-transparent">
           {#each headerGroup.headers as header (header.id)}
-            <TableHead colspan={header.colSpan} class={header.id === "select" ? "w-10" : ""}>
+            <TableHead colspan={header.colSpan} class={cn(header.id === "select" && "w-10")}>
               <DataTableColumnHeader {header} />
             </TableHead>
           {/each}

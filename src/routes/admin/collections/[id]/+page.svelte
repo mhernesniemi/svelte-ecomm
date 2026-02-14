@@ -413,7 +413,7 @@
           {/if}
 
           <!-- Default language fields -->
-          <div class={activeLanguageTab !== DEFAULT_LANGUAGE ? "hidden" : ""}>
+          <div class={cn(activeLanguageTab !== DEFAULT_LANGUAGE && "hidden")}>
             <div class="space-y-4 p-6">
               <div class="grid grid-cols-2 gap-4">
                 <div>
@@ -468,7 +468,7 @@
 
           <!-- Translation language fields -->
           {#each TRANSLATION_LANGUAGES as lang}
-            <div class={activeLanguageTab !== lang.code ? "hidden" : ""}>
+            <div class={cn(activeLanguageTab !== lang.code && "hidden")}>
               <div class="space-y-4 p-6">
                 <div class="grid grid-cols-2 gap-4">
                   <div>

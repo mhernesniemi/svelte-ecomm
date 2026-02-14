@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cn } from "$lib/utils";
   import type { PageData } from "./$types";
   import ArrowLeft from "@lucide/svelte/icons/arrow-left";
   import Package from "@lucide/svelte/icons/package";
@@ -56,7 +57,9 @@
         <h2 class="text-lg font-semibold">Order #{data.order.code}</h2>
         <p class="text-sm text-gray-500">{formatDate(data.order.createdAt)}</p>
       </div>
-      <span class="rounded-full px-3 py-1 text-sm font-medium {getStateColor(data.order.state)}">
+      <span
+        class={cn("rounded-full px-3 py-1 text-sm font-medium", getStateColor(data.order.state))}
+      >
         {data.order.state}
       </span>
     </div>

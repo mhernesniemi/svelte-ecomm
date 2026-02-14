@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { cn } from "$lib/utils";
   import { toast } from "svelte-sonner";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
@@ -141,7 +142,7 @@
           </div>
           <div>
             <span class="text-foreground-secondary">Verified purchase</span>
-            <p class="font-medium {data.review.isVerifiedPurchase ? 'text-green-600' : ''}">
+            <p class={cn("font-medium", data.review.isVerifiedPurchase && "text-green-600")}>
               {data.review.isVerifiedPurchase ? "Yes" : "No"}
             </p>
           </div>

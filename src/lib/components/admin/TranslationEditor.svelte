@@ -1,5 +1,6 @@
 <script lang="ts">
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import { cn } from "$lib/utils";
   import { TRANSLATION_LANGUAGES, DEFAULT_LANGUAGE, LANGUAGES } from "$lib/config/languages.js";
   import Globe from "@lucide/svelte/icons/globe";
 
@@ -52,13 +53,9 @@
       {#each TRANSLATION_LANGUAGES as lang}
         {#if activeTab === lang.code}
           {@const textFieldCount = fields.filter((f) => f.type === "text").length}
-          <div
-            class={textFieldCount > 1
-              ? "grid grid-cols-1 gap-4 sm:grid-cols-2"
-              : "grid grid-cols-1 gap-4"}
-          >
+          <div class={cn("grid grid-cols-1 gap-4", textFieldCount > 1 && "sm:grid-cols-2")}>
             {#each fields as field}
-              <div class={field.type !== "text" && textFieldCount > 1 ? "sm:col-span-2" : ""}>
+              <div class={cn(field.type !== "text" && textFieldCount > 1 && "sm:col-span-2")}>
                 <label
                   for="translation_{lang.code}_{field.name}"
                   class="mb-1 block text-sm font-medium text-foreground-secondary"

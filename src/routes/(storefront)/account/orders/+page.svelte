@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cn } from "$lib/utils";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -55,7 +56,9 @@
               <p class="font-medium">Order #{order.code}</p>
               <p class="text-sm text-gray-500">{formatDate(order.createdAt)}</p>
             </div>
-            <span class="rounded-full px-3 py-1 text-sm font-medium {getStateColor(order.state)}">
+            <span
+              class={cn("rounded-full px-3 py-1 text-sm font-medium", getStateColor(order.state))}
+            >
               {order.state}
             </span>
           </div>
