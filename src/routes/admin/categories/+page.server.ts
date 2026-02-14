@@ -2,6 +2,7 @@ import { categoryService } from "$lib/server/services/categories.js";
 import { taxService } from "$lib/server/services/tax.js";
 import { translationService } from "$lib/server/services/translations.js";
 import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
+import { slugify } from "$lib/utils.js";
 import { fail } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
@@ -83,6 +84,36 @@ export const actions: Actions = {
 			return { success: true };
 		} catch (e) {
 			return fail(500, { error: "Failed to update category" });
+		}
+	},
+
+	quickCreate: async ({ request }) => {
+		const formData = await request.formData();
+		const raw = (formData.get("names") as string) ?? "";
+		const parentId = formData.get("parent_id") as string;
+
+		const names = raw
+			.split(",")
+			.map((n) => n.trim())
+			.filter(Boolean);
+
+		if (names.length === 0) {
+			return fail(400, { error: "At least one name is required" });
+		}
+
+		try {
+			for (const name of names) {
+				await categoryService.create({
+					slug: slugify(name),
+					parentId: parentId ? Number(parentId) : null,
+					name,
+					taxCode: "standard"
+				});
+			}
+
+			return { success: true };
+		} catch (e) {
+			return fail(500, { error: "Failed to create category" });
 		}
 	},
 

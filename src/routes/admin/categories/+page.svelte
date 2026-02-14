@@ -11,9 +11,12 @@
   import * as Collapsible from "$lib/components/admin/ui/collapsible";
   import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import * as Tooltip from "$lib/components/admin/ui/tooltip";
+  import * as Popover from "$lib/components/admin/ui/popover";
+  import * as Command from "$lib/components/admin/ui/command";
   import { slugify, cn } from "$lib/utils.js";
-  import FolderOpen from "@lucide/svelte/icons/folder-open";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
+  import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
+  import Check from "@lucide/svelte/icons/check";
   import Pencil from "@lucide/svelte/icons/pencil";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import type { PageData } from "./$types";
@@ -56,6 +59,16 @@
   let expandedIds = $state(loadExpandedIds());
   const allIds = $derived(collectIds(data.tree));
   const allExpanded = $derived(allIds.length > 0 && allIds.every((id) => expandedIds.has(id)));
+
+  // Inline quick-add state
+  let inlineNames = $state("");
+  let inlineParentId = $state("");
+  let parentComboboxOpen = $state(false);
+  const selectedParentName = $derived(
+    inlineParentId
+      ? (flatCategories.find((c) => c.id === Number(inlineParentId))?.name ?? "Root")
+      : "Root"
+  );
 
   // Dialog state
   let createDialogOpen = $state(false);
@@ -144,150 +157,221 @@
 <svelte:head><title>Categories | Admin</title></svelte:head>
 
 <div>
-  <div class="mb-6">
-    <h1 class="text-2xl leading-[40px] font-bold">Categories</h1>
-  </div>
+  <h1 class="text-2xl leading-[40px] font-bold">Categories</h1>
 
-  {#if data.tree.length === 0}
-    <!-- Empty state -->
-    <div class="rounded-lg border border-dashed border-input-border p-12 text-center">
-      <FolderOpen class="mx-auto h-12 w-12 text-placeholder" />
-      <h3 class="mt-2 text-sm font-medium">No categories</h3>
-      <p class="mt-1 text-sm text-muted-foreground">Get started by creating a root category.</p>
-      <div class="mt-6">
-        <Button type="button" onclick={() => openCreateDialog()}>Add Category</Button>
-      </div>
-    </div>
-  {:else}
-    <button
-      type="button"
-      class="mb-2 text-sm text-foreground-secondary hover:text-foreground"
-      onclick={toggleAll}
-    >
-      {allExpanded ? "Collapse all" : "Expand all"}
-    </button>
-
-    <!-- Category tree -->
-    <div class="overflow-hidden rounded-lg border border-border bg-surface">
-      {#snippet categoryNode(node: CategoryNode, depth: number, parentPath: string)}
-        {@const fullPath = `${parentPath}/${node.slug}`}
-        {@const hasChildren = node.children.length > 0}
-        {@const isExpanded = expandedIds.has(node.id)}
-        {@const taxRate = data.taxRates.find((r) => r.code === node.taxCode)}
-        {@const translations = data.categoryTranslations[node.id]}
-        {@const translatedLangs = TRANSLATION_LANGUAGES.filter((lang) =>
-          translations?.find((t) => t.languageCode === lang.code && t.name)
-        )}
-
-        <Collapsible.Root open={isExpanded}>
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div
-            class={cn(
-              "flex w-full items-center border-b border-border last:border-b-0",
-              "hover:bg-hover",
-              hasChildren && "cursor-pointer"
-            )}
-            style="padding-left: {depth * 1.5 + 0.5}rem"
-            onclick={() => {
-              if (hasChildren) toggleExpand(node.id);
-            }}
-          >
-            <!-- Chevron toggle -->
-            <button
-              type="button"
-              class={cn(
-                "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
-                hasChildren ? "cursor-pointer hover:bg-muted" : "cursor-default"
-              )}
-              onclick={(e) => {
-                e.stopPropagation();
-                if (hasChildren) toggleExpand(node.id);
-              }}
-              tabindex={hasChildren ? 0 : -1}
-            >
-              {#if hasChildren}
-                <ChevronRight
-                  class={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform duration-200",
-                    isExpanded && "rotate-90"
-                  )}
-                />
-              {/if}
-            </button>
-
-            <!-- Row content -->
-            <div class="flex min-w-0 flex-1 items-center gap-3 py-2.5 pr-4">
-              <span class="text-sm font-medium">{node.name}</span>
-              <span class="truncate text-sm text-placeholder">{fullPath}</span>
-              <span class="ml-auto flex shrink-0 items-center gap-3">
-                <span class="flex items-center gap-1.5">
-                  {#each translatedLangs as lang}
-                    <Badge variant="outline">{lang.code.toUpperCase()}</Badge>
-                  {/each}
-                </span>
-                {#if taxRate}
-                  <Badge variant="outline">{taxRate.name}</Badge>
-                {/if}
-              </span>
-            </div>
-
-            <!-- Action buttons -->
-            <!-- svelte-ignore a11y_click_events_have_key_events -->
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <div
-              class="flex shrink-0 items-center gap-1 pr-3 pl-4"
-              onclick={(e) => e.stopPropagation()}
-            >
-              <Tooltip.Provider>
-                <Tooltip.Root ignoreNonKeyboardFocus>
-                  <Tooltip.Trigger
-                    type="button"
-                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
-                    onclick={() => openCreateDialog(node.id)}
-                  >
-                    <PlusIcon
-                      class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground"
-                    />
-                  </Tooltip.Trigger>
-                  <Tooltip.Content>Add child category</Tooltip.Content>
-                </Tooltip.Root>
-              </Tooltip.Provider>
-              <Tooltip.Provider>
-                <Tooltip.Root ignoreNonKeyboardFocus>
-                  <Tooltip.Trigger
-                    type="button"
-                    class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
-                    onclick={() => openEditDialog(node)}
-                  >
-                    <Pencil class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
-                  </Tooltip.Trigger>
-                  <Tooltip.Content>Edit category</Tooltip.Content>
-                </Tooltip.Root>
-              </Tooltip.Provider>
-            </div>
-          </div>
-
-          <Collapsible.Content>
-            {#each node.children as child}
-              {@render categoryNode(child, depth + 1, fullPath)}
-            {/each}
-          </Collapsible.Content>
-        </Collapsible.Root>
-      {/snippet}
-
-      {#each data.tree as rootNode}
-        {@render categoryNode(rootNode, 0, "")}
-      {/each}
+  {#if data.tree.length > 0}
+    <div class="mb-2 flex justify-end">
       <button
         type="button"
-        class="flex w-full cursor-pointer items-center justify-center gap-2 py-2.5 text-sm text-foreground-secondary hover:bg-hover hover:text-foreground"
-        onclick={() => openCreateDialog()}
+        class="text-sm text-foreground-secondary hover:text-foreground"
+        onclick={toggleAll}
       >
-        <PlusIcon class="h-4 w-4" /> Add Category
+        {allExpanded ? "Collapse all" : "Expand all"}
       </button>
     </div>
   {/if}
+
+  <!-- Category tree -->
+  <div class="overflow-hidden rounded-lg border border-border bg-surface">
+    <div class="px-6 py-4">
+      <p class="text-sm text-foreground-tertiary">
+        Add one or more categories. Separate multiple with commas.
+      </p>
+      <form
+        method="POST"
+        action="?/quickCreate"
+        use:enhance={() => {
+          return async ({ update }) => {
+            await update();
+            inlineNames = "";
+            inlineParentId = "";
+          };
+        }}
+        class="mt-3 flex gap-2"
+      >
+        <Input
+          type="text"
+          name="names"
+          bind:value={inlineNames}
+          placeholder="e.g., Electronics, Clothing, Books"
+        />
+        <input type="hidden" name="parent_id" value={inlineParentId} />
+        <Popover.Root bind:open={parentComboboxOpen}>
+          <Popover.Trigger
+            class="flex w-40 shrink-0 items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
+          >
+            <span class={cn(!inlineParentId && "text-muted-foreground")}>
+              {selectedParentName}
+            </span>
+            <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Popover.Trigger>
+          <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
+            <Command.Root>
+              <Command.Input placeholder="Search categories..." />
+              <Command.List class="max-h-64">
+                <Command.Empty>No category found.</Command.Empty>
+                <Command.Group>
+                  <Command.Item
+                    value="Root"
+                    onSelect={() => {
+                      inlineParentId = "";
+                      parentComboboxOpen = false;
+                    }}
+                    class="cursor-pointer"
+                  >
+                    <div class="flex w-full items-center gap-2">
+                      <div class="flex h-4 w-4 items-center justify-center">
+                        {#if !inlineParentId}
+                          <Check class="h-4 w-4" />
+                        {/if}
+                      </div>
+                      <span>Root</span>
+                    </div>
+                  </Command.Item>
+                  {#each flatCategories as category}
+                    <Command.Item
+                      value={category.name}
+                      onSelect={() => {
+                        inlineParentId = String(category.id);
+                        parentComboboxOpen = false;
+                      }}
+                      class="cursor-pointer"
+                    >
+                      <div class="flex w-full items-center gap-2">
+                        <div class="flex h-4 w-4 items-center justify-center">
+                          {#if inlineParentId === String(category.id)}
+                            <Check class="h-4 w-4" />
+                          {/if}
+                        </div>
+                        <span>{"— ".repeat(category.depth)}{category.name}</span>
+                      </div>
+                    </Command.Item>
+                  {/each}
+                </Command.Group>
+              </Command.List>
+            </Command.Root>
+          </Popover.Content>
+        </Popover.Root>
+        <Button type="submit" variant="outline" size="sm" class="shrink-0">Add</Button>
+      </form>
+    </div>
+    {#snippet categoryNode(node: CategoryNode, depth: number, parentPath: string)}
+      {@const fullPath = `${parentPath}/${node.slug}`}
+      {@const hasChildren = node.children.length > 0}
+      {@const isExpanded = expandedIds.has(node.id)}
+      {@const taxRate = data.taxRates.find((r) => r.code === node.taxCode)}
+      {@const translations = data.categoryTranslations[node.id]}
+      {@const translatedLangs = TRANSLATION_LANGUAGES.filter((lang) =>
+        translations?.find((t) => t.languageCode === lang.code && t.name)
+      )}
+
+      <Collapsible.Root open={isExpanded}>
+        <!-- svelte-ignore a11y_click_events_have_key_events -->
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <div
+          class={cn(
+            "flex w-full items-center border-t border-border",
+            "hover:bg-hover",
+            hasChildren && "cursor-pointer"
+          )}
+          style="padding-left: {depth * 1.5 + 0.5}rem"
+          onclick={() => {
+            if (hasChildren) toggleExpand(node.id);
+          }}
+        >
+          <!-- Chevron toggle -->
+          <button
+            type="button"
+            class={cn(
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-md",
+              hasChildren ? "cursor-pointer hover:bg-muted" : "cursor-default"
+            )}
+            onclick={(e) => {
+              e.stopPropagation();
+              if (hasChildren) toggleExpand(node.id);
+            }}
+            tabindex={hasChildren ? 0 : -1}
+          >
+            {#if hasChildren}
+              <ChevronRight
+                class={cn(
+                  "h-4 w-4 text-muted-foreground transition-transform duration-200",
+                  isExpanded && "rotate-90"
+                )}
+              />
+            {/if}
+          </button>
+
+          <!-- Row content -->
+          <div class="flex min-w-0 flex-1 items-center gap-3 py-2.5 pr-4">
+            <span class="text-sm font-medium">{node.name}</span>
+            <span class="truncate text-sm text-placeholder">{fullPath}</span>
+            <span class="ml-auto flex shrink-0 items-center gap-3">
+              <span class="flex items-center gap-1.5">
+                {#each translatedLangs as lang}
+                  <Badge variant="outline">{lang.code.toUpperCase()}</Badge>
+                {/each}
+              </span>
+              {#if taxRate}
+                <Badge variant="outline">{taxRate.name}</Badge>
+              {/if}
+            </span>
+          </div>
+
+          <!-- Action buttons -->
+          <!-- svelte-ignore a11y_click_events_have_key_events -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div
+            class="flex shrink-0 items-center gap-1 pr-3 pl-4"
+            onclick={(e) => e.stopPropagation()}
+          >
+            <Tooltip.Provider>
+              <Tooltip.Root ignoreNonKeyboardFocus>
+                <Tooltip.Trigger
+                  type="button"
+                  class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
+                  onclick={() => openCreateDialog(node.id)}
+                >
+                  <PlusIcon class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
+                </Tooltip.Trigger>
+                <Tooltip.Content>Add child category</Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+            <Tooltip.Provider>
+              <Tooltip.Root ignoreNonKeyboardFocus>
+                <Tooltip.Trigger
+                  type="button"
+                  class="group flex h-7 w-7 items-center justify-center rounded-md hover:bg-foreground/10"
+                  onclick={() => openEditDialog(node)}
+                >
+                  <Pencil class="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground" />
+                </Tooltip.Trigger>
+                <Tooltip.Content>Edit category</Tooltip.Content>
+              </Tooltip.Root>
+            </Tooltip.Provider>
+          </div>
+        </div>
+
+        <Collapsible.Content>
+          {#each node.children as child}
+            {@render categoryNode(child, depth + 1, fullPath)}
+          {/each}
+        </Collapsible.Content>
+      </Collapsible.Root>
+    {/snippet}
+
+    {#if data.tree.length === 0}
+      <div class="border-t border-border p-6 text-center">
+        <p class="text-sm text-muted-foreground">
+          No categories yet. Use the input above to add your first category.
+        </p>
+      </div>
+    {:else}
+      {#each data.tree as rootNode}
+        {@render categoryNode(rootNode, 0, "")}
+      {/each}
+    {/if}
+  </div>
 </div>
 
 <!-- Create Dialog -->
