@@ -91,6 +91,7 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const raw = (formData.get("names") as string) ?? "";
 		const parentId = formData.get("parent_id") as string;
+		const taxCode = (formData.get("tax_code") as string) || "standard";
 
 		const names = raw
 			.split(",")
@@ -107,7 +108,7 @@ export const actions: Actions = {
 					slug: slugify(name),
 					parentId: parentId ? Number(parentId) : null,
 					name,
-					taxCode: "standard"
+					taxCode
 				});
 			}
 

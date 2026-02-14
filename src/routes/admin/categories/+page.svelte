@@ -63,6 +63,7 @@
   // Inline quick-add state
   let inlineNames = $state("");
   let inlineParentId = $state("");
+  let inlineTaxCode = $state("standard");
   let parentComboboxOpen = $state(false);
   const selectedParentName = $derived(
     inlineParentId
@@ -143,7 +144,7 @@
     });
   });
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === "c" && !createDialogOpen && !editDialogOpen) {
+    if (e.key === "c" && !e.metaKey && !e.ctrlKey && !createDialogOpen && !editDialogOpen) {
       const tag = (e.target as HTMLElement).tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       e.preventDefault();
@@ -185,6 +186,7 @@
             await update();
             inlineNames = "";
             inlineParentId = "";
+            inlineTaxCode = "standard";
           };
         }}
         class="mt-3 flex gap-2"
@@ -252,6 +254,11 @@
             </Command.Root>
           </Popover.Content>
         </Popover.Root>
+        <SelectNative name="tax_code" class="w-auto shrink-0" bind:value={inlineTaxCode}>
+          {#each data.taxRates as rate}
+            <option value={rate.code}>{rate.name}</option>
+          {/each}
+        </SelectNative>
         <Button type="submit" variant="secondary" class="shrink-0">Add</Button>
       </form>
     </div>
