@@ -1,6 +1,8 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import type { ActionData } from "./$types";
 
   let { form }: { form: ActionData } = $props();
@@ -32,27 +34,18 @@
         }}
       >
         <div class="mb-4">
-          <label for="email" class="mb-1 block text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            autocomplete="email"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2"
-          />
+          <Label for="email">Email</Label>
+          <Input type="email" id="email" name="email" required autocomplete="email" />
         </div>
 
         <div class="mb-6">
-          <label for="password" class="mb-1 block text-sm font-medium text-gray-700">Password</label
-          >
-          <input
+          <Label for="password">Password</Label>
+          <Input
             type="password"
             id="password"
             name="password"
             required
             autocomplete="current-password"
-            class="w-full rounded-lg border border-gray-300 px-3 py-2"
           />
         </div>
 
