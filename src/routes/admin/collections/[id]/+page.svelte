@@ -41,13 +41,14 @@
   let { data, form } = $props();
 
   let cameFromCreate = $state(false);
+  let showCancelDelete = $state(false);
   let hasSaved = $state(false);
   let createDialogOpen = $state(false);
 
   onMount(() => {
     if ($page.url.searchParams.has("created")) {
       cameFromCreate = true;
-      toast.success("Collection created successfully");
+      showCancelDelete = true;
       history.replaceState({}, "", $page.url.pathname);
     }
   });
@@ -334,9 +335,9 @@
         class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         ><ChevronLeft class="h-4 w-4" /> Back to Collections</a
       >
-      {#if slug}
+      {#if !data.collection.isPrivate}
         <a
-          href="/collections/{data.collection.id}/{slug}"
+          href="/collections/{data.collection.id}/{data.collection.slug}"
           target="_blank"
           class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         >
@@ -351,6 +352,11 @@
           <Button type="button" variant="outline" onclick={() => (createDialogOpen = true)}>
             <Plus class="h-4 w-4" /> Add Collection
           </Button>
+        {/if}
+        {#if showCancelDelete}
+          <form method="POST" action="?/delete" use:enhance>
+            <Button type="submit" variant="outline">Cancel</Button>
+          </form>
         {/if}
         <Button type="submit" form="collection-form" disabled={isSubmitting}>
           {isSubmitting ? "Saving..." : "Save Changes"}
@@ -376,6 +382,7 @@
             if (result.type === "success") {
               toast.success("Collection updated");
               hasSaved = true;
+              showCancelDelete = false;
             }
           };
         }}

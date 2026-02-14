@@ -47,25 +47,28 @@
   let visibility = $state(data.product.visibility);
 
   let cameFromCreate = $state(false);
+  let showCancelDelete = $state(false);
   let hasSaved = $state(false);
   let createDialogOpen = $state(false);
 
-  // Show toast from URL params (created/variant redirects)
+  // Show toast from URL params (variant redirects)
   onMount(() => {
     const url = $page.url;
     if (url.searchParams.has("created")) {
       cameFromCreate = true;
-    }
-    const messages: Record<string, string> = {
-      created: "Product created successfully",
-      variantCreated: "Variant created successfully",
-      variantDeleted: "Variant deleted successfully"
-    };
-    for (const [param, message] of Object.entries(messages)) {
-      if (url.searchParams.has(param)) {
-        toast.success(message);
-        history.replaceState({}, "", url.pathname);
-        break;
+      showCancelDelete = true;
+      history.replaceState({}, "", url.pathname);
+    } else {
+      const messages: Record<string, string> = {
+        variantCreated: "Variant created successfully",
+        variantDeleted: "Variant deleted successfully"
+      };
+      for (const [param, message] of Object.entries(messages)) {
+        if (url.searchParams.has(param)) {
+          toast.success(message);
+          history.replaceState({}, "", url.pathname);
+          break;
+        }
       }
     }
   });
@@ -247,7 +250,7 @@
         class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         ><ChevronLeft class="h-4 w-4" /> Back to Products</a
       >
-      {#if data.product.slug}
+      {#if data.product.visibility === "public"}
         <a
           href="/products/{data.product.id}/{data.product.slug}"
           target="_blank"
@@ -264,6 +267,11 @@
           <Button type="button" variant="outline" onclick={() => (createDialogOpen = true)}>
             <Plus class="h-4 w-4" /> Add Product
           </Button>
+        {/if}
+        {#if showCancelDelete}
+          <form method="POST" action="?/delete" use:enhance>
+            <Button type="submit" variant="outline">Cancel</Button>
+          </form>
         {/if}
         <Button type="submit" form="product-form" disabled={isSavingProduct}>
           {isSavingProduct ? "Saving..." : "Save Changes"}
@@ -289,6 +297,7 @@
             if (result.type === "success") {
               toast.success("Product updated successfully");
               hasSaved = true;
+              showCancelDelete = false;
             }
           };
         }}

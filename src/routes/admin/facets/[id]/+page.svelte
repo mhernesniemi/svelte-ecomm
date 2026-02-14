@@ -25,6 +25,7 @@
   let isSubmitting = $state(false);
   let showDelete = $state(false);
   let cameFromCreate = $state(false);
+  let showCancelDelete = $state(false);
   let hasSaved = $state(false);
   let createDialogOpen = $state(false);
 
@@ -99,7 +100,7 @@
   onMount(() => {
     if ($page.url.searchParams.has("created")) {
       cameFromCreate = true;
-      toast.success("Facet created successfully");
+      showCancelDelete = true;
       history.replaceState({}, "", $page.url.pathname);
       requestAnimationFrame(() => bulkInputEl?.focus());
     }
@@ -191,6 +192,11 @@
           <Plus class="h-4 w-4" /> Add Facet
         </Button>
       {/if}
+      {#if showCancelDelete}
+        <form method="POST" action="?/delete" use:enhance>
+          <Button type="submit" variant="outline">Cancel</Button>
+        </form>
+      {/if}
       <Button type="submit" form="facet-form" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Changes"}
       </Button>
@@ -226,6 +232,7 @@
             isSubmitting = false;
             if (result.type === "success") {
               hasSaved = true;
+              showCancelDelete = false;
               toast.success("Facet updated");
             }
           };
