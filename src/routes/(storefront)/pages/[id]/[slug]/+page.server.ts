@@ -2,14 +2,17 @@ import type { PageServerLoad } from "./$types";
 import { contentPageService } from "$lib/server/services/content-pages.js";
 import { error, redirect } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
 		throw error(404, "Page not found");
 	}
 
-	const page = await contentPageService.getPublishedById(id);
+	const isPreview = url.searchParams.has("preview") && !!locals.adminUser;
+	const page = isPreview
+		? await contentPageService.getById(id)
+		: await contentPageService.getPublishedById(id);
 	if (!page) {
 		throw error(404, "Page not found");
 	}

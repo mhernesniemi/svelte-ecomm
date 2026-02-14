@@ -6,21 +6,22 @@ import { taxService } from "$lib/server/services/tax.js";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad, Actions } from "./$types";
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params, locals, url }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
 		throw error(404, "Product not found");
 	}
 
+	const isPreview = url.searchParams.has("preview") && !!locals.adminUser;
 	const product = await productService.getById(id);
 
-	if (!product || product.visibility === "draft") {
+	if (!product || (!isPreview && product.visibility === "draft")) {
 		throw error(404, "Product not found");
 	}
 
 	// Private products require membership in a tax-exempt group
-	if (product.visibility === "private") {
+	if (!isPreview && product.visibility === "private") {
 		const isTaxExempt = await taxService.isCustomerTaxExempt(locals.customer?.id);
 		if (!isTaxExempt) {
 			throw error(404, "Product not found");

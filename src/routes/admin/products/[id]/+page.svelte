@@ -250,15 +250,16 @@
         class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         ><ChevronLeft class="h-4 w-4" /> Back to Products</a
       >
-      {#if data.product.visibility === "public"}
-        <a
-          href="/products/{data.product.id}/{data.product.slug}"
-          target="_blank"
-          class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
-        >
-          View in store <ExternalLink class="h-3.5 w-3.5" />
-        </a>
-      {/if}
+      <a
+        href="/products/{data.product.id}/{data.product.slug}{data.product.visibility === 'public'
+          ? ''
+          : '?preview'}"
+        target="_blank"
+        class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >
+        {data.product.visibility === "public" ? "View in store" : "Preview"}
+        <ExternalLink class="h-3.5 w-3.5" />
+      </a>
     </div>
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">{productName || "Edit Product"}</h1>

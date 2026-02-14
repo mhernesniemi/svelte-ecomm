@@ -335,15 +335,16 @@
         class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
         ><ChevronLeft class="h-4 w-4" /> Back to Collections</a
       >
-      {#if !data.collection.isPrivate}
-        <a
-          href="/collections/{data.collection.id}/{data.collection.slug}"
-          target="_blank"
-          class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
-        >
-          View in store <ExternalLink class="h-3.5 w-3.5" />
-        </a>
-      {/if}
+      <a
+        href="/collections/{data.collection.id}/{data.collection.slug}{data.collection.isPrivate
+          ? '?preview'
+          : ''}"
+        target="_blank"
+        class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+      >
+        {data.collection.isPrivate ? "Preview" : "View in store"}
+        <ExternalLink class="h-3.5 w-3.5" />
+      </a>
     </div>
     <div class="mt-2 flex items-center justify-between">
       <h1 class="text-2xl font-bold">{name || "Edit Collection"}</h1>

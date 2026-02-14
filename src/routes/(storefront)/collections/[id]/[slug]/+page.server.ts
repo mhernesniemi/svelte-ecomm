@@ -2,19 +2,20 @@ import type { PageServerLoad } from "./$types";
 import { collectionService } from "$lib/server/services/collections.js";
 import { error, redirect } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async ({ params, url }) => {
+export const load: PageServerLoad = async ({ params, url, locals }) => {
 	const id = Number(params.id);
 
 	if (isNaN(id)) {
 		throw error(404, "Collection not found");
 	}
 
+	const isPreview = url.searchParams.has("preview") && !!locals.adminUser;
 	const page = parseInt(url.searchParams.get("page") ?? "1");
 	const limit = 12;
 	const offset = (page - 1) * limit;
 
 	const collection = await collectionService.getById(id);
-	if (!collection || collection.isPrivate) {
+	if (!collection || (!isPreview && collection.isPrivate)) {
 		throw error(404, "Collection not found");
 	}
 
