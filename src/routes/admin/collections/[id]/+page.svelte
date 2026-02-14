@@ -343,8 +343,7 @@
         target="_blank"
         class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       >
-        {data.collection.isPrivate ? "Preview" : "View in store"}
-        <ExternalLink class="h-3.5 w-3.5" />
+        Preview <ExternalLink class="h-3.5 w-3.5" />
       </a>
     </div>
     <div class="mt-2 flex items-center justify-between">
