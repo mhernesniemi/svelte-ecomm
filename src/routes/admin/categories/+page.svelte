@@ -11,12 +11,9 @@
   import * as Collapsible from "$lib/components/admin/ui/collapsible";
   import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
   import * as Tooltip from "$lib/components/admin/ui/tooltip";
-  import * as Popover from "$lib/components/admin/ui/popover";
-  import * as Command from "$lib/components/admin/ui/command";
+  import CategoryCombobox from "$lib/components/admin/CategoryCombobox.svelte";
   import { slugify, cn } from "$lib/utils.js";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
-  import ChevronsUpDown from "@lucide/svelte/icons/chevrons-up-down";
-  import Check from "@lucide/svelte/icons/check";
   import Pencil from "@lucide/svelte/icons/pencil";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import type { PageData } from "./$types";
@@ -64,12 +61,6 @@
   let inlineNames = $state("");
   let inlineParentId = $state("");
   let inlineTaxCode = $state("standard");
-  let parentComboboxOpen = $state(false);
-  const selectedParentName = $derived(
-    inlineParentId
-      ? (flatCategories.find((c) => c.id === Number(inlineParentId))?.name ?? "Root")
-      : "Root"
-  );
 
   // Dialog state
   let createDialogOpen = $state(false);
@@ -198,60 +189,12 @@
           placeholder="e.g., Electronics, Clothing, Books"
         />
         <input type="hidden" name="parent_id" value={inlineParentId} />
-        <Popover.Root bind:open={parentComboboxOpen}>
-          <Popover.Trigger
-            class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover sm:w-48"
-          >
-            <span>{selectedParentName}</span>
-            <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Popover.Trigger>
-          <Popover.Content class="w-[var(--bits-popover-trigger-width)] p-0" align="start">
-            <Command.Root>
-              <Command.Input placeholder="Search categories..." />
-              <Command.List class="max-h-64">
-                <Command.Empty>No category found.</Command.Empty>
-                <Command.Group>
-                  <Command.Item
-                    value="Root"
-                    onSelect={() => {
-                      inlineParentId = "";
-                      parentComboboxOpen = false;
-                    }}
-                    class="cursor-pointer"
-                  >
-                    <div class="flex w-full items-center gap-2">
-                      <div class="flex h-4 w-4 items-center justify-center">
-                        {#if !inlineParentId}
-                          <Check class="h-4 w-4" />
-                        {/if}
-                      </div>
-                      <span>Root</span>
-                    </div>
-                  </Command.Item>
-                  {#each flatCategories as category}
-                    <Command.Item
-                      value={category.name}
-                      onSelect={() => {
-                        inlineParentId = String(category.id);
-                        parentComboboxOpen = false;
-                      }}
-                      class="cursor-pointer"
-                    >
-                      <div class="flex w-full items-center gap-2">
-                        <div class="flex h-4 w-4 items-center justify-center">
-                          {#if inlineParentId === String(category.id)}
-                            <Check class="h-4 w-4" />
-                          {/if}
-                        </div>
-                        <span>{"— ".repeat(category.depth)}{category.name}</span>
-                      </div>
-                    </Command.Item>
-                  {/each}
-                </Command.Group>
-              </Command.List>
-            </Command.Root>
-          </Popover.Content>
-        </Popover.Root>
+        <CategoryCombobox
+          categories={flatCategories}
+          value={inlineParentId}
+          onchange={(v) => (inlineParentId = v)}
+          triggerClass="sm:w-48"
+        />
         <SelectNative
           name="tax_code"
           class="w-full hover:border-input-border hover:bg-hover sm:w-48"

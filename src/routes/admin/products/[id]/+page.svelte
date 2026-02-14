@@ -40,6 +40,7 @@
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import ExternalLink from "@lucide/svelte/icons/external-link";
   import { cn } from "$lib/utils";
+  import CategoryCombobox from "$lib/components/admin/CategoryCombobox.svelte";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import type { ActionData, PageData } from "./$types";
 
@@ -89,7 +90,6 @@
   // Selected facet values and categories - reset when product changes
   let selectedProductFacets = $state<number[]>([]);
   let selectedCategories = $state<number[]>([]);
-  let categoryComboboxOpen = $state(false);
   let facetComboboxOpen = $state(false);
 
   // Initialize selections when product data changes
@@ -659,44 +659,12 @@
         {#if data.categoryTree.length === 0}
           <p class="text-sm text-muted-foreground">No categories defined.</p>
         {:else}
-          <!-- Combobox -->
-          <Popover.Root bind:open={categoryComboboxOpen}>
-            <Popover.Trigger
-              class="flex w-full items-center justify-between rounded-lg border border-input-border bg-surface px-3 py-2 text-sm hover:bg-hover"
-              aria-expanded={categoryComboboxOpen}
-              aria-controls="category-listbox"
-              aria-haspopup="listbox"
-            >
-              <span class="text-muted-foreground">Select categories...</span>
-              <ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Popover.Trigger>
-            <Popover.Content class="w-72 p-0" align="start">
-              <Command.Root>
-                <Command.Input placeholder="Search categories..." />
-                <Command.List id="category-listbox" class="max-h-64">
-                  <Command.Empty>No category found.</Command.Empty>
-                  <Command.Group>
-                    {#each flatCategories as category}
-                      <Command.Item
-                        value={category.name}
-                        onSelect={() => toggleCategory(category.id)}
-                        class="cursor-pointer"
-                      >
-                        <div class="flex w-full items-center gap-2">
-                          <div class="flex h-4 w-4 items-center justify-center">
-                            {#if selectedCategories.includes(category.id)}
-                              <Check class="h-4 w-4" />
-                            {/if}
-                          </div>
-                          <span>{"— ".repeat(category.depth)}{category.name}</span>
-                        </div>
-                      </Command.Item>
-                    {/each}
-                  </Command.Group>
-                </Command.List>
-              </Command.Root>
-            </Popover.Content>
-          </Popover.Root>
+          <CategoryCombobox
+            mode="multi"
+            categories={flatCategories}
+            selected={selectedCategories}
+            onToggle={toggleCategory}
+          />
 
           <!-- Selected categories -->
           {#if selectedCategories.length > 0}
