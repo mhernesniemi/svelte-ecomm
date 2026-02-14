@@ -23,9 +23,11 @@
   import ExternalLink from "@lucide/svelte/icons/external-link";
   let { data, form } = $props();
 
+  let showCancelDelete = $state(false);
+
   onMount(() => {
     if ($page.url.searchParams.has("created")) {
-      toast.success("Content page created successfully");
+      showCancelDelete = true;
       history.replaceState({}, "", $page.url.pathname);
     }
   });
@@ -35,6 +37,7 @@
   });
 
   let isSubmitting = $state(false);
+  let isDeleting = $state(false);
   let showDelete = $state(false);
 
   let title = $state("");
@@ -90,7 +93,7 @@
       class="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
       ><ChevronLeft class="h-4 w-4" /> Back to Pages</a
     >
-    {#if published && slug}
+    {#if data.page.published}
       <a
         href="/pages/{data.page.id}/{slug}"
         target="_blank"
@@ -102,9 +105,14 @@
   </div>
   <div class="mt-2 flex items-center justify-between">
     <h1 class="text-2xl font-bold">{title || "Edit Content Page"}</h1>
-    <Button type="submit" form="content-page-form" disabled={isSubmitting}>
-      {isSubmitting ? "Saving..." : "Save Changes"}
-    </Button>
+    <div class="flex items-center gap-2">
+      {#if showCancelDelete}
+        <Button type="button" variant="outline" onclick={() => (showDelete = true)}>Cancel</Button>
+      {/if}
+      <Button type="submit" form="content-page-form" disabled={isSubmitting}>
+        {isSubmitting ? "Saving..." : "Save Changes"}
+      </Button>
+    </div>
   </div>
 
   <!-- Two Column Layout -->
@@ -121,6 +129,7 @@
             await update({ reset: false });
             isSubmitting = false;
             if (result.type === "success") {
+              showCancelDelete = false;
               toast.success("Page updated");
             }
           };
@@ -332,7 +341,10 @@
   </div>
 </div>
 
-<UnsavedChangesDialog isDirty={() => hasUnsavedChanges} isSaving={() => isSubmitting} />
+<UnsavedChangesDialog
+  isDirty={() => hasUnsavedChanges}
+  isSaving={() => isSubmitting || isDeleting}
+/>
 
 <ImagePicker
   bind:open={showImagePicker}
@@ -345,4 +357,5 @@
   bind:open={showDelete}
   title="Delete Page?"
   description="Are you sure you want to delete this page? This action cannot be undone."
+  ondeleted={() => (isDeleting = true)}
 />

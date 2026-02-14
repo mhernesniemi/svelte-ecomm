@@ -22,7 +22,7 @@ export const actions: Actions = {
 			const page = await contentPageService.create({
 				title: name,
 				slug: slugify(slug || name),
-				published: true
+				published: false
 			});
 			throw redirect(303, `/admin/content-pages/${page.id}?created=1`);
 		} catch (err) {
