@@ -12,7 +12,7 @@
         "destructive-outline": "border border-red-300 text-red-600 hover:bg-destructive-subtle",
         "destructive-ghost": "text-red-600 hover:text-red-800 hover:bg-destructive-subtle",
         outline: "border border-input-border bg-surface text-foreground-secondary hover:bg-hover",
-        secondary: "bg-muted text-foreground hover:bg-muted-strong",
+        secondary: "border border-input-border bg-muted text-foreground hover:bg-muted-strong",
         ghost: "text-foreground-secondary hover:bg-muted",
         link: "text-blue-600 dark:text-blue-400 underline-offset-4 hover:underline"
       },

@@ -252,7 +252,7 @@
             </Command.Root>
           </Popover.Content>
         </Popover.Root>
-        <Button type="submit" variant="outline" size="sm" class="shrink-0">Add</Button>
+        <Button type="submit" variant="secondary" class="shrink-0">Add</Button>
       </form>
     </div>
     {#snippet categoryNode(node: CategoryNode, depth: number, parentPath: string)}
