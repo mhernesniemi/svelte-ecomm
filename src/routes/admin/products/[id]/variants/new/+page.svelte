@@ -3,6 +3,7 @@
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -115,18 +116,11 @@
         <div class="space-y-4 p-6">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label
-                for="variant_name"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                Name
-              </label>
+              <Label for="variant_name">Name</Label>
               <Input type="text" id="variant_name" name="variant_name" bind:value={variantName} />
             </div>
             <div>
-              <label for="sku" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                SKU <span class="text-red-500">*</span>
-              </label>
+              <Label for="sku">SKU <span class="text-red-500">*</span></Label>
               <Input type="text" id="sku" name="sku" bind:value={variantSku} required />
             </div>
           </div>
@@ -139,9 +133,7 @@
           <h2 class="text-lg font-semibold">Price and stock</h2>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label for="price" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                Price (EUR) <span class="text-red-500">*</span>
-              </label>
+              <Label for="price">Price (EUR) <span class="text-red-500">*</span></Label>
               <Input
                 type="number"
                 id="price"
@@ -154,9 +146,7 @@
               />
             </div>
             <div>
-              <label for="stock" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                Stock
-              </label>
+              <Label for="stock">Stock</Label>
               {#if trackInventory}
                 <Input
                   type="number"

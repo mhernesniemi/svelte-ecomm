@@ -330,27 +330,18 @@
           <div class="space-y-4 p-6">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="name" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                  Name <span class="text-red-500">*</span>
-                </label>
+                <Label for="name">Name <span class="text-red-500">*</span></Label>
                 <Input type="text" id="name" name="name" bind:value={productName} required />
               </div>
 
               <div>
-                <label for="slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                  Slug <span class="text-red-500">*</span>
-                </label>
+                <Label for="slug">Slug <span class="text-red-500">*</span></Label>
                 <Input type="text" id="slug" name="slug" bind:value={productSlug} required />
               </div>
             </div>
 
             <div>
-              <label
-                for="description"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                Description
-              </label>
+              <Label for="description">Description</Label>
               <RichTextEditor
                 name="description"
                 content={data.product.description ?? ""}
@@ -367,12 +358,7 @@
             <div class="space-y-4 p-6">
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label
-                    for="translation_{lang.code}_name"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Name
-                  </label>
+                  <Label for="translation_{lang.code}_name">Name</Label>
                   <Input
                     type="text"
                     id="translation_{lang.code}_name"
@@ -382,12 +368,7 @@
                 </div>
 
                 <div>
-                  <label
-                    for="translation_{lang.code}_slug"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Slug
-                  </label>
+                  <Label for="translation_{lang.code}_slug">Slug</Label>
                   <Input
                     type="text"
                     id="translation_{lang.code}_slug"
@@ -398,12 +379,7 @@
               </div>
 
               <div>
-                <label
-                  for="translation_{lang.code}_description"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Description
-                </label>
+                <Label for="translation_{lang.code}_description">Description</Label>
                 <RichTextEditor
                   name="description_{lang.code}"
                   content={translationMap[lang.code]?.description ?? ""}
@@ -823,7 +799,6 @@
                   name="alt"
                   value={currentEditingImage.alt}
                   placeholder="Describe this image..."
-                  class="mt-1"
                 />
                 <p class="mt-1 text-xs text-muted-foreground">
                   Describes the image for screen readers and search engines.

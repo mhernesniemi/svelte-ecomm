@@ -221,7 +221,6 @@
                   value={image.alt}
                   oninput={(e) => updateAltText(index, e.currentTarget.value)}
                   placeholder="Describe this image..."
-                  class="mt-1"
                 />
               </div>
             </div>

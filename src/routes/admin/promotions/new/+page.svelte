@@ -3,6 +3,7 @@
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import { SelectNative } from "$lib/components/admin/ui/select-native";
   import { Badge } from "$lib/components/admin/ui/badge";
   import * as Popover from "$lib/components/admin/ui/popover";
@@ -188,9 +189,7 @@
 
           {#if method === "code"}
             <div>
-              <label for="code" class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >Code</label
-              >
+              <Label for="code">Code</Label>
               <Input
                 type="text"
                 id="code"
@@ -206,9 +205,7 @@
             </div>
           {:else}
             <div>
-              <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >Title</label
-              >
+              <Label for="title">Title</Label>
               <Input
                 type="text"
                 id="title"
@@ -229,24 +226,14 @@
           <AdminCard title="Discount Value">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label
-                  for="discountType"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Discount Type
-                </label>
+                <Label for="discountType">Discount Type</Label>
                 <SelectNative id="discountType" name="discountType" bind:value={discountType}>
                   <option value="percentage">Percentage (%)</option>
                   <option value="fixed_amount">Fixed Amount (EUR)</option>
                 </SelectNative>
               </div>
               <div>
-                <label
-                  for="discountValue"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  Value
-                </label>
+                <Label for="discountValue">Value</Label>
                 <Input
                   type="number"
                   id="discountValue"
@@ -419,12 +406,7 @@
         <AdminCard title="Conditions">
           <div class="grid grid-cols-3 gap-4">
             <div>
-              <label
-                for="minOrderAmount"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                Min Order (EUR)
-              </label>
+              <Label for="minOrderAmount">Min Order (EUR)</Label>
               <Input
                 type="number"
                 id="minOrderAmount"
@@ -436,12 +418,7 @@
               />
             </div>
             <div>
-              <label
-                for="usageLimit"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                Total Usage Limit
-              </label>
+              <Label for="usageLimit">Total Usage Limit</Label>
               <Input
                 type="number"
                 id="usageLimit"
@@ -452,12 +429,7 @@
               />
             </div>
             <div>
-              <label
-                for="usageLimitPerCustomer"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                Per Customer Limit
-              </label>
+              <Label for="usageLimitPerCustomer">Per Customer Limit</Label>
               <Input
                 type="number"
                 id="usageLimitPerCustomer"
@@ -474,18 +446,11 @@
         <AdminCard title="Active Dates">
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label
-                for="startsAt"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                Starts At
-              </label>
+              <Label for="startsAt">Starts At</Label>
               <Input type="datetime-local" id="startsAt" name="startsAt" bind:value={startsAt} />
             </div>
             <div>
-              <label for="endsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                Ends At
-              </label>
+              <Label for="endsAt">Ends At</Label>
               <Input type="datetime-local" id="endsAt" name="endsAt" bind:value={endsAt} />
             </div>
           </div>

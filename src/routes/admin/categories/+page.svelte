@@ -5,6 +5,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge } from "$lib/components/admin/ui/badge";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import { SelectNative } from "$lib/components/admin/ui/select-native";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Collapsible from "$lib/components/admin/ui/collapsible";
@@ -308,12 +309,7 @@
     >
       <div class="my-4 grid grid-cols-2 gap-4">
         <div>
-          <label
-            for="create_name_en"
-            class="mb-1 block text-sm font-medium text-foreground-secondary"
-          >
-            Name
-          </label>
+          <Label for="create_name_en">Name</Label>
           <Input
             type="text"
             id="create_name_en"
@@ -324,9 +320,7 @@
           />
         </div>
         <div>
-          <label for="create_slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
-            Slug
-          </label>
+          <Label for="create_slug">Slug</Label>
           <Input
             type="text"
             id="create_slug"
@@ -338,12 +332,7 @@
         </div>
         {#each TRANSLATION_LANGUAGES as lang}
           <div class="col-span-2">
-            <label
-              for="create_name_{lang.code}"
-              class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >
-              {lang.name} name
-            </label>
+            <Label for="create_name_{lang.code}">{lang.name} name</Label>
             <Input
               type="text"
               id="create_name_{lang.code}"
@@ -353,12 +342,7 @@
           </div>
         {/each}
         <div>
-          <label
-            for="create_parent"
-            class="mb-1 block text-sm font-medium text-foreground-secondary"
-          >
-            Parent
-          </label>
+          <Label for="create_parent">Parent</Label>
           <SelectNative id="create_parent" name="parent_id">
             <option value="">None (Root)</option>
             {#each flatCategories as category}
@@ -369,12 +353,7 @@
           </SelectNative>
         </div>
         <div>
-          <label
-            for="create_tax_code"
-            class="mb-1 block text-sm font-medium text-foreground-secondary"
-          >
-            Tax Rate
-          </label>
+          <Label for="create_tax_code">Tax Rate</Label>
           <SelectNative id="create_tax_code" name="tax_code">
             {#each data.taxRates as rate}
               <option value={rate.code} selected={rate.code === "standard"}>{rate.name}</option>
@@ -414,12 +393,7 @@
         <input type="hidden" name="id" value={editingCategory.id} />
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label
-              for="edit_name_{editingCategory.id}"
-              class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >
-              Name
-            </label>
+            <Label for="edit_name_{editingCategory.id}">Name</Label>
             <Input
               type="text"
               id="edit_name_{editingCategory.id}"
@@ -428,12 +402,7 @@
             />
           </div>
           <div>
-            <label
-              for="edit_slug_{editingCategory.id}"
-              class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >
-              Slug
-            </label>
+            <Label for="edit_slug_{editingCategory.id}">Slug</Label>
             <Input
               type="text"
               id="edit_slug_{editingCategory.id}"
@@ -443,12 +412,7 @@
           </div>
           {#each TRANSLATION_LANGUAGES as lang}
             <div class="col-span-2">
-              <label
-                for="edit_name_{lang.code}_{editingCategory.id}"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                {lang.name} name
-              </label>
+              <Label for="edit_name_{lang.code}_{editingCategory.id}">{lang.name} name</Label>
               <Input
                 type="text"
                 id="edit_name_{lang.code}_{editingCategory.id}"
@@ -460,12 +424,7 @@
             </div>
           {/each}
           <div>
-            <label
-              for="edit_parent_{editingCategory.id}"
-              class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >
-              Parent
-            </label>
+            <Label for="edit_parent_{editingCategory.id}">Parent</Label>
             <SelectNative id="edit_parent_{editingCategory.id}" name="parent_id">
               <option value="">None (Root)</option>
               {#each flatCategories.filter((c) => c.id !== editingCategory!.id) as category}
@@ -476,12 +435,7 @@
             </SelectNative>
           </div>
           <div>
-            <label
-              for="edit_tax_code_{editingCategory.id}"
-              class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >
-              Tax Rate
-            </label>
+            <Label for="edit_tax_code_{editingCategory.id}">Tax Rate</Label>
             <SelectNative id="edit_tax_code_{editingCategory.id}" name="tax_code">
               {#each data.taxRates as rate}
                 <option value={rate.code} selected={rate.code === editingCategory!.taxCode}>

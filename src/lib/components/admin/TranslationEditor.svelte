@@ -1,6 +1,7 @@
 <script lang="ts">
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import { Textarea } from "$lib/components/admin/ui/textarea";
   import { cn } from "$lib/utils";
   import { TRANSLATION_LANGUAGES, DEFAULT_LANGUAGE, LANGUAGES } from "$lib/config/languages.js";
@@ -58,12 +59,7 @@
           <div class={cn("grid grid-cols-1 gap-4", textFieldCount > 1 && "sm:grid-cols-2")}>
             {#each fields as field}
               <div class={cn(field.type !== "text" && textFieldCount > 1 && "sm:col-span-2")}>
-                <label
-                  for="translation_{lang.code}_{field.name}"
-                  class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >
-                  {field.label}
-                </label>
+                <Label for="translation_{lang.code}_{field.name}">{field.label}</Label>
 
                 {#if field.type === "text"}
                   <Input

@@ -11,7 +11,7 @@
 
 <label
   class={cn(
-    "block text-sm font-medium text-foreground-secondary peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+    "mb-1 block text-sm font-medium text-foreground-secondary peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
     className
   )}
   {...restProps}

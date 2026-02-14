@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import { slugify } from "$lib/utils";
 
   let {
@@ -68,12 +69,7 @@
     >
       <input type="hidden" name={slugField} value={slug} />
       <div class="my-4">
-        <label
-          for="create_dialog_name"
-          class="mb-1 block text-sm font-medium text-foreground-secondary"
-        >
-          Name
-        </label>
+        <Label for="create_dialog_name">Name</Label>
         <Input
           type="text"
           id="create_dialog_name"

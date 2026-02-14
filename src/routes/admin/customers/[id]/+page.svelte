@@ -12,6 +12,7 @@
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import type { PageData, ActionData } from "./$types";
@@ -185,9 +186,7 @@
         <AdminCard title="VAT ID" variant="sidebar">
           <div class="flex items-end gap-3">
             <div class="flex-1">
-              <label for="vatId" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                VAT ID
-              </label>
+              <Label for="vatId">VAT ID</Label>
               <Input
                 type="text"
                 id="vatId"

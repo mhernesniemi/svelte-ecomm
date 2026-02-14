@@ -6,6 +6,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -156,19 +157,11 @@
         <AdminCard title="Group Details">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label
-                for="group_name"
-                class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label
-              >
+              <Label for="group_name">Name</Label>
               <Input type="text" id="group_name" name="name" bind:value={groupName} required />
             </div>
             <div>
-              <label
-                for="group_description"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-              >
-                Description
-              </label>
+              <Label for="group_description">Description</Label>
               <Input
                 type="text"
                 id="group_description"

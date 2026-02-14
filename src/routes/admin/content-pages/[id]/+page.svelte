@@ -5,6 +5,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -163,12 +164,7 @@
             <div class="space-y-4 p-6">
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label
-                    for="title"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Title <span class="text-red-500">*</span>
-                  </label>
+                  <Label for="title">Title <span class="text-red-500">*</span></Label>
                   <Input
                     type="text"
                     id="title"
@@ -180,12 +176,7 @@
                 </div>
 
                 <div>
-                  <label
-                    for="slug"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Slug <span class="text-red-500">*</span>
-                  </label>
+                  <Label for="slug">Slug <span class="text-red-500">*</span></Label>
                   <Input
                     type="text"
                     id="slug"
@@ -198,9 +189,7 @@
               </div>
 
               <div>
-                <label for="body" class="mb-1 block text-sm font-medium text-foreground-secondary">
-                  Body
-                </label>
+                <Label for="body">Body</Label>
                 <RichTextEditor
                   name="body"
                   content={data.page.body ?? ""}
@@ -217,12 +206,7 @@
               <div class="space-y-4 p-6">
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label
-                      for="translation_{lang.code}_title"
-                      class="mb-1 block text-sm font-medium text-foreground-secondary"
-                    >
-                      Title
-                    </label>
+                    <Label for="translation_{lang.code}_title">Title</Label>
                     <Input
                       type="text"
                       id="translation_{lang.code}_title"
@@ -233,12 +217,7 @@
                   </div>
 
                   <div>
-                    <label
-                      for="translation_{lang.code}_slug"
-                      class="mb-1 block text-sm font-medium text-foreground-secondary"
-                    >
-                      Slug
-                    </label>
+                    <Label for="translation_{lang.code}_slug">Slug</Label>
                     <Input
                       type="text"
                       id="translation_{lang.code}_slug"
@@ -250,12 +229,7 @@
                 </div>
 
                 <div>
-                  <label
-                    for="translation_{lang.code}_body"
-                    class="mb-1 block text-sm font-medium text-foreground-secondary"
-                  >
-                    Body
-                  </label>
+                  <Label for="translation_{lang.code}_body">Body</Label>
                   <RichTextEditor
                     name="body_{lang.code}"
                     content={translationMap[lang.code]?.body ?? ""}

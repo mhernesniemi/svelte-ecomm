@@ -6,6 +6,7 @@
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge } from "$lib/components/admin/ui/badge";
   import { Input } from "$lib/components/admin/ui/input";
+  import { Label } from "$lib/components/admin/ui/label";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -243,19 +244,11 @@
         <AdminCard title="Facet Details">
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label
-                for="facet_name"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >Name <span class="text-red-500">*</span></label
-              >
+              <Label for="facet_name">Name <span class="text-red-500">*</span></Label>
               <Input type="text" id="facet_name" name="name_en" required bind:value={facetName} />
             </div>
             <div>
-              <label
-                for="facet_code"
-                class="mb-1 block text-sm font-medium text-foreground-secondary"
-                >Code <span class="text-red-500">*</span></label
-              >
+              <Label for="facet_code">Code <span class="text-red-500">*</span></Label>
               <Input type="text" id="facet_code" name="code" required bind:value={facetCode} />
             </div>
           </div>
@@ -389,12 +382,7 @@
     >
       <div class="my-4 grid grid-cols-2 gap-4">
         <div>
-          <label
-            for="edit_value_name"
-            class="mb-1 block text-sm font-medium text-foreground-secondary"
-          >
-            Name <span class="text-red-500">*</span>
-          </label>
+          <Label for="edit_value_name">Name <span class="text-red-500">*</span></Label>
           <Input
             type="text"
             id="edit_value_name"
@@ -404,12 +392,7 @@
           />
         </div>
         <div>
-          <label
-            for="edit_value_code"
-            class="mb-1 block text-sm font-medium text-foreground-secondary"
-          >
-            Code <span class="text-red-500">*</span>
-          </label>
+          <Label for="edit_value_code">Code <span class="text-red-500">*</span></Label>
           <Input
             type="text"
             id="edit_value_code"
@@ -420,12 +403,7 @@
         </div>
         {#each TRANSLATION_LANGUAGES as lang}
           <div class="col-span-2">
-            <label
-              for="edit_value_name_{lang.code}"
-              class="mb-1 block text-sm font-medium text-foreground-secondary"
-            >
-              {lang.name} name
-            </label>
+            <Label for="edit_value_name_{lang.code}">{lang.name} name</Label>
             <Input
               type="text"
               id="edit_value_name_{lang.code}"
