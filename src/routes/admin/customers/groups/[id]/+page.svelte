@@ -5,6 +5,7 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
+  import { Input } from "$lib/components/admin/ui/input";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -159,14 +160,7 @@
                 for="group_name"
                 class="mb-1 block text-sm font-medium text-foreground-secondary">Name</label
               >
-              <input
-                type="text"
-                id="group_name"
-                name="name"
-                bind:value={groupName}
-                required
-                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-              />
+              <Input type="text" id="group_name" name="name" bind:value={groupName} required />
             </div>
             <div>
               <label
@@ -175,13 +169,12 @@
               >
                 Description
               </label>
-              <input
+              <Input
                 type="text"
                 id="group_description"
                 name="description"
                 bind:value={groupDescription}
                 placeholder="Optional"
-                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
               />
             </div>
           </div>

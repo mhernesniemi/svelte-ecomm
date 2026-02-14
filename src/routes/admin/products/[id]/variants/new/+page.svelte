@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button, buttonVariants } from "$lib/components/admin/ui/button";
+  import { Input } from "$lib/components/admin/ui/input";
   import UnsavedChangesDialog from "$lib/components/admin/UnsavedChangesDialog.svelte";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -120,26 +121,13 @@
               >
                 Name
               </label>
-              <input
-                type="text"
-                id="variant_name"
-                name="variant_name"
-                bind:value={variantName}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="text" id="variant_name" name="variant_name" bind:value={variantName} />
             </div>
             <div>
               <label for="sku" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 SKU <span class="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="sku"
-                name="sku"
-                bind:value={variantSku}
-                required
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="text" id="sku" name="sku" bind:value={variantSku} required />
             </div>
           </div>
         </div>
@@ -154,7 +142,7 @@
               <label for="price" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Price (EUR) <span class="text-red-500">*</span>
               </label>
-              <input
+              <Input
                 type="number"
                 id="price"
                 name="price"
@@ -163,7 +151,6 @@
                 min="0"
                 bind:value={variantPrice}
                 required
-                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
@@ -171,22 +158,21 @@
                 Stock
               </label>
               {#if trackInventory}
-                <input
+                <Input
                   type="number"
                   id="stock"
                   name="stock"
                   form="variant-form"
                   min="0"
                   bind:value={variantStock}
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               {:else}
-                <input
+                <Input
                   type="text"
                   id="stock"
                   disabled
                   value="Unlimited"
-                  class="w-full rounded-lg border border-input-border bg-muted px-3 py-2 text-muted-foreground"
+                  class="bg-muted text-muted-foreground"
                 />
               {/if}
             </div>

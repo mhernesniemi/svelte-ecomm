@@ -11,6 +11,7 @@
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
+  import { SelectNative } from "$lib/components/admin/ui/select-native";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -424,13 +425,13 @@
                   >
                     Name <span class="text-red-500">*</span>
                   </label>
-                  <input
+                  <Input
                     type="text"
                     id="name"
                     name="name"
                     bind:value={name}
                     required
-                    class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                    class="shadow-sm"
                   />
                 </div>
                 <div>
@@ -440,13 +441,13 @@
                   >
                     Slug <span class="text-red-500">*</span>
                   </label>
-                  <input
+                  <Input
                     type="text"
                     id="slug"
                     name="slug"
                     bind:value={slug}
                     required
-                    class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                    class="shadow-sm"
                   />
                 </div>
               </div>
@@ -479,12 +480,12 @@
                     >
                       Name
                     </label>
-                    <input
+                    <Input
                       type="text"
                       id="translation_{lang.code}_name"
                       name="name_{lang.code}"
                       value={translationMap[lang.code]?.name ?? ""}
-                      class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                      class="shadow-sm"
                     />
                   </div>
                   <div>
@@ -494,12 +495,12 @@
                     >
                       Slug
                     </label>
-                    <input
+                    <Input
                       type="text"
                       id="translation_{lang.code}_slug"
                       name="slug_{lang.code}"
                       value={translationMap[lang.code]?.slug ?? ""}
-                      class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                      class="shadow-sm"
                     />
                   </div>
                 </div>
@@ -708,8 +709,8 @@
                     {/if}
                   {:else if filter.field === "price"}
                     <div class="flex items-center gap-3">
-                      <select
-                        class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
+                      <SelectNative
+                        class="w-auto shadow-sm"
                         value={filter.operator}
                         onchange={(e) => {
                           localFilters[index] = {
@@ -720,12 +721,12 @@
                       >
                         <option value="gte">at least</option>
                         <option value="lte">at most</option>
-                      </select>
-                      <input
+                      </SelectNative>
+                      <Input
                         type="number"
                         step="0.01"
                         min="0"
-                        class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                        class="w-32 shadow-sm"
                         value={typeof filter.value === "number"
                           ? (filter.value / 100).toFixed(2)
                           : ""}
@@ -741,8 +742,8 @@
                     </div>
                   {:else if filter.field === "stock"}
                     <div class="flex items-center gap-3">
-                      <select
-                        class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
+                      <SelectNative
+                        class="w-auto shadow-sm"
                         value={filter.operator}
                         onchange={(e) => {
                           localFilters[index] = {
@@ -753,10 +754,10 @@
                       >
                         <option value="gt">more than</option>
                         <option value="gte">at least</option>
-                      </select>
-                      <input
+                      </SelectNative>
+                      <Input
                         type="number"
-                        class="w-32 rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                        class="w-32 shadow-sm"
                         value={filter.value}
                         placeholder="Stock level"
                         onchange={(e) => {
@@ -768,9 +769,9 @@
                       />
                     </div>
                   {:else if filter.field === "visibility"}
-                    <select
+                    <SelectNative
                       name="visibility"
-                      class="rounded-lg border border-input-border py-2 pr-8 pl-3 text-sm shadow-sm"
+                      class="w-auto shadow-sm"
                       value={filter.value}
                       onchange={(e) => {
                         localFilters[index] = {
@@ -782,7 +783,7 @@
                       <option value="public">Public</option>
                       <option value="private">Private</option>
                       <option value="draft">Draft</option>
-                    </select>
+                    </SelectNative>
                   {/if}
                 </div>
               </div>

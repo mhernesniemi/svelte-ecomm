@@ -2,6 +2,8 @@
   import { enhance } from "$app/forms";
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Input } from "$lib/components/admin/ui/input";
+  import { SelectNative } from "$lib/components/admin/ui/select-native";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import * as Popover from "$lib/components/admin/ui/popover";
   import * as Command from "$lib/components/admin/ui/command";
@@ -176,26 +178,13 @@
               >
                 Name
               </label>
-              <input
-                type="text"
-                id="variant_name"
-                name="variant_name"
-                bind:value={variantName}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="text" id="variant_name" name="variant_name" bind:value={variantName} />
             </div>
             <div>
               <label for="sku" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 SKU <span class="text-red-500">*</span>
               </label>
-              <input
-                type="text"
-                id="sku"
-                name="sku"
-                bind:value={variantSku}
-                required
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="text" id="sku" name="sku" bind:value={variantSku} required />
             </div>
           </div>
         </div>
@@ -211,22 +200,21 @@
                 Stock
               </label>
               {#if trackInventory}
-                <input
+                <Input
                   type="number"
                   id="stock"
                   name="stock"
                   form="variant-form"
                   min="0"
                   bind:value={variantStock}
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               {:else}
-                <input
+                <Input
                   type="text"
                   id="stock"
                   disabled
                   placeholder="Unlimited"
-                  class="w-full rounded-lg border border-input-border bg-muted px-3 py-2 text-muted-foreground placeholder:text-muted-foreground"
+                  class="bg-muted text-muted-foreground placeholder:text-muted-foreground"
                 />
               {/if}
             </div>
@@ -234,7 +222,7 @@
               <label for="price" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Price (EUR) <span class="text-red-500">*</span>
               </label>
-              <input
+              <Input
                 type="number"
                 id="price"
                 name="price"
@@ -243,7 +231,6 @@
                 min="0"
                 bind:value={variantPrice}
                 required
-                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
@@ -301,13 +288,13 @@
                       {group?.name ?? `Group #${gp.groupId}`}
                     </div>
                     <div class="flex gap-2">
-                      <input
+                      <Input
                         id="group-price-{gp.groupId}"
                         type="number"
                         step="0.01"
                         min="0"
                         bind:value={gp.price}
-                        class="h-10 w-full rounded-lg border border-input-border px-3 text-sm"
+                        class="h-10"
                       />
                       <Button
                         type="button"
@@ -325,23 +312,19 @@
                 <!-- Add row -->
                 {#if availableGroups.length > 0}
                   <div class="grid grid-cols-2 gap-4">
-                    <select
-                      id="new-group-select"
-                      bind:value={newGroupId}
-                      class="h-10 w-full rounded-lg border border-input-border px-3 text-sm"
-                    >
+                    <SelectNative id="new-group-select" bind:value={newGroupId} class="h-10">
                       {#each availableGroups as group}
                         <option value={group.id}>{group.name}</option>
                       {/each}
-                    </select>
-                    <input
+                    </SelectNative>
+                    <Input
                       id="new-group-price"
                       type="number"
                       step="0.01"
                       min="0"
                       bind:value={newGroupPrice}
                       placeholder="0.00"
-                      class="h-10 w-full rounded-lg border border-input-border px-3 text-sm"
+                      class="h-10"
                     />
                   </div>
                   <div>

@@ -11,6 +11,7 @@
   } from "$lib/components/admin/ui/table";
   import { Badge, type BadgeVariant } from "$lib/components/admin/ui/badge";
   import { Button } from "$lib/components/admin/ui/button";
+  import { Input } from "$lib/components/admin/ui/input";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import type { PageData, ActionData } from "./$types";
@@ -187,13 +188,12 @@
               <label for="vatId" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 VAT ID
               </label>
-              <input
+              <Input
                 type="text"
                 id="vatId"
                 name="vatId"
                 bind:value={vatId}
                 placeholder="e.g. FI12345678"
-                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
               />
             </div>
             <Button type="submit" size="sm">Save</Button>

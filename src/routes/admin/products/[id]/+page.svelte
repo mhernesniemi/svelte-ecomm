@@ -10,6 +10,7 @@
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import { Input } from "$lib/components/admin/ui/input";
   import { Label } from "$lib/components/admin/ui/label";
+  import { SelectNative } from "$lib/components/admin/ui/select-native";
   import {
     Table,
     TableHeader,
@@ -332,28 +333,14 @@
                 <label for="name" class="mb-1 block text-sm font-medium text-foreground-secondary">
                   Name <span class="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  bind:value={productName}
-                  required
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                />
+                <Input type="text" id="name" name="name" bind:value={productName} required />
               </div>
 
               <div>
                 <label for="slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
                   Slug <span class="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  id="slug"
-                  name="slug"
-                  bind:value={productSlug}
-                  required
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                />
+                <Input type="text" id="slug" name="slug" bind:value={productSlug} required />
               </div>
             </div>
 
@@ -386,12 +373,11 @@
                   >
                     Name
                   </label>
-                  <input
+                  <Input
                     type="text"
                     id="translation_{lang.code}_name"
                     name="name_{lang.code}"
                     value={translationMap[lang.code]?.name ?? ""}
-                    class="w-full rounded-lg border border-input-border px-3 py-2"
                   />
                 </div>
 
@@ -402,12 +388,11 @@
                   >
                     Slug
                   </label>
-                  <input
+                  <Input
                     type="text"
                     id="translation_{lang.code}_slug"
                     name="slug_{lang.code}"
                     value={translationMap[lang.code]?.slug ?? ""}
-                    class="w-full rounded-lg border border-input-border px-3 py-2"
                   />
                 </div>
               </div>
@@ -595,16 +580,16 @@
                   : "bg-gray-400"
             )}
           ></span>
-          <select
+          <SelectNative
             form="product-form"
             name="visibility"
-            class="block w-full rounded-md border-input-border pl-7 shadow-sm"
+            class="pl-7 shadow-sm"
             bind:value={visibility}
           >
             <option value="draft">Draft</option>
             <option value="public">Public</option>
             <option value="private">Private</option>
-          </select>
+          </SelectNative>
         </div>
         <p class="mt-3 text-xs text-muted-foreground">
           Set this to Public to make it available in the store
@@ -614,17 +599,13 @@
       <!-- Product Type Section (only shown when multiple types exist) -->
       {#if data.productTypes.length > 1}
         <AdminCard title="Product Type" variant="sidebar">
-          <select
-            form="product-form"
-            name="type"
-            class="block w-full rounded-md border-input-border shadow-sm"
-          >
+          <SelectNative form="product-form" name="type" class="shadow-sm">
             {#each data.productTypes as type}
               <option value={type} selected={data.product.type === type}>
                 {type.charAt(0).toUpperCase() + type.slice(1)}
               </option>
             {/each}
-          </select>
+          </SelectNative>
         </AdminCard>
       {/if}
 

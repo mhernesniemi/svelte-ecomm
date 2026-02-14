@@ -5,6 +5,7 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge } from "$lib/components/admin/ui/badge";
+  import { Input } from "$lib/components/admin/ui/input";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -247,14 +248,7 @@
                 class="mb-1 block text-sm font-medium text-foreground-secondary"
                 >Name <span class="text-red-500">*</span></label
               >
-              <input
-                type="text"
-                id="facet_name"
-                name="name_en"
-                required
-                bind:value={facetName}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="text" id="facet_name" name="name_en" required bind:value={facetName} />
             </div>
             <div>
               <label
@@ -262,14 +256,7 @@
                 class="mb-1 block text-sm font-medium text-foreground-secondary"
                 >Code <span class="text-red-500">*</span></label
               >
-              <input
-                type="text"
-                id="facet_code"
-                name="code"
-                required
-                bind:value={facetCode}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="text" id="facet_code" name="code" required bind:value={facetCode} />
             </div>
           </div>
         </AdminCard>
@@ -289,7 +276,7 @@
                 bind:value={bulkInput}
                 onkeydown={handleBulkKeydown}
                 placeholder="e.g., Red, Blue, Yellow"
-                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
+                class="w-full rounded-lg border border-input-border bg-surface px-3 py-2 text-sm text-foreground placeholder:text-placeholder hover:border-foreground/20"
               />
               <Button
                 type="button"
@@ -408,13 +395,12 @@
           >
             Name <span class="text-red-500">*</span>
           </label>
-          <input
+          <Input
             type="text"
             id="edit_value_name"
             value={editName}
             oninput={handleEditNameInput}
             placeholder="e.g., Red"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
         <div>
@@ -424,13 +410,12 @@
           >
             Code <span class="text-red-500">*</span>
           </label>
-          <input
+          <Input
             type="text"
             id="edit_value_code"
             value={editCode}
             oninput={handleEditCodeInput}
             placeholder="e.g., red"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
         {#each TRANSLATION_LANGUAGES as lang}
@@ -441,12 +426,11 @@
             >
               {lang.name} name
             </label>
-            <input
+            <Input
               type="text"
               id="edit_value_name_{lang.code}"
               bind:value={editTranslations[lang.code]}
               placeholder={editName}
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             />
           </div>
         {/each}

@@ -4,6 +4,8 @@
   import { onMount } from "svelte";
   import { Button } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
+  import { Input } from "$lib/components/admin/ui/input";
+  import { SelectNative } from "$lib/components/admin/ui/select-native";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import { Badge } from "$lib/components/admin/ui/badge";
@@ -186,12 +188,12 @@
               <label for="code" class="mb-1 block text-sm font-medium text-foreground-secondary"
                 >Code</label
               >
-              <input
+              <Input
                 type="text"
                 id="code"
                 value={promo.code}
                 disabled
-                class="w-full rounded-lg border border-border bg-background px-3 py-2 text-muted-foreground"
+                class="border-border bg-background text-muted-foreground"
               />
             </div>
           {:else}
@@ -199,13 +201,7 @@
               <label for="title" class="mb-1 block text-sm font-medium text-foreground-secondary"
                 >Title</label
               >
-              <input
-                type="text"
-                id="title"
-                name="title"
-                bind:value={promoTitle}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="text" id="title" name="title" bind:value={promoTitle} />
               <p class="mt-1 text-xs text-muted-foreground">
                 Customers will see this in their cart and at checkout.
               </p>
@@ -224,15 +220,10 @@
                 >
                   Discount Type
                 </label>
-                <select
-                  id="discountType"
-                  name="discountType"
-                  bind:value={discountType}
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
-                >
+                <SelectNative id="discountType" name="discountType" bind:value={discountType}>
                   <option value="percentage">Percentage (%)</option>
                   <option value="fixed_amount">Fixed Amount (EUR)</option>
-                </select>
+                </SelectNative>
               </div>
               <div>
                 <label
@@ -241,14 +232,13 @@
                 >
                   Value
                 </label>
-                <input
+                <Input
                   type="number"
                   id="discountValue"
                   name="discountValue"
                   bind:value={discountValue}
                   min="0"
                   step={discountType === "percentage" ? "1" : "0.01"}
-                  class="w-full rounded-lg border border-input-border px-3 py-2"
                 />
               </div>
             </div>
@@ -263,7 +253,13 @@
           <AdminCard title="Applies To">
             <div class="space-y-3">
               <label class="flex items-center gap-2">
-                <input type="radio" name="appliesTo" value="all" bind:group={appliesTo} />
+                <input
+                  type="radio"
+                  name="appliesTo"
+                  value="all"
+                  bind:group={appliesTo}
+                  class="border-input-border bg-surface"
+                />
                 <span class="text-sm">All products</span>
               </label>
               <label class="flex items-center gap-2">
@@ -272,6 +268,7 @@
                   name="appliesTo"
                   value="specific_products"
                   bind:group={appliesTo}
+                  class="border-input-border bg-surface"
                 />
                 <span class="text-sm">Specific products</span>
               </label>
@@ -281,6 +278,7 @@
                   name="appliesTo"
                   value="specific_collections"
                   bind:group={appliesTo}
+                  class="border-input-border bg-surface"
                 />
                 <span class="text-sm">Specific collections</span>
               </label>
@@ -410,7 +408,7 @@
               >
                 Min Order (EUR)
               </label>
-              <input
+              <Input
                 type="number"
                 id="minOrderAmount"
                 name="minOrderAmount"
@@ -418,7 +416,6 @@
                 placeholder="Optional"
                 min="0"
                 step="0.01"
-                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
@@ -428,14 +425,13 @@
               >
                 Total Usage Limit
               </label>
-              <input
+              <Input
                 type="number"
                 id="usageLimit"
                 name="usageLimit"
                 bind:value={usageLimit}
                 placeholder="Unlimited"
                 min="0"
-                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
             <div>
@@ -445,14 +441,13 @@
               >
                 Per Customer Limit
               </label>
-              <input
+              <Input
                 type="number"
                 id="usageLimitPerCustomer"
                 name="usageLimitPerCustomer"
                 bind:value={usageLimitPerCustomer}
                 placeholder="Unlimited"
                 min="0"
-                class="w-full rounded-lg border border-input-border px-3 py-2"
               />
             </div>
           </div>
@@ -468,25 +463,13 @@
               >
                 Starts At
               </label>
-              <input
-                type="datetime-local"
-                id="startsAt"
-                name="startsAt"
-                bind:value={startsAt}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="datetime-local" id="startsAt" name="startsAt" bind:value={startsAt} />
             </div>
             <div>
               <label for="endsAt" class="mb-1 block text-sm font-medium text-foreground-secondary">
                 Ends At
               </label>
-              <input
-                type="datetime-local"
-                id="endsAt"
-                name="endsAt"
-                bind:value={endsAt}
-                class="w-full rounded-lg border border-input-border px-3 py-2"
-              />
+              <Input type="datetime-local" id="endsAt" name="endsAt" bind:value={endsAt} />
             </div>
           </div>
           <p class="mt-2 text-xs text-muted-foreground">
@@ -531,16 +514,12 @@
 
         <!-- Customer Group -->
         <AdminCard title="Customer Group" variant="sidebar">
-          <select
-            name="customerGroupId"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-            bind:value={customerGroupId}
-          >
+          <SelectNative name="customerGroupId" bind:value={customerGroupId}>
             <option value="">Not restricted</option>
             {#each data.customerGroups as group}
               <option value={group.id}>{group.name}</option>
             {/each}
-          </select>
+          </SelectNative>
           <p class="mt-2 text-xs text-muted-foreground">
             Restrict this promotion to customers in a specific group.
           </p>

@@ -2,6 +2,7 @@
   import { enhance } from "$app/forms";
   import { Button } from "$lib/components/admin/ui/button";
   import * as Dialog from "$lib/components/admin/ui/dialog";
+  import { Input } from "$lib/components/admin/ui/input";
   import { slugify } from "$lib/utils";
 
   let {
@@ -73,14 +74,13 @@
         >
           Name
         </label>
-        <input
+        <Input
           type="text"
           id="create_dialog_name"
           name={fieldName}
           bind:value={name}
           required
           {placeholder}
-          class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
         />
       </div>
       <Dialog.Footer>

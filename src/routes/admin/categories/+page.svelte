@@ -4,6 +4,8 @@
   import { untrack } from "svelte";
   import { Button } from "$lib/components/admin/ui/button";
   import { Badge } from "$lib/components/admin/ui/badge";
+  import { Input } from "$lib/components/admin/ui/input";
+  import { SelectNative } from "$lib/components/admin/ui/select-native";
   import * as Dialog from "$lib/components/admin/ui/dialog";
   import * as Collapsible from "$lib/components/admin/ui/collapsible";
   import { TRANSLATION_LANGUAGES } from "$lib/config/languages.js";
@@ -312,28 +314,26 @@
           >
             Name
           </label>
-          <input
+          <Input
             type="text"
             id="create_name_en"
             name="name_en"
             value={createName}
             oninput={handleCreateNameInput}
             placeholder="e.g., Electronics"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
         <div>
           <label for="create_slug" class="mb-1 block text-sm font-medium text-foreground-secondary">
             Slug
           </label>
-          <input
+          <Input
             type="text"
             id="create_slug"
             name="slug"
             value={createSlug}
             oninput={handleCreateSlugInput}
             placeholder="e.g., electronics"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
           />
         </div>
         {#each TRANSLATION_LANGUAGES as lang}
@@ -344,12 +344,11 @@
             >
               {lang.name} name
             </label>
-            <input
+            <Input
               type="text"
               id="create_name_{lang.code}"
               name="name_{lang.code}"
               placeholder="Leave empty to use default"
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             />
           </div>
         {/each}
@@ -360,18 +359,14 @@
           >
             Parent
           </label>
-          <select
-            id="create_parent"
-            name="parent_id"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-          >
+          <SelectNative id="create_parent" name="parent_id">
             <option value="">None (Root)</option>
             {#each flatCategories as category}
               <option value={category.id} selected={category.id === createParentId}>
                 {"— ".repeat(category.depth)}{category.name}
               </option>
             {/each}
-          </select>
+          </SelectNative>
         </div>
         <div>
           <label
@@ -380,15 +375,11 @@
           >
             Tax Rate
           </label>
-          <select
-            id="create_tax_code"
-            name="tax_code"
-            class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-          >
+          <SelectNative id="create_tax_code" name="tax_code">
             {#each data.taxRates as rate}
               <option value={rate.code} selected={rate.code === "standard"}>{rate.name}</option>
             {/each}
-          </select>
+          </SelectNative>
         </div>
       </div>
       <Dialog.Footer class="mt-6">
@@ -429,12 +420,11 @@
             >
               Name
             </label>
-            <input
+            <Input
               type="text"
               id="edit_name_{editingCategory.id}"
               name="name_en"
               value={editingCategory.name}
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             />
           </div>
           <div>
@@ -444,12 +434,11 @@
             >
               Slug
             </label>
-            <input
+            <Input
               type="text"
               id="edit_slug_{editingCategory.id}"
               name="slug"
               value={editingCategory.slug}
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
             />
           </div>
           {#each TRANSLATION_LANGUAGES as lang}
@@ -460,14 +449,13 @@
               >
                 {lang.name} name
               </label>
-              <input
+              <Input
                 type="text"
                 id="edit_name_{lang.code}_{editingCategory.id}"
                 name="name_{lang.code}"
                 value={data.categoryTranslations[editingCategory.id]?.find(
                   (t) => t.languageCode === lang.code
                 )?.name ?? ""}
-                class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
               />
             </div>
           {/each}
@@ -478,18 +466,14 @@
             >
               Parent
             </label>
-            <select
-              id="edit_parent_{editingCategory.id}"
-              name="parent_id"
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-            >
+            <SelectNative id="edit_parent_{editingCategory.id}" name="parent_id">
               <option value="">None (Root)</option>
               {#each flatCategories.filter((c) => c.id !== editingCategory!.id) as category}
                 <option value={category.id} selected={category.id === editingCategory!.parentId}>
                   {"— ".repeat(category.depth)}{category.name}
                 </option>
               {/each}
-            </select>
+            </SelectNative>
           </div>
           <div>
             <label
@@ -498,17 +482,13 @@
             >
               Tax Rate
             </label>
-            <select
-              id="edit_tax_code_{editingCategory.id}"
-              name="tax_code"
-              class="w-full rounded-lg border border-input-border px-3 py-2 text-sm"
-            >
+            <SelectNative id="edit_tax_code_{editingCategory.id}" name="tax_code">
               {#each data.taxRates as rate}
                 <option value={rate.code} selected={rate.code === editingCategory!.taxCode}>
                   {rate.name}
                 </option>
               {/each}
-            </select>
+            </SelectNative>
           </div>
         </div>
         <Dialog.Footer class="mt-6">

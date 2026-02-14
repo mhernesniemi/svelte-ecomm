@@ -4,6 +4,7 @@
   import { toast } from "svelte-sonner";
   import { Button } from "$lib/components/admin/ui/button";
   import { Checkbox } from "$lib/components/admin/ui/checkbox";
+  import { Input } from "$lib/components/admin/ui/input";
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
   import AdminCard from "$lib/components/admin/AdminCard.svelte";
   import DeleteConfirmDialog from "$lib/components/admin/DeleteConfirmDialog.svelte";
@@ -168,13 +169,13 @@
                   >
                     Title <span class="text-red-500">*</span>
                   </label>
-                  <input
+                  <Input
                     type="text"
                     id="title"
                     name="title"
                     bind:value={title}
                     required
-                    class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                    class="shadow-sm"
                   />
                 </div>
 
@@ -185,13 +186,13 @@
                   >
                     Slug <span class="text-red-500">*</span>
                   </label>
-                  <input
+                  <Input
                     type="text"
                     id="slug"
                     name="slug"
                     bind:value={slug}
                     required
-                    class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                    class="shadow-sm"
                   />
                 </div>
               </div>
@@ -222,12 +223,12 @@
                     >
                       Title
                     </label>
-                    <input
+                    <Input
                       type="text"
                       id="translation_{lang.code}_title"
                       name="title_{lang.code}"
                       value={translationMap[lang.code]?.title ?? ""}
-                      class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                      class="shadow-sm"
                     />
                   </div>
 
@@ -238,12 +239,12 @@
                     >
                       Slug
                     </label>
-                    <input
+                    <Input
                       type="text"
                       id="translation_{lang.code}_slug"
                       name="slug_{lang.code}"
                       value={translationMap[lang.code]?.slug ?? ""}
-                      class="w-full rounded-lg border border-input-border px-3 py-2 shadow-sm"
+                      class="shadow-sm"
                     />
                   </div>
                 </div>

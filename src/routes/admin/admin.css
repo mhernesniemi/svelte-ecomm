@@ -15,7 +15,6 @@
 
 	--color-border: oklch(0.929 0.006 264);
 	--color-input-border: oklch(0.872 0.009 264);
-	--color-input-border-hover: oklch(0.75 0.012 264);
 
 	--color-hover: oklch(0.985 0.002 247);
 
@@ -37,7 +36,6 @@
 
 	--color-border: oklch(0.3 0.012 265);
 	--color-input-border: oklch(0.36 0.012 265);
-	--color-input-border-hover: oklch(0.46 0.012 265);
 
 	--color-hover: oklch(0.245 0.014 265);
 
@@ -45,48 +43,9 @@
 	--color-accent-subtle: oklch(0.24 0.03 265);
 }
 
-/* ── Input hover border ──────────────────────────────────────────── */
-[data-admin]
-	input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]):hover,
-[data-admin] textarea:hover,
-[data-admin] select:hover {
-	border-color: var(--color-input-border-hover);
-}
-
-/* ── Dark mode: override @tailwindcss/forms ──────────────────────── */
-[data-admin].dark select,
-[data-admin].dark [type="text"],
-[data-admin].dark [type="email"],
-[data-admin].dark [type="url"],
-[data-admin].dark [type="password"],
-[data-admin].dark [type="number"],
-[data-admin].dark [type="date"],
-[data-admin].dark [type="datetime-local"],
-[data-admin].dark [type="month"],
-[data-admin].dark [type="search"],
-[data-admin].dark [type="tel"],
-[data-admin].dark [type="time"],
-[data-admin].dark [type="week"],
-[data-admin].dark [multiple],
-[data-admin].dark textarea {
-	background-color: var(--color-surface);
-	border-color: var(--color-input-border);
-	color: var(--color-foreground);
-}
-
+/* ── Dark mode: select arrow ──────────────────────────────────────── */
 [data-admin].dark select {
 	background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-}
-
-[data-admin].dark input::placeholder,
-[data-admin].dark textarea::placeholder {
-	color: var(--color-placeholder);
-}
-
-[data-admin].dark [type="checkbox"],
-[data-admin].dark [type="radio"] {
-	background-color: var(--color-surface);
-	border-color: var(--color-input-border);
 }
 
 /* ── Dark mode: prose (rich text editor) ─────────────────────────── */

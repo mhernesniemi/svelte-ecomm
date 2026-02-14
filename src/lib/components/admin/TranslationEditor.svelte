@@ -1,5 +1,7 @@
 <script lang="ts">
   import { RichTextEditor } from "$lib/components/admin/ui/rich-text-editor";
+  import { Input } from "$lib/components/admin/ui/input";
+  import { Textarea } from "$lib/components/admin/ui/textarea";
   import { cn } from "$lib/utils";
   import { TRANSLATION_LANGUAGES, DEFAULT_LANGUAGE, LANGUAGES } from "$lib/config/languages.js";
   import Globe from "@lucide/svelte/icons/globe";
@@ -64,22 +66,21 @@
                 </label>
 
                 {#if field.type === "text"}
-                  <input
+                  <Input
                     type="text"
                     id="translation_{lang.code}_{field.name}"
                     name="{field.name}_{lang.code}"
                     form={formId}
                     value={translations[lang.code]?.[field.name] ?? ""}
-                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
+                    class="shadow-sm"
                   />
                 {:else if field.type === "textarea"}
-                  <textarea
+                  <Textarea
                     id="translation_{lang.code}_{field.name}"
                     name="{field.name}_{lang.code}"
                     form={formId}
-                    rows="4"
-                    class="w-full rounded-lg border border-input-border px-3 py-2 text-sm shadow-sm"
-                    >{translations[lang.code]?.[field.name] ?? ""}</textarea
+                    rows={4}
+                    class="shadow-sm">{translations[lang.code]?.[field.name] ?? ""}</Textarea
                   >
                 {:else if field.type === "richtext"}
                   <RichTextEditor
