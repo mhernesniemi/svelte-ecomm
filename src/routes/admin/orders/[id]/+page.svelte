@@ -42,7 +42,26 @@
       ><ChevronLeft class="h-4 w-4" /> Back to Orders</a
     >
   </div>
-  <h1 class="text-2xl font-bold">Order {data.order.code}</h1>
+  <div>
+    <h1 class="text-2xl font-bold">Order {data.order.code}</h1>
+    <dl class="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm">
+      <div class="flex gap-1.5">
+        <dt class="text-foreground-secondary">Order ID</dt>
+        <dd>{data.order.id}</dd>
+      </div>
+      {#if data.order.orderPlacedAt}
+        <div class="flex gap-1.5">
+          <dt class="text-foreground-secondary">Placed</dt>
+          <dd>{formatDateTime(data.order.orderPlacedAt)}</dd>
+        </div>
+      {:else}
+        <div class="flex gap-1.5">
+          <dt class="text-foreground-secondary">Created</dt>
+          <dd>{formatDateTime(data.order.createdAt)}</dd>
+        </div>
+      {/if}
+    </dl>
+  </div>
 
   <div class="flex flex-col gap-6 lg:flex-row">
     <!-- Main Content (Left) -->
@@ -76,8 +95,8 @@
         </div>
       </AdminCard>
 
-      <!-- Line Items -->
-      <AdminCard title="Items" noPadding>
+      <!-- Order Details -->
+      <AdminCard title="Order Details" noPadding>
         <div class="divide-y divide-border">
           {#each data.order.lines as line}
             <div class="flex items-center gap-4 px-6 py-4">
@@ -113,7 +132,7 @@
           {/each}
         </div>
 
-        <!-- Totals -->
+        <!-- Totals & Details -->
         <div class="border-t border-border px-6 py-4">
           <dl class="space-y-1.5 text-sm">
             <div class="flex justify-between">
@@ -271,26 +290,6 @@
           {/if}
         </AdminCard>
       {/if}
-
-      <!-- Details -->
-      <AdminCard title="Details" variant="sidebar">
-        <dl class="space-y-2 text-sm">
-          <div class="flex justify-between">
-            <dt class="text-foreground-secondary">Order ID</dt>
-            <dd>{data.order.id}</dd>
-          </div>
-          <div class="flex justify-between">
-            <dt class="text-foreground-secondary">Created</dt>
-            <dd>{formatDateTime(data.order.createdAt)}</dd>
-          </div>
-          {#if data.order.orderPlacedAt}
-            <div class="flex justify-between">
-              <dt class="text-foreground-secondary">Placed</dt>
-              <dd>{formatDateTime(data.order.orderPlacedAt)}</dd>
-            </div>
-          {/if}
-        </dl>
-      </AdminCard>
     </div>
   </div>
 </div>
