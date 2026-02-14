@@ -132,7 +132,9 @@
               <div class="flex min-w-0 flex-1 flex-col">
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
-                    <h4 class="truncate text-sm font-medium text-gray-900">{line.productName}</h4>
+                    <h4 class="truncate text-sm font-medium text-gray-900">
+                      {line.productName || "Untitled product"}
+                    </h4>
                     {#if line.variantName}
                       <p class="text-xs text-gray-500">{line.variantName}</p>
                     {/if}

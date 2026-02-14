@@ -383,8 +383,8 @@ export class OrderService {
 				taxAmount: lineTax.taxAmount,
 				unitPriceNet: lineTax.unitPriceNet,
 				lineTotalNet: lineTax.lineTotalNet,
-				productName: productTrans?.name ?? "Unknown Product",
-				variantName: variantTrans?.name ?? null,
+				productName: productTrans?.name || variant.name || "Unknown Product",
+				variantName: variantTrans?.name || variant.name || null,
 				sku: variant.sku
 			})
 			.returning();

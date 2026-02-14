@@ -687,7 +687,9 @@
                 </div>
                 <div class="flex min-w-0 flex-1 items-center justify-between gap-3">
                   <div class="min-w-0">
-                    <p class="text-sm font-medium text-gray-900">{line.productName}</p>
+                    <p class="text-sm font-medium text-gray-900">
+                      {line.productName || "Untitled product"}
+                    </p>
                     {#if line.variantName}
                       <p class="text-sm text-gray-500">{line.variantName}</p>
                     {/if}
