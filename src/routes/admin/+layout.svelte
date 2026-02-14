@@ -94,7 +94,7 @@
       <h1
         class={cn(
           "font-italic font-mono text-xl font-bold",
-          dark ? "text-blue-300" : "text-blue-600"
+          dark ? "text-blue-500" : "text-blue-600"
         )}
       >
         Hoikka
