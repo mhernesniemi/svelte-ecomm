@@ -92,10 +92,7 @@
 </script>
 
 {#snippet commentCell({ id, comment }: { id: number; comment: string | null })}
-  <a
-    href="/admin/reviews/{id}"
-    class="inline-block max-w-xs truncate font-medium text-foreground hover:underline"
-  >
+  <a href="/admin/reviews/{id}" class="inline-block max-w-xs truncate font-medium hover:underline">
     {comment ?? "-"}
   </a>
 {/snippet}

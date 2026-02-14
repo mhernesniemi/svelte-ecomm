@@ -72,7 +72,7 @@
 </script>
 
 {#snippet collectionCell({ name, id }: { name: string; id: number })}
-  <a href="/admin/collections/{id}" class="font-medium text-foreground hover:underline">
+  <a href="/admin/collections/{id}" class="font-medium hover:underline">
     {name}
   </a>
 {/snippet}
@@ -90,7 +90,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl leading-[40px] font-bold text-foreground">Collections</h1>
+      <h1 class="text-2xl leading-[40px] font-bold">Collections</h1>
     </div>
     {#if data.collections.length > 0}
       <Button type="button" onclick={() => (createDialogOpen = true)}>

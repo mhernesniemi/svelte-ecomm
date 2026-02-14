@@ -132,7 +132,7 @@
   method: string;
   id: number;
 })}
-  <a href="/admin/promotions/{id}" class="font-medium text-foreground hover:underline">
+  <a href="/admin/promotions/{id}" class="font-medium hover:underline">
     {method === "automatic" ? title : code}
   </a>
 {/snippet}
@@ -162,7 +162,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl leading-[40px] font-bold text-foreground">Promotions</h1>
+      <h1 class="text-2xl leading-[40px] font-bold">Promotions</h1>
     </div>
     {#if data.promotions.length > 0}
       <a href="/admin/promotions/new" class={buttonVariants()}

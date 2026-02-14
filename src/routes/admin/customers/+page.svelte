@@ -133,14 +133,14 @@
   firstName: string;
   lastName: string;
 })}
-  <a href="/admin/customers/{id}" class="font-medium text-foreground hover:underline">
+  <a href="/admin/customers/{id}" class="font-medium hover:underline">
     {firstName}
     {lastName}
   </a>
 {/snippet}
 
 {#snippet groupNameCell({ id, name }: { id: number; name: string })}
-  <a href="/admin/customers/groups/{id}" class="font-medium text-foreground hover:underline">
+  <a href="/admin/customers/groups/{id}" class="font-medium hover:underline">
     {name}
   </a>
 {/snippet}

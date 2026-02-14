@@ -312,7 +312,7 @@
         <ImageIcon class="h-5 w-5 text-placeholder" />
       </div>
     {/if}
-    <span class="font-medium text-foreground group-hover:underline">
+    <span class="font-medium group-hover:underline">
       {name}
     </span>
   </a>
@@ -538,9 +538,7 @@
               <div class="rounded-lg border border-border">
                 <!-- Card header -->
                 <div class="flex items-center justify-between border-b border-border px-4 py-2.5">
-                  <span class="text-sm font-medium text-foreground"
-                    >{getFieldLabel(filter.field)}</span
-                  >
+                  <span class="text-sm font-medium">{getFieldLabel(filter.field)}</span>
                   <button
                     type="button"
                     onclick={() => removeFilter(index)}

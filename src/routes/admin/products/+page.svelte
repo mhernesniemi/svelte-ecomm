@@ -86,7 +86,7 @@
         <ImageIcon class="h-5 w-5 text-placeholder" />
       </div>
     {/if}
-    <span class="font-medium text-foreground group-hover:underline">
+    <span class="font-medium group-hover:underline">
       {name}
     </span>
   </a>
@@ -105,7 +105,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl font-bold text-foreground">Products</h1>
+      <h1 class="text-2xl font-bold">Products</h1>
     </div>
     {#if data.products.length > 0}
       <Button type="button" onclick={() => (createDialogOpen = true)}>

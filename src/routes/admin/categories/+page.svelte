@@ -145,14 +145,14 @@
 
 <div>
   <div class="mb-6">
-    <h1 class="text-2xl leading-[40px] font-bold text-foreground">Categories</h1>
+    <h1 class="text-2xl leading-[40px] font-bold">Categories</h1>
   </div>
 
   {#if data.tree.length === 0}
     <!-- Empty state -->
     <div class="rounded-lg border border-dashed border-input-border p-12 text-center">
       <FolderOpen class="mx-auto h-12 w-12 text-placeholder" />
-      <h3 class="mt-2 text-sm font-medium text-foreground">No categories</h3>
+      <h3 class="mt-2 text-sm font-medium">No categories</h3>
       <p class="mt-1 text-sm text-muted-foreground">Get started by creating a root category.</p>
       <div class="mt-6">
         <Button type="button" onclick={() => openCreateDialog()}>Add Category</Button>
@@ -218,7 +218,7 @@
 
             <!-- Row content -->
             <div class="flex min-w-0 flex-1 items-center gap-3 py-2.5 pr-4">
-              <span class="text-sm font-medium text-foreground">{node.name}</span>
+              <span class="text-sm font-medium">{node.name}</span>
               <span class="truncate text-sm text-placeholder">{fullPath}</span>
               <span class="ml-auto flex shrink-0 items-center gap-3">
                 <span class="flex items-center gap-1.5">

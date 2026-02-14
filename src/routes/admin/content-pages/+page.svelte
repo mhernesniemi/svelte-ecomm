@@ -68,7 +68,7 @@
 </script>
 
 {#snippet titleCell({ id, title }: { id: number; title: string })}
-  <a href="/admin/content-pages/{id}" class="font-medium text-foreground hover:underline">
+  <a href="/admin/content-pages/{id}" class="font-medium hover:underline">
     {title || "Untitled"}
   </a>
 {/snippet}
@@ -86,7 +86,7 @@
 <div>
   <div class="mb-6 flex items-center justify-between">
     <div>
-      <h1 class="text-2xl leading-[40px] font-bold text-foreground">Content Pages</h1>
+      <h1 class="text-2xl leading-[40px] font-bold">Content Pages</h1>
     </div>
     {#if data.pages.length > 0}
       <Button onclick={() => (showCreatePage = true)}><PlusIcon class="h-4 w-4" /> Add Page</Button>

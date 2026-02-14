@@ -67,7 +67,7 @@
         <div>
           <h3 class="mb-1 text-sm font-medium text-foreground-secondary">Comment</h3>
           {#if data.review.comment}
-            <p class="whitespace-pre-wrap text-foreground">{data.review.comment}</p>
+            <p class="whitespace-pre-wrap">{data.review.comment}</p>
           {:else}
             <p class="text-placeholder">No comment</p>
           {/if}

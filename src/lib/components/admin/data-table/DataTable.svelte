@@ -120,7 +120,7 @@
       {@const Icon = emptyIcon}
       <Icon class="mx-auto h-12 w-12 text-placeholder" />
     {/if}
-    <h3 class="mt-2 text-sm font-medium text-foreground">{emptyTitle}</h3>
+    <h3 class="mt-2 text-sm font-medium">{emptyTitle}</h3>
     {#if emptyDescription}
       <p class="mt-1 text-sm text-muted-foreground">{emptyDescription}</p>
     {/if}

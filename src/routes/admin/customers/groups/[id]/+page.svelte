@@ -258,7 +258,7 @@
                 <div class="flex min-w-0 flex-1 items-center gap-3">
                   <a
                     href="/admin/customers/{customer.id}"
-                    class="text-sm font-medium text-foreground hover:underline"
+                    class="text-sm font-medium hover:underline"
                   >
                     {customer.firstName}
                     {customer.lastName}
@@ -288,9 +288,7 @@
       <AdminCard title="Tax" variant="sidebar">
         <div class="flex items-center gap-2">
           <Checkbox id="is_tax_exempt" bind:checked={isTaxExempt} />
-          <label for="is_tax_exempt" class="text-sm font-medium text-foreground">
-            Tax exempt
-          </label>
+          <label for="is_tax_exempt" class="text-sm font-medium"> Tax exempt </label>
         </div>
         <p class="mt-2 text-xs text-muted-foreground">
           Customers in this group will not be charged VAT

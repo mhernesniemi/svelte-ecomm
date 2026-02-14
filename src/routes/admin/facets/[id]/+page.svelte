@@ -299,7 +299,7 @@
                 class="flex items-center border-b border-border px-6 py-2.5 last:border-b-0 hover:bg-hover"
               >
                 <div class="flex min-w-0 flex-1 items-center gap-3">
-                  <span class="text-sm font-medium text-foreground">{value.name}</span>
+                  <span class="text-sm font-medium">{value.name}</span>
                   <span class="text-sm text-placeholder">{value.code}</span>
                   <span class="ml-auto flex shrink-0 items-center gap-3">
                     <span class="flex items-center gap-1.5">
